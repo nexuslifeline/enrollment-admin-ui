@@ -1,0 +1,82 @@
+<style scoped>
+  .background-blue{
+    background: #228cf7!important;
+  }
+  .box{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 500px;
+    padding: 40px;
+    box-sizing: border-box;
+    border-radius: 20px;
+  }
+</style>
+<template>
+  <b-container class="background-blue d-flex justify-content-center min-vh-100 min-vw-100">
+    <b-row>
+      <b-col>
+        <b-card-group>
+          <b-card class="box p-4">
+              <b-form>
+                <h3>Admin Login</h3>
+                <small>Welcome to Admistrator Portal</small><br><br>
+                <b-form-group>
+                  <label>Username</label>
+                  <b-form-input
+                    v-model="username"
+                    placeholder="Username"/>
+                </b-form-group>
+                <b-form-group>
+                  <label>Password</label>
+                  <b-form-input
+                    v-model="password"
+                    type="Password"
+                    placeholder="Password" />
+                </b-form-group>
+
+                <b-row alignHorizontal="end">
+                   <b-col md=4>
+                    <b-button @click="authLogin()" variant="outline-primary" block>Login</b-button>
+                  </b-col>
+                </b-row>
+              </b-form>
+          </b-card>
+        </b-card-group>
+      </b-col>
+    </b-row>
+  </b-container>
+</template>
+
+<script>
+import { AuthApi } from '../../mixins/api'
+export default {
+  name: 'Login',
+  mixins: [AuthApi],
+  data() {
+    return {
+      username: null,
+      password: null
+    }
+  },
+  methods: {
+    authLogin(){
+      this.login({ username: this.username, password: this.password })
+        .then(response => {
+          const res = response.data
+          this.$store.commit('loginUser')
+          localStorage.setItem('access_token', res.token.accessToken)
+          var student = res.student
+          this.$router.go({ name: 'Dashboard'})
+        })
+        .catch(response => {
+          console.log(response)
+        })
+    },
+    register(){
+      this.$router.push({name: 'Register'})
+    }
+  }
+}
+</script>
