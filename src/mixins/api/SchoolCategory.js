@@ -13,6 +13,9 @@ export default {
     },
     updateSchoolCategory(data, id) {
       return this.$http.put(`${apiPrefix}/${apiVersion}/school-categories/${id}`, data);
+    },
+    getLevelsOfSchoolCategoryList(schoolCategoryId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/school-categories/${schoolCategoryId}/levels`, { params: params })
     }
   }
 }

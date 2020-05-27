@@ -32,11 +32,11 @@
                   <label>Password</label>
                   <b-form-input
                     v-model="password"
-                    type="Password"
+                    type="password"
                     placeholder="Password" />
                 </b-form-group>
 
-                <b-row alignHorizontal="end">
+                <b-row align-h="end">
                    <b-col md=4>
                     <b-button @click="authLogin()" variant="outline-primary" block>Login</b-button>
                   </b-col>
@@ -66,17 +66,13 @@ export default {
         .then(response => {
           const res = response.data
           this.$store.commit('loginUser')
-          localStorage.setItem('access_token', res.token.accessToken)
-          var student = res.student
-          this.$router.go({ name: 'Dashboard'})
+          localStorage.setItem('access_token', res.accessToken)
+          this.$router.push({ name: 'Dashboard'})
         })
         .catch(response => {
           console.log(response)
         })
     },
-    register(){
-      this.$router.push({name: 'Register'})
-    }
   }
 }
 </script>

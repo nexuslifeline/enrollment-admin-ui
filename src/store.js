@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import token from './helpers/http'
 Vue.use(Vuex)
 
 const state = {
@@ -23,7 +22,6 @@ const mutations = {
     state[variable] = value
   },
   loginUser (state) {
-    token = localStorage.getItem('access_token')
     state.isLoggedIn = true
   },
   logoutUser (state) {
