@@ -3,17 +3,10 @@ import { apiVersion, apiPrefix } from './config';
 export default {
   methods: {
     getSubjectList(params) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects`, { params: params })
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects`, { params: params });
     },
-    getSubject(id) {
-
+    updateSubjectsOfLevel(levelId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/levels/${levelId}/subjects`, data);
     },
-    addSubject(data) {
-
-    },
-    updateSubject(data, id) {
-      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/subjects/` + id, data)
-    },
-    
   }
 }

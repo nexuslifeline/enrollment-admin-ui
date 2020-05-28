@@ -1,9 +1,3 @@
-<style scoped>
-.test:after {
-	content: '\2807';
-	font-size: 30px
-}
-</style>
 <template>
 	<div>
     <b-row>
@@ -13,14 +7,13 @@
 						<b-row>
 							<b-col md=9>
 								<b-tabs pills>
-									<b-tab @click='loadCoursesOfSchoolCategory(0)' active title='All' />    						
-									<b-tab v-for='schoolCategory in options.schoolCategories.items' :key='schoolCategory.id' 
-										@click='loadCoursesOfSchoolCategory(schoolCategory.id)' 
+									<b-tab active title='All' />    						
+									<b-tab v-for='schoolCategory in options.schoolCategories.items' :key='schoolCategory.id'
 										:title='schoolCategory.name'/>
 								</b-tabs>
 							</b-col>
 							<b-col md=3>
-								<b-form-select v-model='filters.student.courseId' :disabled='options.courses.items.length == 0' class='float-right w-100'>
+								<b-form-select v-model='filters.student.courseId' class='float-right w-100'>
 									<template v-slot:first>
 										<b-form-select-option :value='null' disabled>-- Course --</b-form-select-option>
 									</template>
@@ -49,7 +42,7 @@
 							</b-col>
 						</b-row> <!-- row button and search input -->
 						<b-table 
-							hover outlined small responsive show-empty
+							hover outlined small show-empty
 							:fields='tables.students.fields'
 							:items='tables.students.items'
 							:busy='tables.students.isBusy'
@@ -247,6 +240,7 @@ export default {
 	created(){
 		this.loadStudentList()
 		this.loadSchoolCategoryList()
+		this.loadCourseList()
 	},
 	methods: {
 		loadStudentList(){
@@ -271,9 +265,9 @@ export default {
 					this.options.schoolCategories.items = res
 				})
 		},
-		loadCoursesOfSchoolCategory(id){
+		loadCourseList(){
 			var params = { paginate: false }
-			this.getCoursesOfSchoolCategory(id, params)
+			this.getCourseList(params)
 			.then(response => {
 				const res = response.data
 				this.options.courses.items = res
