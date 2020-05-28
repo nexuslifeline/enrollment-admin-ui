@@ -31,6 +31,12 @@ export default [
         name: 'Curriculum',
         to: '/curriculum',
         icon: 'cil-layers'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Subject',
+        to: '/subject',
+        icon: 'cil-layers'
       }
     ]
   }
