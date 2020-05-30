@@ -76,14 +76,46 @@
 							<template v-slot:row-details>
 								<b-card>
 									<b-row>
-										<b-col md='6'>
-											<h4>Course</h4>
-											<h4>BSIT</h4>
-										</b-col>
-										<b-col md='6'>
-											<h4>Semester</h4>
-											<h4>1st Semester</h4>
-										</b-col>
+										<b-col md=12>
+                      <b-row>
+                        <b-col md=5>
+                          <h6>Course</h6>
+                          <h6>Bachelor of Science in Information Technology</h6>
+                        </b-col>
+                        <b-col md=2>
+                          <h6>Level</h6>
+                          <h6>First Year</h6>
+                        </b-col>
+                        <b-col md=2>
+                          <h6>Semester</h6>
+                          <h6>1st Semester</h6>
+                        </b-col>
+                        <b-col >
+                          <h6>SY</h6>
+                          <h6>2020-2021</h6>
+                        </b-col>
+                      </b-row>
+                      <b-row class='mt-2'> 
+                        <b-col md=12> 
+                          <b-table
+                            hover outlined small show-empty responsive
+                            :fields='tables.subjects.fields'
+                            :items='tables.subjects.items'
+                            :busy='tables.subjects.isBusy'
+                          >
+                          </b-table>
+                        </b-col>
+                      </b-row>
+                      <b-row >
+                        <b-col md=12>
+                          <b-row align-h='end'>
+                            <b-col md=2>
+                              <b-button block variant='outline-primary'>Update</b-button>
+                            </b-col>
+                          </b-row>
+                        </b-col>
+                      </b-row>
+                    </b-col>
 									</b-row>
 								</b-card>
 							</template>
@@ -208,7 +240,43 @@ export default {
 						},
 					],
 					items: []
-				}
+        },
+        subjects :{
+          isBusy: false,
+          fields: [
+            {
+							key: 'code',
+							label: 'Code',
+							tdClass: 'align-middle',
+							thStyle: { width: '15%'}
+            },
+            {
+							key: 'name',
+							label: 'Subject',
+							tdClass: 'align-middle',
+							thStyle: { width: '30%'}
+            },
+            {
+							key: 'description',
+							label: 'Description',
+							tdClass: 'align-middle',
+							thStyle: { width: 'auto'}
+            },
+            {
+							key: 'units',
+							label: 'Units',
+							tdClass: 'align-middle',
+							thStyle: { width: '15%'}
+            },
+            {
+							key: 'labs',
+							label: 'Labs',
+							tdClass: 'align-middle',
+							thStyle: { width: '15%'}
+						},
+          ]
+        },
+        items: []
 			},
 			paginations: {
 				student: {
