@@ -13,7 +13,6 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 //   baseURL: 'http://enrollment.test',
 //   timeout: 30000
 // }
-
 Vue.config.performance = true
 Vue.use(CoreuiVue)
 Vue.use(BootstrapVue)

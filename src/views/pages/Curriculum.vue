@@ -46,9 +46,9 @@
 								</b-col>
 							</b-row>
 							<b-row class='mb-3'>
-								<b-col md=6 offset-md="6">
+								<b-col md=6 offset-md='6'>
 									<b-button class='float-right' variant='outline-primary'
-										@click="showModalSubjects=true">
+										@click='showModalSubjects=true'>
 										<b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
 									</b-button>
 								</b-col>
@@ -66,15 +66,9 @@
 										responsive small hover outlined show-empty
 										:items.sync='forms.curriculum.fields.subjects'
 										:fields='tables.subjects.fields'
-										:busy="tables.subjects.isBusy">
-										<template v-slot:table-busy>
-											<div class="text-center text-danger my-2">
-												<b-spinner class="align-middle"></b-spinner>
-												<strong>Loading...</strong>
-											</div>
-										</template>
+										:busy='tables.subjects.isBusy'>
 										<template v-slot:cell(action)='row'>
-											<b-button @click="removeSubject(row)" size="sm" variant="danger"><b-icon-x></b-icon-x></b-button>
+											<b-button @click='removeSubject(row)' size='sm' variant='danger'><b-icon-x></b-icon-x></b-button>
 										</template>
 									</b-table>
 								</b-col>
@@ -92,27 +86,46 @@
 			v-model='showModalSubjects'
 			:noCloseOnEsc='true'
 			:noCloseOnBackdrop='true'
-			size="xl">
+			size='xl'>
 			<div slot='modal-title'> <!-- modal title -->
 					Subjects
 			</div> <!-- modal title -->
 			<b-row> <!-- modal body -->
 				<b-col md=12>
+          <b-row class='mb-2'>
+            <b-col offset-md='8' md='4'>
+              <b-form-input
+                v-model='filters.subject.criteria'
+                type='text' 
+                placeholder='Search'>
+              </b-form-input>
+            </b-col>
+          </b-row>
 					<b-table
 						small hover outlined show-empty
 						:items.sync='tables.subjects.items'
 						:fields='tables.subjects.fields'
-						:busy="tables.subjects.isBusy2">
-						<template v-slot:table-busy>
-							<div class="text-center text-danger my-2">
-								<b-spinner class="align-middle"></b-spinner>
-								<strong>Loading...</strong>
-							</div>
-						</template>
+            :filter='filters.subject.criteria'
+						:busy='tables.subjects.isBusy2'>
 						<template v-slot:cell(action)='row'>
-							<b-button @click="addSubject(row)" size="sm" variant="success"><b-icon-plus></b-icon-plus></b-button>
+							<b-button @click='addSubject(row)' size='sm' variant='success'><b-icon-plus></b-icon-plus></b-button>
 						</template>
 					</b-table>
+          <b-row>
+            <b-col md=6>
+              Showing {{paginations.subject.from}} to {{paginations.subject.to}} of {{paginations.subject.totalRows}} records.
+            </b-col>
+            <b-col md=6>
+              <b-pagination
+                v-model='paginations.subject.activePage'
+                :total-rows='paginations.subject.totalRows'
+                :per-page='paginations.subject.perPage'
+                size='sm'
+                align='end'
+                @input='loadSubjects()'
+              />
+            </b-col>
+          </b-row>
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot='modal-footer' class='w-100'><!-- modal footer buttons -->
@@ -181,6 +194,20 @@ export default {
 					items: []
 				}
 			},
+      paginations: {
+				subject: {
+					from: 0,
+					to: 0,
+					totalRows: 0,
+					activePage: 1,
+					perPage: 10,
+				}
+      },
+      filters: {
+        subject: {
+          criteria: null
+        }
+      },
 			options: {
 				schoolCategories: {
 					items: []
@@ -291,11 +318,15 @@ export default {
 		},
 		loadSubjects(){
 			this.tables.subjects.isBusy2 = true
-			var params = { paginate: true, perPage: 10 }
+			var params = { paginate: true, perPage: this.paginations.subject.perPage, page: this.paginations.subject.activePage }
 			this.getSubjectList(params)
 				.then(response => {
 					const res = response.data
-					this.tables.subjects.items = res.data
+          this.tables.subjects.items = res.data
+          this.paginations.subject.from = res.meta.from
+					this.paginations.subject.to = res.meta.to
+					this.paginations.subject.totalRows = res.meta.total
+					this.paginations.subject.pages = res.meta.lastPage
 					this.tables.subjects.isBusy2 = false
 				})
 		},
