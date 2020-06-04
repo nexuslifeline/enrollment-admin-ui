@@ -8,16 +8,17 @@ import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
+
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 // const axiosConfig = {
 //   baseURL: 'http://enrollment.test',
 //   timeout: 30000
 // }
-
 Vue.config.performance = true
 Vue.use(CoreuiVue)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
+Vue.component('vue-autonumeric', require('vue-autonumeric'))
 //import axios from 'axios'
 Vue.prototype.$log = console.log.bind(console)
 

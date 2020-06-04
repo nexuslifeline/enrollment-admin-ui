@@ -8,7 +8,7 @@
 							<b-col md=9>
 								<b-tabs pills>
 									<b-tab active title="All" />    						
-									<b-tab v-for="schoolCategory in options.schoolCategories.items" :key="schoolCategory.id"
+									<b-tab v-for="schoolCategory in options.schoolCategories.items" :key="schoolCategory.id" 
 										:title="schoolCategory.name"/>
 								</b-tabs>
 							</b-col>
@@ -41,14 +41,14 @@
 								</b-form-input>
 							</b-col>
 						</b-row> <!-- row button and search input -->
-						<b-table 
-							hover outlined small show-empty
+						<b-table
+							details-td-class="table-secondary"
+							hover outlined small responsive show-empty
 							:fields="tables.students.fields"
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 							:filter="filters.student.criteria"
-							:filter-included-fields="tables.students.filterIncludedFields"
-						>
+							:filter-included-fields="tables.students.filterIncludedFields">
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
@@ -69,28 +69,104 @@
 								<small>Details</small>
 							</template>
 							<template v-slot:cell(action)="row">
-								<b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
-									<template v-slot:button-content>
-										<b-icon-grip-horizontal></b-icon-grip-horizontal>
-									</template>
-									<b-dropdown-item @click="showModalApproval=true">Approve</b-dropdown-item>
-									<b-dropdown-item @click="showModalRejection=true">Reject</b-dropdown-item>
-									<b-dropdown-item @click="row.toggleDetails">View Details</b-dropdown-item>
-								</b-dropdown>
+								<b-icon-caret-down @click="row.toggleDetails"></b-icon-caret-down>
 							</template>
 							<template v-slot:row-details>
+								<b-row>
+									<b-col md="4">
+										<h6>Course</h6>
+										<h6>Bachelor of Science in Information Technology</h6>
+									</b-col>
+									<b-col md="2">
+										<h6>Level</h6>
+										<h6>First Year</h6>
+									</b-col>
+									<b-col md="2">
+										<h6>Semester</h6>
+										<h6>1st Semester</h6>
+									</b-col>
+									<b-col md="2">
+										<h6>S.Y.</h6>
+										<h6>2019-2020</h6>
+									</b-col>
+									<b-col md="2">
+										<h6>Student Type</h6>
+										<h6>Regular</h6>
+									</b-col>
+								</b-row>
 								<b-card>
-									<b-row>
-										<b-col md="6">
-											<h4>Course</h4>
-											<h4>BSIT</h4>
+									<b-table
+										hover outlined small responsive show-empty
+										:fields="tables.subjects.fields"
+										:items="tables.subjects.items"
+										:busy="tables.subjects.isBusy">
+									</b-table>
+									<template v-slot:footer>
+										<b-row>
+											<b-col md=10>
+												<h5 class="float-right font-weight-bold">TUITION FEE</h5>
+											</b-col>
+											<b-col md=2>
+												<h5 class="float-right pr-2 font-weight-bold">P1,400.00</h5>
+											</b-col>
+										</b-row>
+									</template>
+								</b-card>
+								<b-card>
+									<b-row class="mb-3">
+										<b-col md=6>
+											<h5>STUDENT FEES</h5>
 										</b-col>
-										<b-col md="6">
-											<h4>Semester</h4>
-											<h4>1st Semester</h4>
+										<b-col md=6>
+											<b-button 
+                        variant="outline-primary" 
+                        class="float-right">
+                        <b-icon-plus-circle></b-icon-plus-circle> New Item
+                      </b-button>
 										</b-col>
 									</b-row>
+									<b-table
+										hover outlined small responsive show-empty
+										:fields="tables.fees.fields"
+										:items="tables.fees.items"
+										:busy="tables.fees.isBusy">
+									</b-table>
+									<template v-slot:footer>
+										<b-row>
+											<b-col md=2>
+												<h5 class="font-weight-bold pt-1">UPON ENROLLMENT FEE: </h5>
+											</b-col>
+											<b-col md=2>
+												<b-form-input></b-form-input>
+											</b-col>
+											<b-col md=2>
+												<h5 class="font-weight-bold pt-1">PREVIOUS BALANCE: </h5>
+											</b-col>
+											<b-col md=2>
+												<b-form-input></b-form-input>
+											</b-col>
+											<b-col md=2>
+												<h5 class="float-right font-weight-bold">Total</h5>
+											</b-col>
+											<b-col md=2>
+												<h5 class="float-right font-weight-bold">P5,400.00</h5>
+											</b-col>
+										</b-row>
+									</template>
 								</b-card>
+								<b-row class="mb-3">
+									<b-col md=12>
+										<b-button 
+                      class="float-left ml-2">
+                      Cancel
+                    </b-button>
+										<b-button 
+                      class="float-right mr-2" 
+                      variant="outline-primary">
+                      Approve
+                    </b-button>
+									</b-col>
+								</b-row>
 							</template>
 						</b-table>
 						<b-row>
@@ -112,77 +188,16 @@
 				</b-card>
       </b-col>
     </b-row>
-		<!-- Modal Approval -->
-		<b-modal 
-			v-model="showModalApproval"
-			centered
-			header-bg-variant="success"
-			header-text-variant="light"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					Finalize Approval
-			</div> <!-- modal title -->
-			<b-row> <!-- modal body -->
-				<b-col md=12>
-					<label>Notes</label>
-					<b-textarea 
-						rows=7 />
-				</b-col>
-			</b-row> <!-- modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
-          @click="showModalApproval=false">
-          Cancel
-        </b-button>
-				<b-button class="float-right" variant="outline-primary">
-					Confirm
-				</b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
-		<!-- Modal Approval -->
-		<!-- Modal Reject --> 
-		<b-modal 
-			v-model="showModalRejection"
-			centered
-			header-bg-variant="danger"
-			header-text-variant="light"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					Confirm Rejection
-			</div> <!-- modal title -->
-			<b-row> <!-- modal body -->
-				<b-col md=12>
-					<label>Reason</label>
-					<b-textarea
-						rows=7 />
-				</b-col>
-			</b-row> <!-- modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
-          @click="showModalRejection=false">
-          Cancel
-        </b-button>
-				<b-button class="float-right" variant="outline-primary">
-					Confirm
-				</b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
-		<!-- Modal Approval -->
 	</div> <!-- main container -->
 </template>
 <script>
 import { StudentApi, SchoolCategoryApi, CourseApi } from "../../mixins/api"
 export default {
-	name: "Student",
+	name: "StudentFee",
 	mixins: [StudentApi, SchoolCategoryApi, CourseApi],
 	data() {
 		return {
-			showModalApproval: false,
-			showModalRejection: false,
+			course: 0,
 			tables: {
 				students: {
 					isBusy: false,
@@ -200,13 +215,6 @@ export default {
 								item.name = item.firstName + " " + item.middleName + " " + item.lastName
 							} 
 						},
-						// {
-						// 	key: "name",
-						// 	label: "",
-						// 	tdClass: "align-middle",
-						// 	thStyle: { width: "45%" },
-							
-						// },
 						{
 							key: "education",
 							label: "Education",
@@ -221,11 +229,80 @@ export default {
 						},
 					],
 					items: []
+				},
+				subjects: {
+					isBusy: false,
+					fields: [
+						{
+							key: "code",
+							label: "CODE",
+							tdClass: "align-middle",
+							thStyle: { width: "10%"}
+						},
+						{
+							key: "name",
+							label: "SUBJECT",
+							tdClass: "align-middle",
+							thStyle: { width: "20%"}
+						},
+						{
+							key: "description",
+							label: "DESCRIPTION",
+							tdClass: "align-middle",
+							thStyle: { width: "25%"}
+						},
+						{
+							key: "units",
+							label: "UNIT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: { width: "8%"}
+						},
+						{
+							key: "amount_per_unit",
+							label: "UNIT AMOUNT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: { width: "15%"}
+						},
+						{
+							key: "total_amount",
+							label: "LINE TOTAL",
+							tdClass: "align-middle text-right",
+							thClass: "text-right"
+						}
+					],
+					items: []
+				},
+				fees: {
+					isBusy: false,
+					fields: [
+						{
+							key: "name",
+							label: "NAME",
+							tdClass: "align-middle",
+							thStyle: { width: "30%"}
+						},
+						{
+							key: "notes",
+							label: "NOTES",
+							tdClass: "align-middle",
+							thStyle: { width: "30%"}
+						},
+						{
+							key: "amount",
+							label: "AMOUNT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: { width: "40%"}
+						}
+					],
+					items: []
 				}
 			},
 			paginations: {
 				student: {
-					from: 0,
+          from: 0,
 					to: 0,
 					totalRows: 0,
 					page: 1,
