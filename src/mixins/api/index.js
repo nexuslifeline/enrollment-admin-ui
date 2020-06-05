@@ -5,3 +5,5 @@ export { default as CourseApi } from './Course';
 export { default as LevelApi } from './Level';
 export { default as SemesterApi } from './Semester';
 export { default as SubjectApi } from './Subject';
+export { default as RateSheetApi } from './RateSheet';
+export { default as SchoolFeeApi } from './SchoolFee';
