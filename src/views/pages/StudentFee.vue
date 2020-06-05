@@ -8,7 +8,8 @@
 							<b-col md=9>
 								<b-tabs pills>
 									<b-tab active title="All" />    						
-									<b-tab v-for="schoolCategory in options.schoolCategories.items" :key="schoolCategory.id" 
+									<b-tab v-for="schoolCategory in options.schoolCategories.values"
+										:key="schoolCategory.id" 
 										:title="schoolCategory.name"/>
 								</b-tabs>
 							</b-col>
@@ -17,7 +18,10 @@
 									<template v-slot:first>
 										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 									</template>
-									<b-form-select-option v-for="course in options.courses.items" :key="course.id" :value="course.id">
+									<b-form-select-option 
+										v-for="course in options.courses.items" 
+										:key="course.id" 
+										:value="course.id">
 										{{course.name}}
 									</b-form-select-option>
 								</b-form-select>
@@ -191,10 +195,11 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, SchoolCategoryApi, CourseApi } from "../../mixins/api"
+import { StudentApi, CourseApi } from "../../mixins/api"
+import { SchoolCategories } from "../../helpers/enum"
 export default {
 	name: "StudentFee",
-	mixins: [StudentApi, SchoolCategoryApi, CourseApi],
+	mixins: [StudentApi, CourseApi],
 	data() {
 		return {
 			course: 0,
@@ -321,15 +326,12 @@ export default {
 				courses: {
 					items: []
 				},
-				schoolCategories: {
-					items: []
-				},
+				schoolCategories: SchoolCategories
 			}
 		}
 	},
 	created(){
 		this.loadStudentList()
-		this.loadSchoolCategoryList()
 		this.loadCourseList()
 	},
 	methods: {
@@ -345,14 +347,6 @@ export default {
 					this.paginations.student.to = res.meta.to
 					this.paginations.student.totalRows = res.meta.total
 					this.tables.students.isBusy = false
-				})
-		},
-		loadSchoolCategoryList(){
-			var params = { paginate: false }
-			this.getSchoolCategoryList(params)
-				.then(response => {
-					const res = response.data
-					this.options.schoolCategories.items = res
 				})
 		},
 		loadCourseList(){
