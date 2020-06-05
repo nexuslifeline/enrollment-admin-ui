@@ -107,50 +107,78 @@
       <b-row>
         <b-col md=6>
           <b-form-group label="Units">
-            <b-form-input 
-              type="number" 
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.units" />
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="units"
+              v-model='forms.subject.fields.units'
+              :class="'form-control text-right'"
+              :options="[{ 
+                decimalPlaces: 0,
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
         <b-col md=6>
           <b-form-group label="Amount per Unit">
-            <b-form-input 
-              type="number"
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.amountPerUnit" />
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="amountPerUnit"
+              v-model='forms.subject.fields.amountPerUnit'
+              :class="'form-control text-right'"
+              :options="[{ 
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
       </b-row>
       <b-row>
         <b-col md=6>
           <b-form-group label="Labs">
-            <b-form-input 
-              type="number" 
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.labs" />
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="labs"
+              v-model='forms.subject.fields.labs'
+              :class="'form-control text-right'"
+              :options="[{ 
+                decimalPlaces: 0,
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
         <b-col md=6>
           <b-form-group label="Amount per Lab">
-            <b-form-input 
-              type="number" 
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.amountPerLab" />
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="amountPerLab"
+              v-model='forms.subject.fields.amountPerLab'
+              :class="'form-control text-right'"
+              :options="[{ 
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
       </b-row>
       <b-row>
         <b-col offset-md=6 md=6>
           <b-form-group label="Total Amount">
-            <b-form-input 
-              disabled type="number" 
-              class="text-right" 
-              v-model="forms.subject.fields.totalAmount" />
+            <vue-autonumeric
+              :disabled="true"
+              ref="totalAmount"
+              v-model='forms.subject.fields.totalAmount'
+              :class="'form-control text-right'"
+              :options="[{ 
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
       </b-row>

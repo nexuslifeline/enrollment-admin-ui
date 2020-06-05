@@ -8,7 +8,9 @@
 							<b-row>
 								<b-col md=12>
 									<b-tabs pills> 						
-										<b-tab v-for="schoolCategory in options.schoolCategories.items" :key="schoolCategory.id" 
+										<b-tab 
+											v-for="schoolCategory in options.schoolCategories.values" 
+											:key="schoolCategory.id" 
 											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
 											:title="schoolCategory.name"/>
 									</b-tabs>
@@ -22,21 +24,31 @@
 									<b-alert show>
 										<b-row>
 											<b-col md=3>
-												<b-form-select v-model="forms.curriculum.fields.courseId">
+												<b-form-select 
+													@change="loadSubjectsOfLevelList()" 
+													v-model="forms.curriculum.fields.courseId">
 													<template v-slot:first>
 														<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 													</template>
-													<b-form-select-option v-for="course in options.courses.items" :key="course.id" :value="course.id">
+													<b-form-select-option
+														v-for="course in options.courses.items" 
+														:key="course.id" 
+														:value="course.id">
 														{{course.name}}
 													</b-form-select-option>
 												</b-form-select>
 											</b-col>
 											<b-col md=3>
-												<b-form-select v-model="forms.curriculum.fields.semesterId">
+												<b-form-select 
+													@change="loadSubjectsOfLevelList()" 
+													v-model="forms.curriculum.fields.semesterId">
 													<template v-slot:first>
 														<b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
 													</template>
-													<b-form-select-option v-for="semester in options.semesters.items" :key="semester.id" :value="semester.id">
+													<b-form-select-option 
+														v-for="semester in options.semesters.values"
+														:key="semester.id" 
+														:value="semester.id">
 														{{semester.name}}
 													</b-form-select-option>
 												</b-form-select>
@@ -149,6 +161,7 @@
 </template>
 <script>
 import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi } from "../../mixins/api"
+import { SchoolCategories, Semesters } from "../../helpers/enum"
 export default {
 	name: "Curriculum",
 	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi ],
@@ -222,44 +235,26 @@ export default {
         }
       },
 			options: {
-				schoolCategories: {
-					items: []
-				},
+				schoolCategories: SchoolCategories,
 				levels: {
 					items: []
 				},
 				courses: {
 					items: []
 				},
-				semesters: {
-					items: []
-				}
+				semesters: Semesters
 			},
 			levelIndex: 0
 		}
 	},
 	created(){
-		this.loadSchoolCategoryList()
-		this.loadSemesterList()
+		this.loadLevelsOfSchoolCategoryList(this.options.schoolCategories.getEnum(1).id)
 		this.loadSubjects()
 	},
 	methods: {
-		loadSchoolCategoryList(){
-			this.isLoaded = true
-			var params = { paginate: false }
-			this.getSchoolCategoryList(params)
-				.then(response => {
-					const res = response.data
-					this.options.schoolCategories.items = res
-					this.loadLevelsOfSchoolCategoryList(res[0].id)
-					this.isLoaded = false
-				})
-				.catch(error => {
-					console.log(error)
-				})
-		},
 		loadLevelsOfSchoolCategoryList(id){
 			this.isLoaded = true
+			this.options.courses.items = []
 			this.forms.curriculum.fields.schoolCategoryId = id
 			var params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(id, params)
@@ -267,18 +262,22 @@ export default {
 					const res = response.data
 					this.options.levels.items = res
 					this.levelIndex = 0
-					this.loadCoursesOfLevelList(res[0].id)
+					if (res.length > 0) {
+						this.loadCoursesOfLevelList(res[0].id)
+					} else {
+						this.forms.curriculum.fields.subjects = []
+					}
 					this.isLoaded = false
 				})
 				.catch(error => {
 					console.log(error)
 				})
 		},
-		loadSubjectsOfLevelList(id){
+		loadSubjectsOfLevelList(){
       this.tables.subjects.isBusy = true
-      const { courseId, semesterId } = this.forms.curriculum.fields
+      const { levelId, courseId, semesterId } = this.forms.curriculum.fields
 			var params = { courseId, semesterId , paginate : false }
-			this.getSubjectsOfLevelList(id, params)
+			this.getSubjectsOfLevelList(levelId, params)
 				.then(response => {
 					const res = response.data
 					this.forms.curriculum.fields.subjects = res
@@ -300,7 +299,7 @@ export default {
 						this.forms.curriculum.fields.courseId = this.options.courses.items[0].id
 					}
 					
-					this.loadSubjectsOfLevelList(levelId)
+					this.loadSubjectsOfLevelList()
 					this.isLoaded = false
 				})
 		},
