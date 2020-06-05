@@ -195,20 +195,27 @@ export default {
 							key: "name",
 							label: "SUBJECT",
 							tdClass: "align-middle",
-							thStyle: {width: "25%"}
+							thStyle: {width: "20%"}
 						},
 						{
 							key: "description",
 							label: "DESCRIPTION",
 							tdClass: "align-middle",
-							thStyle: {width: "35%"}
+							thStyle: {width: "30%"}
+            },
+            {
+							key: "labs",
+							label: "LAB UNITS",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "15%"}
 						},
 						{
 							key: "units",
 							label: "UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "20%"}
+							thStyle: {width: "15%"}
 						},
 						{
 							key: "action",
@@ -291,12 +298,13 @@ export default {
 			var params = { paginate: false, schoolCategoryId }
 			this.getCoursesOfLevelList(levelId, params)
 				.then(response => {
-					const res = response.data
-					this.options.courses.items = res
+          const res = response.data
+          const { courses, semesters } = this.options
+					courses.items = res
 
 					if(res.length > 0){
-						this.forms.curriculum.fields.semesterId = this.options.semesters.items[0].id
-						this.forms.curriculum.fields.courseId = this.options.courses.items[0].id
+						this.forms.curriculum.fields.semesterId = semesters.getEnum(1).id
+						this.forms.curriculum.fields.courseId = courses.items[0].id
 					}
 					
 					this.loadSubjectsOfLevelList()

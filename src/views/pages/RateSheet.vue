@@ -226,7 +226,7 @@ export default {
       },
 			tables: {
 				rateSheetFees: {
-          isbusy: false,
+          isBusy: false,
 					fields: [
 						{
 							key: "name",
@@ -325,8 +325,9 @@ export default {
     },
     levelName() {
       const { fields } = this.forms.rateSheet
-      if (fields.levelId) {
-        return this.options.levels.items.find(i => i.id == fields.levelId).name
+      let level = this.options.levels.items.find(i => i.id == fields.levelId)
+      if (level) {
+        return level.name
       }
     }
   },
@@ -369,7 +370,7 @@ export default {
           courses.items = res
           
 					if(res.length > 0){
-            rateSheet.fields.semesterId = semesters.items[0].id
+            rateSheet.fields.semesterId = semesters.getEnum(1).id
             rateSheet.fields.courseId = courses.items[0].id
 					}
 					
