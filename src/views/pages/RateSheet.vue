@@ -1,6 +1,6 @@
 <template>
 	<div>
-    <b-overlay :show='isLoaded' rounded='sm'>
+    <b-overlay :show="isLoaded" rounded="sm">
       <b-row>
         <b-col md=12>
           <b-card>
@@ -8,35 +8,46 @@
               <b-row>
                 <b-col md=12>
                   <b-tabs pills  > 						
-                    <b-tab v-for='schoolCategory in options.schoolCategories.items' :key='schoolCategory.id' 
-                      @click='loadLevelsOfSchoolCategoryList(schoolCategory.id)'
-                      :title='schoolCategory.name'/>
+                    <b-tab v-for="schoolCategory in options.schoolCategories.values" 
+                      :key="schoolCategory.id" 
+                      @click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
+                      :title="schoolCategory.name"/>
                   </b-tabs>
                 </b-col>
               </b-row>
               <hr>
               <h4>Rate Sheet</h4>
               <p>Lorem ipsum dolor sit amet.</p>
-              <b-row v-show='options.courses.items.length	> 0'>
-                <b-col offset-md='2' md=10>
+              <b-row v-show="options.courses.items.length	> 0">
+                <b-col offset-md="2" md=10>
                   <b-alert show>
                     <b-row>
                       <b-col md=3>
-                        <b-form-select v-model='forms.rateSheet.fields.courseId' @input=loadFeesOfLevel()>
+                        <b-form-select 
+                          v-model="forms.rateSheet.fields.courseId" 
+                          @change="loadFeesOfLevel()">
                           <template v-slot:first>
-                            <b-form-select-option :value='null' disabled>-- Course --</b-form-select-option>
+                            <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
                           </template>
-                          <b-form-select-option v-for='course in options.courses.items' :key='course.id' :value='course.id'>
+                          <b-form-select-option 
+                            v-for="course in options.courses.items" 
+                            :key="course.id" 
+                            :value="course.id">
                             {{course.name}}
                           </b-form-select-option>
                         </b-form-select>
                       </b-col>
                       <b-col md=3>
-												<b-form-select v-model='forms.rateSheet.fields.semesterId' @input=loadFeesOfLevel()>
+												<b-form-select 
+                          v-model="forms.rateSheet.fields.semesterId" 
+                          @change="loadFeesOfLevel()">
 													<template v-slot:first>
-														<b-form-select-option :value='null' disabled>-- Semester --</b-form-select-option>
+														<b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
 													</template>
-													<b-form-select-option v-for='semester in options.semesters.items' :key='semester.id' :value='semester.id'>
+													<b-form-select-option 
+                            v-for="semester in options.semesters.values" 
+                            :key="semester.id" 
+                            :value="semester.id">
 														{{ semester.name }}
 													</b-form-select-option>
 												</b-form-select>
@@ -49,43 +60,43 @@
                 <b-col md=2>
                 </b-col>
                 <b-col md=4>
-                  <h5>Student Fees - {{  }} </h5>
+                  <h5>Student Fees - {{ levelName }}</h5>
                 </b-col>
                 <b-col md=6>
                   <b-button 
                     class="float-right" 
                     variant="outline-primary"
-                    @click='showModalFees=true'
+                    @click="showModalFees=true"
                   ><b-icon-plus-circle></b-icon-plus-circle> ADD NEW ITEM</b-button>
                 </b-col>
               </b-row>
               <b-row>
                 <b-col md=2>
-                  <b-tabs pills vertical v-model='levelIndex'>
-                    <b-tab v-for='level in options.levels.items' :key='level.id' 
-                      @click='loadCoursesOfLevelList(level.id)'
-                      :title='level.name'/>
+                  <b-tabs pills vertical v-model="levelIndex">
+                    <b-tab v-for="level in options.levels.items" :key="level.id" 
+                      @click="loadCoursesOfLevelList(level.id)"
+                      :title="level.name"/>
                   </b-tabs>
                 </b-col>
                 <b-col md=10>
                   <b-table
                     responsive small hover outlined show-empty
-                    :items.sync='forms.rateSheet.fields.fees'
-                    :fields='tables.rateSheetFees.fields'
-                    :busy='tables.rateSheetFees.isBusy'>
-                    <template v-slot:cell(pivot.amount)='row'>
-                      <!-- <b-form-input v-model='row.item.pivot.amount' style='text-align: right'/> -->
+                    :items.sync="forms.rateSheet.fields.fees"
+                    :fields="tables.rateSheetFees.fields"
+                    :busy="tables.rateSheetFees.isBusy">
+                    <template v-slot:cell(pivot.amount)="row">
+                      <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <vue-autonumeric
                         v-model="row.item.pivot.amount"
-                        :class="'form-control text-right'" 
+                        class="form-control text-right" 
                         :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
                       </vue-autonumeric>
                     </template>
-                    <template v-slot:cell(pivot.notes)='row'>
-                      <b-form-input v-model='row.item.pivot.notes' style='text-align: right'/>
+                    <template v-slot:cell(pivot.notes)="row">
+                      <b-form-input v-model="row.item.pivot.notes" style="text-align: right"/>
                     </template>
-                    <template v-slot:cell(action)='row'>
-											<b-button @click='removeFee(row)' size='sm' variant='danger'><b-icon-x></b-icon-x></b-button>
+                    <template v-slot:cell(action)="row">
+											<b-button @click="removeFee(row)" size="sm" variant="danger"><b-icon-x></b-icon-x></b-button>
 										</template>
                   </b-table>
                   <hr>
@@ -96,21 +107,21 @@
                           <h6 class="font-weight-bold pt-1">UPON ENROLLMENT FEE : </h6>
                         </b-col>
                         <b-col md=5>
-                          <b-form-input v-model='forms.rateSheet.fields.enrollmentFee'></b-form-input>
+                          <b-form-input v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input>
                         </b-col>
                       </b-row> -->
                       <b-form-group
-                        label='UPON ENROLLMENT FEE'
-                        label-for='enrollmentFee'
-                        label-cols='5'>
+                        label="UPON ENROLLMENT FEE"
+                        label-for="enrollmentFee"
+                        label-cols="5">
                         <vue-autonumeric
-                          id='enrollmentFee'
-                          v-model='forms.rateSheet.fields.enrollmentFee'
-                          :class="'form-control text-right'"
+                          id="enrollmentFee"
+                          v-model="forms.rateSheet.fields.enrollmentFee"
+                          class="form-control text-right"
                           style="width: 70%"
                           :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                         </vue-autonumeric>
-                        <!-- <b-form-input id='enrollmentFee' v-model='forms.rateSheet.fields.enrollmentFee'></b-form-input> -->
+                        <!-- <b-form-input id="enrollmentFee" v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input> -->
                       </b-form-group>
                     </b-col>
                     <b-col md=6 >
@@ -140,32 +151,32 @@
     </b-overlay>
     <!-- MODAL SUBJECT -->
 		<b-modal 
-			v-model='showModalFees'
-			:noCloseOnEsc='true'
-			:noCloseOnBackdrop='true'
-			size='xl'>
-			<div slot='modal-title'> <!-- modal title -->
+			v-model="showModalFees"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true"
+			size="xl">
+			<div slot="modal-title"> <!-- modal title -->
 					School Fees
 			</div> <!-- modal title -->
 			<b-row> <!-- modal body -->
 				<b-col md=12>
-          <b-row class='mb-2'>
-            <b-col offset-md='8' md='4'>
+          <b-row class="mb-2">
+            <b-col offset-md="8" md="4">
               <b-form-input
-                v-model='filters.fee.criteria'
-                type='text' 
-                placeholder='Search'>
+                v-model="filters.fee.criteria"
+                type="text" 
+                placeholder="Search">
               </b-form-input>
             </b-col>
           </b-row>
 					<b-table
 						small hover outlined show-empty
-						:items.sync='tables.fees.items'
-						:fields='tables.fees.fields'
-            :filter='filters.fee.criteria'
-						:busy='tables.fees.isBusy2'>
-						<template v-slot:cell(action)='row'>
-							<b-button @click='addFee(row)' size='sm' variant='success'><b-icon-plus></b-icon-plus></b-button>
+						:items.sync="tables.fees.items"
+						:fields="tables.fees.fields"
+            :filter="filters.fee.criteria"
+						:busy="tables.fees.isBusy2">
+						<template v-slot:cell(action)="row">
+							<b-button @click="addFee(row)" size="sm" variant="success"><b-icon-plus></b-icon-plus></b-button>
 						</template>
 					</b-table>
           <b-row>
@@ -174,27 +185,28 @@
             </b-col>
             <b-col md=6>
               <b-pagination
-                v-model='paginations.fee.activePage'
-                :total-rows='paginations.fee.totalRows'
-                :per-page='paginations.fee.perPage'
-                size='sm'
-                align='end'
-                @input='loadSubjects()'
+                v-model="paginations.fee.activePage"
+                :total-rows="paginations.fee.totalRows"
+                :per-page="paginations.fee.perPage"
+                size="sm"
+                align="end"
+                @input="loadSubjects()"
               />
             </b-col>
           </b-row>
 				</b-col>
 			</b-row> <!-- modal body -->
-			<div slot='modal-footer' class='w-100'><!-- modal footer buttons -->
-				<b-button class='float-left' @click='showModalFees=false'>Close</b-button>
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button class="float-left" @click="showModalFees=false">Close</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 	</div> <!-- main container -->
 </template>
 <script>
-import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from '../../mixins/api'
+import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
+import { SchoolCategories, Semesters } from "../../helpers/enum"
 export default {
-	name: 'RateSheet',
+	name: "RateSheet",
 	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi ],
 	data() {
 		return {
@@ -217,30 +229,30 @@ export default {
           isbusy: false,
 					fields: [
 						{
-							key: 'name',
-							label: 'NAME',
-							tdClass: 'align-middle',
-							thStyle: {width: 'auto'}
+							key: "name",
+							label: "NAME",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
 						},
 						{
-							key: 'pivot.notes',
-							label: 'NOTES',
-							tdClass: 'align-middle',
-							thStyle: {width: '40%'}
+							key: "pivot.notes",
+							label: "NOTES",
+							tdClass: "align-middle",
+							thStyle: {width: "40%"}
 						},
 						{
-							key: 'pivot.amount',
-							label: 'AMOUNT',
-							tdClass: 'align-middle text-right',
-							thClass: 'text-right',
-							thStyle: {width: '30%'}
+							key: "pivot.amount",
+							label: "AMOUNT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "30%"}
             },
             {
-							key: 'action',
-							label: '',
-							tdClass: 'align-middle text-right',
-							thClass: 'text-right',
-							thStyle: {width: '5px'}
+							key: "action",
+							label: "",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "5px"}
 						}
           ],
         },
@@ -248,23 +260,23 @@ export default {
           isBusy: false,
           	fields: [
 						{
-							key: 'name',
-							label: 'NAME',
-							tdClass: 'align-middle',
-							thStyle: {width: '30%'}
+							key: "name",
+							label: "NAME",
+							tdClass: "align-middle",
+							thStyle: {width: "30%"}
 						},
 						{
-							key: 'description',
-							label: 'Description',
-							tdClass: 'align-middle',
-							thStyle: {width: '40%'}
+							key: "description",
+							label: "Description",
+							tdClass: "align-middle",
+							thStyle: {width: "40%"}
 						},
 						{
-							key: 'action',
-							label: '',
-							tdClass: 'align-middle text-right',
-							thClass: 'text-right',
-							thStyle: {width: '30%'}
+							key: "action",
+							label: "",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "30%"}
 						}
           ],
           items: []
@@ -285,27 +297,22 @@ export default {
         }
       },
 			options: {
-				schoolCategories: {
-					items: []
-				},
+				schoolCategories: SchoolCategories,
 				levels: {
 					items: []
 				},
 				courses: {
 					items: []
 				},
-				semesters: {
-					items: []
-				}
+				semesters: Semesters
       },
       levelIndex: 0
 		}
 	},
 	created(){
     //this.loadRateSheetList()
+    this.loadLevelsOfSchoolCategoryList(this.options.schoolCategories.getEnum(1).id)
     this.loadFees()
-    this.loadSchoolCategoryList()
-    this.loadSemesterList()
   },
   computed: {
     totalAmount(){
@@ -315,37 +322,32 @@ export default {
       })
 
       return total.toFixed(2)
+    },
+    levelName() {
+      const { fields } = this.forms.rateSheet
+      if (fields.levelId) {
+        return this.options.levels.items.find(i => i.id == fields.levelId).name
+      }
     }
   },
 	methods: {
-		loadSchoolCategoryList(){
-      this.isLoaded = true
-      const params = { paginate: false }
-      const { schoolCategories } = this.options
-			this.getSchoolCategoryList(params)
-				.then(response => {
-					const res = response.data
-					schoolCategories.items = res
-          this.loadLevelsOfSchoolCategoryList(res[0].id)
-          this.isLoaded = false
-				})
-				.catch(error => {
-					console.log(error)
-				})
-		},
 		loadLevelsOfSchoolCategoryList(id){
       this.isLoaded = true
       const params = { paginate: false }
-      const { rateSheet } = this.forms
-      const { levels } = this.options
+      //const { rateSheet } = this.forms
+      const { levels, courses } = this.options
+      courses.items = []
 			this.getLevelsOfSchoolCategoryList(id, params)
 				.then(response => {
-					const res = response.data
-					levels.items = res
+          const res = response.data
           this.levelIndex = 0
-          rateSheet.fields.levelId = res[0].id
-					this.loadCoursesOfLevelList(res[0].id)
-          this.loadFeesOfLevel()
+          levels.items = res
+          if (res.length > 0) {
+            this.loadCoursesOfLevelList(res[0].id)
+          } else {
+            this.forms.rateSheet.fields.fees = []
+          }
+          //rateSheet.fields.levelId = res[0].id
           this.isLoaded = false
 				})
 				.catch(error => {
@@ -420,13 +422,13 @@ export default {
 				})
 		},
     addFee(row){
-      console.log(row)
+      //console.log(row)
       this.forms.rateSheet.fields.fees.push({ 
         id: row.item.id,
         name : row.item.name,
         isIntegrated: row.item.isIntegrated,
         description: row.item.description,
-        pivot:{ schoolFeeId: row.item.id, amount: 0.00, notes: '' }
+        pivot:{ schoolFeeId: row.item.id, amount: 0.00, notes: "" }
       })
     },
 		removeFee(row){
@@ -435,7 +437,6 @@ export default {
     createUpdateRateSheet(){
 
       const { id, levelId, courseId, semesterId, enrollmentFee } = this.forms.rateSheet.fields
-      const { rateSheetFees } = this.tables
       const data = { levelId: levelId, courseId: courseId, semesterId: semesterId, enrollmentFee: enrollmentFee, fees:[] }
       
       this.forms.rateSheet.fields.fees.forEach(rs => {
@@ -446,17 +447,17 @@ export default {
         this.addRateSheet(data).then(response => {
           const res = response.data
           this.forms.rateSheet.fields.id = res.id
-          alert('Rate Saved.')
+          alert("Rate Saved.")
           //console.log(res)
         })
       }
       else{
         this.updateRateSheet(id, data).then(response => {
           const res = response.data
-          alert('Rate Updated.')
+          alert("Rate Updated.")
         })
       }
     }
-	}
+  },
 }
 </script>
