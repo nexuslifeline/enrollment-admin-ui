@@ -75,13 +75,13 @@ export default {
   },
   methods: {
     logout(){
-      if(localStorage.access_token) {
+      if(localStorage.adminAccessToken) {
         this.$http.post('api/v1/logout', [], {
             headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('access_token')
+              Authorization: 'Bearer ' + localStorage.getItem('adminAccessToken')
             }
           }).then(response => {
-            localStorage.removeItem('access_token')
+            localStorage.removeItem('adminAccessToken')
             this.$store.commit('logoutUser')
             this.$router.push({ name: 'Login' })
           }).catch(err => {

@@ -7,17 +7,19 @@
 						<b-row>
 							<b-col md=9>
 								<b-tabs pills>
-									<b-tab active title="All" />    						
+									<b-tab @click="filters.student.schoolCategoryId = null, loadStudentList()" active title="All" />    						
 									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
 										:key="schoolCategory.id"
-										:title="schoolCategory.name"/>
+										:title="schoolCategory.name"
+                    @click="filters.student.schoolCategoryId = schoolCategory.id, loadStudentList()"/>
 								</b-tabs>
 							</b-col>
 							<b-col md=3>
-								<b-form-select v-model="filters.student.courseId" class="float-right w-100">
+								<b-form-select @change="loadStudentList()" v-model="filters.student.courseId" class="float-right w-100">
 									<template v-slot:first>
 										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 									</template>
+                  <b-form-select-option :value="null">None</b-form-select-option>
 									<b-form-select-option 
 										v-for="course in options.courses.items" 
 										:key="course.id" 
@@ -30,10 +32,10 @@
 						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
 							<b-col md="8">
-								<b-form-radio-group v-model="filters.student.status">
-									<b-form-radio value="0">Show All</b-form-radio>
-									<b-form-radio value="1">Approved</b-form-radio>
-									<b-form-radio value="2">Pending</b-form-radio>
+								<b-form-radio-group v-model="filters.student.applicationStatusId">
+									<b-form-radio :value="null">Show All</b-form-radio>
+									<b-form-radio :value=1>Approved</b-form-radio>
+									<b-form-radio :value=2>Pending</b-form-radio>
 								</b-form-radio-group>
 							</b-col>
 
@@ -46,6 +48,7 @@
 							</b-col>
 						</b-row> <!-- row button and search input -->
 						<b-table 
+              details-td-class="table-secondary"
 							hover outlined small show-empty
 							:fields="tables.students.fields"
 							:items="tables.students.items"
@@ -59,18 +62,20 @@
 										<b-avatar rounded blank size="3rem" :text="data.item.firstName.charAt(0) + '' + data.item.lastName.charAt(0)"></b-avatar>
 										<!-- <b-img rounded blank blank-color="#ccc" width="64" alt="placeholder"></b-img> -->
 									</template>
-									<span>{{data.item.name}}</span><br>
-									<small>{{data.item.address ? 
+									<span>{{ data.item.name }}</span><br>
+									<small>{{ data.item.address ? 
                     data.item.address.address + ", " 
                     + data.item.address.city + ", " 
                     + data.item.address.province + ", " 
-                    + data.item.address.country : ""}}
+                    + data.item.address.country : "" }}
                   </small>
 								</b-media>
 							</template>
 							<template v-slot:cell(education)="data">
-								<span>Course</span><br>
-								<small>Details</small>
+								<span>{{ getName(data.item.transcript, 'level') + " " 
+                  + getName(data.item.transcript, 'semester') + " " 
+                  + getName(data.item.transcript, 'studentType') }}</span><br>
+                <small>{{ getName(data.item.transcript, 'course') }}</small>
 							</template>
 							<template v-slot:cell(action)="row">
 								<b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
@@ -79,22 +84,73 @@
 									</template>
 									<b-dropdown-item @click="showModalApproval=true">Approve</b-dropdown-item>
 									<b-dropdown-item @click="showModalRejection=true">Reject</b-dropdown-item>
-									<b-dropdown-item @click="row.toggleDetails">View Details</b-dropdown-item>
+									<b-dropdown-item @click="row.toggleDetails()">View Details</b-dropdown-item>
 								</b-dropdown>
 							</template>
-							<template v-slot:row-details>
-								<b-card>
-									<b-row>
-										<b-col md="6">
-											<h4>Course</h4>
-											<h4>BSIT</h4>
-										</b-col>
-										<b-col md="6">
-											<h4>Semester</h4>
-											<h4>1st Semester</h4>
-										</b-col>
-									</b-row>
+							<template v-slot:row-details="data">
+                <b-row class="m-2">
+                  <b-col md="3">
+                    <h6>Level</h6>
+                    <h6>{{ getName(data.item.transcript, 'level') }}</h6>
+                  </b-col>
+                  <b-col md="4">
+                    <div v-show="getName(data.item.transcript, 'course') != ''">
+                      <h6>Course</h6>
+                      <h6>{{ getName(data.item.transcript, 'course') }}</h6>
+                    </div>
+                  </b-col>
+                  <b-col md="2">
+                    <div v-show="getName(data.item.transcript, 'course') != ''">
+                      <h6>Semester</h6>
+                      <h6>{{ getName(data.item.transcript, 'semester') }}</h6>
+                    </div>
+                  </b-col>
+                  <b-col md="3">
+                    <h6>School Year</h6>
+                    <h6>{{ getName(data.item.transcript, 'schoolYear') }}</h6>
+                  </b-col>
+                </b-row>
+                <b-card>
+                  <div v-if="data.item.transcript">
+                    <h5>Subjects</h5>
+                    <b-table
+                      class="mb-4"
+                      hover outlined small responsive show-empty
+                      :fields="tables.subjects.fields"
+                      :items="data.item.transcript.subjects"
+                      :busy="tables.subjects.isBusy">
+                    </b-table>
+                  </div>
+                  <div v-if="data.item.activeAdmission">
+                    <h5>Files</h5>
+                    <b-table
+                      v-if="data.item.activeAdmission.files.length > 0"
+                      hover outlined small responsive show-empty
+                      :fields="tables.files.fields"
+                      :items="data.item.activeAdmission.files"
+                      :busy="tables.files.isBusy">
+                      <template v-slot:cell(action)="row">
+                        <b-button 
+                          @click="previewFile(row)" 
+                          size="sm" variant="secondary">
+                          <b-icon-x></b-icon-x>
+                        </b-button>
+                      </template>
+                    </b-table>
+                  </div>
+                  
+									<!-- <template v-slot:footer>
+										<b-row>
+											<b-col md=10>
+												<h5 class="float-right font-weight-bold">TUITION FEE</h5>
+											</b-col>
+											<b-col md=2>
+												<h5 class="float-right pr-2 font-weight-bold">P1,400.00</h5>
+											</b-col>
+										</b-row>
+									</template> -->
 								</b-card>
+                <b-button class="float-right m-2" variant="outline-primary">Approve</b-button>
 							</template>
 						</b-table>
 						<b-row>
@@ -116,6 +172,41 @@
 				</b-card>
       </b-col>
     </b-row>
+    <!-- Modal Preview -->
+    <b-modal 
+			v-model="showModalPreview"
+			size="xl"
+			header-bg-variant="success"
+			header-text-variant="light"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+					Preview
+			</div> <!-- modal title -->
+			<b-row class="justify-content-md-center"> <!-- modal body -->
+				<b-col md=12>
+          <div v-if="file.src">
+            <center>
+              <b-img v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'" :src="file.src" />
+              <b-embed
+                v-else
+                type="iframe"
+                aspect="16by9"
+                allowfullscreen
+                :src="file.src"
+              ></b-embed>
+            </center>
+          </div>
+				</b-col>
+			</b-row> <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button 
+          @click="showModalPreview=false">
+          Close
+        </b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+    <!-- Modal Preview -->
 		<!-- Modal Approval -->
 		<b-modal 
 			v-model="showModalApproval"
@@ -179,15 +270,20 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi } from "../../mixins/api"
+import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi } from "../../mixins/api"
 import { SchoolCategories } from "../../helpers/enum"
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi],
+	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi],
 	data() {
 		return {
+      showModalPreview: false,
 			showModalApproval: false,
-			showModalRejection: false,
+      showModalRejection: false,
+      file: {
+        type: null,
+        src: null
+      },
 			tables: {
 				students: {
 					isBusy: false,
@@ -216,7 +312,15 @@ export default {
 							key: "education",
 							label: "Education",
 							tdClass: "align-middle",
-							thStyle: { width: "49%"}
+              thStyle: { width: "49%"},
+              formatter: (value, key, item) => {
+								if (item.active_application) {
+                  const { transcript } = item.active_application
+                  return transcript.course.name
+                } else {
+                  // item.transcript = item.active_admission.transcript
+                }
+							} 
 						},
 						{
 							key: "action",
@@ -226,7 +330,82 @@ export default {
 						},
 					],
 					items: []
-				}
+        },
+        subjects: {
+					isBusy: false,
+					fields: [
+            {
+							key: "code",
+							label: "Code",
+							tdClass: "align-middle",
+							thStyle: {width: "8%"}
+						},
+						{
+							key: "name",
+							label: "Name",
+							tdClass: "align-middle",
+							thStyle: {width: "15%"}
+						},
+						{
+							key: "description",
+							label: "DESCRIPTION",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
+						},
+						{
+							key: "units",
+							label: "UNITS",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "8%"}
+            },
+            {
+							key: "amountPerUnit",
+							label: "AMOUNT PER UNIT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "13%"}
+						},
+						{
+							key: "labs",
+							label: "LABS",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "8%"}
+            },
+            {
+							key: "amountPerLab",
+							label: "AMOUNT PER LAB",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "13%"}
+            },
+            {
+							key: "totalAmount",
+							label: "TOTAL AMOUNT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "15%"}
+            }
+          ],
+					items: []
+        },
+        files: {
+					isBusy: false,
+					fields: [
+            {
+							key: "name",
+							label: "Filename",
+							tdClass: "align-middle"
+						},
+						{
+              key: "action",
+              label: "",
+              tdClass: "align-middle"
+            }
+          ],
+					items: []
+				},
 			},
 			paginations: {
 				student: {
@@ -242,7 +421,7 @@ export default {
 					criteria: null,
 					schoolCategoryId: null,
 					courseId: null,
-					status: "0"
+					applicationStatusId: null
 				}
 			},
 			options: {
@@ -260,8 +439,9 @@ export default {
 	methods: {
 		loadStudentList(){
       this.tables.students.isBusy = true
+      const { applicationStatusId, schoolCategoryId, courseId } = this.filters.student
       const { perPage, page } = this.paginations.student
-			var params = { paginate: true, perPage, page }
+			let params = { paginate: true, perPage, page, applicationStatusId, schoolCategoryId, courseId }
 			this.getStudentList(params)
 				.then(response => {
 					const res = response.data
@@ -273,13 +453,37 @@ export default {
 				})
 		},
 		loadCourseList(){
-			var params = { paginate: false }
+			let params = { paginate: false }
 			this.getCourseList(params)
 			.then(response => {
 				const res = response.data
 				this.options.courses.items = res
 			})
-		}
-	}
+    },
+    getName(item, child){
+      if (item) {
+        let value = item[child]
+        if (value) {
+          return value['name']
+        }
+      }
+      return ''
+    },
+    previewFile(row) {
+      const { admissionId, id } = row.item
+      this.file.type = null
+      this.file.src = null
+      this.getAdmissionFilePreview(admissionId, id)
+        .then(response => {
+          this.file.type = response.headers.contentType
+          const file = new Blob([response.data], { type: response.headers.contentType })
+          const reader = new FileReader();
+          
+          reader.onload = e => this.file.src = e.target.result
+          reader.readAsDataURL(file);
+          this.showModalPreview = true
+        })
+    }
+  },
 }
 </script>

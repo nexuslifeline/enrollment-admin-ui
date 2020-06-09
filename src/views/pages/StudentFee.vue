@@ -7,17 +7,19 @@
 						<b-row>
 							<b-col md=9>
 								<b-tabs pills>
-									<b-tab active title="All" />    						
-									<b-tab v-for="schoolCategory in options.schoolCategories.values"
-										:key="schoolCategory.id" 
-										:title="schoolCategory.name"/>
+									<b-tab @click="filters.student.schoolCategoryId = null, loadStudentList()" active title="All" />    						
+									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
+										:key="schoolCategory.id"
+										:title="schoolCategory.name"
+                    @click="filters.student.schoolCategoryId = schoolCategory.id, loadStudentList()"/>
 								</b-tabs>
 							</b-col>
 							<b-col md=3>
-								<b-form-select v-model="filters.student.courseId" class="float-right w-100">
+								<b-form-select @change="loadStudentList()" v-model="filters.student.courseId" class="float-right w-100">
 									<template v-slot:first>
 										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 									</template>
+                  <b-form-select-option :value="null">None</b-form-select-option>
 									<b-form-select-option 
 										v-for="course in options.courses.items" 
 										:key="course.id" 
@@ -30,10 +32,10 @@
 						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
 							<b-col md="8">
-								<b-form-radio-group v-model="filters.student.status">
-									<b-form-radio value="0">Show All</b-form-radio>
-									<b-form-radio value="1">Approved</b-form-radio>
-									<b-form-radio value="2">Pending</b-form-radio>
+								<b-form-radio-group v-model="filters.student.applicationStatusId">
+									<b-form-radio :value="null">Show All</b-form-radio>
+									<b-form-radio :value=1>Approved</b-form-radio>
+									<b-form-radio :value=2>Pending</b-form-radio>
 								</b-form-radio-group>
 							</b-col>
 
@@ -69,40 +71,51 @@
 								</b-media>
 							</template>
 							<template v-slot:cell(education)="data">
-								<span>Course</span><br>
-								<small>Details</small>
+								<span>{{ getName(data.item.transcript, 'level') + " " 
+                  + getName(data.item.transcript, 'semester') + " " 
+                  + getName(data.item.transcript, 'studentType') }}</span><br>
+                <small>{{ getName(data.item.transcript, 'course') }}</small>
 							</template>
 							<template v-slot:cell(action)="row">
 								<b-icon-caret-down @click="row.toggleDetails"></b-icon-caret-down>
 							</template>
-							<template v-slot:row-details>
-								<b-row>
-									<b-col md="4">
-										<h6>Course</h6>
-										<h6>Bachelor of Science in Information Technology</h6>
-									</b-col>
-									<b-col md="2">
-										<h6>Level</h6>
-										<h6>First Year</h6>
-									</b-col>
-									<b-col md="2">
-										<h6>Semester</h6>
-										<h6>1st Semester</h6>
-									</b-col>
-									<b-col md="2">
-										<h6>S.Y.</h6>
-										<h6>2019-2020</h6>
-									</b-col>
+							<template v-slot:row-details="data">
+								<b-row class="m-2">
+								  <b-col md="3">
+                    <h6>Level</h6>
+                    <h6>{{ getName(data.item.transcript, 'level') }}</h6>
+                  </b-col>
+                  <b-col md="3">
+                    <div v-show="getName(data.item.transcript, 'course') != ''">
+                      <h6>Course</h6>
+                      <h6>{{ getName(data.item.transcript, 'course') }}</h6>
+                    </div>
+                  </b-col>
+                  <b-col md="2">
+                    <div v-show="getName(data.item.transcript, 'course') != ''">
+                      <h6>Semester</h6>
+                      <h6>{{ getName(data.item.transcript, 'semester') }}</h6>
+                    </div>
+                  </b-col>
+                  <b-col md="2">
+                    <h6>School Year</h6>
+                    <h6>{{ getName(data.item.transcript, 'schoolYear') }}</h6>
+                  </b-col>
 									<b-col md="2">
 										<h6>Student Type</h6>
-										<h6>Regular</h6>
+										<h6>{{ getName(data.item.transcript, 'studentType') }}</h6>
 									</b-col>
 								</b-row>
 								<b-card>
+                  <b-row class="mb-3">
+                    <b-col md=6>
+                      <h5>SUBJECTS</h5>
+                    </b-col>
+                  </b-row>
 									<b-table
 										hover outlined small responsive show-empty
 										:fields="tables.subjects.fields"
-										:items="tables.subjects.items"
+                    :items="data.item.transcript.subjects"
 										:busy="tables.subjects.isBusy">
 									</b-table>
 									<template v-slot:footer>
@@ -111,7 +124,7 @@
 												<h5 class="float-right font-weight-bold">TUITION FEE</h5>
 											</b-col>
 											<b-col md=2>
-												<h5 class="float-right pr-2 font-weight-bold">P1,400.00</h5>
+												<h5 class="float-right pr-2 font-weight-bold">{{ subjectTotalAmount(data.item.transcript.subjects) }}</h5>
 											</b-col>
 										</b-row>
 									</template>
@@ -141,13 +154,21 @@
 												<h5 class="font-weight-bold pt-1">UPON ENROLLMENT FEE: </h5>
 											</b-col>
 											<b-col md=2>
-												<b-form-input></b-form-input>
+												<vue-autonumeric
+                          class="form-control text-right"
+                          style="width: 70%"
+                          :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
+                        </vue-autonumeric>
 											</b-col>
 											<b-col md=2>
 												<h5 class="font-weight-bold pt-1">PREVIOUS BALANCE: </h5>
 											</b-col>
 											<b-col md=2>
-												<b-form-input></b-form-input>
+												<vue-autonumeric
+                          class="form-control text-right"
+                          style="width: 70%"
+                          :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
+                        </vue-autonumeric>
 											</b-col>
 											<b-col md=2>
 												<h5 class="float-right font-weight-bold">Total</h5>
@@ -238,47 +259,62 @@ export default {
 				subjects: {
 					isBusy: false,
 					fields: [
-						{
+            {
 							key: "code",
-							label: "CODE",
+							label: "Code",
 							tdClass: "align-middle",
-							thStyle: { width: "10%"}
+							thStyle: {width: "8%"}
 						},
 						{
 							key: "name",
-							label: "SUBJECT",
+							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "20%"}
+							thStyle: {width: "15%"}
 						},
 						{
 							key: "description",
 							label: "DESCRIPTION",
 							tdClass: "align-middle",
-							thStyle: { width: "25%"}
+							thStyle: {width: "auto"}
 						},
 						{
 							key: "units",
-							label: "UNIT",
+							label: "UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: { width: "8%"}
-						},
-						{
-							key: "amount_per_unit",
-							label: "UNIT AMOUNT",
+							thStyle: {width: "8%"}
+            },
+            {
+							key: "amountPerUnit",
+							label: "AMOUNT PER UNIT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: { width: "15%"}
+							thStyle: {width: "13%"}
 						},
 						{
-							key: "total_amount",
-							label: "LINE TOTAL",
+							key: "labs",
+							label: "LABS",
 							tdClass: "align-middle text-right",
-							thClass: "text-right"
-						}
-					],
+							thClass: "text-right",
+							thStyle: {width: "8%"}
+            },
+            {
+							key: "amountPerLab",
+							label: "AMOUNT PER LAB",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "13%"}
+            },
+            {
+							key: "totalAmount",
+							label: "TOTAL AMOUNT",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "15%"}
+            }
+          ],
 					items: []
-				},
+        },
 				fees: {
 					isBusy: false,
 					fields: [
@@ -319,7 +355,7 @@ export default {
 					criteria: null,
 					schoolCategoryId: null,
 					courseId: null,
-					status: "0"
+					applicationStatusId: null
 				}
 			},
 			options: {
@@ -337,8 +373,9 @@ export default {
 	methods: {
 		loadStudentList(){
       this.tables.students.isBusy = true
+      const { applicationStatusId, schoolCategoryId, courseId } = this.filters.student
       const { perPage, page } = this.paginations.student
-			var params = { paginate: true, perPage, page }
+			let params = { paginate: true, perPage, page, applicationStatusId, schoolCategoryId, courseId }
 			this.getStudentList(params)
 				.then(response => {
 					const res = response.data
@@ -356,7 +393,28 @@ export default {
 				const res = response.data
 				this.options.courses.items = res
 			})
-		}
-	}
+    },
+    getName(item, child){
+      if (item) {
+        let value = item[child]
+        if (value) {
+          return value['name']
+        }
+      }
+      return ''
+    },
+  },
+  computed: {
+    subjectTotalAmount() {
+      return subjects => {
+        let amount = 0
+        subjects.forEach(s => {
+          console.log(s.totalAmount)
+          amount += Number(s.totalAmount)
+        })
+        return amount.toFixed(2)
+      }
+    }
+  }
 }
 </script>
