@@ -17,8 +17,5 @@ export default {
     deleteSubject(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/subjects/` + id)
     },
-    updateSubjectsOfLevel(levelId, data) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/levels/${levelId}/subjects`, data);
-    },
   }
 }
