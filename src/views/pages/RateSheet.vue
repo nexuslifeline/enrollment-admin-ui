@@ -93,7 +93,7 @@
                       </vue-autonumeric>
                     </template>
                     <template v-slot:cell(pivot.notes)="row">
-                      <b-form-input v-model="row.item.pivot.notes" style="text-align: right"/>
+                      <b-form-input v-model="row.item.pivot.notes"/>
                     </template>
                     <template v-slot:cell(action)="row">
 											<b-button @click="removeFee(row)" size="sm" variant="danger"><b-icon-x></b-icon-x></b-button>

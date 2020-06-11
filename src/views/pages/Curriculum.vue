@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<b-overlay :show="isLoaded" rounded="sm">
+		<b-overlay :show="isLoading" rounded="sm">
 			<b-row>
 				<b-col md=12>
 					<b-card>
@@ -168,7 +168,7 @@ export default {
 	data() {
 		return {
 			showModalSubjects: false,
-			isLoaded: false,
+			isLoading: false,
 			forms: {
 				curriculum: {
 					fields: {
@@ -260,10 +260,10 @@ export default {
 	},
 	methods: {
 		loadLevelsOfSchoolCategoryList(id){
-			this.isLoaded = true
+			this.isLoading = true
 			this.options.courses.items = []
 			this.forms.curriculum.fields.schoolCategoryId = id
-			var params = { paginate: false }
+			let params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(id, params)
 				.then(response => {
 					const res = response.data
@@ -274,7 +274,7 @@ export default {
 					} else {
 						this.forms.curriculum.fields.subjects = []
 					}
-					this.isLoaded = false
+					this.isLoading = false
 				})
 				.catch(error => {
 					console.log(error)
@@ -283,7 +283,7 @@ export default {
 		loadSubjectsOfLevelList(){
       this.tables.subjects.isBusy = true
       const { levelId, courseId, semesterId } = this.forms.curriculum.fields
-			var params = { courseId, semesterId , paginate : false }
+			let params = { courseId, semesterId , paginate : false }
 			this.getSubjectsOfLevelList(levelId, params)
 				.then(response => {
 					const res = response.data
@@ -292,10 +292,10 @@ export default {
 			});
 		},
 		loadCoursesOfLevelList(levelId){
-			this.isLoaded = true
+			this.isLoading = true
       this.forms.curriculum.fields.levelId = levelId
       const { schoolCategoryId } = this.forms.curriculum.fields
-			var params = { paginate: false, schoolCategoryId }
+			let params = { paginate: false, schoolCategoryId }
 			this.getCoursesOfLevelList(levelId, params)
 				.then(response => {
           const res = response.data
@@ -308,21 +308,21 @@ export default {
 					}
 					
 					this.loadSubjectsOfLevelList()
-					this.isLoaded = false
+					this.isLoading = false
 				})
 		},
 		loadSemesterList(){
-			this.isLoaded = true
-			var params = { paginate: false }
+			this.isLoading = true
+			let params = { paginate: false }
 			this.getSemesterList(params)
 				.then(response => {
 					const res = response.data
 					this.options.semesters.items = res
-					this.isLoaded = false
+					this.isLoading = false
 				})
 		},
 		updateCurriculum(){
-			var data = { subjects : [] }
+			let data = { subjects : [] }
 
 			this.forms.curriculum.fields.subjects.forEach(s => {
 				data.subjects.push({
@@ -341,7 +341,7 @@ export default {
 		loadSubjects(){
       this.tables.subjects.isBusy2 = true
       const { perPage, page } = this.paginations.subject
-			var params = { paginate: true, perPage: this.paginations.subject.perPage, page: this.paginations.subject.page }
+			let params = { paginate: true, perPage: this.paginations.subject.perPage, page: this.paginations.subject.page }
 			this.getSubjectList(params)
 				.then(response => {
 					const res = response.data
