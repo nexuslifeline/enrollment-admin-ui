@@ -66,7 +66,7 @@ export default {
         .then(response => {
           const res = response.data
           this.$store.commit('loginUser')
-          localStorage.setItem('access_token', res.accessToken)
+          localStorage.setItem('adminAccessToken', res.accessToken)
           this.$router.push({ name: 'Dashboard'})
         })
         .catch(response => {
