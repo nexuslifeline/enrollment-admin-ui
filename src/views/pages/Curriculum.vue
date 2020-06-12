@@ -281,14 +281,15 @@ export default {
 				})
 		},
 		loadSubjectsOfLevelList(){
-      this.tables.subjects.isBusy = true
-      const { levelId, courseId, semesterId } = this.forms.curriculum.fields
+      const { subjects } = this.tables
+      subjects.isBusy = true
+      const { fields, fields: { levelId, courseId, semesterId } } = this.forms.curriculum
 			let params = { courseId, semesterId , paginate : false }
 			this.getSubjectsOfLevelList(levelId, params)
 				.then(response => {
 					const res = response.data
-					this.forms.curriculum.fields.subjects = res
-					this.tables.subjects.isBusy = false
+					fields.subjects = res
+					subjects.isBusy = false
 			});
 		},
 		loadCoursesOfLevelList(levelId){
@@ -337,24 +338,23 @@ export default {
 				.then(response => {
 					console.log(response)
 				})
-		},
-		loadSubjects(){
-      this.tables.subjects.isBusy2 = true
-      const { perPage, page } = this.paginations.subject
-			let params = { paginate: true, perPage: this.paginations.subject.perPage, page: this.paginations.subject.page }
+    },
+    loadSubjects(){
+      const { subjects } = this.tables
+      const { subject, subject: { perPage, page } } = this.paginations
+      subjects.isBusy2 = true
+			let params = { paginate: true, perPage, page }
 			this.getSubjectList(params)
 				.then(response => {
 					const res = response.data
-          this.tables.subjects.items = res.data
-          this.paginations.subject.from = res.meta.from
-					this.paginations.subject.to = res.meta.to
-					this.paginations.subject.totalRows = res.meta.total
-					this.paginations.subject.pages = res.meta.lastPage
-					this.tables.subjects.isBusy2 = false
+          subjects.items = res.data
+          subject.from = res.meta.from
+					subject.to = res.meta.to
+					subject.totalRows = res.meta.total
+					subjects.isBusy2 = false
 				})
-		},
+    },
 		addSubject(row){
-			console.log(row)
 			this.forms.curriculum.fields.subjects.push(row.item)
 		},
 		removeSubject(row){

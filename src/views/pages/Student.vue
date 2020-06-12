@@ -67,11 +67,9 @@
 										<!-- <b-img rounded blank blank-color="#ccc" width="64" alt="placeholder"></b-img> -->
 									</template>
 									<span>{{ data.item.student.name }}</span><br>
-									<small>{{ data.item.student.address ? 
-                    data.item.student.address.address + ", " 
-                    + data.item.student.address.city + ", " 
-                    + data.item.student.address.province + ", " 
-                    + data.item.student.address.country : "" }}
+                  <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+									<small>Address : {{ data.item.student.address ? 
+                    data.item.student.address.address : "" }}
                   </small>
 								</b-media>
 							</template>
@@ -81,7 +79,7 @@
                   + getName(data.item, 'studentType') }}</span><br>
                 <small>{{ getName(data.item, 'course') }}</small>
 							</template>
-							<template v-slot:cell(transcriptStatusId)="data">
+							<template v-slot:cell(status)="data">
 								<b-badge
 									:variant="data.item.transcriptStatusId === transcriptStatuses.FINALIZED.id 
 										? 'primary' 
@@ -94,8 +92,16 @@
 									<template v-slot:button-content>
 										<b-icon-grip-horizontal></b-icon-grip-horizontal>
 									</template>
-									<b-dropdown-item @click="showModalApproval=true">Approve</b-dropdown-item>
-									<b-dropdown-item @click="showModalRejection=true">Reject</b-dropdown-item>
+									<b-dropdown-item 
+                    v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
+                    @click="setApproval(row)">
+                    Approve
+                  </b-dropdown-item>
+									<b-dropdown-item 
+                    v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
+                    @click="setDisapproval(row)">
+                    Reject
+                  </b-dropdown-item>
 									<b-dropdown-item @click="loadDetails(row)">{{ row.detailsShowing ? 'Hide' : 'View' }} Details</b-dropdown-item>
 								</b-dropdown>
 							</template>
@@ -125,7 +131,17 @@
 									</b-row>
 									<b-card>
 										<div v-if="data.item.subjects">
-											<h5>Subjects</h5>
+											<b-row class="mb-3">
+                        <b-col md=6>
+                          <h5 class="pt-2">SUBJECTS</h5>
+                        </b-col>
+                        <b-col md=6 v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
+                          <b-button class="float-right" variant="outline-primary"
+                            @click="onAddSubject(data.item.subjects)">
+                            <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
+                          </b-button>
+                        </b-col>
+                      </b-row>
 											<b-table
 												class="mb-4"
 												hover outlined small responsive show-empty
@@ -134,6 +150,7 @@
 												:busy="tables.subjects.isBusy">
 												<template v-slot:cell(action)="row">
 													<b-button 
+                            v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
 														@click="removeSubject(data.item.subjects, row)" 
 														size="sm" variant="danger">
 														<b-icon-x></b-icon-x>
@@ -170,7 +187,11 @@
 											</b-row>
 										</template> -->
 									</b-card>
-									<b-button class="float-right m-2" variant="outline-primary">Approve</b-button>
+									<b-button
+                    v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                    @click="setApproval(data)"
+                    class="float-right m-2" 
+                    variant="outline-primary">Approve</b-button>
 								</b-overlay>
 							</template>
 						</b-table>
@@ -243,6 +264,7 @@
 				<b-col md=12>
 					<label>Notes</label>
 					<b-textarea 
+            v-model="forms.applicationAdmission.fields.ApprovalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
@@ -252,7 +274,16 @@
           @click="showModalApproval=false">
           Cancel
         </b-button>
-				<b-button class="float-right" variant="outline-primary">
+				<b-button 
+          @click="onApproval()"
+          class="float-right" 
+          variant="outline-primary">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
 					Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
@@ -273,6 +304,7 @@
 				<b-col md=12>
 					<label>Reason</label>
 					<b-textarea
+            v-model="forms.applicationAdmission.fields.disapprovalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
@@ -282,30 +314,121 @@
           @click="showModalRejection=false">
           Cancel
         </b-button>
-				<b-button class="float-right" variant="outline-primary">
+				<b-button 
+          @click="onDisapproval()"
+          class="float-right" variant="outline-primary">
 					Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Approval -->
+    <!-- Modal Subject -->
+    <b-modal 
+			v-model="showModalSubjects"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true"
+			size="xl">
+			<div slot="modal-title"> <!-- modal title -->
+					Subjects
+			</div> <!-- modal title -->
+			<b-row> <!-- modal body -->
+				<b-col md=12>
+          <b-row class="mb-2">
+            <b-col offset-md="8" md="4">
+              <b-form-input
+                v-model="filters.subject.criteria"
+                type="text" 
+                placeholder="Search">
+              </b-form-input>
+            </b-col>
+          </b-row>
+					<b-table
+						small hover outlined show-empty
+						:items.sync="tables.subjects.items"
+						:fields="tables.subjects.fields"
+            :filter="filters.subject.criteria"
+						:busy="tables.subjects.isBusy">
+						<template v-slot:cell(action)="row">
+							<b-button 
+                @click="addSubject(row)" 
+                size="sm" variant="primary">
+                <b-icon-plus></b-icon-plus>
+              </b-button>
+						</template>
+					</b-table>
+          <b-row>
+            <b-col md=6>
+              Showing {{paginations.subject.from}} to {{paginations.subject.to}} of {{paginations.subject.totalRows}} records.
+            </b-col>
+            <b-col md=6>
+              <b-pagination
+                v-model="paginations.subject.page"
+                :total-rows="paginations.subject.totalRows"
+                :per-page="paginations.subject.perPage"
+                size="sm"
+                align="end"
+                @input="loadSubjects()"
+              />
+            </b-col>
+          </b-row>
+				</b-col>
+			</b-row> <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button class="float-left" @click="showModalSubjects=false">Close</b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+    <!-- Modal Subject -->
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi } from "../../mixins/api"
-import { SchoolCategories, ApplicationStatuses, TranscriptStatuses } from "../../helpers/enum"
+import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi } from "../../mixins/api"
+import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses } from "../../helpers/enum"
+import { showNotification } from "../../helpers/forms"
+
+const transcriptFields = {
+  transcriptStatusId: null
+}
+
+const studentFeeFields = {
+  schoolYearId: null,
+  semesterId: null,
+  levelId: null,
+  courseId: null,
+  transcriptId: null,
+  studentFeeStatusId: null
+}
+
+const applicationAdmissionFields = {
+  approvalNotes: null,
+  disapprovalNotes: null
+}
+
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi],
+	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi],
 	data() {
 		return {
       showModalPreview: false,
 			showModalApproval: false,
-			showModalRejection: false,
+      showModalRejection: false,
+      showModalSubjects: false,
 			isLoading: false,
 			transcriptStatuses: TranscriptStatuses,
       file: {
         type: null,
         src: null
+      },
+      forms: {
+        transcript: {
+          fields: { ...transcriptFields }
+        },
+        studentFee: {
+          fields: { ...studentFeeFields}
+        },
+        applicationAdmission: {
+          fields: { ...applicationAdmissionFields }
+        },
+        subjects: []
       },
 			tables: {
 				students: {
@@ -338,7 +461,7 @@ export default {
               thStyle: { width: "45%"}
 						},
 						{
-							key: "transcriptStatusId",
+							key: "status",
 							label: "Status",
 							tdClass: "align-middle",
 							thStyle: { width: "8%"}
@@ -442,6 +565,13 @@ export default {
 					totalRows: 0,
 					page: 1,
 					perPage: 10,
+        },
+				subject: {
+					from: 0,
+					to: 0,
+					totalRows: 0,
+					page: 1,
+					perPage: 10,
 				}
 			},
 			filters: {
@@ -450,25 +580,145 @@ export default {
 					schoolCategoryId: null,
 					courseId: null,
 					transcriptStatusId: null
-				}
+        },
+        subject: {
+          criteria: null
+        }
 			},
 			options: {
 				courses: {
 					items: []
 				},
 				schoolCategories: SchoolCategories
-			}
+      },
+      isProcessing: false,
+      studentSubjects: [],
+      row: []
 		}
 	},
 	created(){
 		this.loadTranscript()
-		this.loadCourseList()
+    this.loadCourseList()
+    this.loadSubjects()
 	},
 	methods: {
+    setApproval(row) {
+      if (!row.item.subjects) {
+        const { id: transcriptId } = row.item
+        const params = { paginate: false }
+        this.getSubjectsOfTranscript(transcriptId, params)
+					.then(({ data }) => {
+            this.$set(row.item, 'subjects', data)
+            this.row = row.item
+            this.showModalApproval = true
+				})
+      } else {
+        this.row = row.item
+        this.showModalApproval = true
+      }
+      
+    },
+    onApproval() {
+      const { 
+        id: transcriptId,
+        applicationId,
+        admissionId
+      } = this.row
+
+      const { 
+        applicationAdmission: { fields: application },
+        applicationAdmission: { fields: admission },
+        transcript: { fields: transcript },
+        studentFee: { fields: studentFee }
+      } = this.forms
+
+      const applicationAdmission = [
+        { application },
+        { admission }
+      ]
+
+      const index = applicationId ? 0 : 1
+
+      let subjects = []
+
+      this.row.subjects.forEach(subject => {
+				subjects.push({
+					subjectId: subject.id
+				})
+      })
+      
+      studentFee.schoolYearId = this.row.schoolYearId,
+      studentFee.semesterId = this.row.semesterId,
+      studentFee.levelId = this.row.levelId,
+      studentFee.courseId = this.row.courseId,
+      studentFee.studentFeeStatusId = StudentFeeStatuses.DRAFT.id
+      studentFee.transcriptId = transcriptId
+
+      transcript.transcriptStatusId = TranscriptStatuses.FINALIZED.id
+
+      const data = {
+        ...applicationAdmission[index],
+        studentFee,
+        ...transcript,
+        subjects
+      }
+
+      this.isProcessing = true;
+      this.updateTranscript(data, transcriptId).then(({ data }) => {
+        this.row.transcriptStatusId = TranscriptStatuses.FINALIZED.id
+        this.isProcessing = false
+        this.showModalApproval = false
+        showNotification(this, "success", "Approved Successfully.")
+      }).catch((error) => {
+        console.log(error)
+        this.isProcessing = false;
+      });
+    },
+    setDisapproval(row) {
+      this.row = row.item
+      this.showModalRejection = true
+    },
+    onDisapproval() {
+      const { 
+        id: transcriptId,
+        applicationId,
+        admissionId
+      } = this.row
+
+      const { 
+        applicationAdmission: { fields: application },
+        applicationAdmission: { fields: admission },
+        transcript: { fields: transcript }
+      } = this.forms
+
+      const data = applicationId 
+      ? { application: { 
+            ...application,
+            applicationStatusId: ApplicationStatuses.REJECTED.id
+          } 
+        } 
+        : { admission: { 
+            ...admission,
+            applicationStatusId: ApplicationStatuses.REJECTED.id
+          }
+        }
+
+      this.isProcessing = true;
+      this.updateTranscript(data, transcriptId).then(({ data }) => {
+        this.loadTranscript()
+        this.isProcessing = false
+        this.showModalRejection = false
+        showNotification(this, "success", "Rejected Successfully.")
+      }).catch((error) => {
+        console.log(error)
+        this.isProcessing = false;
+      });
+    },
 		loadTranscript(){
-      this.tables.students.isBusy = true
+      const { students } = this.tables
+      const { student, student: { perPage, page } } = this.paginations
+      students.isBusy = true
       const { transcriptStatusId, schoolCategoryId, courseId } = this.filters.student
-			const { perPage, page } = this.paginations.student
 			const applicationStatusId = ApplicationStatuses.SUBMITTED.id
 			let params = { 
 				paginate: true, 
@@ -480,11 +730,11 @@ export default {
 			this.getTranscriptList(params)
 				.then(response => {
 					const res = response.data
-					this.tables.students.items = res.data;
-					this.paginations.student.from = res.meta.from
-					this.paginations.student.to = res.meta.to
-					this.paginations.student.totalRows = res.meta.total
-					this.tables.students.isBusy = false
+					students.items = res.data;
+					student.from = res.meta.from
+					student.to = res.meta.to
+					student.totalRows = res.meta.total
+					students.isBusy = false
 				})
 		},
 		loadCourseList(){
@@ -508,7 +758,6 @@ export default {
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
 						this.isLoading = false
-						
 				})
 				if (admissionId) {
 					this.isLoading = true
@@ -544,6 +793,28 @@ export default {
           reader.readAsDataURL(file);
           this.showModalPreview = true
         })
+    },
+    loadSubjects(){
+      const { subjects } = this.tables
+      const { subject, subject: { perPage, page } } = this.paginations
+      subjects.isBusy = true
+			let params = { paginate: true, perPage, page }
+			this.getSubjectList(params)
+				.then(response => {
+					const res = response.data
+          subjects.items = res.data
+          subject.from = res.meta.from
+					subject.to = res.meta.to
+					subject.totalRows = res.meta.total
+					subjects.isBusy = false
+				})
+    },
+    onAddSubject(subjects){
+      this.studentSubjects = subjects
+      this.showModalSubjects = true
+    },
+		addSubject(row){
+			this.studentSubjects.push(row.item)
 		},
 		removeSubject(subjects, row){
 			subjects.splice(row.index, 1)

@@ -149,7 +149,7 @@
         </b-col>
       </b-row>
     </b-overlay>
-    <!-- MODAL SUBJECT -->
+    <!-- MODAL FEES -->
 		<b-modal 
 			v-model="showModalFees"
 			:noCloseOnEsc="true"
@@ -411,7 +411,6 @@ export default {
         fee.from = res.meta.from
         fee.to = res.meta.to
         fee.totalRows = res.meta.total
-        fee.pages = res.meta.lastPage
       })
     },
     loadSemesterList(){

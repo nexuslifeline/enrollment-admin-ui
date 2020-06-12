@@ -7,7 +7,8 @@ import { iconsSet as icons } from './assets/icons/icons.js'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-
+import 'vue-awesome/icons'
+import Icon from 'vue-awesome/components/Icon'
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 // const axiosConfig = {
@@ -15,6 +16,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 //   timeout: 30000
 // }
 Vue.config.performance = true
+Vue.component('v-icon', Icon)
 Vue.use(CoreuiVue)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
