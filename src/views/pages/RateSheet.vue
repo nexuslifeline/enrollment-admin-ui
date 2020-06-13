@@ -93,7 +93,7 @@
                       </vue-autonumeric>
                     </template>
                     <template v-slot:cell(pivot.notes)="row">
-                      <b-form-input v-model="row.item.pivot.notes" style="text-align: right"/>
+                      <b-form-input v-model="row.item.pivot.notes"/>
                     </template>
                     <template v-slot:cell(action)="row">
 											<b-button @click="removeFee(row)" size="sm" variant="danger"><b-icon-x></b-icon-x></b-button>
@@ -149,7 +149,7 @@
         </b-col>
       </b-row>
     </b-overlay>
-    <!-- MODAL SUBJECT -->
+    <!-- MODAL FEES -->
 		<b-modal 
 			v-model="showModalFees"
 			:noCloseOnEsc="true"
@@ -411,7 +411,6 @@ export default {
         fee.from = res.meta.from
         fee.to = res.meta.to
         fee.totalRows = res.meta.total
-        fee.pages = res.meta.lastPage
       })
     },
     loadSemesterList(){
