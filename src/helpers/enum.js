@@ -63,8 +63,30 @@ export const ApplicationSteps = new Enum({
   BILLING: { id: 6, name: 'BILLING', description: 'Lorem ipsum dolor amet' }
 });
 
+export const ApplicationStatuses = new Enum({
+  APPROVED: { id: 1, name: 'Approved' },
+  DRAFT: { id: 2, name: 'Draft' },
+  REJECTED: { id: 3, name: 'Reject' },
+  SUBMITTED: { id: 4, name: 'Submitted' },
+});
+
+export const TranscriptStatuses = new Enum({
+  DRAFT: { id: 1, name: 'Draft' },
+  FINALIZED: { id: 2, name: 'Finalized' },
+});
+
+export const StudentFeeStatuses = new Enum({
+  DRAFT: { id: 1, name: 'Draft/Pending' },
+  APPROVED: { id: 2, name: 'Approved' },
+});
+
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Sem', description: 'First Semester' },
   SECOND_SEM: { id: 2, name: '2nd Sem', description: 'Second Semester' },
   THIRD_SEM: { id: 3, name: '3rd Sem', description: 'Third Semester' }
 });
+
+export const Fees = new Enum({
+  TUITION_FEE: { id: 1, name: 'Tuition Fee' }
+});
+
