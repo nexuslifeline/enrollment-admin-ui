@@ -569,7 +569,6 @@ export default {
         const form = applicationId ? 'application' : 'admission'
         row.item[form].applicationStatusId = ApplicationStatuses.APPROVED.id
         this.isProcessing = false
-        // this.showModalApproval = false
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
         console.log(error)
@@ -625,10 +624,10 @@ export default {
             const rateSheetParams = { levelId, courseId, semesterId  }
             this.getRateSheetList(rateSheetParams)
               .then(({ data }) => {
-                const res = data.data[0]
-                this.$set(row.item, 'enrollmentFee', res.enrollmentFee)
+                const res = data.data
+                this.$set(row.item, 'enrollmentFee', res[0] ? res.enrollmentFee : 0)
                 this.$set(row.item, 'previousBalance', 0)
-                this.$set(row.item, 'fees', res.fees)
+                this.$set(row.item, 'fees', res[0] ? res.fees : [])
 
                 const schoolCategories = [
                   SchoolCategories.SENIOR_HIGH_SCHOOL.id,
