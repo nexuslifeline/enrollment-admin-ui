@@ -69,7 +69,7 @@
 									<span>{{ data.item.student.name }}</span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
 									<small>Address : {{ data.item.student.address ? 
-                    data.item.student.address.address : "" }}
+                    data.item.student.address.currentCompleteAddress : "" }}
                   </small>
 								</b-media>
 							</template>
