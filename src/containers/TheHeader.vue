@@ -1,3 +1,27 @@
+<style scoped>
+  a.c-header-brand:hover {
+    text-decoration: none;
+  }
+  .logo__stc-brand {
+    display: flex;
+    align-items: center;
+    padding: 16px 8px;
+    font-weight: bold;
+  }
+  .logo__stc-brand img {
+      width: 60px;
+      height: auto;
+      margin: 0 8px;
+  }
+  .c-sidebar-minimized .logo__stc-brand .logo__title {
+    display: none;
+    opacity: 0;
+  }
+  .c-sidebar-minimized .logo__stc-brand img {
+    width: 40px;
+    height: auto;
+  }
+</style>
 <template>
   <CHeader fixed with-subheader light>
     <CToggler
@@ -11,7 +35,9 @@
       @click="$store.commit('toggleSidebarDesktop')"
     />
     <CHeaderBrand class="mx-auto d-lg-none" to="/">
-      <CIcon name="logo" height="48" alt="Logo"/>
+      <div class="logo__stc-brand">
+        <img src="../assets/images/stc_logo.png"> <span class="logo__title">Saint Theresa College <br> of Tandag Inc.</span>
+      </div>
     </CHeaderBrand>
     <CHeaderNav class="d-md-down-none mr-auto">
       <CHeaderNavItem class="px-3">
