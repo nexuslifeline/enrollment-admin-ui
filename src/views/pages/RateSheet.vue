@@ -205,6 +205,7 @@
 <script>
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
 import { SchoolCategories, Semesters } from "../../helpers/enum"
+import { showNotification } from '../../helpers/forms'
 export default {
 	name: "RateSheet",
 	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi ],
@@ -405,7 +406,7 @@ export default {
       const { fees } = this.tables
       const { fee } = this.paginations
       const params = { paginate: true, perPage : 10 }
-      this.getFees(params).then(response => {
+      this.getSchoolFeeList(params).then(response => {
         const res = response.data
         fees.items = res.data
         fee.from = res.meta.from
@@ -447,14 +448,20 @@ export default {
         this.addRateSheet(data).then(response => {
           const res = response.data
           this.forms.rateSheet.fields.id = res.id
-          alert("Rate Saved.")
+          showNotification(this, 'success', 'Rate Sheet is updated.')
           //console.log(res)
+        })
+        .catch(error => {
+          showNotification(this, 'danger', 'Error in updating rate sheet')
         })
       }
       else{
         this.updateRateSheet(id, data).then(response => {
           const res = response.data
-          alert("Rate Updated.")
+          showNotification(this, 'success', 'Rate Sheet is updated.')
+        })
+        .catch(error => {
+          showNotification(this, 'danger', 'Error in updating rate sheet')
         })
       }
     }
