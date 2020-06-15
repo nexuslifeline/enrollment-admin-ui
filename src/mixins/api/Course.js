@@ -6,13 +6,16 @@ export default {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/courses`, { params: params });
     },
     getCourse(id) {
-      return this.$http.get(`${apiPrefix}/${apiVersion}/courses/${id}`);
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/courses/${id}`);
     },
     addCourse(data) {
-      return this.$http.post(`${apiPrefix}/${apiVersion}/courses`, data);
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/courses`, data);
     },
     updateCourse(data, id) {
-      return this.$http.put(`${apiPrefix}/${apiVersion}/courses/${id}`, data);
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/courses/${id}`, data);
+    },
+    deleteCourse(id) {
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/courses/${id}`);
     }
   }
 }

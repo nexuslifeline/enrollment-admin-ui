@@ -19,6 +19,8 @@ const StudentFee = () => import('@/views/pages/StudentFee')
 const RateSheet = () => import('@/views/pages/RateSheet')
 const Curriculum = () => import('@/views/pages/Curriculum')
 const Subject = () => import('@/views/pages/Subject')
+const Course = () => import('@/views/pages/Course')
+const SchoolFee = () => import('@/views/pages/SchoolFee')
 
 Vue.use(Router)
 
@@ -89,6 +91,18 @@ function configRoutes () {
           path: 'subject',
           name: 'Subject',
           component: Subject,
+          meta: {requiresAuth: true}
+        },
+        {
+          path: 'course',
+          name: 'Course',
+          component: Course,
+          meta: {requiresAuth: true}
+        },
+        {
+          path: 'schoolfee',
+          name: 'School Fee',
+          component: SchoolFee,
           meta: {requiresAuth: true}
         }
       ]

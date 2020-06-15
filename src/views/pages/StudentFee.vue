@@ -692,7 +692,7 @@ export default {
       const { fee, fee: { perPage, page } } = this.paginations
       const params = { paginate: true, perPage, page }
       fees.isBusy = true
-      this.getFees(params).then(response => {
+      this.getSchoolFeeList(params).then(response => {
         const res = response.data
         fees.items = res.data
         fee.from = res.meta.from
