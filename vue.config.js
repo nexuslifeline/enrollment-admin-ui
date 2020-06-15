@@ -14,6 +14,9 @@ module.exports = {
       },
     },
   },
+  outputDir: process.env.NODE_ENV === 'production'
+    ? 'release-stc-admin/'
+    : 'dev-stc-admin',
   transpileDependencies: [
     '@coreui/utils'
   ],
