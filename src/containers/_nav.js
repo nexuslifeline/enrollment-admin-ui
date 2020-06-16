@@ -46,8 +46,20 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Schoo Fee',
+        name: 'School Fee',
         to: '/schoolfee',
+        icon: 'cil-layers'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Users',
+        to: '/user',
+        icon: 'cil-layers'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'User Group',
+        to: '/usergroup',
         icon: 'cil-layers'
       }
     ]

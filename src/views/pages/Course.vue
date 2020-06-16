@@ -10,7 +10,7 @@
                 <b-row>
                   <b-col md=8>
                     <b-button variant="outline-primary" 
-                      @click="clearFields(), entryMode='Add', onShowModal()">
+                      @click="setCreate()">
                       <b-icon-plus-circle></b-icon-plus-circle> ADD NEW COURSE
                     </b-button>
                   </b-col>
@@ -40,7 +40,7 @@
                         <b-icon-grip-horizontal></b-icon-grip-horizontal>
                       </template>
                       <b-dropdown-item 
-                        @click="setCourseUpdate(row)" >
+                        @click="setUpdate(row)" >
                         Edit
                       </b-dropdown-item>
                       <b-dropdown-item 
@@ -157,12 +157,13 @@
 
 const courseFields = {
   id: null,
-  name: "",
-  description: "",
+  name: null,
+  description: null
 }
 
 import { CourseApi } from "../../mixins/api"
-import { validate, reset } from '../../helpers/forms';
+import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { copyValue } from '../../helpers/extractor'
 export default {
 	name: "Course",
 	mixins: [ CourseApi ],
@@ -226,65 +227,54 @@ export default {
 	methods: {
 		loadCourses(){
       const { courses } = this.tables
-      const { course } = this.paginations
+      const { course, course: { perPage, page } } = this.paginations
 
       courses.isBusy = true
 
-			var params = { paginate: true, perPage: course.perPage, page: course.page }
-      this.getCourseList(params).then(response =>{
-        const res = response.data
-        courses.items = res.data
-        course.from = res.meta.from
-        course.to = res.meta.to
-        course.totalRows = res.meta.total
+			var params = { paginate: true, perPage, page }
+      this.getCourseList(params).then(({ data }) =>{
+        courses.items = data.data
+        course.from = data.meta.from
+        course.to = data.meta.to
+        course.totalRows = data.meta.total
         courses.isBusy = false
       })
     },
     onCourseEntry(){
-      reset(this.forms.course)
+      const { course, course: { fields } } = this.forms
+      reset(course)
       if(this.entryMode == "Add"){
-        this.addCourse(this.forms.course.fields)
-          .then(response => {
-            const res = response
+        this.addCourse(fields)
+          .then(({ data }) => {
             const { course } = this.paginations
             if(course.totalRows % course.perPage == 0){
               course.totalRows++
             }
-            if(course.page == course.totalRows){
+            let totalPages = Math.ceil(course.totalRows / course.perPage)
+            if(course.page == totalPages){
               this.loadCourses()
             }
             else {
-              course.page = course.totalRows
+              course.page = totalPages
             }
-            this.showNotification("success", "Course created successfully.")
+            showNotification(this, "success", "Course created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            // if(err){
-            //   var key = Object.keys(err)[0]
-            //   this.showNotification("danger", err[key])
-            //   this.$refs[key].focus()
-            // }
             validate(this.forms.course, errors)
           })
       }
       else {
         const { fields } = this.forms.course
         this.updateCourse(fields, fields.id)
-          .then(response => {
-            const res = response.data
+          .then(({ data }) => {
             this.loadCourses()
-            this.showNotification("success", "Course updated successfully.")
+            showNotification(this, "success", "Course updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            // if(err){
-            //   var key = Object.keys(err)[0]
-            //   this.showNotification("danger", err[key])
-            //   this.$refs[key].focus()
-            // }
             validate(this.forms.course, errors)
           })
       }
@@ -294,46 +284,22 @@ export default {
       this.deleteCourse(id)
         .then(response => {
           this.loadCourses()
-          this.showNotification("success", "Course deleted successfully.")
+          showNotification(this, "success", "Course deleted successfully.")
           this.showModalConfirmation = false
         })
     },
-    clearFields(){
-      var keyField = this.forms.course.fields
-      for(var key in keyField){
-        if (typeof keyField[key] !== "object") {
-          if(typeof keyField[key] == "number"){
-            keyField[key] = 0
-          }
-          else{
-            keyField[key] = null
-          }
-        } 
-        else {
-          var innerFields = keyField[key]
-          for (var innerKey in innerFields) {
-            innerFields[innerKey] = null
-          }
-        }
-      }
-    },
-    setCourseUpdate(row){
-      reset(this.forms.course)
-      for(var key in this.forms.course.fields){
-        this.forms.course.fields[key] = row.item[key]
-      }
+    setUpdate(row){
+      const { course, course: { fields } } = this.forms
+      copyValue(row.item, fields)
+      reset(course)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
-    showNotification(variant, msg){
-      this.$bvToast.toast(msg, {
-        title: "Notification",
-        variant: variant,
-        solid: true
-      })
-    },
-    onShowModal(){
-      reset(this.forms.course)
+    setCreate(){
+      const { course } = this.forms
+      reset(course)
+      clearFields(course.fields)
+      this.entryMode='Add'
       this.showModalEntry = true
     }
 	}

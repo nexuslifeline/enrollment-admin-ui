@@ -11,12 +11,12 @@
                   <b-col md=8>
                     <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SCHOOL FEE
+                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW USER GROUP
                     </b-button>
                   </b-col>
                   <b-col md=4>
                     <b-form-input
-                      v-model="filters.schoolFee.criteria"
+                      v-model="filters.userGroup.criteria"
                       type="text" 
                       placeholder="Search">
                     </b-form-input>
@@ -30,10 +30,10 @@
               <b-col md=12>
                 <b-table
 									small hover outlined show-empty
-									:fields="tables.schoolFees.fields"
-                  :busy="tables.schoolFees.isBusy"
-                  :items="tables.schoolFees.items" 
-                  :filter="filters.schoolFee.criteria">
+									:fields="tables.userGroups.fields"
+                  :busy="tables.userGroups.isBusy"
+                  :items="tables.userGroups.items" 
+                  :filter="filters.userGroup.criteria">
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -44,7 +44,7 @@
                         Edit
                       </b-dropdown-item>
                       <b-dropdown-item 
-                        @click="forms.schoolFee.fields.id = row.item.id, showModalConfirmation = true">
+                        @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -52,16 +52,16 @@
 								</b-table>
                 <b-row>
                   <b-col md=6>
-                    Showing {{ paginations.schoolFee.from }} to {{ paginations.schoolFee.to }} of {{ paginations.schoolFee.totalRows }} records.
+                    Showing {{ paginations.userGroup.from }} to {{ paginations.userGroup.to }} of {{ paginations.userGroup.totalRows }} records.
                     </b-col>
                   <b-col md=6>
                     <b-pagination
-                      v-model="paginations.schoolFee.page"
-                      :total-rows="paginations.schoolFee.totalRows"
-                      :per-page="paginations.schoolFee.perPage"
+                      v-model="paginations.userGroup.page"
+                      :total-rows="paginations.userGroup.totalRows"
+                      :per-page="paginations.userGroup.perPage"
                       size="sm"
                       align="end"
-                      @input="loadSchoolFees()" />
+                      @input="loadUserGroups()" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -73,43 +73,56 @@
     </b-row>
     <!-- Modal Entry -->
     <b-modal 
+      @shown="$refs.code.focus()"
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					School Fees - {{ entryMode }}
+					User Group - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
 			<b-row> 
-        <b-col md=12>
+				<b-col md=6>
+          <b-form-group >
+            <label class="required">Code</label>
+            <b-form-input 
+              ref="code" 
+              v-model="forms.userGroup.fields.code" 
+              :state="forms.userGroup.states.code" />
+            <b-form-invalid-feedback>
+              {{forms.userGroup.errors.code}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+        <b-col md=6>
           <b-form-group >
             <label class="required">Name</label>
             <b-form-input 
               ref="name" 
-              v-model="forms.schoolFee.fields.name"
-              :state="forms.schoolFee.states.name" />
+              v-model="forms.userGroup.fields.name" 
+              :state="forms.userGroup.states.name" />
             <b-form-invalid-feedback>
-              {{forms.schoolFee.errors.name}}
+              {{forms.userGroup.errors.name}}
             </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
 			</b-row>
       <b-row>
         <b-col md=12>
-           <b-form-group >
-              <label class="required">Description</label>
-              <b-form-textarea 
-                ref="description" 
-                v-model="forms.schoolFee.fields.description" 
-                :state="forms.schoolFee.states.description"/>
-              <b-form-invalid-feedback>
-                {{forms.schoolFee.errors.description}}
-              </b-form-invalid-feedback>
+          <b-form-group>
+            <label class="required">Description</label>
+            <b-form-textarea 
+              ref="description" 
+              v-model="forms.userGroup.fields.description" 
+              :state="forms.userGroup.states.description" />
+            <b-form-invalid-feedback>
+              {{forms.userGroup.errors.description}}
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
-     
-      <!-- end modal body -->
+      
+      <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
@@ -120,27 +133,26 @@
         <b-button 
           variant="outline-primary" 
           class="float-right" 
-          @click="onSchoolFeeEntry()">
+          @click="onUserGroupEntry()">
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
     <!-- End Modal Entry -->
-
     <!-- Modal Confirmation -->
     <b-modal 
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
       <div slot="modal-title">
-          Delete School Fee
+          Delete User Group
       </div>
-      Are you sure you want to delete this School Fee ?
+      Are you sure you want to delete this user group?
       <div slot="modal-footer">
         <b-button 
           variant="outline-primary" 
           class="mr-2" 
-          @click="onSchoolFeeDelete()">
+          @click="onUserGroupDelete()">
           Yes
         </b-button>
         <b-button 
@@ -155,34 +167,41 @@
 </template>
 <script>
 
-const schoolFeeFields = {
+const userGroupFields = {
   id: null,
+  code: null,
   name: null,
-  description: null,
+  description: null
 }
 
-import { SchoolFeeApi } from "../../mixins/api"
-import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { UserGroupApi } from "../../mixins/api"
+import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 export default {
-	name: "schoolFee",
-	mixins: [ SchoolFeeApi ],
+	name: "UserGroup",
+	mixins: [ UserGroupApi ],
 	data() {
 		return {
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: "",
       forms: {
-        schoolFee: {
-          fields: { ...schoolFeeFields },
-          states: { ...schoolFeeFields },
-          errors: { ...schoolFeeFields }
+        userGroup: {
+          fields: { ...userGroupFields },
+          states: { ...userGroupFields },
+          errors: { ...userGroupFields }
         }
       },
 			tables: {
-				schoolFees: {
+				userGroups: {
           isBusy: false,
 					fields: [
+            {
+							key: "code",
+							label: "Code",
+							tdClass: "align-middle",
+							thStyle: {width: "20%"}
+						},
 						{
 							key: "name",
 							label: "Name",
@@ -206,7 +225,7 @@ export default {
 				}
       },
       paginations: {
-				schoolFee: {
+				userGroup: {
 					from: 0,
 					to: 0,
 					totalRows: 0,
@@ -215,90 +234,87 @@ export default {
 				}
       },
       filters: {
-        schoolFee: {
+        userGroup: {
           criteria: null
         }
       }
 		}
 	},
 	created(){
-		this.loadSchoolFees()
+		this.loadUserGroups()
 	},
 	methods: {
-		loadSchoolFees(){
-      const { schoolFees } = this.tables
-      const { schoolFee, schoolFee: { perPage, page } } = this.paginations
-
-      schoolFees.isBusy = true
-
+		loadUserGroups(){
+      const { userGroups } = this.tables
+      userGroups.isBusy = true
+      const { userGroup, userGroup: { perPage, page } } = this.paginations
 			var params = { paginate: true, perPage, page }
-      this.getSchoolFeeList(params).then(({ data }) =>{
-        schoolFees.items = data.data
-        schoolFee.from = data.meta.from
-        schoolFee.to = data.meta.to
-        schoolFee.totalRows = data.meta.total
-        schoolFees.isBusy = false
+      this.getUserGroupList(params).then(({ data }) =>{
+        userGroups.items = data.data
+        userGroup.from = data.meta.from
+        userGroup.to = data.meta.to
+        userGroup.totalRows = data.meta.total
+        userGroups.isBusy = false
       })
     },
-    onSchoolFeeEntry(){
-      const { schoolFee, schoolFee: { fields } } = this.forms
-      reset(schoolFee)
+    onUserGroupEntry(){
+      const { userGroup, userGroup: { fields } } = this.forms
+      reset(userGroup)
       if(this.entryMode == "Add"){
-        this.addSchoolFee(fields)
+        this.addUserGroup(fields)
           .then(({ data }) => {
-            const { schoolFee } = this.paginations
-            if(schoolFee.totalRows % schoolFee.perPage == 0){
-              schoolFee.totalRows++
+            const { userGroup } = this.paginations
+            if(userGroup.totalRows % userGroup.perPage == 0){
+              userGroup.totalRows++
             }
-            let totalPages = Math.ceil(schoolFee.totalRows / schoolFee.perPage)
-            if(schoolFee.page == totalPages){
+            let totalPages = Math.ceil(userGroup.totalRows / userGroup.perPage)
+            if(userGroup.page == totalPages){
               this.loadUserGroups()
             }
             else {
-              schoolFee.page = totalPages
+              userGroup.page = totalPages
             }
-            showNotification(this, "success", "School Fee created successfully.")
+            showNotification(this, "success", "User group created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            validate(schoolFee, errors)
+            validate(userGroup, errors)
           })
       }
       else {
-        const { fields } = this.forms.schoolFee
-        this.updateSchoolFee(fields, fields.id)
+        this.updateUserGroup(fields, fields.id)
           .then(({ data }) => {
-            this.loadSchoolFees()
-            showNotification(this, "success", "School Fee updated successfully.")
+            this.loadUserGroups()
+            showNotification(this, "success", "User group updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            validate(schoolFee, errors)
+            validate(userGroup, errors)
           })
       }
     },
-    onSchoolFeeDelete(){
-      const { id } = this.forms.schoolFee.fields
-      this.deleteSchoolFee(id)
+    onUserGroupDelete(){
+      const { id } = this.forms.userGroup.fields
+      this.deleteUserGroup(id)
         .then(response => {
-          this.loadSchoolFees()
-          showNotification(this, "success", "School Fee deleted successfully.")
+          this.loadUserGroups()
+          showNotification(this, "success", "User group deleted successfully.")
           this.showModalConfirmation = false
         })
     },
     setUpdate(row){
-      const { schoolFee, schoolFee: { fields } } = this.forms
+      const { userGroup, userGroup: { fields } } = this.forms
       copyValue(row.item, fields)
-      reset(schoolFee)
+      reset(userGroup)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
     setCreate(){
-      const { schoolFee } = this.forms
-      reset(schoolFee)
-      clearFields(schoolFee.fields)
+      const { userGroup } = this.forms
+      reset(userGroup)
+      clearFields(userGroup.fields)
       this.entryMode='Add'
       this.showModalEntry = true
     }

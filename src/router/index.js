@@ -21,6 +21,8 @@ const Curriculum = () => import('@/views/pages/Curriculum')
 const Subject = () => import('@/views/pages/Subject')
 const Course = () => import('@/views/pages/Course')
 const SchoolFee = () => import('@/views/pages/SchoolFee')
+const UserGroup = () => import('@/views/pages/UserGroup')
+const User = () => import('@/views/pages/User')
 
 Vue.use(Router)
 
@@ -103,6 +105,18 @@ function configRoutes () {
           path: 'schoolfee',
           name: 'School Fee',
           component: SchoolFee,
+          meta: {requiresAuth: true}
+        },
+        {
+          path: 'user',
+          name: 'User',
+          component: User,
+          meta: {requiresAuth: true}
+        },
+        {
+          path: 'usergroup',
+          name: 'User Group',
+          component: UserGroup,
           meta: {requiresAuth: true}
         }
       ]
