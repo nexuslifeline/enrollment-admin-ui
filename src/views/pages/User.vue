@@ -332,7 +332,7 @@ export default {
             }
             let totalPages = Math.ceil(user.totalRows / user.perPage)
             if(user.page == totalPages){
-              this.loadSubjects()
+              this.loadPersonnels()
             }
             else {
               user.page = totalPages
@@ -370,6 +370,7 @@ export default {
     setUpdate(row){
       const { user, user: { fields } } = this.forms
       const { item } = row
+      clearFields(fields)
       reset(user)
 
       fields.id = item.id
