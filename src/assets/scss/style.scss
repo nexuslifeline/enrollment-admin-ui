@@ -1,5 +1,6 @@
 // If you want to override variables do it here
 @import "variables";
+@import "shared";
 
 // Import styles
 @import "~@coreui/coreui/scss/coreui";
@@ -21,4 +22,12 @@
 label.required:before {
   content: '* ';
   color: red;
+}
+
+.col-auto {
+
+  @include for-size(phone-only) {
+      width: 100%;
+      text-align: center;
+  }
 }
