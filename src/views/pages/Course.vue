@@ -1,3 +1,16 @@
+<style lang="scss" scoped>
+  @import "../../assets/scss/shared.scss";
+
+  .bottom-space {
+    margin-bottom: 0px;
+    
+    @include for-size(phone-only) {
+      margin-bottom: 15px;
+    }
+
+  }
+</style> 
+
 <template>
   <div>
     <b-row>
@@ -9,7 +22,7 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button variant="outline-primary" 
+                    <b-button class="bottom-space" variant="outline-primary" 
                       @click="clearFields(), entryMode='Add', onShowModal()">
                       <b-icon-plus-circle></b-icon-plus-circle> ADD NEW COURSE
                     </b-button>
