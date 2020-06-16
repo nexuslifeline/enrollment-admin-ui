@@ -1,3 +1,15 @@
+<style lang="scss" scoped>
+  @import "../../assets/scss/shared.scss";
+
+  .bottom-space {
+    margin-bottom: 0px;
+    
+    @include for-size(phone-only) {
+      margin-bottom: 15px;
+    }
+
+  }
+</style> 
 <template>
   <div>
     <b-row>
@@ -8,7 +20,7 @@
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
-                  <b-col md=8>
+                  <b-col md=8 class="bottom-space">
                     <b-button variant="outline-primary" 
                       @click="clearFields(), entryMode='Add', onShowModal()">
                       <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
@@ -29,7 +41,7 @@
             <b-row >
               <b-col md=12>
                 <b-table
-									small hover outlined show-empty
+									responsive small hover outlined show-empty
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
                   :items="tables.subjects.items" 
