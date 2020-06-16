@@ -10,7 +10,7 @@
                 <b-row>
                   <b-col md=8>
                     <b-button variant="outline-primary" 
-                      @click="clearFields(), entryMode='Add', showModalEntry=true">
+                      @click="clearFields(), entryMode='Add', onShowModal()">
                       <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
                     </b-button>
                   </b-col>
@@ -82,28 +82,44 @@
       <!-- modal body -->
 			<b-row> 
 				<b-col md=6>
-          <b-form-group label="Code">
+          <b-form-group >
+            <label class="required">Code</label>
             <b-form-input 
               ref="code" 
-              placeholder="Code" 
-              v-model="forms.subject.fields.code" />
+              v-model="forms.subject.fields.code" 
+              :state="forms.subject.states.code" />
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.code}}
+            </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
         <b-col md=6>
-          <b-form-group label="Name">
+          <b-form-group >
+            <label class="required">Name</label>
             <b-form-input 
               ref="name" 
-              placeholder="Name" 
-              v-model="forms.subject.fields.name" />
+              v-model="forms.subject.fields.name" 
+              :state="forms.subject.states.name" />
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.name}}
+            </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
 			</b-row>
-      <b-form-group label="Description">
-        <b-form-textarea 
-          ref="description" 
-          placeholder="Description" 
-          v-model="forms.subject.fields.description" />
-      </b-form-group>
+      <b-row>
+        <b-col md=12>
+          <b-form-group>
+            <label class="required">Name</label>
+            <b-form-textarea 
+              ref="description" 
+              v-model="forms.subject.fields.description" 
+              :state="forms.subject.states.description" />
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.description}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-row>
         <b-col md=6>
           <b-form-group label="Units">
@@ -199,7 +215,7 @@
         </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
-    <!-- Modal Entry -->
+    <!-- End Modal Entry -->
     <!-- Modal Confirmation -->
     <b-modal 
       v-model="showModalConfirmation"
@@ -223,10 +239,25 @@
         </b-button>            
       </div>
     </b-modal>
+    <!-- End Modal Confirmation -->
   </div>
 </template>
 <script>
+
+const subjectFields = {
+  id: null,
+  code: "",
+  name: "",
+  description: "",
+  units: 0,
+  amountPerUnit: 0,
+  labs: 0,
+  amountPerLab: 0,
+  totalAmount: 0
+}
+
 import { SubjectApi } from "../../mixins/api"
+import { validate, reset } from '../../helpers/forms'
 export default {
 	name: "Subject",
 	mixins: [ SubjectApi ],
@@ -237,17 +268,9 @@ export default {
       entryMode: "",
       forms: {
         subject: {
-          fields: {
-            id: null,
-            code: "",
-            name: "",
-            description: "",
-            units: 0,
-            amountPerUnit: 0,
-            labs: 0,
-            amountPerLab: 0,
-            totalAmount: 0
-          }
+          fields: { ...subjectFields },
+          states: { ...subjectFields },
+          errors: { ...subjectFields }
         }
       },
 			tables: {
@@ -351,6 +374,7 @@ export default {
       })
     },
     onSubjectEntry(){
+      reset(this.forms.subject)
       if(this.entryMode == "Add"){
         this.addSubject(this.forms.subject.fields)
           .then(response => {
@@ -369,12 +393,13 @@ export default {
             this.showModalEntry = false
           })
           .catch(error => {
-            const err = error.response.data.errors
-            if(err){
-              var key = Object.keys(err)[0]
-              this.showNotification("danger", err[key])
-              this.$refs[key].focus()
-            }
+            const errors = error.response.data.errors
+            // if(err){
+            //   var key = Object.keys(err)[0]
+            //   this.showNotification("danger", err[key])
+            //   this.$refs[key].focus()
+            // }
+            validate(this.forms.subject, errors)
           })
       }
       else {
@@ -387,12 +412,13 @@ export default {
             this.showModalEntry = false
           })
           .catch(error => {
-            const err = error.response.data.errors
-            if(err){
-              var key = Object.keys(err)[0]
-              this.showNotification("danger", err[key])
-              this.$refs[key].focus()
-            }
+            const errors = error.response.data.errors
+            // if(err){
+            //   var key = Object.keys(err)[0]
+            //   this.showNotification("danger", err[key])
+            //   this.$refs[key].focus()
+            // }
+            validate(this.forms.subject, errors)
           })
       }
     },
@@ -425,6 +451,8 @@ export default {
       }
     },
     setSubjectUpdate(row){
+      reset(this.forms.subject)
+
       for(var key in this.forms.subject.fields){
         this.forms.subject.fields[key] = row.item[key]
       }
@@ -441,6 +469,10 @@ export default {
         variant: variant,
         solid: true
       })
+    },
+    onShowModal(){
+      reset(this.forms.subject)
+      this.showModalEntry = true
     }
 	}
 }

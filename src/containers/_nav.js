@@ -37,6 +37,18 @@ export default [
         name: 'Subject',
         to: '/subject',
         icon: 'cil-layers'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Course',
+        to: '/course',
+        icon: 'cil-layers'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Schoo Fee',
+        to: '/schoolfee',
+        icon: 'cil-layers'
       }
     ]
   }

@@ -69,7 +69,7 @@
 								  <span>{{ data.item.student.name }}</span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
 									<small>Address : {{ data.item.student.address ? 
-                    data.item.student.address.address : "" }}
+                    data.item.student.address.currentCompleteAddress : "" }}
                   </small>
 								</b-media>
 							</template>
@@ -625,10 +625,10 @@ export default {
             this.getRateSheetList(rateSheetParams)
               .then(({ data }) => {
                 const res = data.data
-                this.$set(row.item, 'enrollmentFee', res[0] ? res.enrollmentFee : 0)
+                this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
                 this.$set(row.item, 'previousBalance', 0)
-                this.$set(row.item, 'fees', res[0] ? res.fees : [])
-
+                this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
+              
                 const schoolCategories = [
                   SchoolCategories.SENIOR_HIGH_SCHOOL.id,
                   SchoolCategories.COLLEGE.id,
@@ -692,7 +692,7 @@ export default {
       const { fee, fee: { perPage, page } } = this.paginations
       const params = { paginate: true, perPage, page }
       fees.isBusy = true
-      this.getFees(params).then(response => {
+      this.getSchoolFeeList(params).then(response => {
         const res = response.data
         fees.items = res.data
         fee.from = res.meta.from

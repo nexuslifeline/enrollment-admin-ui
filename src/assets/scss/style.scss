@@ -17,3 +17,8 @@
   height: 1.2rem;
   font-size: 1.2rem;
 }
+
+label.required:before {
+  content: '* ';
+  color: red;
+}

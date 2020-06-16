@@ -162,6 +162,7 @@
 <script>
 import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi } from "../../mixins/api"
 import { SchoolCategories, Semesters } from "../../helpers/enum"
+import { showNotification } from '../../helpers/forms'
 export default {
 	name: "Curriculum",
 	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi ],
@@ -336,8 +337,12 @@ export default {
       const { levelId } = this.forms.curriculum.fields
 			this.updateSubjectsOfLevel(levelId, data)
 				.then(response => {
-					console.log(response)
-				})
+					showNotification(this, 'success', 'Curriculum is updated.')
+          //console.log(res)
+        })
+        .catch(error => {
+          showNotification(this, 'danger', 'Error in updating curriculum.')
+        })
     },
     loadSubjects(){
       const { subjects } = this.tables
