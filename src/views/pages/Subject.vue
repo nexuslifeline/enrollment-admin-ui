@@ -22,7 +22,7 @@
                 <b-row>
                   <b-col md=8 class="bottom-space">
                     <b-button variant="outline-primary" 
-                      @click="clearFields(), entryMode='Add', onShowModal()">
+                      @click="onCreate()">
                       <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
                     </b-button>
                   </b-col>
@@ -121,7 +121,7 @@
       <b-row>
         <b-col md=12>
           <b-form-group>
-            <label class="required">Name</label>
+            <label class="required">Description</label>
             <b-form-textarea 
               ref="description" 
               v-model="forms.subject.fields.description" 
@@ -258,18 +258,19 @@
 
 const subjectFields = {
   id: null,
-  code: "",
-  name: "",
-  description: "",
-  units: 0,
-  amountPerUnit: 0,
-  labs: 0,
-  amountPerLab: 0,
-  totalAmount: 0
+  code: null,
+  name: null,
+  description: null,
+  units: null,
+  amountPerUnit: null,
+  labs: null,
+  amountPerLab: null,
+  totalAmount: null
 }
 
 import { SubjectApi } from "../../mixins/api"
-import { validate, reset } from '../../helpers/forms'
+import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { copyValue } from '../../helpers/extractor'
 export default {
 	name: "Subject",
 	mixins: [ SubjectApi ],
@@ -373,101 +374,70 @@ export default {
 	},
 	methods: {
 		loadSubjects(){
-      this.tables.subjects.isBusy = true
-      const { perPage, page } = this.paginations.subject
+      const { subjects } = this.tables
+      subjects.isBusy = true
+      const { subject, subject: { perPage, page } } = this.paginations
 			var params = { paginate: true, perPage, page }
-      this.getSubjectList(params).then(response =>{
-        const res = response.data
-        this.tables.subjects.items = res.data
-        this.paginations.subject.from = res.meta.from
-        this.paginations.subject.to = res.meta.to
-        this.paginations.subject.totalRows = res.meta.total
-        this.tables.subjects.isBusy = false
+      this.getSubjectList(params).then(({ data }) =>{
+        subjects.items = data.data
+        subject.from = data.meta.from
+        subject.to = data.meta.to
+        subject.totalRows = data.meta.total
+        subjects.isBusy = false
       })
     },
     onSubjectEntry(){
-      reset(this.forms.subject)
+      const { subject, subject: { fields } } = this.forms
+      reset(subject)
       if(this.entryMode == "Add"){
-        this.addSubject(this.forms.subject.fields)
-          .then(response => {
-            const res = response
+        this.addSubject(fields)
+          .then(({ data }) => {
             const { subject } = this.paginations
             if(subject.totalRows % subject.perPage == 0){
               subject.totalRows++
             }
-            if(subject.page == subject.totalRows){
+            let totalPages = Math.ceil(subject.totalRows / subject.perPage)
+            if(subject.page == totalPages){
               this.loadSubjects()
             }
             else {
-              subject.page = subject.totalRows
+              subject.page = totalPages
             }
-            this.showNotification("success", "Subject created successfully.")
+            showNotification(this, "success", "Subject created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            // if(err){
-            //   var key = Object.keys(err)[0]
-            //   this.showNotification("danger", err[key])
-            //   this.$refs[key].focus()
-            // }
-            validate(this.forms.subject, errors)
+            validate(subject, errors)
           })
       }
       else {
         const { fields } = this.forms.subject
         this.updateSubject(fields, fields.id)
-          .then(response => {
-            const res = response.data
+          .then(({ data }) => {
             this.loadSubjects()
-            this.showNotification("success", "Subject updated successfully.")
+            showNotification(this, "success", "Subject updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            // if(err){
-            //   var key = Object.keys(err)[0]
-            //   this.showNotification("danger", err[key])
-            //   this.$refs[key].focus()
-            // }
-            validate(this.forms.subject, errors)
+            validate(subject, errors)
           })
       }
     },
     onSubjectDelete(){
       const { id } = this.forms.subject.fields
       this.deleteSubject(id)
-        .then(response => {
+        .then(({ data }) => {
           this.loadSubjects()
-          this.showNotification("success", "Subject deleted successfully.")
+          showNotification(this, "success", "Subject deleted successfully.")
           this.showModalConfirmation = false
         })
     },
-    clearFields(){
-      var keyField = this.forms.subject.fields
-      for(var key in keyField){
-        if (typeof keyField[key] !== "object") {
-          if(typeof keyField[key] == "number"){
-            keyField[key] = 0
-          }
-          else{
-            keyField[key] = null
-          }
-        } 
-        else {
-          var innerFields = keyField[key]
-          for (var innerKey in innerFields) {
-            innerFields[innerKey] = null
-          }
-        }
-      }
-    },
     setSubjectUpdate(row){
-      reset(this.forms.subject)
-
-      for(var key in this.forms.subject.fields){
-        this.forms.subject.fields[key] = row.item[key]
-      }
+      const { subject, subject: { fields } } = this.forms
+      copyValue(row.item, fields)
+      reset(subject)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
@@ -475,15 +445,11 @@ export default {
       const { fields } = this.forms.subject
       fields.totalAmount = (fields.units * fields.amountPerUnit) + (fields.labs * fields.amountPerLab)
     },
-    showNotification(variant, msg){
-      this.$bvToast.toast(msg, {
-        title: "Notification",
-        variant: variant,
-        solid: true
-      })
-    },
-    onShowModal(){
-      reset(this.forms.subject)
+    onCreate(){
+      const { subject } = this.forms
+      reset(subject)
+      clearFields(subject.fields)
+      this.entryMode='Add'
       this.showModalEntry = true
     }
 	}

@@ -10,7 +10,7 @@
                 <b-row>
                   <b-col md=8>
                     <b-button variant="outline-primary" 
-                      @click="clearFields(), entryMode='Add', onShowModal()">
+                      @click="setCreate()">
                       <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SCHOOL FEE
                     </b-button>
                   </b-col>
@@ -40,7 +40,7 @@
                         <b-icon-grip-horizontal></b-icon-grip-horizontal>
                       </template>
                       <b-dropdown-item 
-                        @click="setSchoolFeeUpdate(row)" >
+                        @click="setUpdate(row)" >
                         Edit
                       </b-dropdown-item>
                       <b-dropdown-item 
@@ -100,7 +100,6 @@
               <label class="required">Description</label>
               <b-form-textarea 
                 ref="description" 
-                placeholder="Description" 
                 v-model="forms.schoolFee.fields.description" 
                 :state="forms.schoolFee.states.description"/>
               <b-form-invalid-feedback>
@@ -121,7 +120,7 @@
         <b-button 
           variant="outline-primary" 
           class="float-right" 
-          @click="onCourseEntry()">
+          @click="onSchoolFeeEntry()">
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
@@ -158,12 +157,13 @@
 
 const schoolFeeFields = {
   id: null,
-  name: "",
-  description: "",
+  name: null,
+  description: null,
 }
 
 import { SchoolFeeApi } from "../../mixins/api"
-import { validate, reset } from '../../helpers/forms';
+import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { copyValue } from '../../helpers/extractor'
 export default {
 	name: "schoolFee",
 	mixins: [ SchoolFeeApi ],
@@ -227,66 +227,55 @@ export default {
 	methods: {
 		loadSchoolFees(){
       const { schoolFees } = this.tables
-      const { schoolFee } = this.paginations
+      const { schoolFee, schoolFee: { perPage, page } } = this.paginations
 
       schoolFees.isBusy = true
 
-			var params = { paginate: true, perPage: schoolFee.perPage, page: schoolFee.page }
-      this.getSchoolFeeList(params).then(response =>{
-        const res = response.data
-        schoolFees.items = res.data
-        schoolFee.from = res.meta.from
-        schoolFee.to = res.meta.to
-        schoolFee.totalRows = res.meta.total
+			var params = { paginate: true, perPage, page }
+      this.getSchoolFeeList(params).then(({ data }) =>{
+        schoolFees.items = data.data
+        schoolFee.from = data.meta.from
+        schoolFee.to = data.meta.to
+        schoolFee.totalRows = data.meta.total
         schoolFees.isBusy = false
       })
     },
-    onCourseEntry(){
-      reset(this.forms.schoolFee)
+    onSchoolFeeEntry(){
+      const { schoolFee, schoolFee: { fields } } = this.forms
+      reset(schoolFee)
       if(this.entryMode == "Add"){
-        this.addSchoolFee(this.forms.schoolFee.fields)
-          .then(response => {
-            const res = response
+        this.addSchoolFee(fields)
+          .then(({ data }) => {
             const { schoolFee } = this.paginations
             if(schoolFee.totalRows % schoolFee.perPage == 0){
               schoolFee.totalRows++
             }
-            if(schoolFee.page == schoolFee.totalRows){
-              this.loadSchoolFees()
+            let totalPages = Math.ceil(schoolFee.totalRows / schoolFee.perPage)
+            if(schoolFee.page == totalPages){
+              this.loadUserGroups()
             }
             else {
-              schoolFee.page = schoolFee.totalRows
+              schoolFee.page = totalPages
             }
-            this.showNotification("success", "School Fee created successfully.")
+            showNotification(this, "success", "School Fee created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            // if(err){
-            //   var key = Object.keys(err)[0]
-            //   this.showNotification("danger", err[key])
-            //   this.$refs[key].focus()
-            // }
-            validate(this.forms.schoolFee, errors)
+            validate(schoolFee, errors)
           })
       }
       else {
         const { fields } = this.forms.schoolFee
         this.updateSchoolFee(fields, fields.id)
-          .then(response => {
-            const res = response.data
+          .then(({ data }) => {
             this.loadSchoolFees()
-            this.showNotification("success", "School Fee updated successfully.")
+            showNotification(this, "success", "School Fee updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            // if(err){
-            //   var key = Object.keys(err)[0]
-            //   this.showNotification("danger", err[key])
-            //   this.$refs[key].focus()
-            // }
-            validate(this.forms.schoolFee, errors)
+            validate(schoolFee, errors)
           })
       }
     },
@@ -295,46 +284,22 @@ export default {
       this.deleteSchoolFee(id)
         .then(response => {
           this.loadSchoolFees()
-          this.showNotification("success", "School Fee deleted successfully.")
+          showNotification(this, "success", "School Fee deleted successfully.")
           this.showModalConfirmation = false
         })
     },
-    clearFields(){
-      var keyField = this.forms.schoolFee.fields
-      for(var key in keyField){
-        if (typeof keyField[key] !== "object") {
-          if(typeof keyField[key] == "number"){
-            keyField[key] = 0
-          }
-          else{
-            keyField[key] = null
-          }
-        } 
-        else {
-          var innerFields = keyField[key]
-          for (var innerKey in innerFields) {
-            innerFields[innerKey] = null
-          }
-        }
-      }
-    },
-    setSchoolFeeUpdate(row){
-      reset(this.forms.schoolFee)
-      for(var key in this.forms.schoolFee.fields){
-        this.forms.schoolFee.fields[key] = row.item[key]
-      }
+    setUpdate(row){
+      const { schoolFee, schoolFee: { fields } } = this.forms
+      copyValue(row.item, fields)
+      reset(schoolFee)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
-    showNotification(variant, msg){
-      this.$bvToast.toast(msg, {
-        title: "Notification",
-        variant: variant,
-        solid: true
-      })
-    },
-    onShowModal(){
-      reset(this.forms.schoolFee)
+    setCreate(){
+      const { schoolFee } = this.forms
+      reset(schoolFee)
+      clearFields(schoolFee.fields)
+      this.entryMode='Add'
       this.showModalEntry = true
     }
 	}

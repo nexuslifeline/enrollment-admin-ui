@@ -21,3 +21,23 @@ export const showNotification = (instance, variant, msg) => {
     solid: true
   })
 }
+
+export const clearFields = (form) => {
+  var keyField = form
+  for(var key in keyField){
+    if (typeof keyField[key] !== "object") {
+      if(typeof keyField[key] == "number"){
+        keyField[key] = 0
+      }
+      else{
+        keyField[key] = null
+      }
+    } 
+    else {
+      var innerFields = keyField[key]
+      for (var innerKey in innerFields) {
+        innerFields[innerKey] = null
+      }
+    }
+  }
+}

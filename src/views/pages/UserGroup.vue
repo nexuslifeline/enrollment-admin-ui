@@ -1,16 +1,3 @@
-<style lang="scss" scoped>
-  @import "../../assets/scss/shared.scss";
-
-  .bottom-space {
-    margin-bottom: 0px;
-    
-    @include for-size(phone-only) {
-      margin-bottom: 15px;
-    }
-
-  }
-</style> 
-
 <template>
   <div>
     <b-row>
@@ -22,15 +9,15 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button class="bottom-space" variant="outline-primary"
+                    <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW COURSE
+                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW USER GROUP
                     </b-button>
                   </b-col>
                   <b-col md=4>
                     <b-form-input
-                      v-model="filters.course.criteria"
-                      type="text"
+                      v-model="filters.userGroup.criteria"
+                      type="text" 
                       placeholder="Search">
                     </b-form-input>
                   </b-col>
@@ -43,10 +30,10 @@
               <b-col md=12>
                 <b-table
 									small hover outlined show-empty
-									:fields="tables.courses.fields"
-                  :busy="tables.courses.isBusy"
-                  :items="tables.courses.items" 
-                  :filter="filters.course.criteria">
+									:fields="tables.userGroups.fields"
+                  :busy="tables.userGroups.isBusy"
+                  :items="tables.userGroups.items" 
+                  :filter="filters.userGroup.criteria">
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -57,7 +44,7 @@
                         Edit
                       </b-dropdown-item>
                       <b-dropdown-item 
-                        @click="forms.course.fields.id = row.item.id, showModalConfirmation = true">
+                        @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -65,16 +52,16 @@
 								</b-table>
                 <b-row>
                   <b-col md=6>
-                    Showing {{ paginations.course.from }} to {{ paginations.course.to }} of {{ paginations.course.totalRows }} records.
+                    Showing {{ paginations.userGroup.from }} to {{ paginations.userGroup.to }} of {{ paginations.userGroup.totalRows }} records.
                     </b-col>
                   <b-col md=6>
                     <b-pagination
-                      v-model="paginations.course.page"
-                      :total-rows="paginations.course.totalRows"
-                      :per-page="paginations.course.perPage"
+                      v-model="paginations.userGroup.page"
+                      :total-rows="paginations.userGroup.totalRows"
+                      :per-page="paginations.userGroup.perPage"
                       size="sm"
                       align="end"
-                      @input="loadCourses()" />
+                      @input="loadUserGroups()" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -86,43 +73,56 @@
     </b-row>
     <!-- Modal Entry -->
     <b-modal 
+      @shown="$refs.code.focus()"
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					Courses - {{ entryMode }}
+					User Group - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
 			<b-row> 
-        <b-col md=12>
-          <b-form-group>
+				<b-col md=6>
+          <b-form-group >
+            <label class="required">Code</label>
+            <b-form-input 
+              ref="code" 
+              v-model="forms.userGroup.fields.code" 
+              :state="forms.userGroup.states.code" />
+            <b-form-invalid-feedback>
+              {{forms.userGroup.errors.code}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+        <b-col md=6>
+          <b-form-group >
             <label class="required">Name</label>
             <b-form-input 
               ref="name" 
-              v-model="forms.course.fields.name"
-              :state="forms.course.states.name" />
+              v-model="forms.userGroup.fields.name" 
+              :state="forms.userGroup.states.name" />
             <b-form-invalid-feedback>
-              {{forms.course.errors.name}}
+              {{forms.userGroup.errors.name}}
             </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
 			</b-row>
       <b-row>
         <b-col md=12>
-           <b-form-group >
-              <label class="required">Description</label>
-              <b-form-textarea 
-                ref="description" 
-                v-model="forms.course.fields.description" 
-                :state="forms.course.states.description"/>
-              <b-form-invalid-feedback>
-                {{forms.course.errors.description}}
-              </b-form-invalid-feedback>
+          <b-form-group>
+            <label class="required">Description</label>
+            <b-form-textarea 
+              ref="description" 
+              v-model="forms.userGroup.fields.description" 
+              :state="forms.userGroup.states.description" />
+            <b-form-invalid-feedback>
+              {{forms.userGroup.errors.description}}
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
-     
-      <!-- end modal body -->
+      
+      <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
@@ -133,27 +133,26 @@
         <b-button 
           variant="outline-primary" 
           class="float-right" 
-          @click="onCourseEntry()">
+          @click="onUserGroupEntry()">
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
     <!-- End Modal Entry -->
-
     <!-- Modal Confirmation -->
     <b-modal 
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
       <div slot="modal-title">
-          Delete Course
+          Delete User Group
       </div>
-      Are you sure you want to delete this course ?
+      Are you sure you want to delete this user group?
       <div slot="modal-footer">
         <b-button 
           variant="outline-primary" 
           class="mr-2" 
-          @click="onCourseDelete()">
+          @click="onUserGroupDelete()">
           Yes
         </b-button>
         <b-button 
@@ -168,34 +167,41 @@
 </template>
 <script>
 
-const courseFields = {
+const userGroupFields = {
   id: null,
+  code: null,
   name: null,
   description: null
 }
 
-import { CourseApi } from "../../mixins/api"
-import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { UserGroupApi } from "../../mixins/api"
+import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 export default {
-	name: "Course",
-	mixins: [ CourseApi ],
+	name: "UserGroup",
+	mixins: [ UserGroupApi ],
 	data() {
 		return {
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: "",
       forms: {
-        course: {
-          fields: { ...courseFields },
-          states: { ...courseFields },
-          errors: { ...courseFields }
+        userGroup: {
+          fields: { ...userGroupFields },
+          states: { ...userGroupFields },
+          errors: { ...userGroupFields }
         }
       },
 			tables: {
-				courses: {
+				userGroups: {
           isBusy: false,
 					fields: [
+            {
+							key: "code",
+							label: "Code",
+							tdClass: "align-middle",
+							thStyle: {width: "20%"}
+						},
 						{
 							key: "name",
 							label: "Name",
@@ -219,7 +225,7 @@ export default {
 				}
       },
       paginations: {
-				course: {
+				userGroup: {
 					from: 0,
 					to: 0,
 					totalRows: 0,
@@ -228,90 +234,87 @@ export default {
 				}
       },
       filters: {
-        course: {
+        userGroup: {
           criteria: null
         }
       }
 		}
 	},
 	created(){
-		this.loadCourses()
+		this.loadUserGroups()
 	},
 	methods: {
-		loadCourses(){
-      const { courses } = this.tables
-      const { course, course: { perPage, page } } = this.paginations
-
-      courses.isBusy = true
-
+		loadUserGroups(){
+      const { userGroups } = this.tables
+      userGroups.isBusy = true
+      const { userGroup, userGroup: { perPage, page } } = this.paginations
 			var params = { paginate: true, perPage, page }
-      this.getCourseList(params).then(({ data }) =>{
-        courses.items = data.data
-        course.from = data.meta.from
-        course.to = data.meta.to
-        course.totalRows = data.meta.total
-        courses.isBusy = false
+      this.getUserGroupList(params).then(({ data }) =>{
+        userGroups.items = data.data
+        userGroup.from = data.meta.from
+        userGroup.to = data.meta.to
+        userGroup.totalRows = data.meta.total
+        userGroups.isBusy = false
       })
     },
-    onCourseEntry(){
-      const { course, course: { fields } } = this.forms
-      reset(course)
+    onUserGroupEntry(){
+      const { userGroup, userGroup: { fields } } = this.forms
+      reset(userGroup)
       if(this.entryMode == "Add"){
-        this.addCourse(fields)
+        this.addUserGroup(fields)
           .then(({ data }) => {
-            const { course } = this.paginations
-            if(course.totalRows % course.perPage == 0){
-              course.totalRows++
+            const { userGroup } = this.paginations
+            if(userGroup.totalRows % userGroup.perPage == 0){
+              userGroup.totalRows++
             }
-            let totalPages = Math.ceil(course.totalRows / course.perPage)
-            if(course.page == totalPages){
-              this.loadCourses()
+            let totalPages = Math.ceil(userGroup.totalRows / userGroup.perPage)
+            if(userGroup.page == totalPages){
+              this.loadUserGroups()
             }
             else {
-              course.page = totalPages
+              userGroup.page = totalPages
             }
-            showNotification(this, "success", "Course created successfully.")
+            showNotification(this, "success", "User group created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            validate(this.forms.course, errors)
+            validate(userGroup, errors)
           })
       }
       else {
-        const { fields } = this.forms.course
-        this.updateCourse(fields, fields.id)
+        this.updateUserGroup(fields, fields.id)
           .then(({ data }) => {
-            this.loadCourses()
-            showNotification(this, "success", "Course updated successfully.")
+            this.loadUserGroups()
+            showNotification(this, "success", "User group updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            validate(this.forms.course, errors)
+            validate(userGroup, errors)
           })
       }
     },
-    onCourseDelete(){
-      const { id } = this.forms.course.fields
-      this.deleteCourse(id)
+    onUserGroupDelete(){
+      const { id } = this.forms.userGroup.fields
+      this.deleteUserGroup(id)
         .then(response => {
-          this.loadCourses()
-          showNotification(this, "success", "Course deleted successfully.")
+          this.loadUserGroups()
+          showNotification(this, "success", "User group deleted successfully.")
           this.showModalConfirmation = false
         })
     },
     setUpdate(row){
-      const { course, course: { fields } } = this.forms
+      const { userGroup, userGroup: { fields } } = this.forms
       copyValue(row.item, fields)
-      reset(course)
+      reset(userGroup)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
     setCreate(){
-      const { course } = this.forms
-      reset(course)
-      clearFields(course.fields)
+      const { userGroup } = this.forms
+      reset(userGroup)
+      clearFields(userGroup.fields)
       this.entryMode='Add'
       this.showModalEntry = true
     }
