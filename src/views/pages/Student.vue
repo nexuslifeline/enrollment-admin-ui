@@ -675,6 +675,7 @@ export default {
       });
     },
     setDisapproval(row) {
+      console.log(row)
       this.row = row.item
       this.showModalRejection = true
     },
@@ -694,12 +695,14 @@ export default {
       const data = applicationId 
       ? { application: { 
             ...application,
-            applicationStatusId: ApplicationStatuses.REJECTED.id
+            applicationStatusId: ApplicationStatuses.REJECTED.id,
+            applicationStepId: this.row.application.applicationStepId - 1
           } 
         } 
         : { admission: { 
             ...admission,
-            applicationStatusId: ApplicationStatuses.REJECTED.id
+            applicationStatusId: ApplicationStatuses.REJECTED.id,
+            admissionStepId: this.row.admission.admissionStepId - 1
           }
         }
 

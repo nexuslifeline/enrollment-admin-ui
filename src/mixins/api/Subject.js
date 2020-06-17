@@ -5,7 +5,7 @@ export default {
     getSubjectList(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects`, { params: params });
     },
-    getStudent(id) {
+    getSubject(id) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects/${id}`);
     },
     addSubject(data) {
