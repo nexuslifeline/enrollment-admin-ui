@@ -98,3 +98,62 @@ export const Fees = new Enum({
   TUITION_FEE: { id: 1, name: 'Tuition Fee' }
 });
 
+export const DegreeTypes = new Enum({
+  ASSOCIATE_DEGREE: { id: 1, name: 'Associate Degree', levels: [
+    { levelId: 15, schoolCategoryId: 5 }, 
+    { levelId: 16, schoolCategoryId: 5 },
+    { levelId: 17, schoolCategoryId: 5 },
+  ]},
+  BACHELORS_DEGREE_4_YEARS: { id: 2, name: "Bachelor's Degree (4 yrs)", levels: [
+    { levelId: 15, schoolCategoryId: 5 }, 
+    { levelId: 16, schoolCategoryId: 5 },
+    { levelId: 17, schoolCategoryId: 5 },
+    { levelId: 18, schoolCategoryId: 5 }
+  ]},
+  BACHELORS_DEGREE_5_YEARS: { id: 3, name: "Bachelor's Degree (5 yrs)", levels: [
+    { levelId: 15, schoolCategoryId: 5 }, 
+    { levelId: 16, schoolCategoryId: 5 },
+    { levelId: 17, schoolCategoryId: 5 },
+    { levelId: 18, schoolCategoryId: 5 },
+    { levelId: 19, schoolCategoryId: 5 },
+  ]},
+  MASTERS_DEGREE: { id: 4, name: "Master's Degree", levels: [
+    { levelId: 20, schoolCategoryId: 6 }, 
+    { levelId: 21, schoolCategoryId: 6 }
+  ]},
+  DOCTORATE_DEGREE: { id: 5, name: 'Doctorate Degree', levels: [
+    { levelId: 22, schoolCategoryId: 6 }, 
+    { levelId: 23, schoolCategoryId: 6 },
+    { levelId: 24, schoolCategoryId: 6 }, 
+    { levelId: 25, schoolCategoryId: 6 },
+    { levelId: 26, schoolCategoryId: 6 }, 
+    { levelId: 27, schoolCategoryId: 6 },
+    { levelId: 28, schoolCategoryId: 6 }
+  ]},
+});
+
+
+//user type: registrar = 1, finance = 2
+export const UserGroups = new Enum({
+  SUPER_USER: { id: 1, name: 'Super User', schoolCategoryId: null, userType: 0 },
+  REGISTRAR_PRE_SCHOOL: { id: 2, name: 'Registrar - Pre-School', schoolCategoryId: 1, userType: 1 },
+  FINANCE_PRE_SCHOOL: { id: 3, name: 'Finance - Pre-School', schoolCategoryId: 1, userType: 2 },
+  REGISTRAR_PRIMARY_SCHOOL: { id: 4, name: 'Registrar - Primary School', schoolCategoryId: 2, userType: 1 },
+  FINANCE_PRIMARY_SCHOOL: { id: 5, name: 'Finance - Primary School', schoolCategoryId: 2, userType: 2 },
+  REGISTRAR_JUNIOR_HIGH_SCHOOL: { id: 6, name: 'Registrar - Junior High School', schoolCategoryId: 3, userType: 1 },
+  FINANCE_JUNIOR_HIGH_SCHOOL: { id: 7, name: 'Finance - Junior High School', schoolCategoryId: 3, userType: 2 },
+  REGISTRAR_SENIOR_HIGH_SCHOOL: { id: 8, name: 'Registrar - Senior High School', schoolCategoryId: 4, userType: 1 },
+  FINANCE_SENIOR_HIGH_SCHOOL: { id: 9, name: 'Finance - Senior High School', schoolCategoryId: 4, userType: 2 },
+  REGISTRAR_COLLEGE: { id: 10, name: 'Registrar - College', schoolCategoryId: 5, userType: 1 },
+  FINANCE_COLLEGE: { id: 11, name: 'Finance - College', schoolCategoryId: 5, userType: 2 },
+  REGISTRAR_GRADUATE_SCHOOL: { id: 12, name: 'Registrar - Graduate School', schoolCategoryId: 6, userType: 1 },
+  FINANCE_GRADUATE_SCHOOL: { id: 13, name: 'Finance - Graduate School', schoolCategoryId: 6, userType: 2 },
+});
+
+// export const DegreeTypeLevels = new Enum({
+//   ASSOCIATE_DEGREE: { id: 1, levels: [15, 16, 17] },
+//   BACHELORS_DEGREE_4_YEARS: { id: 2, name: "Bachelor's Degree (4 yrs)" },
+//   BACHELORS_DEGREE_5_YEARS: { id: 3, name: "Bachelor's Degree (5 yrs)" },
+//   MASTERS_DEGREE: { id: 4, name: "Master's Degree" },
+//   DOCTORATE_DEGREE: { id: 5, name: 'Doctorate Degree' }
+// });

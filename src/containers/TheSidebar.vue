@@ -35,7 +35,7 @@
       </div>
     </CSidebarBrand>
 
-    <CRenderFunction flat :content-to-render="$options.nav"/>
+    <CRenderFunction flat :content-to-render="nav"/>
     <CSidebarMinimizer
       class="d-md-down-none"
       @click.native="$store.commit('set', ['sidebarMinimize', !minimize])"
@@ -44,11 +44,18 @@
 </template>
 
 <script>
-import nav from './_nav'
+import { navs } from './_nav'
 
 export default {
   name: 'TheSidebar',
-  nav,
+  data(){
+    return {
+      nav: null
+    }
+  },
+  created(){
+    this.nav = navs()
+  },
   computed: {
     show () {
       return this.$store.state.sidebarShow 

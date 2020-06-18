@@ -11,6 +11,7 @@
 										<b-tab 
 											v-for="schoolCategory in options.schoolCategories.values" 
 											:key="schoolCategory.id" 
+											:active="schoolCategoryId === schoolCategory.id"
 											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
 											:title="schoolCategory.name"/>
 									</b-tabs>
@@ -161,7 +162,7 @@
 </template>
 <script>
 import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi } from "../../mixins/api"
-import { SchoolCategories, Semesters } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification } from '../../helpers/forms'
 export default {
 	name: "Curriculum",
@@ -252,11 +253,12 @@ export default {
 				},
 				semesters: Semesters
 			},
-			levelIndex: 0
+			levelIndex: 0,
+			schoolCategoryId: null
 		}
 	},
 	created(){
-		this.loadLevelsOfSchoolCategoryList(this.options.schoolCategories.getEnum(1).id)
+		this.checkRights()
 		this.loadSubjects()
 	},
 	methods: {
@@ -364,6 +366,20 @@ export default {
 		},
 		removeSubject(row){
 			this.forms.curriculum.fields.subjects.splice(row.index, 1);
+		},
+		checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+			}
+
+			if (UserGroups.SUPER_USER.id == userGroup.id) {
+				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+			}
+			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
 		}
 	}
 }

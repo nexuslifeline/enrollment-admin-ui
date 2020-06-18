@@ -75,11 +75,14 @@ export default {
   methods: {
     authLogin(){
       this.login({ username: this.username, password: this.password })
-        .then(response => {
-          const res = response.data
+        .then(({ data }) => {
           this.$store.commit('loginUser')
-          localStorage.setItem('adminAccessToken', res.accessToken)
-          this.$router.push({ name: 'Dashboard'})
+          localStorage.setItem('adminAccessToken', data.accessToken)
+          this.getAuthenticatedUser()
+            .then(({ data }) => {
+              localStorage.setItem('userGroupId', data.userGroupId)
+              this.$router.push({ name: 'Dashboard'})
+            })
         })
         .catch(response => {
           console.log(response)

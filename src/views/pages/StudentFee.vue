@@ -7,10 +7,14 @@
 						<b-row>
 							<b-col md=9>
 								<b-tabs pills>
-									<b-tab @click="filters.student.schoolCategoryId = null, loadTranscript()" active title="All" />    						
+									<b-tab 
+										@click="filters.student.schoolCategoryId = null, loadTranscript()"
+										active
+										title="All" />
 									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
 										:key="schoolCategory.id"
 										:title="schoolCategory.name"
+										:active="schoolCategoryId == schoolCategory.id"
                     @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
 								</b-tabs>
 							</b-col>
@@ -316,7 +320,7 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
-import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees } from "../../helpers/enum"
+import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
 export default {
 	name: "StudentFee",
@@ -514,11 +518,12 @@ export default {
 				},
 				schoolCategories: SchoolCategories
       },
+      schoolCategoryId: null,
       studentFees: []
 		}
 	},
 	created(){
-		this.loadTranscript()
+		this.checkRights()
     this.loadCourseList()
     this.loadFees()
 	},
@@ -701,6 +706,16 @@ export default {
         fees.isBusy = false
       })
     },
+    checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+			}
+			this.loadTranscript()
+		}
   },
   computed: {
     subjectsTotalAmount() {

@@ -17,8 +17,10 @@
                   <b-col md=4>
                     <b-form-input
                       v-model="filters.schoolFee.criteria"
+                      debounce="500"
                       type="text" 
-                      placeholder="Search">
+                      placeholder="Search"
+                      @keydown.enter="loadSchoolFees()" >
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -32,8 +34,8 @@
 									small hover outlined show-empty
 									:fields="tables.schoolFees.fields"
                   :busy="tables.schoolFees.isBusy"
-                  :items="tables.schoolFees.items" 
-                  :filter="filters.schoolFee.criteria">
+                  :items="tables.schoolFees.items">
+                  <!-- :filter="filters.schoolFee.criteria> -->
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -228,10 +230,10 @@ export default {
 		loadSchoolFees(){
       const { schoolFees } = this.tables
       const { schoolFee, schoolFee: { perPage, page } } = this.paginations
-
+      const { criteria } = this.filters.schoolFee
       schoolFees.isBusy = true
 
-			var params = { paginate: true, perPage, page }
+			var params = { paginate: true, perPage, page, criteria }
       this.getSchoolFeeList(params).then(({ data }) =>{
         schoolFees.items = data.data
         schoolFee.from = data.meta.from
@@ -301,7 +303,7 @@ export default {
       clearFields(schoolFee.fields)
       this.entryMode='Add'
       this.showModalEntry = true
-    }
+    },
 	}
 }
 </script>

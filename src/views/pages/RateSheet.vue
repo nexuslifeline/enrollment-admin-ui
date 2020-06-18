@@ -7,9 +7,10 @@
             <b-card-body>
               <b-row>
                 <b-col md=12>
-                  <b-tabs pills  > 						
+                  <b-tabs pills>			
                     <b-tab v-for="schoolCategory in options.schoolCategories.values" 
                       :key="schoolCategory.id" 
+                      :active="schoolCategoryId == schoolCategory.id"
                       @click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
                       :title="schoolCategory.name"/>
                   </b-tabs>
@@ -185,12 +186,12 @@
             </b-col>
             <b-col md=6>
               <b-pagination
-                v-model="paginations.fee.activePage"
+                v-model="paginations.fee.page"
                 :total-rows="paginations.fee.totalRows"
                 :per-page="paginations.fee.perPage"
                 size="sm"
                 align="end"
-                @input="loadSubjects()"
+                @input="loadFees()"
               />
             </b-col>
           </b-row>
@@ -204,7 +205,7 @@
 </template>
 <script>
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
-import { SchoolCategories, Semesters } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification } from '../../helpers/forms'
 export default {
 	name: "RateSheet",
@@ -259,26 +260,27 @@ export default {
         },
         fees: {
           isBusy: false,
-          	fields: [
-						{
-							key: "name",
-							label: "NAME",
-							tdClass: "align-middle",
-							thStyle: {width: "30%"}
-						},
-						{
-							key: "description",
-							label: "Description",
-							tdClass: "align-middle",
-							thStyle: {width: "40%"}
-						},
-						{
-							key: "action",
-							label: "",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "30%"}
-						}
+          isBusy2: false,
+          fields: [
+            {
+              key: "name",
+              label: "NAME",
+              tdClass: "align-middle",
+              thStyle: {width: "30%"}
+            },
+            {
+              key: "description",
+              label: "Description",
+              tdClass: "align-middle",
+              thStyle: {width: "40%"}
+            },
+            {
+              key: "action",
+              label: "",
+              tdClass: "align-middle text-right",
+              thClass: "text-right",
+              thStyle: {width: "30%"}
+            }
           ],
           items: []
         }
@@ -288,7 +290,7 @@ export default {
 					from: 0,
 					to: 0,
 					totalRows: 0,
-					activePage: 1,
+					page: 1,
 					perPage: 10,
 				}
       },
@@ -307,12 +309,13 @@ export default {
 				},
 				semesters: Semesters
       },
-      levelIndex: 0
+      levelIndex: 0,
+      schoolCategoryI: null
 		}
 	},
 	created(){
     //this.loadRateSheetList()
-    this.loadLevelsOfSchoolCategoryList(this.options.schoolCategories.getEnum(1).id)
+    this.checkRights()
     this.loadFees()
   },
   computed: {
@@ -404,14 +407,15 @@ export default {
     },
     loadFees(){
       const { fees } = this.tables
-      const { fee } = this.paginations
-      const params = { paginate: true, perPage : 10 }
-      this.getSchoolFeeList(params).then(response => {
-        const res = response.data
-        fees.items = res.data
-        fee.from = res.meta.from
-        fee.to = res.meta.to
-        fee.totalRows = res.meta.total
+      const { fee, fee: { perPage, page } } = this.paginations
+      fees.isBusy2 = true
+      const params = { paginate: true, perPage, page }
+      this.getSchoolFeeList(params).then(({ data }) => {
+        fees.items = data.data
+        fee.from = data.meta.from
+        fee.to = data.meta.to
+        fee.totalRows = data.meta.total
+        fees.isBusy2 = false
       })
     },
     loadSemesterList(){
@@ -464,7 +468,21 @@ export default {
           showNotification(this, 'danger', 'Error in updating rate sheet')
         })
       }
-    }
+    },
+    checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+      }
+      
+      if (UserGroups.SUPER_USER.id == userGroup.id) {
+				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+			}
+			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
+		}
   },
 }
 </script>

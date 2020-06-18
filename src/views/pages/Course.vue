@@ -105,23 +105,51 @@
               {{forms.course.errors.name}}
             </b-form-invalid-feedback>
           </b-form-group>
-				</b-col>
-			</b-row>
-      <b-row>
-        <b-col md=12>
-           <b-form-group >
-              <label class="required">Description</label>
-              <b-form-textarea 
-                ref="description" 
-                v-model="forms.course.fields.description" 
-                :state="forms.course.states.description"/>
-              <b-form-invalid-feedback>
-                {{forms.course.errors.description}}
-              </b-form-invalid-feedback>
+          <b-form-group >
+            <label class="required">Description</label>
+            <b-form-textarea 
+              ref="description" 
+              v-model="forms.course.fields.description" 
+              :state="forms.course.states.description"/>
+            <b-form-invalid-feedback>
+              {{forms.course.errors.description}}
+            </b-form-invalid-feedback>
           </b-form-group>
-        </b-col>
-      </b-row>
-     
+          <b-form-group>
+            <label class="required">Degree Types</label>
+            <b-form-select 
+              v-model="forms.course.fields.degreeTypeId" 
+              :state="forms.course.states.degreeTypeId">
+              <template v-slot:first>
+                <b-form-select-option :value="null" disabled>-- Select Degree Type --</b-form-select-option>
+              </template>
+              <b-form-select-option 
+                v-for="degreeType in options.degreeTypes.values"
+                :key="degreeType.id"
+                :value="degreeType.id">
+                {{degreeType.name}}
+              </b-form-select-option>
+            </b-form-select>
+            <b-form-invalid-feedback>
+              {{forms.course.errors.degreeTypeId}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+          <!-- <b-form-checkbox-group
+            v-model="forms.course.fields.levels"
+            stacked>
+            <b-form-checkbox
+              v-for="level in options.levels.items"
+              :key="level.id"
+              :value="level.id">
+              {{ level.name }}
+            </b-form-checkbox>
+            <b-form-invalid-feedback 
+              :state="forms.course.states.levels">
+              {{forms.course.errors.levels}}
+            </b-form-invalid-feedback>
+          </b-form-checkbox-group> -->
+			</b-row>
       <!-- end modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
@@ -171,12 +199,15 @@
 const courseFields = {
   id: null,
   name: null,
-  description: null
+  description: null,
+  degreeTypeId: null,
+  levels: null
 }
 
 import { CourseApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
+import { DegreeTypes } from '../../helpers/enum'
 export default {
 	name: "Course",
 	mixins: [ CourseApi ],
@@ -231,11 +262,14 @@ export default {
         course: {
           criteria: null
         }
+      },
+      options: {
+        degreeTypes: DegreeTypes
       }
 		}
 	},
 	created(){
-		this.loadCourses()
+    this.loadCourses()
 	},
 	methods: {
 		loadCourses(){
@@ -255,8 +289,12 @@ export default {
     },
     onCourseEntry(){
       const { course, course: { fields } } = this.forms
+      let degreeType = DegreeTypes.getEnum(this.forms.course.fields.degreeTypeId)
+      if (degreeType) {
+        fields.levels = degreeType.levels
+      }
       reset(course)
-      if(this.entryMode == "Add"){
+      if (this.entryMode == "Add") {
         this.addCourse(fields)
           .then(({ data }) => {
             const { course } = this.paginations
@@ -277,9 +315,7 @@ export default {
             const errors = error.response.data.errors
             validate(this.forms.course, errors)
           })
-      }
-      else {
-        const { fields } = this.forms.course
+      } else {
         this.updateCourse(fields, fields.id)
           .then(({ data }) => {
             this.loadCourses()

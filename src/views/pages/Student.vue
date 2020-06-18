@@ -7,10 +7,14 @@
 						<b-row>
 							<b-col md=9>
 								<b-tabs pills>
-									<b-tab @click="filters.student.schoolCategoryId = null, loadTranscript()" active title="All" />    						
+									<b-tab 
+										@click="filters.student.schoolCategoryId = null, loadTranscript()"
+										active
+										title="All" />
 									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
 										:key="schoolCategory.id"
 										:title="schoolCategory.name"
+										:active="schoolCategoryId == schoolCategory.id"
                     @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
 								</b-tabs>
 							</b-col>
@@ -382,7 +386,7 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi } from "../../mixins/api"
-import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses } from "../../helpers/enum"
+import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
 
 const transcriptFields = {
@@ -591,13 +595,14 @@ export default {
 				},
 				schoolCategories: SchoolCategories
       },
-      isProcessing: false,
+			isProcessing: false,
+			schoolCategoryId: null,
       studentSubjects: [],
       row: []
 		}
 	},
 	created(){
-		this.loadTranscript()
+		this.checkRights()
     this.loadCourseList()
     this.loadSubjects()
 	},
@@ -821,6 +826,16 @@ export default {
 		},
 		removeSubject(subjects, row){
 			subjects.splice(row.index, 1)
+		},
+		checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+			}
+			this.loadTranscript()
 		}
   },
 }
