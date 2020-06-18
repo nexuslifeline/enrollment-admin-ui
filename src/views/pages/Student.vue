@@ -50,6 +50,8 @@
 							<b-col md="4">
 								<b-form-input
 									v-model="filters.student.criteria"
+                  debounce="500"
+                  @update="loadTranscript()"
 									type="text" 
 									placeholder="Search">
 								</b-form-input>
@@ -61,8 +63,6 @@
 							:fields="tables.students.fields"
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
-							:filter="filters.student.criteria"
-							:filter-included-fields="tables.students.filterIncludedFields"
 						>
 							<template v-slot:cell(name)="data">
 								<b-media>
@@ -94,7 +94,7 @@
 							<template v-slot:cell(action)="row">
 								<b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
 									<template v-slot:button-content>
-										<b-icon-grip-horizontal></b-icon-grip-horizontal>
+										<v-icon name="ellipsis-v" />
 									</template>
 									<b-dropdown-item 
                     v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
@@ -142,7 +142,7 @@
                         <b-col md=6 v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
                           <b-button class="float-right" variant="outline-primary"
                             @click="onAddSubject(data.item.subjects)">
-                            <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
+                            <v-icon name="plus-circle" /> ADD NEW SUBJECT
                           </b-button>
                         </b-col>
                       </b-row>
@@ -157,7 +157,7 @@
                             v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
 														@click="removeSubject(data.item.subjects, row)" 
 														size="sm" variant="danger">
-														<b-icon-x></b-icon-x>
+														<v-icon name="trash" />
 													</b-button>
 												</template>
 											</b-table>
@@ -351,12 +351,15 @@
 						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields"
             :filter="filters.subject.criteria"
-						:busy="tables.subjects.isBusy">
+						:busy="tables.subjects.isBusy"
+            :current-page="paginations.subject.page"
+            :per-page="paginations.subject.perPage"
+            @filtered="onFiltered($event, paginations.subject)">
 						<template v-slot:cell(action)="row">
 							<b-button 
                 @click="addSubject(row)" 
-                size="sm" variant="primary">
-                <b-icon-plus></b-icon-plus>
+                size="sm" variant="success">
+                <v-icon name="plus" />
               </b-button>
 						</template>
 					</b-table>
@@ -371,7 +374,7 @@
                 :per-page="paginations.subject.perPage"
                 size="sm"
                 align="end"
-                @input="loadSubjects()"
+                @input="recordDetails(paginations.subject)"
               />
             </b-col>
           </b-row>
@@ -388,6 +391,7 @@
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
+import Tables from "../../helpers/tables"
 
 const transcriptFields = {
   transcriptStatusId: null
@@ -409,7 +413,7 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi],
+	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, Tables],
 	data() {
 		return {
       showModalPreview: false,
@@ -726,7 +730,7 @@ export default {
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
-      const { transcriptStatusId, schoolCategoryId, courseId } = this.filters.student
+      const { transcriptStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
 			const applicationStatusId = ApplicationStatuses.SUBMITTED.id
 			let params = { 
 				paginate: true, 
@@ -734,7 +738,8 @@ export default {
 				transcriptStatusId, 
 				schoolCategoryId, 
 				courseId, 
-				applicationStatusId }
+        applicationStatusId,
+        criteria }
 			this.getTranscriptList(params)
 				.then(response => {
 					const res = response.data
@@ -804,16 +809,14 @@ export default {
     },
     loadSubjects(){
       const { subjects } = this.tables
-      const { subject, subject: { perPage, page } } = this.paginations
+      const { subject } = this.paginations
       subjects.isBusy = true
-			let params = { paginate: true, perPage, page }
+			let params = { paginate: false }
 			this.getSubjectList(params)
-				.then(response => {
-					const res = response.data
-          subjects.items = res.data
-          subject.from = res.meta.from
-					subject.to = res.meta.to
-					subject.totalRows = res.meta.total
+				.then(({ data }) => {
+          subjects.items = data
+          subject.totalRows = data.length
+          this.recordDetails(subject)
 					subjects.isBusy = false
 				})
     },

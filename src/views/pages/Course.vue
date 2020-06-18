@@ -24,7 +24,7 @@
                   <b-col md=8>
                     <b-button class="bottom-space" variant="outline-primary"
                       @click="setCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW COURSE
+                      <v-icon name="plus-circle" /> ADD NEW COURSE
                     </b-button>
                   </b-col>
                   <b-col md=4>
@@ -46,11 +46,14 @@
 									:fields="tables.courses.fields"
                   :busy="tables.courses.isBusy"
                   :items="tables.courses.items" 
-                  :filter="filters.course.criteria">
+                  :current-page="paginations.course.page"
+                  :per-page="paginations.course.perPage"
+                  :filter="filters.course.criteria"
+                  @filtered="onFiltered($event, paginations.course)">
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
-                        <b-icon-grip-horizontal></b-icon-grip-horizontal>
+                        <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
                         @click="setUpdate(row)" >
@@ -72,9 +75,9 @@
                       v-model="paginations.course.page"
                       :total-rows="paginations.course.totalRows"
                       :per-page="paginations.course.perPage"
+                      @input="recordDetails(paginations.course)"
                       size="sm"
-                      align="end"
-                      @input="loadCourses()" />
+                      align="end" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -208,9 +211,10 @@ import { CourseApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import { DegreeTypes } from '../../helpers/enum'
+import Tables from '../../helpers/tables'
 export default {
 	name: "Course",
-	mixins: [ CourseApi ],
+	mixins: [ CourseApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -274,21 +278,21 @@ export default {
 	methods: {
 		loadCourses(){
       const { courses } = this.tables
-      const { course, course: { perPage, page } } = this.paginations
+      const { course } = this.paginations
 
       courses.isBusy = true
 
-			var params = { paginate: true, perPage, page }
+			var params = { paginate: false }
       this.getCourseList(params).then(({ data }) =>{
-        courses.items = data.data
-        course.from = data.meta.from
-        course.to = data.meta.to
-        course.totalRows = data.meta.total
+        courses.items = data
+        course.totalRows = data.length
+        this.recordDetails(course)
         courses.isBusy = false
       })
     },
     onCourseEntry(){
       const { course, course: { fields } } = this.forms
+      const { courses } = this.tables
       let degreeType = DegreeTypes.getEnum(this.forms.course.fields.degreeTypeId)
       if (degreeType) {
         fields.levels = degreeType.levels
@@ -298,41 +302,33 @@ export default {
         this.addCourse(fields)
           .then(({ data }) => {
             const { course } = this.paginations
-            if(course.totalRows % course.perPage == 0){
-              course.totalRows++
-            }
-            let totalPages = Math.ceil(course.totalRows / course.perPage)
-            if(course.page == totalPages){
-              this.loadCourses()
-            }
-            else {
-              course.page = totalPages
-            }
+            this.addRow(courses, course, data)
             showNotification(this, "success", "Course created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            validate(this.forms.course, errors)
+            validate(course, errors)
           })
       } else {
         this.updateCourse(fields, fields.id)
           .then(({ data }) => {
-            this.loadCourses()
+            this.updateRow(courses, data)
             showNotification(this, "success", "Course updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            validate(this.forms.course, errors)
+            validate(course, errors)
           })
       }
     },
     onCourseDelete(){
       const { id } = this.forms.course.fields
+      const { courses } = this.tables
       this.deleteCourse(id)
-        .then(response => {
-          this.loadCourses()
+        .then(({ data }) => {
+          this.deleteRow(courses, id)
           showNotification(this, "success", "Course deleted successfully.")
           this.showModalConfirmation = false
         })

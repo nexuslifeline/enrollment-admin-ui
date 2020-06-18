@@ -68,7 +68,7 @@
                     class="float-right" 
                     variant="outline-primary"
                     @click="showModalFees=true"
-                  ><b-icon-plus-circle></b-icon-plus-circle> ADD NEW ITEM</b-button>
+                  ><v-icon name="plus-circle" /> ADD NEW ITEM</b-button>
                 </b-col>
               </b-row>
               <b-row>
@@ -97,7 +97,7 @@
                       <b-form-input v-model="row.item.pivot.notes"/>
                     </template>
                     <template v-slot:cell(action)="row">
-											<b-button @click="removeFee(row)" size="sm" variant="danger"><b-icon-x></b-icon-x></b-button>
+											<b-button @click="removeFee(row)" size="sm" variant="danger"><v-icon name="trash" /></b-button>
 										</template>
                   </b-table>
                   <hr>
@@ -175,9 +175,12 @@
 						:items.sync="tables.fees.items"
 						:fields="tables.fees.fields"
             :filter="filters.fee.criteria"
-						:busy="tables.fees.isBusy2">
+						:busy="tables.fees.isBusy2"
+            :current-page="paginations.fee.page"
+            :per-page="paginations.fee.perPage"
+            @filtered="onFiltered($event, paginations.fee)">
 						<template v-slot:cell(action)="row">
-							<b-button @click="addFee(row)" size="sm" variant="success"><b-icon-plus></b-icon-plus></b-button>
+							<b-button @click="addFee(row)" size="sm" variant="success"><v-icon name="plus" /></b-button>
 						</template>
 					</b-table>
           <b-row>
@@ -191,7 +194,7 @@
                 :per-page="paginations.fee.perPage"
                 size="sm"
                 align="end"
-                @input="loadFees()"
+                @input="recordDetails(paginations.fee)"
               />
             </b-col>
           </b-row>
@@ -207,9 +210,10 @@
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
 import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification } from '../../helpers/forms'
+import Tables from '../../helpers/tables'
 export default {
 	name: "RateSheet",
-	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi ],
+	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi, Tables ],
 	data() {
 		return {
       isLoaded: false,
@@ -407,14 +411,13 @@ export default {
     },
     loadFees(){
       const { fees } = this.tables
-      const { fee, fee: { perPage, page } } = this.paginations
+      const { fee } = this.paginations
       fees.isBusy2 = true
-      const params = { paginate: true, perPage, page }
+      const params = { paginate: false }
       this.getSchoolFeeList(params).then(({ data }) => {
-        fees.items = data.data
-        fee.from = data.meta.from
-        fee.to = data.meta.to
-        fee.totalRows = data.meta.total
+        fees.items = data
+        fee.totalRows = data.length
+        this.recordDetails(fee)
         fees.isBusy2 = false
       })
     },
