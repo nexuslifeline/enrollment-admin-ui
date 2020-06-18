@@ -1,21 +1,20 @@
 {
-  "name": "@coreui/coreui-free-vue-admin-template",
-  "version": "3.0.2",
-  "description": "Open Source Bootstrap Admin Template",
+  "name": "@stc/admin-app",
+  "version": "0.1.0",
+  "description": "STC Tandag Admin Application",
   "author": {
-    "name": "CoreUI",
-    "url": "https://coreui.io",
-    "github": "https://github.com/coreui",
-    "twitter": "https://twitter.com/core_ui"
+    "name": "nexuslifeline",
+    "url": "http://nexuslifeline.com",
+    "github": "https://github.com/nexuslifeline"
   },
   "contributors": [
     {
-      "name": "CoreUI Team",
-      "url": "https://github.com/orgs/coreui/people"
+      "name": "Nexuslifeline Team",
+      "url": "http://nexuslifeline.com"
     }
   ],
-  "homepage": "http://coreui.io",
-  "copyright": "Copyright 2020 creativeLabs Łukasz Holeczek",
+  "homepage": "http://student.stctandag.edu.ph",
+  "copyright": "Copyright 2020 Nexuslifeline Team",
   "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",

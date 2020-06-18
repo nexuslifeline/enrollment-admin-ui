@@ -3,11 +3,14 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import CoreuiVue from '@coreui/vue'
-import { iconsSet as icons } from './assets/icons/icons.js'
+//import { iconsSet as icons } from './assets/icons/icons.js'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import 'vue-awesome/icons'
+import { BootstrapVue } from 'bootstrap-vue'
+import 'vue-awesome/icons/spinner'
+import 'vue-awesome/icons/check'
+import 'vue-awesome/icons/sync'
+import 'vue-awesome/icons/trash'
 import Icon from 'vue-awesome/components/Icon'
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
@@ -19,7 +22,7 @@ Vue.config.performance = true
 Vue.component('v-icon', Icon)
 Vue.use(CoreuiVue)
 Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
+//Vue.use(IconsPlugin)
 Vue.component('vue-autonumeric', require('vue-autonumeric'))
 //import axios from 'axios'
 Vue.prototype.$log = console.log.bind(console)
@@ -31,7 +34,6 @@ new Vue({
   el: '#app',
   router,
   store,
-  icons,
   template: '<App/>',
   components: {
     App
