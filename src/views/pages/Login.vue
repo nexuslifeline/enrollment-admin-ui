@@ -12,6 +12,17 @@
     box-sizing: border-box;
     border-radius: 20px;
   }
+
+  .version {
+    position: absolute;
+    left: 50%;
+    bottom: -7%;
+    font-size: 9px;
+    right: 0;
+    transform: translate(-50%,0);
+    text-align: center;
+    color: #fff;
+  }
 </style>
 <template>
   <b-container class="background-blue d-flex justify-content-center min-vh-100 min-vw-100">
@@ -35,13 +46,13 @@
                     type="password"
                     placeholder="Password" />
                 </b-form-group>
-
                 <b-row align-h="end">
                    <b-col md=4>
                     <b-button @click="authLogin()" variant="outline-primary" block>Login</b-button>
                   </b-col>
                 </b-row>
               </b-form>
+              <b-col md=4 class="version">version: {{version}}</b-col>
           </b-card>
         </b-card-group>
       </b-col>
@@ -57,7 +68,8 @@ export default {
   data() {
     return {
       username: null,
-      password: null
+      password: null,
+      version: process.env.VUE_APP_API_VERSION
     }
   },
   methods: {
