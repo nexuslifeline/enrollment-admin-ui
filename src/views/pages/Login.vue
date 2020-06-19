@@ -36,8 +36,6 @@
                 <b-form-group>
                   <label>Email</label>
                   <b-form-input
-                    v-model="username"
-                    placeholder="Email"/>
                     v-model="forms.auth.fields.username"
                     :state="forms.auth.states.username" />
                   <b-form-invalid-feedback>
@@ -94,7 +92,7 @@ export default {
     return {
       username: null,
       password: null,
-      version: process.env.VUE_APP_VERSION
+      version: process.env.VUE_APP_VERSION,
       forms: {
         auth: {
           isProcessing: false,
