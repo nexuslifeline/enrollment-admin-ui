@@ -17,7 +17,7 @@
     position: absolute;
     left: 50%;
     bottom: -7%;
-    font-size: 9px;
+    font-size: 11px;
     right: 0;
     transform: translate(-50%,0);
     text-align: center;
@@ -52,7 +52,7 @@
                   </b-col>
                 </b-row>
               </b-form>
-              <b-col md=4 class="version">version: {{version}}</b-col>
+              <b-col md=4 class="version">Version: {{version}}</b-col>
           </b-card>
         </b-card-group>
       </b-col>
@@ -69,7 +69,7 @@ export default {
     return {
       username: null,
       password: null,
-      version: process.env.VUE_APP_API_VERSION
+      version: process.env.VUE_APP_VERSION
     }
   },
   methods: {
