@@ -7,10 +7,14 @@
 						<b-row>
 							<b-col md=9>
 								<b-tabs pills>
-									<b-tab @click="filters.student.schoolCategoryId = null, loadTranscript()" active title="All" />    						
+									<b-tab 
+										@click="filters.student.schoolCategoryId = null, loadTranscript()"
+										active
+										title="All" />
 									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
 										:key="schoolCategory.id"
 										:title="schoolCategory.name"
+										:active="schoolCategoryId == schoolCategory.id"
                     @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
 								</b-tabs>
 							</b-col>
@@ -48,6 +52,8 @@
 							<b-col md="4">
 								<b-form-input
 									v-model="filters.student.criteria"
+                  debounce="500"
+                  @update="loadTranscript()"
 									type="text" 
 									placeholder="Search">
 								</b-form-input>
@@ -58,9 +64,7 @@
 							hover outlined small responsive show-empty
 							:fields="tables.students.fields"
 							:items="tables.students.items"
-							:busy="tables.students.isBusy"
-							:filter="filters.student.criteria"
-							:filter-included-fields="tables.students.filterIncludedFields">
+							:busy="tables.students.isBusy">
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
@@ -92,7 +96,7 @@
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<b-icon-caret-down @click="loadDetails(row)"></b-icon-caret-down>
+								<v-icon name="caret-down" @click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
                 <b-overlay :show="isLoading" rounded="sm">
@@ -158,7 +162,7 @@
                             data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id" 
                           variant="outline-primary" 
                           class="float-right">
-                          <b-icon-plus-circle></b-icon-plus-circle> New Item
+                          <v-icon name="plus-circle" /> New Item
                         </b-button>
                       </b-col>
                     </b-row>
@@ -185,7 +189,7 @@
                               && row.item.id !== fees.TUITION_FEE.id"
                           @click="removeFee(data.item.fees, row)" 
                           size="sm" variant="danger">
-                          <b-icon-x></b-icon-x>
+                          <v-icon name="trash" />
                         </b-button>
                       </template>
                     </b-table>
@@ -282,12 +286,15 @@
 						:items.sync="tables.fees.items"
 						:fields="tables.fees.fields"
             :filter="filters.fee.criteria"
-						:busy="tables.fees.isBusy2">
+						:busy="tables.fees.isBusy2"
+            :current-page="paginations.fee.page"
+            :per-page="paginations.fee.perPage"
+            @filtered="onFiltered($event, paginations.fee)">
 						<template v-slot:cell(action)="row">
 							<b-button 
                 @click="addFee(row)" 
-                size="sm" variant="primary">
-                <b-icon-plus></b-icon-plus>
+                size="sm" variant="success">
+                <v-icon name="plus" />
               </b-button>
 						</template>
 					</b-table>
@@ -297,12 +304,12 @@
             </b-col>
             <b-col md=6>
               <b-pagination
-                v-model="paginations.fee.activePage"
+                v-model="paginations.fee.page"
                 :total-rows="paginations.fee.totalRows"
                 :per-page="paginations.fee.perPage"
                 size="sm"
                 align="end"
-                @input="loadSubjects()"
+                @input="recordDetails()"
               />
             </b-col>
           </b-row>
@@ -316,11 +323,12 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
-import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees } from "../../helpers/enum"
+import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
+import Tables from "../../helpers/tables"
 export default {
 	name: "StudentFee",
-	mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi],
+	mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi, Tables],
 	data() {
 		return {
 			showModalFees: false,
@@ -493,7 +501,7 @@ export default {
 					from: 0,
 					to: 0,
 					totalRows: 0,
-					activePage: 1,
+					page: 1,
 					perPage: 10,
 				}
 			},
@@ -514,11 +522,12 @@ export default {
 				},
 				schoolCategories: SchoolCategories
       },
+      schoolCategoryId: null,
       studentFees: []
 		}
 	},
 	created(){
-		this.loadTranscript()
+		this.checkRights()
     this.loadCourseList()
     this.loadFees()
 	},
@@ -579,7 +588,7 @@ export default {
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
-      const { applicationStatusId, schoolCategoryId, courseId } = this.filters.student
+      const { applicationStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
 			const transcriptStatusId = TranscriptStatuses.FINALIZED.id
 			let params = { 
 				paginate: true, 
@@ -587,7 +596,8 @@ export default {
 				transcriptStatusId, 
 				schoolCategoryId, 
 				courseId, 
-				applicationStatusId }
+        applicationStatusId,
+        criteria }
 			this.getTranscriptList(params)
 				.then(response => {
 					const res = response.data
@@ -689,18 +699,27 @@ export default {
     },
     loadFees(){
       const { fees } = this.tables
-      const { fee, fee: { perPage, page } } = this.paginations
-      const params = { paginate: true, perPage, page }
+      const { fee } = this.paginations
+      const params = { paginate: false }
       fees.isBusy = true
-      this.getSchoolFeeList(params).then(response => {
-        const res = response.data
-        fees.items = res.data
-        fee.from = res.meta.from
-        fee.to = res.meta.to
-        fee.totalRows = res.meta.total
-        fees.isBusy = false
+      this.getSchoolFeeList(params)
+        .then(({ data }) => {
+          fees.items = data
+          fee.totalRows = data.length
+          this.recordDetails(fee)
+          fees.isBusy = false
       })
     },
+    checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+			}
+			this.loadTranscript()
+    }
   },
   computed: {
     subjectsTotalAmount() {

@@ -11,6 +11,7 @@
 										<b-tab 
 											v-for="schoolCategory in options.schoolCategories.values" 
 											:key="schoolCategory.id" 
+											:active="schoolCategoryId === schoolCategory.id"
 											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
 											:title="schoolCategory.name"/>
 									</b-tabs>
@@ -61,7 +62,7 @@
 								<b-col md=6 offset-md="6">
 									<b-button class="float-right" variant="outline-primary"
 										@click="showModalSubjects=true">
-										<b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
+										<v-icon name="plus-circle" /> ADD NEW SUBJECT
 									</b-button>
 								</b-col>
 							</b-row>
@@ -83,7 +84,7 @@
 											<b-button 
                         @click="removeSubject(row)" 
                         size="sm" variant="danger">
-                        <b-icon-x></b-icon-x>
+                        <v-icon name="trash" />
                       </b-button>
 										</template>
 									</b-table>
@@ -127,12 +128,15 @@
 						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields"
             :filter="filters.subject.criteria"
-						:busy="tables.subjects.isBusy2">
+						:busy="tables.subjects.isBusy2"
+            :current-page="paginations.subject.page"
+            :per-page="paginations.subject.perPage"
+            @filtered="onFiltered($event, paginations.subject)">
 						<template v-slot:cell(action)="row">
 							<b-button 
                 @click="addSubject(row)" 
                 size="sm" variant="success">
-                <b-icon-plus></b-icon-plus>
+                <v-icon name="plus" />
               </b-button>
 						</template>
 					</b-table>
@@ -147,7 +151,7 @@
                 :per-page="paginations.subject.perPage"
                 size="sm"
                 align="end"
-                @input="loadSubjects()"
+                @input="recordDetails(paginations.subject)"
               />
             </b-col>
           </b-row>
@@ -161,11 +165,12 @@
 </template>
 <script>
 import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi } from "../../mixins/api"
-import { SchoolCategories, Semesters } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification } from '../../helpers/forms'
+import Tables from '../../helpers/tables'
 export default {
 	name: "Curriculum",
-	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi ],
+	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi, Tables ],
 	data() {
 		return {
 			showModalSubjects: false,
@@ -252,11 +257,12 @@ export default {
 				},
 				semesters: Semesters
 			},
-			levelIndex: 0
+			levelIndex: 0,
+			schoolCategoryId: null
 		}
 	},
 	created(){
-		this.loadLevelsOfSchoolCategoryList(this.options.schoolCategories.getEnum(1).id)
+		this.checkRights()
 		this.loadSubjects()
 	},
 	methods: {
@@ -266,12 +272,11 @@ export default {
 			this.forms.curriculum.fields.schoolCategoryId = id
 			let params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(id, params)
-				.then(response => {
-					const res = response.data
-					this.options.levels.items = res
+				.then(({ data }) => {
+					this.options.levels.items = data
 					this.levelIndex = 0
-					if (res.length > 0) {
-						this.loadCoursesOfLevelList(res[0].id)
+					if (data.length > 0) {
+						this.loadCoursesOfLevelList(data[0].id)
 					} else {
 						this.forms.curriculum.fields.subjects = []
 					}
@@ -287,9 +292,8 @@ export default {
       const { fields, fields: { levelId, courseId, semesterId } } = this.forms.curriculum
 			let params = { courseId, semesterId , paginate : false }
 			this.getSubjectsOfLevelList(levelId, params)
-				.then(response => {
-					const res = response.data
-					fields.subjects = res
+				.then(({ data }) => {
+					fields.subjects = data
 					subjects.isBusy = false
 			});
 		},
@@ -299,12 +303,11 @@ export default {
       const { schoolCategoryId } = this.forms.curriculum.fields
 			let params = { paginate: false, schoolCategoryId }
 			this.getCoursesOfLevelList(levelId, params)
-				.then(response => {
-          const res = response.data
+				.then(({ data }) => {
           const { courses, semesters } = this.options
-					courses.items = res
+					courses.items = data
 
-					if(res.length > 0){
+					if(data.length > 0){
 						this.forms.curriculum.fields.semesterId = semesters.getEnum(1).id
 						this.forms.curriculum.fields.courseId = courses.items[0].id
 					}
@@ -317,9 +320,8 @@ export default {
 			this.isLoading = true
 			let params = { paginate: false }
 			this.getSemesterList(params)
-				.then(response => {
-					const res = response.data
-					this.options.semesters.items = res
+				.then(({ data }) => {
+					this.options.semesters.items = data
 					this.isLoading = false
 				})
 		},
@@ -336,7 +338,7 @@ export default {
 			})
       const { levelId } = this.forms.curriculum.fields
 			this.updateSubjectsOfLevel(levelId, data)
-				.then(response => {
+				.then(({ data }) => {
 					showNotification(this, 'success', 'Curriculum is updated.')
           //console.log(res)
         })
@@ -346,16 +348,14 @@ export default {
     },
     loadSubjects(){
       const { subjects } = this.tables
-      const { subject, subject: { perPage, page } } = this.paginations
+      const { subject } = this.paginations
       subjects.isBusy2 = true
-			let params = { paginate: true, perPage, page }
+			let params = { paginate: false }
 			this.getSubjectList(params)
-				.then(response => {
-					const res = response.data
-          subjects.items = res.data
-          subject.from = res.meta.from
-					subject.to = res.meta.to
-					subject.totalRows = res.meta.total
+				.then(({ data }) => {
+          subjects.items = data
+          subject.totalRows = data.length
+          this.recordDetails(subject)
 					subjects.isBusy2 = false
 				})
     },
@@ -364,6 +364,20 @@ export default {
 		},
 		removeSubject(row){
 			this.forms.curriculum.fields.subjects.splice(row.index, 1);
+		},
+		checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+			}
+
+			if (UserGroups.SUPER_USER.id == userGroup.id) {
+				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+			}
+			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
 		}
 	}
 }

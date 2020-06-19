@@ -11,7 +11,7 @@
                   <b-col md=8>
                     <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW USER GROUP
+                      <v-icon name="plus-circle" /> ADD NEW USER GROUP
                     </b-button>
                   </b-col>
                   <b-col md=4>
@@ -32,12 +32,15 @@
 									small hover outlined show-empty
 									:fields="tables.userGroups.fields"
                   :busy="tables.userGroups.isBusy"
-                  :items="tables.userGroups.items" 
-                  :filter="filters.userGroup.criteria">
+                  :items="tables.userGroups.items"
+                  :current-page="paginations.userGroup.page"
+                  :per-page="paginations.userGroup.perPage"
+                  :filter="filters.userGroup.criteria"
+                  @filtered="onFiltered($event, paginations.userGroup)">
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
-                        <b-icon-grip-horizontal></b-icon-grip-horizontal>
+                        <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
                         @click="setUpdate(row)" >
@@ -61,7 +64,7 @@
                       :per-page="paginations.userGroup.perPage"
                       size="sm"
                       align="end"
-                      @input="loadUserGroups()" />
+                      @input="recordDetails(paginations.userGroup)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -177,9 +180,10 @@ const userGroupFields = {
 import { UserGroupApi } from "../../mixins/api"
 import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
+import Tables from '../../helpers/tables'
 export default {
 	name: "UserGroup",
-	mixins: [ UserGroupApi ],
+	mixins: [ UserGroupApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -246,34 +250,27 @@ export default {
 	methods: {
 		loadUserGroups(){
       const { userGroups } = this.tables
-      userGroups.isBusy = true
       const { userGroup, userGroup: { perPage, page } } = this.paginations
-			var params = { paginate: true, perPage, page }
+
+      userGroups.isBusy = true
+
+			var params = { paginate: false }
       this.getUserGroupList(params).then(({ data }) =>{
-        userGroups.items = data.data
-        userGroup.from = data.meta.from
-        userGroup.to = data.meta.to
-        userGroup.totalRows = data.meta.total
+        userGroups.items = data
+        userGroup.totalRows = data.length
+        this.recordDetails(userGroup)
         userGroups.isBusy = false
       })
     },
     onUserGroupEntry(){
       const { userGroup, userGroup: { fields } } = this.forms
+      const { userGroups } = this.tables
       reset(userGroup)
       if(this.entryMode == "Add"){
         this.addUserGroup(fields)
           .then(({ data }) => {
             const { userGroup } = this.paginations
-            if(userGroup.totalRows % userGroup.perPage == 0){
-              userGroup.totalRows++
-            }
-            let totalPages = Math.ceil(userGroup.totalRows / userGroup.perPage)
-            if(userGroup.page == totalPages){
-              this.loadUserGroups()
-            }
-            else {
-              userGroup.page = totalPages
-            }
+            this.addRow(userGroups, userGroup, data)
             showNotification(this, "success", "User group created successfully.")
             this.showModalEntry = false
           })
@@ -285,7 +282,7 @@ export default {
       else {
         this.updateUserGroup(fields, fields.id)
           .then(({ data }) => {
-            this.loadUserGroups()
+            this.updateRow(userGroups, data)
             showNotification(this, "success", "User group updated successfully.")
             this.showModalEntry = false
           })
@@ -297,9 +294,10 @@ export default {
     },
     onUserGroupDelete(){
       const { id } = this.forms.userGroup.fields
+      const { userGroups } = this.tables
       this.deleteUserGroup(id)
-        .then(response => {
-          this.loadUserGroups()
+        .then(({ data }) => {
+          this.deleteRow(userGroups, id)
           showNotification(this, "success", "User group deleted successfully.")
           this.showModalConfirmation = false
         })

@@ -23,7 +23,7 @@
                   <b-col md=8 class="bottom-space">
                     <b-button variant="outline-primary" 
                       @click="onCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
+                      <v-icon name="plus-circle" /> ADD NEW SUBJECT
                     </b-button>
                   </b-col>
                   <b-col md=4>
@@ -41,15 +41,18 @@
             <b-row >
               <b-col md=12>
                 <b-table
-									responsive small hover outlined show-empty
+									small hover outlined show-empty
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
                   :items="tables.subjects.items" 
-                  :filter="filters.subject.criteria">
+                  :current-page="paginations.subject.page"
+                  :per-page="paginations.subject.perPage"
+                  :filter="filters.subject.criteria"
+                  @filtered="onFiltered($event, paginations.subject)">
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
-                        <b-icon-grip-horizontal></b-icon-grip-horizontal>
+                        <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
                         @click="setSubjectUpdate(row)" >
@@ -73,7 +76,7 @@
                       :per-page="paginations.subject.perPage"
                       size="sm"
                       align="end"
-                      @input="loadSubjects()" />
+                      @input="recordDetails(paginations.subject)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -271,9 +274,10 @@ const subjectFields = {
 import { SubjectApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
+import Tables from '../../helpers/tables'
 export default {
 	name: "Subject",
-	mixins: [ SubjectApi ],
+	mixins: [ SubjectApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -375,34 +379,27 @@ export default {
 	methods: {
 		loadSubjects(){
       const { subjects } = this.tables
+      const { subject } = this.paginations
+
       subjects.isBusy = true
-      const { subject, subject: { perPage, page } } = this.paginations
-			var params = { paginate: true, perPage, page }
-      this.getSubjectList(params).then(({ data }) =>{
-        subjects.items = data.data
-        subject.from = data.meta.from
-        subject.to = data.meta.to
-        subject.totalRows = data.meta.total
+
+			var params = { paginate: false }
+      this.getSubjectList(params).then(({ data }) => {
+        subjects.items = data
+        subject.totalRows = data.length
+        this.recordDetails(subject)
         subjects.isBusy = false
       })
     },
     onSubjectEntry(){
       const { subject, subject: { fields } } = this.forms
+      const { subjects } = this.tables
       reset(subject)
       if(this.entryMode == "Add"){
         this.addSubject(fields)
           .then(({ data }) => {
             const { subject } = this.paginations
-            if(subject.totalRows % subject.perPage == 0){
-              subject.totalRows++
-            }
-            let totalPages = Math.ceil(subject.totalRows / subject.perPage)
-            if(subject.page == totalPages){
-              this.loadSubjects()
-            }
-            else {
-              subject.page = totalPages
-            }
+            this.addRow(subjects, subject, data)
             showNotification(this, "success", "Subject created successfully.")
             this.showModalEntry = false
           })
@@ -415,7 +412,7 @@ export default {
         const { fields } = this.forms.subject
         this.updateSubject(fields, fields.id)
           .then(({ data }) => {
-            this.loadSubjects()
+            this.updateRow(subjects, data)
             showNotification(this, "success", "Subject updated successfully.")
             this.showModalEntry = false
           })
@@ -427,9 +424,10 @@ export default {
     },
     onSubjectDelete(){
       const { id } = this.forms.subject.fields
+      const { subjects } = this.tables
       this.deleteSubject(id)
         .then(({ data }) => {
-          this.loadSubjects()
+          this.deleteRow(subjects, id)
           showNotification(this, "success", "Subject deleted successfully.")
           this.showModalConfirmation = false
         })
