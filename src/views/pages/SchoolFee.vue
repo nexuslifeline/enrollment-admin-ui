@@ -38,6 +38,15 @@
                   :filter="filters.schoolFee.criteria"
                   @filtered="onFiltered($event, paginations.schoolFee)">
                   <!-- :filter="filters.schoolFee.criteria> -->
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon 
+                        name="spinner" 
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -117,14 +126,20 @@
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
-          class="float-left" 
+          class="float-left btn-close" 
           @click="showModalEntry=false">
           Close
         </b-button>
         <b-button 
+          :disabled="forms.schoolFee.isProcessing"
           variant="outline-primary" 
-          class="float-right" 
+          class="float-right btn-save" 
           @click="onSchoolFeeEntry()">
+          <v-icon 
+            v-if="forms.schoolFee.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
@@ -141,14 +156,21 @@
       </div>
       Are you sure you want to delete this School Fee ?
       <div slot="modal-footer">
-        <b-button 
+        <b-button
+          :disabled="forms.schoolFee.isProcessing"
           variant="outline-primary" 
-          class="mr-2" 
+          class="mr-2 btn-save" 
           @click="onSchoolFeeDelete()">
+          <v-icon 
+            v-if="forms.schoolFee.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
           Yes
         </b-button>
         <b-button 
-          variant="outline-danger" 
+          variant="outline-danger"
+          class="btn-close"
           @click="showModalConfirmation=false">
           No
         </b-button>            
@@ -179,6 +201,7 @@ export default {
       entryMode: "",
       forms: {
         schoolFee: {
+          isProcessing: false,
           fields: { ...schoolFeeFields },
           states: { ...schoolFeeFields },
           errors: { ...schoolFeeFields }
@@ -246,17 +269,19 @@ export default {
     onSchoolFeeEntry(){
       const { schoolFee, schoolFee: { fields } } = this.forms
       const { schoolFees } = this.tables
+      schoolFee.isProcessing = true
       reset(schoolFee)
       if(this.entryMode == "Add"){
         this.addSchoolFee(fields)
           .then(({ data }) => {
-            const { schoolFee } = this.paginations
-            this.addRow(schoolFees, schoolFee, data)
+            this.addRow(schoolFees, this.paginations.schoolFee, data)
+            schoolFee.isProcessing = false
             showNotification(this, "success", "School Fee created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            schoolFee.isProcessing = false
             validate(schoolFee, errors)
           })
       }
@@ -265,21 +290,25 @@ export default {
         this.updateSchoolFee(fields, fields.id)
           .then(({ data }) => {
             this.updateRow(schoolFees, data)
+            schoolFee.isProcessing = false
             showNotification(this, "success", "School Fee updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            schoolFee.isProcessing = false
             validate(schoolFee, errors)
           })
       }
     },
     onSchoolFeeDelete(){
-      const { id } = this.forms.schoolFee.fields
+      const { schoolFee, schoolFee: { fields: { id } } } = this.forms
       const { schoolFees } = this.tables
+      schoolFee.isProcessing = true
       this.deleteSchoolFee(id)
         .then(({ data }) => {
-          this.deleteRow(schoolFees, id)
+          this.deleteRow(schoolFees, this.paginations.schoolFee, id)
+          schoolFee.isProcessing = false
           showNotification(this, "success", "School Fee deleted successfully.")
           this.showModalConfirmation = false
         })
