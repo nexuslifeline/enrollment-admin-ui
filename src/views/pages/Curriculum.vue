@@ -19,7 +19,7 @@
 							</b-row>
 							<hr>
 							<h4>Curriculum</h4>
-							<p>Lorem ipsum dolor sit amet.</p>
+							<p>Details about the subjects comprising the Course or Program.</p>
 							<b-row v-show="options.courses.items.length	> 0">
 								<b-col offset-md="2" md=10>
 									<b-alert show>
