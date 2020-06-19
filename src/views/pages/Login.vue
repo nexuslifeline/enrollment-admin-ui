@@ -38,17 +38,36 @@
                   <b-form-input
                     v-model="username"
                     placeholder="Email"/>
+                    v-model="forms.auth.fields.username"
+                    :state="forms.auth.states.username" />
+                  <b-form-invalid-feedback>
+                    {{forms.auth.errors.username}}
+                  </b-form-invalid-feedback>
                 </b-form-group>
                 <b-form-group>
                   <label>Password</label>
                   <b-form-input
-                    v-model="password"
-                    type="password"
-                    placeholder="Password" />
+                    v-model="forms.auth.fields.password"
+                    :state="forms.auth.states.password"
+                    type="password" />
+                    <b-form-invalid-feedback>
+                      {{forms.auth.errors.password}}
+                    </b-form-invalid-feedback>
                 </b-form-group>
                 <b-row align-h="end">
                    <b-col md=4>
-                    <b-button @click="authLogin()" variant="outline-primary" block>Login</b-button>
+                    <b-button 
+                      :disabled="forms.auth.isProcessing"
+                      @click="authLogin()" 
+                      variant="outline-primary" 
+                      block>
+                      <v-icon
+                        v-if="forms.auth.isProcessing"
+                        name="sync"
+                        class="mr-2"
+                        spin />
+                      Login
+                    </b-button>
                   </b-col>
                 </b-row>
               </b-form>
@@ -61,7 +80,13 @@
 </template>
 
 <script>
+const fields = {
+  username: null,
+  password: null
+}
+
 import { AuthApi } from '../../mixins/api'
+import { validate, reset } from '../../helpers/forms'
 export default {
   name: 'Login',
   mixins: [AuthApi],
@@ -70,22 +95,37 @@ export default {
       username: null,
       password: null,
       version: process.env.VUE_APP_VERSION
+      forms: {
+        auth: {
+          isProcessing: false,
+          fields: {...fields},
+          states: {...fields},
+          errors: {...fields}
+        }
+      },
+      version: process.env.VUE_APP_API_VERSION
     }
   },
   methods: {
     authLogin(){
-      this.login({ username: this.username, password: this.password })
+      const { auth, auth: { fields: { username, password } } } = this.forms;
+      auth.isProcessing = true;
+      reset(auth)
+      this.login({ username, password })
         .then(({ data }) => {
           this.$store.commit('loginUser')
           localStorage.setItem('adminAccessToken', data.accessToken)
           this.getAuthenticatedUser()
             .then(({ data }) => {
+              auth.isProcessing = false;
               localStorage.setItem('userGroupId', data.userGroupId)
               this.$router.push({ name: 'Dashboard'})
             })
-        })
-        .catch(response => {
-          console.log(response)
+        }).catch((error) => {
+          console.log(error)
+          auth.isProcessing = false;
+          const { errors } = error.response.data;
+          validate(auth, errors);
         })
     },
   }

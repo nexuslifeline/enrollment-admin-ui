@@ -93,10 +93,16 @@
 						</b-card-body>
 						<template v-slot:footer>
 							<b-button 
-                class="float-right" 
+								:disabled="forms.curriculum.isProcessing"
+                class="float-right btn-save" 
                 @click="updateCurriculum()" 
                 variant="outline-primary">
-                Update
+								<v-icon 
+									v-if="forms.curriculum.isProcessing"
+									name="sync"
+									spin
+									class="mr-2" />
+                Save
               </b-button>
 						</template>
 					</b-card>
@@ -177,6 +183,7 @@ export default {
 			isLoading: false,
 			forms: {
 				curriculum: {
+					isProcessing: false,
 					fields: {
 						schoolCategoryId: null,
 						levelId: null,
@@ -327,22 +334,27 @@ export default {
 		},
 		updateCurriculum(){
 			let data = { subjects : [] }
+			const { curriculum, curriculum: { fields } } = this.forms
+			
+			curriculum.isProcessing = true
 
-			this.forms.curriculum.fields.subjects.forEach(s => {
+			fields.subjects.forEach(s => {
 				data.subjects.push({
-					courseId: this.forms.curriculum.fields.courseId,
-					semesterId: this.forms.curriculum.fields.semesterId,
-					schoolCategoryId: this.forms.curriculum.fields.schoolCategoryId,
+					courseId: fields.courseId,
+					semesterId: fields.semesterId,
+					schoolCategoryId: fields.schoolCategoryId,
 					subjectId: s.id
 				})
 			})
-      const { levelId } = this.forms.curriculum.fields
-			this.updateSubjectsOfLevel(levelId, data)
+
+			this.updateSubjectsOfLevel(fields.levelId, data)
 				.then(({ data }) => {
+					curriculum.isProcessing = false
 					showNotification(this, 'success', 'Curriculum is updated.')
           //console.log(res)
         })
         .catch(error => {
+					curriculum.isProcessing = false
           showNotification(this, 'danger', 'Error in updating curriculum.')
         })
     },

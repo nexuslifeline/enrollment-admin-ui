@@ -141,10 +141,17 @@
             </b-card-body>
             <template v-slot:footer>
               <b-button 
-                class="float-right" 
+                :disabled="forms.rateSheet.isProcessing"
+                class="float-right btn-save" 
                 variant="outline-primary"
-                @click="createUpdateRateSheet()"
-              >Update</b-button>
+                @click="createUpdateRateSheet()">
+                <v-icon 
+                  v-if="forms.rateSheet.isProcessing" 
+                  name="sync" 
+                  spin 
+                  class="mr-2" />
+                Save
+              </b-button>
             </template>
           </b-card>
         </b-col>
@@ -220,6 +227,7 @@ export default {
       showModalFees: false,      
       forms: {
         rateSheet: {
+          isProcessing: false,
           fields: {
             id: null,
             levelId: null,
@@ -347,12 +355,11 @@ export default {
       const { levels, courses } = this.options
       courses.items = []
 			this.getLevelsOfSchoolCategoryList(id, params)
-				.then(response => {
-          const res = response.data
+				.then(({ data }) => {
           this.levelIndex = 0
-          levels.items = res
-          if (res.length > 0) {
-            this.loadCoursesOfLevelList(res[0].id)
+          levels.items = data
+          if (data.length > 0) {
+            this.loadCoursesOfLevelList(data[0].id)
           } else {
             this.forms.rateSheet.fields.fees = []
           }
@@ -373,11 +380,10 @@ export default {
       rateSheet.fields.courseId = null
       //const {  }
 			this.getCoursesOfLevelList(levelId, params)
-				.then(response => {
-					const res = response.data
-          courses.items = res
+				.then(({ data }) => {
+          courses.items = data
           
-					if(res.length > 0){
+					if(data.length > 0){
             rateSheet.fields.semesterId = semesters.getEnum(1).id
             rateSheet.fields.courseId = courses.items[0].id
 					}
@@ -395,19 +401,19 @@ export default {
       rateSheet.fields.id = null //clear id of rate sheet field
       rateSheet.fields.fees = []
       
-      this.getRateSheetList(params).then(response => {
-        const res = response.data
-        if(res.data.length > 0)
-        {
-          rateSheet.fields.id = res.data[0].id
-          rateSheet.fields.levelId = res.data[0].levelId
-          rateSheet.fields.courseId = res.data[0].courseId
-          rateSheet.fields.semesterId = res.data[0].semesterId
-          rateSheet.fields.enrollmentFee = res.data[0].enrollmentFee
-          rateSheet.fields.fees = res.data[0].fees
-        }
-        rateSheetFees.isBusy = false
-      })
+      this.getRateSheetList(params)
+        .then(({ data }) => {
+          if(data.data.length > 0)
+          {
+            rateSheet.fields.id = data.data[0].id
+            rateSheet.fields.levelId = data.data[0].levelId
+            rateSheet.fields.courseId = data.data[0].courseId
+            rateSheet.fields.semesterId = data.data[0].semesterId
+            rateSheet.fields.enrollmentFee = data.data[0].enrollmentFee
+            rateSheet.fields.fees = data.data[0].fees
+          }
+          rateSheetFees.isBusy = false
+        })
     },
     loadFees(){
       const { fees } = this.tables
@@ -424,9 +430,8 @@ export default {
     loadSemesterList(){
 			var params = { paginate: false }
 			this.getSemesterList(params)
-				.then(response => {
-					const res = response.data
-					this.options.semesters.items = res
+				.then(({ data }) => {
+					this.options.semesters.items = data
 				})
 		},
     addFee(row){
@@ -443,33 +448,46 @@ export default {
 			this.forms.rateSheet.fields.fees.splice(row.index, 1);
 		},
     createUpdateRateSheet(){
+      const { rateSheet, rateSheet: { fields } } = this.forms
+      rateSheet.isProcessing = true
+      const data = { 
+        levelId: fields.levelId, 
+        courseId: fields.courseId, 
+        semesterId: fields.semesterId, 
+        enrollmentFee: fields.enrollmentFee, 
+        fees:[] 
+      }
 
-      const { id, levelId, courseId, semesterId, enrollmentFee } = this.forms.rateSheet.fields
-      const data = { levelId: levelId, courseId: courseId, semesterId: semesterId, enrollmentFee: enrollmentFee, fees:[] }
-      
-      this.forms.rateSheet.fields.fees.forEach(rs => {
-        data.fees.push({ rateSheetId: rs.pivot.rateSheetId, schoolFeeId: rs.pivot.schoolFeeId, amount: rs.pivot.amount, notes: rs.pivot.notes })  
+      fields.fees.forEach(rs => {
+        data.fees.push({ 
+          rateSheetId: rs.pivot.rateSheetId,
+          schoolFeeId: rs.pivot.schoolFeeId,
+          amount: rs.pivot.amount,
+          notes: rs.pivot.notes 
+        })  
       })
 
-      if(id === null){
-        this.addRateSheet(data).then(response => {
-          const res = response.data
-          this.forms.rateSheet.fields.id = res.id
-          showNotification(this, 'success', 'Rate Sheet is updated.')
-          //console.log(res)
-        })
-        .catch(error => {
-          showNotification(this, 'danger', 'Error in updating rate sheet')
-        })
+      if(fields.id === null){
+        this.addRateSheet(data)
+          .then(({ data }) => {
+            this.forms.rateSheet.fields.id = data.id
+            rateSheet.isProcessing = false
+            showNotification(this, 'success', 'Rate Sheet is updated.')
+            //console.log(res)
+          }).catch(error => {
+            rateSheet.isProcessing = false
+            showNotification(this, 'danger', 'Error in updating rate sheet')
+          })
       }
       else{
-        this.updateRateSheet(id, data).then(response => {
-          const res = response.data
-          showNotification(this, 'success', 'Rate Sheet is updated.')
-        })
-        .catch(error => {
-          showNotification(this, 'danger', 'Error in updating rate sheet')
-        })
+        this.updateRateSheet(fields.id, data)
+          .then(({ data }) => {
+            rateSheet.isProcessing = false
+            showNotification(this, 'success', 'Rate Sheet is updated.')
+          }).catch(error => {
+            rateSheet.isProcessing = false
+            showNotification(this, 'danger', 'Error in updating rate sheet')
+          })
       }
     },
     checkRights(){

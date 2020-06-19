@@ -24,6 +24,14 @@ label.required:before {
   color: red;
 }
 
+.btn-save {
+  min-width: 100px;
+}
+
+.btn-close {
+  min-width: 100px;
+}
+
 .col-auto {
 
   @include for-size(phone-only) {

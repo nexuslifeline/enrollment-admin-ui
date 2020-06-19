@@ -37,6 +37,15 @@
                   :per-page="paginations.userGroup.perPage"
                   :filter="filters.userGroup.criteria"
                   @filtered="onFiltered($event, paginations.userGroup)">
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon 
+                        name="spinner" 
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -129,14 +138,20 @@
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
-          class="float-left" 
+          class="float-left btn-close" 
           @click="showModalEntry=false">
           Close
         </b-button>
         <b-button 
+          :disabled="forms.userGroup.isProcessing"
           variant="outline-primary" 
-          class="float-right" 
+          class="float-right btn-save" 
           @click="onUserGroupEntry()">
+          <v-icon
+            v-if="forms.userGroup.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
@@ -154,12 +169,18 @@
       <div slot="modal-footer">
         <b-button 
           variant="outline-primary" 
-          class="mr-2" 
+          class="mr-2 btn-save" 
           @click="onUserGroupDelete()">
+          <v-icon
+            v-if="forms.userGroup.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
           Yes
         </b-button>
         <b-button 
-          variant="outline-danger" 
+          variant="outline-danger"
+          class="btn-close"
           @click="showModalConfirmation=false">
           No
         </b-button>            
@@ -191,6 +212,7 @@ export default {
       entryMode: "",
       forms: {
         userGroup: {
+          isProcessing: false,
           fields: { ...userGroupFields },
           states: { ...userGroupFields },
           errors: { ...userGroupFields }
@@ -265,17 +287,19 @@ export default {
     onUserGroupEntry(){
       const { userGroup, userGroup: { fields } } = this.forms
       const { userGroups } = this.tables
+      userGroup.isProcessing = true
       reset(userGroup)
       if(this.entryMode == "Add"){
         this.addUserGroup(fields)
           .then(({ data }) => {
-            const { userGroup } = this.paginations
-            this.addRow(userGroups, userGroup, data)
+            this.addRow(userGroups, this.paginations.userGroup, data)
+            userGroup.isProcessing = false
             showNotification(this, "success", "User group created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            userGroup.isProcessing = false
             validate(userGroup, errors)
           })
       }
@@ -283,21 +307,25 @@ export default {
         this.updateUserGroup(fields, fields.id)
           .then(({ data }) => {
             this.updateRow(userGroups, data)
+            userGroup.isProcessing = false
             showNotification(this, "success", "User group updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            userGroup.isProcessing = false
             validate(userGroup, errors)
           })
       }
     },
     onUserGroupDelete(){
-      const { id } = this.forms.userGroup.fields
+      const { userGroup, userGroup: { fields: { id } } } = this.forms
       const { userGroups } = this.tables
+      userGroup.isProcessing = true
       this.deleteUserGroup(id)
         .then(({ data }) => {
-          this.deleteRow(userGroups, id)
+          this.deleteRow(userGroups, this.paginations.userGroup, id)
+          userGroup.isProcessing = false
           showNotification(this, "success", "User group deleted successfully.")
           this.showModalConfirmation = false
         })
