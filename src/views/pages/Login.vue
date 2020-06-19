@@ -17,7 +17,7 @@
     position: absolute;
     left: 50%;
     bottom: -7%;
-    font-size: 9px;
+    font-size: 11px;
     right: 0;
     transform: translate(-50%,0);
     text-align: center;
@@ -34,10 +34,10 @@
                 <h3>Admin Login</h3>
                 <small>Welcome to Admistrator Portal</small><br><br>
                 <b-form-group>
-                  <label>Username</label>
+                  <label>Email</label>
                   <b-form-input
                     v-model="username"
-                    placeholder="Username"/>
+                    placeholder="Email"/>
                 </b-form-group>
                 <b-form-group>
                   <label>Password</label>
@@ -52,7 +52,7 @@
                   </b-col>
                 </b-row>
               </b-form>
-              <b-col md=4 class="version">version: {{version}}</b-col>
+              <b-col md=4 class="version">Version: {{version}}</b-col>
           </b-card>
         </b-card-group>
       </b-col>
@@ -69,17 +69,20 @@ export default {
     return {
       username: null,
       password: null,
-      version: process.env.VUE_APP_API_VERSION
+      version: process.env.VUE_APP_VERSION
     }
   },
   methods: {
     authLogin(){
       this.login({ username: this.username, password: this.password })
-        .then(response => {
-          const res = response.data
+        .then(({ data }) => {
           this.$store.commit('loginUser')
-          localStorage.setItem('adminAccessToken', res.accessToken)
-          this.$router.push({ name: 'Dashboard'})
+          localStorage.setItem('adminAccessToken', data.accessToken)
+          this.getAuthenticatedUser()
+            .then(({ data }) => {
+              localStorage.setItem('userGroupId', data.userGroupId)
+              this.$router.push({ name: 'Dashboard'})
+            })
         })
         .catch(response => {
           console.log(response)

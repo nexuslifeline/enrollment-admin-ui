@@ -7,9 +7,10 @@
             <b-card-body>
               <b-row>
                 <b-col md=12>
-                  <b-tabs pills  > 						
+                  <b-tabs pills>			
                     <b-tab v-for="schoolCategory in options.schoolCategories.values" 
                       :key="schoolCategory.id" 
+                      :active="schoolCategoryId == schoolCategory.id"
                       @click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
                       :title="schoolCategory.name"/>
                   </b-tabs>
@@ -17,7 +18,7 @@
               </b-row>
               <hr>
               <h4>Rate Sheet</h4>
-              <p>Lorem ipsum dolor sit amet.</p>
+              <p>Details about the Fees of Student within current Academic Year.</p>
               <b-row v-show="options.courses.items.length	> 0">
                 <b-col offset-md="2" md=10>
                   <b-alert show>
@@ -67,7 +68,7 @@
                     class="float-right" 
                     variant="outline-primary"
                     @click="showModalFees=true"
-                  ><b-icon-plus-circle></b-icon-plus-circle> ADD NEW ITEM</b-button>
+                  ><v-icon name="plus-circle" /> ADD NEW ITEM</b-button>
                 </b-col>
               </b-row>
               <b-row>
@@ -96,7 +97,7 @@
                       <b-form-input v-model="row.item.pivot.notes"/>
                     </template>
                     <template v-slot:cell(action)="row">
-											<b-button @click="removeFee(row)" size="sm" variant="danger"><b-icon-x></b-icon-x></b-button>
+											<b-button @click="removeFee(row)" size="sm" variant="danger"><v-icon name="trash" /></b-button>
 										</template>
                   </b-table>
                   <hr>
@@ -174,9 +175,12 @@
 						:items.sync="tables.fees.items"
 						:fields="tables.fees.fields"
             :filter="filters.fee.criteria"
-						:busy="tables.fees.isBusy2">
+						:busy="tables.fees.isBusy2"
+            :current-page="paginations.fee.page"
+            :per-page="paginations.fee.perPage"
+            @filtered="onFiltered($event, paginations.fee)">
 						<template v-slot:cell(action)="row">
-							<b-button @click="addFee(row)" size="sm" variant="success"><b-icon-plus></b-icon-plus></b-button>
+							<b-button @click="addFee(row)" size="sm" variant="success"><v-icon name="plus" /></b-button>
 						</template>
 					</b-table>
           <b-row>
@@ -185,12 +189,12 @@
             </b-col>
             <b-col md=6>
               <b-pagination
-                v-model="paginations.fee.activePage"
+                v-model="paginations.fee.page"
                 :total-rows="paginations.fee.totalRows"
                 :per-page="paginations.fee.perPage"
                 size="sm"
                 align="end"
-                @input="loadSubjects()"
+                @input="recordDetails(paginations.fee)"
               />
             </b-col>
           </b-row>
@@ -204,11 +208,12 @@
 </template>
 <script>
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
-import { SchoolCategories, Semesters } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification } from '../../helpers/forms'
+import Tables from '../../helpers/tables'
 export default {
 	name: "RateSheet",
-	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi ],
+	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi, Tables ],
 	data() {
 		return {
       isLoaded: false,
@@ -259,26 +264,27 @@ export default {
         },
         fees: {
           isBusy: false,
-          	fields: [
-						{
-							key: "name",
-							label: "NAME",
-							tdClass: "align-middle",
-							thStyle: {width: "30%"}
-						},
-						{
-							key: "description",
-							label: "Description",
-							tdClass: "align-middle",
-							thStyle: {width: "40%"}
-						},
-						{
-							key: "action",
-							label: "",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "30%"}
-						}
+          isBusy2: false,
+          fields: [
+            {
+              key: "name",
+              label: "NAME",
+              tdClass: "align-middle",
+              thStyle: {width: "30%"}
+            },
+            {
+              key: "description",
+              label: "Description",
+              tdClass: "align-middle",
+              thStyle: {width: "40%"}
+            },
+            {
+              key: "action",
+              label: "",
+              tdClass: "align-middle text-right",
+              thClass: "text-right",
+              thStyle: {width: "30%"}
+            }
           ],
           items: []
         }
@@ -288,7 +294,7 @@ export default {
 					from: 0,
 					to: 0,
 					totalRows: 0,
-					activePage: 1,
+					page: 1,
 					perPage: 10,
 				}
       },
@@ -307,12 +313,13 @@ export default {
 				},
 				semesters: Semesters
       },
-      levelIndex: 0
+      levelIndex: 0,
+      schoolCategoryI: null
 		}
 	},
 	created(){
     //this.loadRateSheetList()
-    this.loadLevelsOfSchoolCategoryList(this.options.schoolCategories.getEnum(1).id)
+    this.checkRights()
     this.loadFees()
   },
   computed: {
@@ -405,13 +412,13 @@ export default {
     loadFees(){
       const { fees } = this.tables
       const { fee } = this.paginations
-      const params = { paginate: true, perPage : 10 }
-      this.getSchoolFeeList(params).then(response => {
-        const res = response.data
-        fees.items = res.data
-        fee.from = res.meta.from
-        fee.to = res.meta.to
-        fee.totalRows = res.meta.total
+      fees.isBusy2 = true
+      const params = { paginate: false }
+      this.getSchoolFeeList(params).then(({ data }) => {
+        fees.items = data
+        fee.totalRows = data.length
+        this.recordDetails(fee)
+        fees.isBusy2 = false
       })
     },
     loadSemesterList(){
@@ -464,7 +471,21 @@ export default {
           showNotification(this, 'danger', 'Error in updating rate sheet')
         })
       }
-    }
+    },
+    checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+      }
+      
+      if (UserGroups.SUPER_USER.id == userGroup.id) {
+				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+			}
+			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
+		}
   },
 }
 </script>

@@ -23,8 +23,8 @@ export const showNotification = (instance, variant, msg) => {
 }
 
 export const clearFields = (form) => {
-  var keyField = form
-  for(var key in keyField){
+  let keyField = form
+  for(let key in keyField){
     if (typeof keyField[key] !== "object") {
       if(typeof keyField[key] == "number"){
         keyField[key] = 0
@@ -34,8 +34,8 @@ export const clearFields = (form) => {
       }
     } 
     else {
-      var innerFields = keyField[key]
-      for (var innerKey in innerFields) {
+      let innerFields = keyField[key]
+      for (let innerKey in innerFields) {
         innerFields[innerKey] = null
       }
     }

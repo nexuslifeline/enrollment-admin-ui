@@ -11,14 +11,14 @@
                   <b-col md=8>
                     <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SCHOOL FEE
+                      <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE
                     </b-button>
                   </b-col>
                   <b-col md=4>
                     <b-form-input
                       v-model="filters.schoolFee.criteria"
                       type="text" 
-                      placeholder="Search">
+                      placeholder="Search" >
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -32,12 +32,16 @@
 									small hover outlined show-empty
 									:fields="tables.schoolFees.fields"
                   :busy="tables.schoolFees.isBusy"
-                  :items="tables.schoolFees.items" 
-                  :filter="filters.schoolFee.criteria">
+                  :items="tables.schoolFees.items"
+                  :current-page="paginations.schoolFee.page"
+                  :per-page="paginations.schoolFee.perPage"
+                  :filter="filters.schoolFee.criteria"
+                  @filtered="onFiltered($event, paginations.schoolFee)">
+                  <!-- :filter="filters.schoolFee.criteria> -->
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
-                        <b-icon-grip-horizontal></b-icon-grip-horizontal>
+                        <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
                         @click="setUpdate(row)" >
@@ -61,7 +65,7 @@
                       :per-page="paginations.schoolFee.perPage"
                       size="sm"
                       align="end"
-                      @input="loadSchoolFees()" />
+                      @input="recordDetails(paginations.schoolFee)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -164,9 +168,10 @@ const schoolFeeFields = {
 import { SchoolFeeApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
+import Tables from '../../helpers/tables'
 export default {
 	name: "schoolFee",
-	mixins: [ SchoolFeeApi ],
+	mixins: [ SchoolFeeApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -227,36 +232,26 @@ export default {
 	methods: {
 		loadSchoolFees(){
       const { schoolFees } = this.tables
-      const { schoolFee, schoolFee: { perPage, page } } = this.paginations
-
+      const { schoolFee } = this.paginations
       schoolFees.isBusy = true
 
-			var params = { paginate: true, perPage, page }
+			var params = { paginate: false }
       this.getSchoolFeeList(params).then(({ data }) =>{
-        schoolFees.items = data.data
-        schoolFee.from = data.meta.from
-        schoolFee.to = data.meta.to
-        schoolFee.totalRows = data.meta.total
+        schoolFees.items = data
+        schoolFee.totalRows = data.length
+        this.recordDetails(schoolFee)
         schoolFees.isBusy = false
       })
     },
     onSchoolFeeEntry(){
       const { schoolFee, schoolFee: { fields } } = this.forms
+      const { schoolFees } = this.tables
       reset(schoolFee)
       if(this.entryMode == "Add"){
         this.addSchoolFee(fields)
           .then(({ data }) => {
             const { schoolFee } = this.paginations
-            if(schoolFee.totalRows % schoolFee.perPage == 0){
-              schoolFee.totalRows++
-            }
-            let totalPages = Math.ceil(schoolFee.totalRows / schoolFee.perPage)
-            if(schoolFee.page == totalPages){
-              this.loadUserGroups()
-            }
-            else {
-              schoolFee.page = totalPages
-            }
+            this.addRow(schoolFees, schoolFee, data)
             showNotification(this, "success", "School Fee created successfully.")
             this.showModalEntry = false
           })
@@ -269,7 +264,7 @@ export default {
         const { fields } = this.forms.schoolFee
         this.updateSchoolFee(fields, fields.id)
           .then(({ data }) => {
-            this.loadSchoolFees()
+            this.updateRow(schoolFees, data)
             showNotification(this, "success", "School Fee updated successfully.")
             this.showModalEntry = false
           })
@@ -281,9 +276,10 @@ export default {
     },
     onSchoolFeeDelete(){
       const { id } = this.forms.schoolFee.fields
+      const { schoolFees } = this.tables
       this.deleteSchoolFee(id)
-        .then(response => {
-          this.loadSchoolFees()
+        .then(({ data }) => {
+          this.deleteRow(schoolFees, id)
           showNotification(this, "success", "School Fee deleted successfully.")
           this.showModalConfirmation = false
         })
@@ -301,7 +297,7 @@ export default {
       clearFields(schoolFee.fields)
       this.entryMode='Add'
       this.showModalEntry = true
-    }
+    },
 	}
 }
 </script>

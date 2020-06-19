@@ -11,7 +11,7 @@
                   <b-col md=8>
                     <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW USER
+                      <v-icon name="plus-circle" /> ADD NEW USER
                     </b-button>
                   </b-col>
                   <b-col md=4>
@@ -32,12 +32,15 @@
 									small hover outlined show-empty
 									:fields="tables.users.fields"
                   :busy="tables.users.isBusy"
-                  :items="tables.users.items" 
-                  :filter="filters.user.criteria">
+                  :items="tables.users.items"
+                  :current-page="paginations.user.page"
+                  :per-page="paginations.user.perPage"
+                  :filter="filters.user.criteria"
+                  @filtered="onFiltered($event, paginations.user)">
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
-                        <b-icon-grip-horizontal></b-icon-grip-horizontal>
+                        <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
                         @click="setUpdate(row)" >
@@ -61,7 +64,7 @@
                       :per-page="paginations.user.perPage"
                       size="sm"
                       align="end"
-                      @input="loadPersonnels()" />
+                      @input="recordDetails(paginations.user)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -225,9 +228,10 @@ const userFields = {
 
 import { PersonnelApi, UserGroupApi } from "../../mixins/api"
 import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
+import Tables from '../../helpers/tables'
 export default {
 	name: "Personnel",
-	mixins: [ PersonnelApi, UserGroupApi ],
+	mixins: [ PersonnelApi, UserGroupApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -309,34 +313,27 @@ export default {
 	methods: {
 		loadPersonnels(){
       const { users } = this.tables
+      const { user } = this.paginations
+
       users.isBusy = true
-      const { user, user: { perPage, page } } = this.paginations
-			var params = { paginate: true, perPage, page }
+
+			var params = { paginate: false }
       this.getPersonnelList(params).then(({ data }) =>{
-        users.items = data.data
-        user.from = data.meta.from
-        user.to = data.meta.to
-        user.totalRows = data.meta.total
+        users.items = data
+        user.totalRows = data.length
+        this.recordDetails(user)
         users.isBusy = false
       })
     },
     onUserEntry(){
       const { user, user: { fields } } = this.forms
+      const { users } = this.tables
       reset(user)
       if(this.entryMode == "Add"){
         this.addPersonnel(fields)
           .then(({ data }) => {
             const { user } = this.paginations
-            if(user.totalRows % user.perPage == 0){
-              user.totalRows++
-            }
-            let totalPages = Math.ceil(user.totalRows / user.perPage)
-            if(user.page == totalPages){
-              this.loadPersonnels()
-            }
-            else {
-              user.page = totalPages
-            }
+            this.addRow(users, user, data)
             showNotification(this, "success", "User created successfully.")
             this.showModalEntry = false
           })
@@ -348,7 +345,7 @@ export default {
       else {
         this.updatePersonnel(fields, fields.id)
           .then(({ data }) => {
-            this.loadPersonnels()
+            this.updateRow(users, data)
             showNotification(this, "success", "User updated successfully.")
             this.showModalEntry = false
           })
@@ -360,9 +357,10 @@ export default {
     },
     onUserGroupDelete(){
       const { id } = this.forms.user.fields
+      const { users } = this.tables
       this.deletePersonnel(id)
-        .then(response => {
-          this.loadPersonnels()
+        .then(({ data }) => {
+          this.deleteRow(users, id)
           showNotification(this, "success", "User deleted successfully.")
           this.showModalConfirmation = false
         })
