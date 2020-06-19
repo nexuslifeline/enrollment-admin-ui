@@ -10,7 +10,7 @@ module.exports = {
     resolve: {
        symlinks: false,
        alias: {
-          AutoNumeric: 'autonumeric/dist/autoNumeric.min',
+          AutoNumeric: 'node_modules/autonumeric/dist/autoNumeric.min',
       },
     },
   },
