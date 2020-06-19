@@ -34,10 +34,10 @@
                 <h3>Admin Login</h3>
                 <small>Welcome to Admistrator Portal</small><br><br>
                 <b-form-group>
-                  <label>Username</label>
+                  <label>Email</label>
                   <b-form-input
                     v-model="username"
-                    placeholder="Username"/>
+                    placeholder="Email"/>
                 </b-form-group>
                 <b-form-group>
                   <label>Password</label>
