@@ -101,7 +101,6 @@ export default {
           errors: {...fields}
         }
       },
-      version: process.env.VUE_APP_API_VERSION
     }
   },
   methods: {
