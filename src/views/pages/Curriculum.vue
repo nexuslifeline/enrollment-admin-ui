@@ -20,46 +20,42 @@
 							<hr>
 							<h4>Curriculum</h4>
 							<p>Details about the subjects comprising the Course or Program.</p>
-							<b-row v-show="options.courses.items.length	> 0">
-								<b-col offset-md="2" md=10>
-									<b-alert show>
-										<b-row>
-											<b-col md=3>
-												<b-form-select 
-													@change="loadSubjectsOfLevelList()" 
-													v-model="forms.curriculum.fields.courseId">
-													<template v-slot:first>
-														<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
-													</template>
-													<b-form-select-option
-														v-for="course in options.courses.items" 
-														:key="course.id" 
-														:value="course.id">
-														{{course.name}}
-													</b-form-select-option>
-												</b-form-select>
-											</b-col>
-											<b-col md=3>
-												<b-form-select 
-													@change="loadSubjectsOfLevelList()" 
-													v-model="forms.curriculum.fields.semesterId">
-													<template v-slot:first>
-														<b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
-													</template>
-													<b-form-select-option 
-														v-for="semester in options.semesters.values"
-														:key="semester.id" 
-														:value="semester.id">
-														{{semester.name}}
-													</b-form-select-option>
-												</b-form-select>
-											</b-col>
-										</b-row>
-									</b-alert>
-								</b-col>
-							</b-row>
 							<b-row class="mb-3">
-								<b-col md=6 offset-md="6">
+								<b-col md=8 offset-md="2">
+                  <b-row v-show="options.courses.items.length	> 0">
+                    <b-col md=3>
+                      <b-form-select 
+                        @change="loadSubjectsOfLevelList()" 
+                        v-model="forms.curriculum.fields.courseId">
+                        <template v-slot:first>
+                          <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                        </template>
+                        <b-form-select-option
+                          v-for="course in options.courses.items" 
+                          :key="course.id" 
+                          :value="course.id">
+                          {{course.name}}
+                        </b-form-select-option>
+                      </b-form-select>
+                    </b-col>
+                    <b-col md=3>
+                      <b-form-select 
+                        @change="loadSubjectsOfLevelList()" 
+                        v-model="forms.curriculum.fields.semesterId">
+                        <template v-slot:first>
+                          <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
+                        </template>
+                        <b-form-select-option 
+                          v-for="semester in options.semesters.values"
+                          :key="semester.id" 
+                          :value="semester.id">
+                          {{semester.name}}
+                        </b-form-select-option>
+                      </b-form-select>
+                    </b-col>
+                  </b-row>
+								</b-col>
+								<b-col md=2>
 									<b-button class="float-right" variant="outline-primary"
 										@click="showModalSubjects=true">
 										<v-icon name="plus-circle" /> ADD NEW SUBJECT
@@ -121,7 +117,26 @@
 			<b-row> <!-- modal body -->
 				<b-col md=12>
           <b-row class="mb-2">
-            <b-col offset-md="8" md="4">
+            <b-col md="4">
+              <b-form-select
+                v-if="
+                  forms.curriculum.fields.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id || 
+                  forms.curriculum.fields.schoolCategoryId === options.schoolCategories.COLLEGE.id || 
+                  forms.curriculum.fields.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
+                @change="filterByDepartment()"
+                v-model="filters.subject.departmentId">
+                <template v-slot:first>
+                  <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="department in options.departments.items" 
+                  :key="department.id" 
+                  :value="department.id">
+                  {{department.name}}
+                </b-form-select-option>
+              </b-form-select>
+            </b-col>
+            <b-col offset-md="4" md="4">
               <b-form-input
                 v-model="filters.subject.criteria"
                 type="text" 
@@ -131,7 +146,7 @@
           </b-row>
 					<b-table
 						small hover outlined show-empty
-						:items.sync="tables.subjects.items"
+						:items.sync="tables.subjects.filteredItems"
 						:fields="tables.subjects.fields"
             :filter="filters.subject.criteria"
 						:busy="tables.subjects.isBusy2"
@@ -170,13 +185,13 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi } from "../../mixins/api"
+import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi, DepartmentApi } from "../../mixins/api"
 import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification } from '../../helpers/forms'
 import Tables from '../../helpers/tables'
 export default {
 	name: "Curriculum",
-	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi, Tables ],
+	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi, DepartmentApi, Tables ],
 	data() {
 		return {
 			showModalSubjects: false,
@@ -237,7 +252,8 @@ export default {
 							thStyle: {width: "5%"}
 						}
 					],
-					items: []
+          items: [],
+          filteredItems: []
 				}
 			},
       paginations: {
@@ -251,7 +267,8 @@ export default {
       },
       filters: {
         subject: {
-          criteria: null
+          criteria: null,
+          departmentId: null
         }
       },
 			options: {
@@ -262,24 +279,28 @@ export default {
 				courses: {
 					items: []
 				},
-				semesters: Semesters
+        semesters: Semesters,
+        departments: {
+          items: []
+        }
 			},
 			levelIndex: 0,
 			schoolCategoryId: null
 		}
 	},
 	created(){
-		this.checkRights()
-		this.loadSubjects()
+    this.checkRights()
+    this.loadDepartments()
 	},
 	methods: {
 		loadLevelsOfSchoolCategoryList(id){
 			this.isLoading = true
 			this.options.courses.items = []
 			this.forms.curriculum.fields.schoolCategoryId = id
-			let params = { paginate: false }
+      let params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(id, params)
 				.then(({ data }) => {
+          this.loadSubjects(id)
 					this.options.levels.items = data
 					this.levelIndex = 0
 					if (data.length > 0) {
@@ -358,14 +379,15 @@ export default {
           showNotification(this, 'danger', 'Error in updating curriculum.')
         })
     },
-    loadSubjects(){
+    loadSubjects(schoolCategoryId){
       const { subjects } = this.tables
       const { subject } = this.paginations
       subjects.isBusy2 = true
-			let params = { paginate: false }
+			let params = { paginate: false, schoolCategoryId }
 			this.getSubjectList(params)
 				.then(({ data }) => {
           subjects.items = data
+          subjects.filteredItems = data
           subject.totalRows = data.length
           this.recordDetails(subject)
 					subjects.isBusy2 = false
@@ -397,8 +419,21 @@ export default {
 			if (UserGroups.SUPER_USER.id == userGroup.id) {
 				this.schoolCategoryId = SchoolCategories.getEnum(1).id
 			}
-			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
-		}
+      this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
+    },
+    loadDepartments(){
+      let params = { paginate: false }
+      const { departments } = this.options
+      this.getDepartmentList(params)
+        .then(({ data }) => {
+          departments.items = data
+        })
+    },
+    filterByDepartment() {
+      const { subjects } = this.tables
+      const { departmentId } = this.filters.subject
+      subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+    }
 	}
 }
 </script>

@@ -11,3 +11,4 @@ export { default as TranscriptApi } from './Transcript';
 export { default as AdmissionFileApi } from './AdmissionFile';
 export { default as UserGroupApi } from './UserGroup';
 export { default as PersonnelApi } from './Personnel';
+export { default as DepartmentApi } from './Department';

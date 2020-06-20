@@ -276,7 +276,7 @@ export default {
 
       userGroups.isBusy = true
 
-			var params = { paginate: false }
+			let params = { paginate: false }
       this.getUserGroupList(params).then(({ data }) =>{
         userGroups.items = data
         userGroup.totalRows = data.length

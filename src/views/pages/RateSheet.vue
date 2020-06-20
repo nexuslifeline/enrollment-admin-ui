@@ -19,51 +19,45 @@
               <hr>
               <h4>Rate Sheet</h4>
               <p>Details about the Fees of Student within current Academic Year.</p>
-              <b-row v-show="options.courses.items.length	> 0">
-                <b-col offset-md="2" md=10>
-                  <b-alert show>
-                    <b-row>
-                      <b-col md=3>
-                        <b-form-select 
-                          v-model="forms.rateSheet.fields.courseId" 
-                          @change="loadFeesOfLevel()">
-                          <template v-slot:first>
-                            <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
-                          </template>
-                          <b-form-select-option 
-                            v-for="course in options.courses.items" 
-                            :key="course.id" 
-                            :value="course.id">
-                            {{course.name}}
-                          </b-form-select-option>
-                        </b-form-select>
-                      </b-col>
-                      <b-col md=3>
-												<b-form-select 
-                          v-model="forms.rateSheet.fields.semesterId" 
-                          @change="loadFeesOfLevel()">
-													<template v-slot:first>
-														<b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
-													</template>
-													<b-form-select-option 
-                            v-for="semester in options.semesters.values" 
-                            :key="semester.id" 
-                            :value="semester.id">
-														{{ semester.name }}
-													</b-form-select-option>
-												</b-form-select>
-											</b-col>
-                    </b-row>
-                  </b-alert>
-                </b-col>
-              </b-row>
               <b-row class="mb-3">
                 <b-col md=2>
-                </b-col>
-                <b-col md=4>
-                  <h5>Student Fees - {{ levelName }}</h5>
+                  <!-- <h5>Student Fees - {{ levelName }}</h5>  -->
                 </b-col>
                 <b-col md=6>
+                  <b-row v-show="options.courses.items.length	> 0">
+                    <b-col md=4>
+                      <b-form-select 
+                        v-model="forms.rateSheet.fields.courseId" 
+                        @change="loadFeesOfLevel()">
+                        <template v-slot:first>
+                          <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                        </template>
+                        <b-form-select-option 
+                          v-for="course in options.courses.items" 
+                          :key="course.id" 
+                          :value="course.id">
+                          {{course.name}}
+                        </b-form-select-option>
+                      </b-form-select>
+                    </b-col>
+                    <b-col md=4>
+                      <b-form-select 
+                        v-model="forms.rateSheet.fields.semesterId" 
+                        @change="loadFeesOfLevel()">
+                        <template v-slot:first>
+                          <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
+                        </template>
+                        <b-form-select-option 
+                          v-for="semester in options.semesters.values" 
+                          :key="semester.id" 
+                          :value="semester.id">
+                          {{ semester.name }}
+                        </b-form-select-option>
+                      </b-form-select>
+                    </b-col>
+                  </b-row>
+                </b-col>
+                <b-col md=4>
                   <b-button 
                     class="float-right" 
                     variant="outline-primary"
@@ -428,7 +422,7 @@ export default {
       })
     },
     loadSemesterList(){
-			var params = { paginate: false }
+			let params = { paginate: false }
 			this.getSemesterList(params)
 				.then(({ data }) => {
 					this.options.semesters.items = data

@@ -52,8 +52,12 @@
                         <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
-                        @click="setUpdate(row)" >
-                        Edit
+                        @click="setUpdatePersonnel(row)" >
+                        Edit Personnel Info
+                      </b-dropdown-item>
+                      <b-dropdown-item 
+                        @click="setUpdateUser(row)" >
+                        Edit Account Info
                       </b-dropdown-item>
                       <b-dropdown-item 
                         @click="forms.user.fields.id = row.item.id, showModalConfirmation = true">
@@ -83,14 +87,14 @@
         </b-card>
       </b-col>
     </b-row>
-    <!-- Modal Entry -->
+    <!-- Modal Entry Add -->
     <b-modal 
       @shown="$refs.username.focus()"
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					User - {{ entryMode }}
+					User - Add
 			</div> <!-- modal title -->
       <!-- modal body -->
 			<b-row> 
@@ -100,26 +104,24 @@
             <b-form-input 
               ref="username" 
               v-model="forms.user.fields.username" 
-              :state="forms.user.states.username" />
+              :state="forms.user.states.userUsername" />
             <b-form-invalid-feedback>
-              {{forms.user.errors.username}}
+              {{forms.user.errors.userUsername}}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group >
             <label class="required">Password</label>
             <b-form-input 
-              :disabled="entryMode === 'Edit'"
               type="password"
               v-model="forms.user.fields.password" 
-              :state="forms.user.states.password" />
+              :state="forms.user.states.userPassword" />
             <b-form-invalid-feedback>
-              {{forms.user.errors.password}}
+              {{forms.user.errors.userPassword}}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group >
             <label class="required">Confirm Password</label>
             <b-form-input 
-              :disabled="entryMode === 'Edit'"
               type="password"
               v-model="forms.user.fields.passwordConfirmation" />
           </b-form-group>
@@ -127,7 +129,7 @@
             <label class="required">User Group</label>
             <b-form-select 
               v-model="forms.user.fields.userGroupId"
-              :state="forms.user.states.userGroupId" >
+              :state="forms.user.states.userUserGroupId" >
               <template v-slot:first>
                 <b-form-select-option :value='null' disabled>-- Select User Group --</b-form-select-option>
               </template>
@@ -136,7 +138,7 @@
               </b-form-select-option>
             </b-form-select>
             <b-form-invalid-feedback>
-              {{forms.user.errors.userGroupId}}
+              {{forms.user.errors.userUserGroupId}}
             </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
@@ -144,37 +146,37 @@
           <b-form-group >
             <label class="required">Firstname</label>
             <b-form-input 
-              v-model="forms.user.fields.firstName" 
-              :state="forms.user.states.firstName" />
+              v-model="forms.personnel.fields.firstName" 
+              :state="forms.personnel.states.firstName" />
             <b-form-invalid-feedback>
-              {{forms.user.errors.firstName}}
+              {{forms.personnel.errors.firstName}}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group >
             <label>Middlename</label>
             <b-form-input 
-              v-model="forms.user.fields.middleName" 
-              :state="forms.user.states.middleName" />
+              v-model="forms.personnel.fields.middleName" 
+              :state="forms.personnel.states.middleName" />
             <b-form-invalid-feedback>
-              {{forms.user.errors.middleName}}
+              {{forms.personnel.errors.middleName}}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group >
             <label class="required">Lastname</label>
             <b-form-input 
-              v-model="forms.user.fields.lastName" 
-              :state="forms.user.states.lastName" />
+              v-model="forms.personnel.fields.lastName" 
+              :state="forms.personnel.states.lastName" />
             <b-form-invalid-feedback>
-              {{forms.user.errors.lastName}}
+              {{forms.personnel.errors.lastName}}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <label class="required">Birthdate</label>
             <b-form-input type="date" 
-              v-model="forms.user.fields.birthDate" 
-              :state="forms.user.states.birthDate" />
+              v-model="forms.personnel.fields.birthDate" 
+              :state="forms.personnel.states.birthDate" />
             <b-form-invalid-feedback>
-              {{forms.user.errors.birthDate}}
+              {{forms.personnel.errors.birthDate}}
             </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
@@ -203,6 +205,159 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
     <!-- End Modal Entry -->
+    <!-- Modal Entry Edit Personnel info -->
+    <b-modal 
+      @shown="$refs.firstname.focus()"
+			v-model="showModalUpdatePersonnel"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+					User - Edit
+			</div> <!-- modal title -->
+      <!-- modal body -->
+			<b-row> 
+        <b-col md=12>
+          <b-form-group >
+            <label class="required">Firstname</label>
+            <b-form-input
+              ref="firstname" 
+              v-model="forms.personnel.fields.firstName" 
+              :state="forms.personnel.states.firstName" />
+            <b-form-invalid-feedback>
+              {{forms.personnel.errors.firstName}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group >
+            <label>Middlename</label>
+            <b-form-input 
+              v-model="forms.personnel.fields.middleName" 
+              :state="forms.personnel.states.middleName" />
+            <b-form-invalid-feedback>
+              {{forms.personnel.errors.middleName}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group >
+            <label class="required">Lastname</label>
+            <b-form-input 
+              v-model="forms.personnel.fields.lastName" 
+              :state="forms.personnel.states.lastName" />
+            <b-form-invalid-feedback>
+              {{forms.personnel.errors.lastName}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group>
+            <label class="required">Birthdate</label>
+            <b-form-input type="date" 
+              v-model="forms.personnel.fields.birthDate" 
+              :state="forms.personnel.states.birthDate" />
+            <b-form-invalid-feedback>
+              {{forms.personnel.errors.birthDate}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+			</b-row>
+      <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button 
+          variant="outline-danger" 
+          class="float-left btn-close" 
+          @click="showModalEntry=false">
+          Close
+        </b-button>
+        <b-button
+          :disabled="forms.user.isProcessing"
+          variant="outline-primary" 
+          class="float-right btn-save" 
+          @click="onUserEntry()">
+          <v-icon
+            v-if="forms.user.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
+          Save
+        </b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+    <!-- End Modal Entry Edit Personnel info -->
+    <!-- Modal Entry Edit User info -->
+    <b-modal 
+      @shown="$refs.username.focus()"
+			v-model="showModalUpdateUser"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+					User Account - Edit
+			</div> <!-- modal title -->
+      <!-- modal body -->
+			<b-row> 
+				<b-col md=12>
+          <b-form-group >
+            <label class="required">Email</label>
+            <b-form-input 
+              ref="username" 
+              v-model="forms.user.fields.username" 
+              :state="forms.user.states.userUsername" />
+            <b-form-invalid-feedback>
+              {{forms.user.errors.userUsername}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group >
+            <label class="required">Password</label>
+            <b-form-input 
+              type="password"
+              v-model="forms.user.fields.password" 
+              :state="forms.user.states.userPassword" />
+            <b-form-invalid-feedback>
+              {{forms.user.errors.userPassword}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group >
+            <label class="required">Confirm Password</label>
+            <b-form-input 
+              type="password"
+              v-model="forms.user.fields.passwordConfirmation" />
+          </b-form-group>
+          <b-form-group>
+            <label class="required">User Group</label>
+            <b-form-select 
+              v-model="forms.user.fields.userGroupId"
+              :state="forms.user.states.userUserGroupId" >
+              <template v-slot:first>
+                <b-form-select-option :value='null' disabled>-- Select User Group --</b-form-select-option>
+              </template>
+              <b-form-select-option v-for='userGroup in options.userGroups.items' :key='userGroup.id' :value='userGroup.id'>
+                {{userGroup.name}}
+              </b-form-select-option>
+            </b-form-select>
+            <b-form-invalid-feedback>
+              {{forms.user.errors.userUserGroupId}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+			</b-row>
+      <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button 
+          variant="outline-danger" 
+          class="float-left btn-close" 
+          @click="showModalEntry=false">
+          Close
+        </b-button>
+        <b-button
+          :disabled="forms.user.isProcessing"
+          variant="outline-primary" 
+          class="float-right btn-save" 
+          @click="onUserEntry()">
+          <v-icon
+            v-if="forms.user.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
+          Save
+        </b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+    <!-- End Modal Entry Edit User info -->
     <!-- Modal Confirmation -->
     <b-modal 
       v-model="showModalConfirmation"
@@ -239,11 +394,20 @@
 <script>
 
 const userFields = {
-  id: null,
   username: null,
   password: null,
   passwordConfirmation: null,
   userGroupId: null,
+}
+
+const userErrorFields = {
+  userUsername: null,
+  userPassword: null,
+  userUserGroupId: null,
+}
+
+const personnelFields = {
+  id: null,
   firstName: null,
   middleName: null,
   lastName: null,
@@ -253,20 +417,28 @@ const userFields = {
 import { PersonnelApi, UserGroupApi } from "../../mixins/api"
 import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
 import Tables from '../../helpers/tables'
+import Personnel from '../../mixins/api/Personnel'
 export default {
 	name: "Personnel",
 	mixins: [ PersonnelApi, UserGroupApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
+      showModalUpdatePersonnel: false,
+      showModalUpdateUser: false,
       showModalConfirmation: false,
       entryMode: "",
       forms: {
+        personnel: {
+          fields: { ...personnelFields },
+          states: { ...personnelFields },
+          errors: { ...personnelFields }
+        }, 
         user: {
           isProcessing: false,
           fields: { ...userFields },
-          states: { ...userFields },
-          errors: { ...userFields }
+          states: { ...userErrorFields },
+          errors: { ...userErrorFields }
         }
       },
 			tables: {
@@ -342,7 +514,7 @@ export default {
 
       users.isBusy = true
 
-			var params = { paginate: false }
+			let params = { paginate: false }
       this.getPersonnelList(params).then(({ data }) =>{
         users.items = data
         user.totalRows = data.length
@@ -351,12 +523,14 @@ export default {
       })
     },
     onUserEntry(){
-      const { user, user: { fields } } = this.forms
+      const { user, personnel, personnel: { fields: { id } } } = this.forms
       const { users } = this.tables
       user.isProcessing = true
       reset(user)
+      reset(personnel)
       if(this.entryMode == "Add"){
-        this.addPersonnel(fields)
+        const data = { ...personnel.fields, user: user.fields }
+        this.addPersonnel(data)
           .then(({ data }) => {
             this.addRow(users, this.paginations.user, data)
             user.isProcessing = false
@@ -367,15 +541,31 @@ export default {
             const errors = error.response.data.errors
             user.isProcessing = false
             validate(user, errors)
+            validate(personnel, errors)
           })
       }
-      else {
-        this.updatePersonnel(fields, fields.id)
+      else if (this.entryMode == "Edit Personnel") {
+        this.updatePersonnel(personnel.fields, id)
           .then(({ data }) => {
             this.updateRow(users, data)
             user.isProcessing = false
             showNotification(this, "success", "User updated successfully.")
-            this.showModalEntry = false
+            this.showModalUpdatePersonnel = false
+          })
+          .catch(error => {
+            const errors = error.response.data.errors
+            user.isProcessing = false
+            validate(personnel, errors)
+          })
+      }
+      else if (this.entryMode == "Edit User") {
+        const data = { user: user.fields }
+        this.updatePersonnel(data, id)
+          .then(({ data }) => {
+            this.updateRow(users, data)
+            user.isProcessing = false
+            showNotification(this, "success", "User updated successfully.")
+            this.showModalUpdateUser = false
           })
           .catch(error => {
             const errors = error.response.data.errors
@@ -396,7 +586,7 @@ export default {
           this.showModalConfirmation = false
         })
     },
-    setUpdate(row){
+    setUpdateUser(row){
       const { user, user: { fields } } = this.forms
       const { item } = row
       clearFields(fields)
@@ -405,18 +595,31 @@ export default {
       fields.id = item.id
       fields.username = item.user.username
       fields.userGroupId = item.user.userGroupId
+
+      this.entryMode = "Edit User"
+      this.showModalUpdateUser = true
+    },
+    setUpdatePersonnel(row){
+      const { personnel, personnel: { fields } } = this.forms
+      const { item } = row
+      clearFields(fields)
+      reset(personnel)
+      console.log(item)
+      fields.id = item.id
       fields.firstName = item.firstName
-      fields.lastName = item.lastName
       fields.middleName = item.middleName
+      fields.lastName = item.lastName
       fields.birthDate = item.birthDate
 
-      this.entryMode = "Edit"
-      this.showModalEntry = true
+      this.entryMode = "Edit Personnel"
+      this.showModalUpdatePersonnel = true
     },
     setCreate(){
-      const { user } = this.forms
+      const { user, personnel } = this.forms
       reset(user)
+      reset(personnel)
       clearFields(user.fields)
+      clearFields(personnel.fields)
       this.entryMode='Add'
       this.showModalEntry = true
     }

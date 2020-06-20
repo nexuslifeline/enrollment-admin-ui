@@ -144,6 +144,50 @@
           </b-form-group>
         </b-col>
       </b-row>
+      <b-row> 
+				<b-col md=6>
+          <b-form-group >
+            <label class="required">School Category</label>
+            <b-form-select 
+              v-model="forms.subject.fields.schoolCategoryId"
+              :state="forms.subject.states.schoolCategoryId">
+              <template v-slot:first>
+                <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
+              </template>
+              <b-form-select-option 
+                v-for="schoolCategory in options.schoolCategories.values" 
+                :key="schoolCategory.id" 
+                :value="schoolCategory.id">
+                {{schoolCategory.name}}
+              </b-form-select-option>
+            </b-form-select>
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.schoolCategoryId}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+        <b-col md=6>
+          <b-form-group >
+            <label class="required">Department</label>
+            <b-form-select 
+              v-model="forms.subject.fields.departmentId"
+              :state="forms.subject.states.departmentId">
+              <template v-slot:first>
+                <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
+              </template>
+              <b-form-select-option 
+                v-for="department in options.departments.items" 
+                :key="department.id" 
+                :value="department.id">
+                {{department.name}}
+              </b-form-select-option>
+            </b-form-select>
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.departmentId}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+				</b-col>
+			</b-row>
       <b-row>
         <b-col md=6>
           <b-form-group label="Lecture Units">
@@ -304,6 +348,8 @@ const subjectFields = {
   code: null,
   name: null,
   description: null,
+  schoolCategoryId: null,
+  departmentId: null,
   units: null,
   amountPerUnit: null,
   labs: null,
@@ -312,14 +358,14 @@ const subjectFields = {
   totalAmount: null
 }
 
-import { SubjectApi } from "../../mixins/api"
+import { SubjectApi, DepartmentApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
-import { UserGroups } from '../../helpers/enum'
+import { UserGroups, SchoolCategories } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 export default {
 	name: "Subject",
-	mixins: [ SubjectApi, Tables ],
+	mixins: [ SubjectApi, DepartmentApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -341,54 +387,66 @@ export default {
 							key: "code",
 							label: "Code",
 							tdClass: "align-middle",
-							thStyle: {width: "8%"}
+							thStyle: {width: "6%"}
 						},
 						{
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: {width: "15%"}
+							thStyle: {width: "12%"}
 						},
 						{
 							key: "description",
 							label: "DESCRIPTION",
 							tdClass: "align-middle",
 							thStyle: {width: "auto"}
+            },
+            {
+							key: "department.name",
+							label: "DEPARTMENT",
+							tdClass: "align-middle",
+							thStyle: {width: "8%"}
+            },
+            {
+							key: "schoolCategory.name",
+							label: "SCHOOL CATEGORY",
+							tdClass: "align-middle",
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "units",
 							label: "LEC UNITS",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "8%"}
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "7%"}
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER LEC UNIT",
+							label: "AMOUNT PER LEC",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "13%"}
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "labs",
 							label: "LAB UNITS",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "8%"}
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "7%"}
             },
             {
 							key: "amountPerLab",
 							label: "AMOUNT PER LAB",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "13%"}
+							thStyle: {width: "10%"}
             },
             {
 							key: "totalAmount",
 							label: "TOTAL AMOUNT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "15%"}
+							thStyle: {width: "10%"}
             },
             {
               key: "action",
@@ -413,11 +471,18 @@ export default {
         subject: {
           criteria: null
         }
+      },
+      options: {
+        schoolCategories: SchoolCategories,
+        departments: {
+          items: []
+        }
       }
 		}
 	},
 	created(){
-		this.loadSubjects()
+    this.loadSubjects()
+    this.loadDepartments()
 	},
 	methods: {
 		loadSubjects(){
@@ -426,13 +491,22 @@ export default {
 
       subjects.isBusy = true
 
-			var params = { paginate: false }
-      this.getSubjectList(params).then(({ data }) => {
-        subjects.items = data
-        subject.totalRows = data.length
-        this.recordDetails(subject)
-        subjects.isBusy = false
-      })
+			let params = { paginate: false }
+      this.getSubjectList(params)
+        .then(({ data }) => {
+          subjects.items = data
+          subject.totalRows = data.length
+          this.recordDetails(subject)
+          subjects.isBusy = false
+        })
+    },
+    loadDepartments(){
+      let params = { paginate: false }
+      const { departments } = this.options
+      this.getDepartmentList(params)
+        .then(({ data }) => {
+          departments.items = data
+        })
     },
     onSubjectEntry(){
       const { subject, subject: { fields } } = this.forms
