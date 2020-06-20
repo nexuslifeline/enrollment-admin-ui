@@ -1,3 +1,19 @@
+$blue: #0080FF;
+$white: #FFFFFF;
+$gray: #b8b8b8;
+$light-gray: #fcfcfc;
+$light-gray-10: #ebebeb;
+$dark-gray: #7c7c7c;
+$dark-gray-10: #9c9c9c;
+$light-blue: #A1CFFD;
+$green: #00cc45;
+$darkblue: #0654A2;
+$red: red;
+
+$brand-primary: $blue;
+$brand-border-color: $light-gray-10;
+
+
 @mixin for-size($size, $extra:0) {
   @if $size==small-phone-only {
     @media (max-width: 320px + $extra) {
