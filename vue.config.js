@@ -23,5 +23,6 @@ module.exports = {
     : 'dev-stc-admin',
   transpileDependencies: [
     '@coreui/utils'
-  ]
+  ],
+  productionSourceMap: process.env.NODE_ENV == 'production' ? false : true
 }
