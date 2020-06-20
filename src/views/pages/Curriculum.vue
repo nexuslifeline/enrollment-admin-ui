@@ -57,7 +57,7 @@
 								</b-col>
 								<b-col md=2>
 									<b-button class="float-right" variant="outline-primary"
-										@click="showModalSubjects=true">
+										@click="showModalSubjects=true, filters.subject.departmentId=null">
 										<v-icon name="plus-circle" /> ADD NEW SUBJECT
 									</b-button>
 								</b-col>

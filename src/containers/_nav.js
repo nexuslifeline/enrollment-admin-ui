@@ -52,6 +52,13 @@ export const navs = () => {
       // Registrar
           {
             _name: 'CSidebarNavItem',
+            name: 'Department',
+            to: '/department',
+            icon: 'cil-layers',
+            // _class: checkRights(1)
+          },
+          {
+            _name: 'CSidebarNavItem',
             name: 'Subject',
             to: '/subject',
             icon: 'cil-layers',

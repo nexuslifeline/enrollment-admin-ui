@@ -261,7 +261,7 @@
 				<b-button 
           variant="outline-danger" 
           class="float-left btn-close" 
-          @click="showModalEntry=false">
+          @click="showModalUpdatePersonnel=false">
           Close
         </b-button>
         <b-button
@@ -340,7 +340,7 @@
 				<b-button 
           variant="outline-danger" 
           class="float-left btn-close" 
-          @click="showModalEntry=false">
+          @click="showModalUpdateUser=false">
           Close
         </b-button>
         <b-button
@@ -560,6 +560,7 @@ export default {
       }
       else if (this.entryMode == "Edit User") {
         const data = { user: user.fields }
+        console.log(personnel)
         this.updatePersonnel(data, id)
           .then(({ data }) => {
             this.updateRow(users, data)
@@ -587,12 +588,12 @@ export default {
         })
     },
     setUpdateUser(row){
-      const { user, user: { fields } } = this.forms
+      const { personnel, user, user: { fields } } = this.forms
       const { item } = row
       clearFields(fields)
       reset(user)
 
-      fields.id = item.id
+      personnel.fields.id = item.id
       fields.username = item.user.username
       fields.userGroupId = item.user.userGroupId
 

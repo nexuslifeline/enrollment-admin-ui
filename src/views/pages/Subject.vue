@@ -150,7 +150,8 @@
             <label class="required">School Category</label>
             <b-form-select 
               v-model="forms.subject.fields.schoolCategoryId"
-              :state="forms.subject.states.schoolCategoryId">
+              :state="forms.subject.states.schoolCategoryId"
+              @input="forms.subject.fields.departmentId=null">
               <template v-slot:first>
                 <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
               </template>
@@ -171,7 +172,13 @@
             <label class="required">Department</label>
             <b-form-select 
               v-model="forms.subject.fields.departmentId"
-              :state="forms.subject.states.departmentId">
+              :state="forms.subject.states.departmentId"
+              :disabled="
+                  forms.subject.fields.schoolCategoryId === null || 
+                  forms.subject.fields.schoolCategoryId === options.schoolCategories.PRE_SCHOOL.id || 
+                  forms.subject.fields.schoolCategoryId === options.schoolCategories.PRIMARY_SCHOOL.id || 
+                  forms.subject.fields.schoolCategoryId === options.schoolCategories.JUNIOR_HIGH_SCHOOL.id"
+              >
               <template v-slot:first>
                 <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
               </template>
@@ -576,6 +583,8 @@ export default {
       subject.fields.amountPerUnit = 0
       subject.fields.labs = 0
       subject.fields.amountPerLab = 0
+      subject.fields.departmentId = null
+      subject.fields.schoolCategoryId = null
       this.entryMode='Add'
       this.showModalEntry = true
     },
