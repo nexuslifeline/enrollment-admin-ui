@@ -1,3 +1,27 @@
+<style scoped>
+  a.c-sidebar-brand:hover {
+    text-decoration: none;
+  }
+  .logo__stc-brand {
+    display: flex;
+    align-items: center;
+    padding: 16px 8px;
+    font-weight: bold;
+  }
+  .logo__stc-brand img {
+      width: 60px;
+      height: auto;
+      margin: 0 8px;
+  }
+  .c-sidebar-minimized .logo__stc-brand .logo__title {
+    display: none;
+    opacity: 0;
+  }
+  .c-sidebar-minimized .logo__stc-brand img {
+    width: 40px;
+    height: auto;
+  }
+</style>
 <template>
   <CSidebar 
     fixed 
@@ -6,23 +30,12 @@
     @update:show="(value) => $store.commit('set', ['sidebarShow', value])"
   >
     <CSidebarBrand class="d-md-down-none" to="/">
-      <CIcon 
-        class="c-sidebar-brand-full" 
-        name="logo" 
-        size="custom-size" 
-        :height="35" 
-        viewBox="0 0 556 134"
-      />
-      <CIcon 
-        class="c-sidebar-brand-minimized" 
-        name="logo" 
-        size="custom-size" 
-        :height="35" 
-        viewBox="0 0 110 134"
-      />
+      <div class="logo__stc-brand">
+        <img src="../assets/images/stc_logo.png"> <span class="logo__title">Saint Theresa College <br> of Tandag Inc.</span>
+      </div>
     </CSidebarBrand>
 
-    <CRenderFunction flat :content-to-render="$options.nav"/>
+    <CRenderFunction flat :content-to-render="nav"/>
     <CSidebarMinimizer
       class="d-md-down-none"
       @click.native="$store.commit('set', ['sidebarMinimize', !minimize])"
@@ -31,11 +44,18 @@
 </template>
 
 <script>
-import nav from './_nav'
+import { navs } from './_nav'
 
 export default {
   name: 'TheSidebar',
-  nav,
+  data(){
+    return {
+      nav: null
+    }
+  },
+  created(){
+    this.nav = navs()
+  },
   computed: {
     show () {
       return this.$store.state.sidebarShow 
@@ -46,3 +66,5 @@ export default {
   }
 }
 </script>
+
+

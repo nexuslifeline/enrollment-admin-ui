@@ -5,7 +5,7 @@ export default {
     getSubjectList(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects`, { params: params });
     },
-    getStudent(id) {
+    getSubject(id) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects/${id}`);
     },
     addSubject(data) {
@@ -16,9 +16,6 @@ export default {
     },
     deleteSubject(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/subjects/` + id)
-    },
-    updateSubjectsOfLevel(levelId, data) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/levels/${levelId}/subjects`, data);
     },
   }
 }

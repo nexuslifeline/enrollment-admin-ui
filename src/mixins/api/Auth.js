@@ -4,6 +4,9 @@ export default {
   methods: {
     login(data) {
       return this.$http.post(`${apiPrefix}/${apiVersion}/personnel/login`, data);
-    }
+    },
+    getAuthenticatedUser(){
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/me`);
+    },
   }
 }

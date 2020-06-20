@@ -1,3 +1,15 @@
+<style lang="scss" scoped>
+  @import "../../assets/scss/shared.scss";
+
+  .bottom-space {
+    margin-bottom: 0px;
+    
+    @include for-size(phone-only) {
+      margin-bottom: 15px;
+    }
+
+  }
+</style> 
 <template>
   <div>
     <b-row>
@@ -8,10 +20,10 @@
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
-                  <b-col md=8>
+                  <b-col md=8 class="bottom-space">
                     <b-button variant="outline-primary" 
-                      @click="clearFields(), entryMode='Add', showModalEntry=true">
-                      <b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
+                      @click="onCreate()">
+                      <v-icon name="plus-circle" /> ADD NEW SUBJECT
                     </b-button>
                   </b-col>
                   <b-col md=4>
@@ -33,11 +45,23 @@
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
                   :items="tables.subjects.items" 
-                  :filter="filters.subject.criteria">
+                  :current-page="paginations.subject.page"
+                  :per-page="paginations.subject.perPage"
+                  :filter="filters.subject.criteria"
+                  @filtered="onFiltered($event, paginations.subject)">
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon 
+                        name="spinner" 
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
-                        <b-icon-grip-horizontal></b-icon-grip-horizontal>
+                        <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
                         @click="setSubjectUpdate(row)" >
@@ -61,7 +85,7 @@
                       :per-page="paginations.subject.perPage"
                       size="sm"
                       align="end"
-                      @input="loadSubjects()" />
+                      @input="recordDetails(paginations.subject)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -82,75 +106,138 @@
       <!-- modal body -->
 			<b-row> 
 				<b-col md=6>
-          <b-form-group label="Code">
+          <b-form-group >
+            <label class="required">Code</label>
             <b-form-input 
               ref="code" 
-              placeholder="Code" 
-              v-model="forms.subject.fields.code" />
+              v-model="forms.subject.fields.code" 
+              :state="forms.subject.states.code" />
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.code}}
+            </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
         <b-col md=6>
-          <b-form-group label="Name">
+          <b-form-group >
+            <label class="required">Name</label>
             <b-form-input 
               ref="name" 
-              placeholder="Name" 
-              v-model="forms.subject.fields.name" />
+              v-model="forms.subject.fields.name" 
+              :state="forms.subject.states.name" />
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.name}}
+            </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
 			</b-row>
-      <b-form-group label="Description">
-        <b-form-textarea 
-          ref="description" 
-          placeholder="Description" 
-          v-model="forms.subject.fields.description" />
-      </b-form-group>
       <b-row>
-        <b-col md=6>
-          <b-form-group label="Units">
-            <b-form-input 
-              type="number" 
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.units" />
-          </b-form-group>
-        </b-col>
-        <b-col md=6>
-          <b-form-group label="Amount per Unit">
-            <b-form-input 
-              type="number"
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.amountPerUnit" />
+        <b-col md=12>
+          <b-form-group>
+            <label class="required">Description</label>
+            <b-form-textarea 
+              ref="description" 
+              v-model="forms.subject.fields.description" 
+              :state="forms.subject.states.description" />
+            <b-form-invalid-feedback>
+              {{forms.subject.errors.description}}
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
       <b-row>
         <b-col md=6>
-          <b-form-group label="Labs">
-            <b-form-input 
-              type="number" 
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.labs" />
+          <b-form-group label="Lecture Units">
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="units"
+              :disabled="checkRights(1)"
+              v-model='forms.subject.fields.units'
+              :class="'form-control text-right'"
+              :options="[{ 
+                decimalPlaces: 0,
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
         <b-col md=6>
-          <b-form-group label="Amount per Lab">
-            <b-form-input 
-              type="number" 
-              @input="computeTotalAmount()" 
-              class="text-right" 
-              v-model="forms.subject.fields.amountPerLab" />
+          <b-form-group label="Amount per Lecture Units">
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="amountPerUnit"
+              :disabled="checkRights(2)"
+              v-model='forms.subject.fields.amountPerUnit'
+              :class="'form-control text-right'"
+              :options="[{ 
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
       </b-row>
       <b-row>
-        <b-col offset-md=6 md=6>
+        <b-col md=6>
+          <b-form-group label="Lab Units">
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="labs"
+              :disabled="checkRights(1)"
+              v-model='forms.subject.fields.labs'
+              :class="'form-control text-right'"
+              :options="[{ 
+                decimalPlaces: 0,
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
+          </b-form-group>
+        </b-col>
+        <b-col md=6>
+          <b-form-group label="Amount per Lab Units">
+            <vue-autonumeric
+              @input="computeTotalAmount()"
+              ref="amountPerLab"
+              :disabled="checkRights(2)"
+              v-model='forms.subject.fields.amountPerLab'
+              :class="'form-control text-right'"
+              :options="[{ 
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md=6>
+          <b-form-group label="Total Units">
+            <vue-autonumeric
+              :disabled="true"
+              ref="totalUnits"
+              v-model='forms.subject.fields.totalUnits'
+              :class="'form-control text-right'"
+              :options="[{ 
+                decimalPlaces: 0,
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
+          </b-form-group>
+        </b-col>
+        <b-col md=6>
           <b-form-group label="Total Amount">
-            <b-form-input 
-              disabled type="number" 
-              class="text-right" 
-              v-model="forms.subject.fields.totalAmount" />
+            <vue-autonumeric
+              :disabled="true"
+              ref="totalAmount"
+              v-model='forms.subject.fields.totalAmount'
+              :class="'form-control text-right'"
+              :options="[{ 
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
           </b-form-group>
         </b-col>
       </b-row>
@@ -159,19 +246,25 @@
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
-          class="float-left" 
+          class="float-left btn-close" 
           @click="showModalEntry=false">
           Close
         </b-button>
         <b-button 
+          :disabled="forms.subject.isProcessing"
           variant="outline-primary" 
-          class="float-right" 
+          class="float-right btn-save" 
           @click="onSubjectEntry()">
+          <v-icon
+            v-if="forms.subject.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
-    <!-- Modal Entry -->
+    <!-- End Modal Entry -->
     <!-- Modal Confirmation -->
     <b-modal 
       v-model="showModalConfirmation"
@@ -184,24 +277,49 @@
       <div slot="modal-footer">
         <b-button 
           variant="outline-primary" 
-          class="mr-2" 
+          class="mr-2 btn-save" 
           @click="onSubjectDelete()">
+          <v-icon 
+            v-if="forms.subject.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
           Yes
         </b-button>
         <b-button 
+          class="btn-close"
           variant="outline-danger" 
           @click="showModalConfirmation=false">
           No
         </b-button>            
       </div>
     </b-modal>
+    <!-- End Modal Confirmation -->
   </div>
 </template>
 <script>
+
+const subjectFields = {
+  id: null,
+  code: null,
+  name: null,
+  description: null,
+  units: null,
+  amountPerUnit: null,
+  labs: null,
+  amountPerLab: null,
+  totalUnits: null,
+  totalAmount: null
+}
+
 import { SubjectApi } from "../../mixins/api"
+import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { copyValue } from '../../helpers/extractor'
+import { UserGroups } from '../../helpers/enum'
+import Tables from '../../helpers/tables'
 export default {
 	name: "Subject",
-	mixins: [ SubjectApi ],
+	mixins: [ SubjectApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
@@ -209,17 +327,10 @@ export default {
       entryMode: "",
       forms: {
         subject: {
-          fields: {
-            id: null,
-            code: "",
-            name: "",
-            description: "",
-            units: 0,
-            amountPerUnit: 0,
-            labs: 0,
-            amountPerLab: 0,
-            totalAmount: 0
-          }
+          isProcessing: false,
+          fields: { ...subjectFields },
+          states: { ...subjectFields },
+          errors: { ...subjectFields }
         }
       },
 			tables: {
@@ -246,21 +357,21 @@ export default {
 						},
 						{
 							key: "units",
-							label: "UNITS",
+							label: "LEC UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER UNIT",
+							label: "AMOUNT PER LEC UNIT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "13%"}
 						},
 						{
 							key: "labs",
-							label: "LABS",
+							label: "LAB UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
@@ -310,109 +421,105 @@ export default {
 	},
 	methods: {
 		loadSubjects(){
-      this.tables.subjects.isBusy = true
-      const { perPage, page } = this.paginations.subject
-			var params = { paginate: true, perPage, page }
-      this.getSubjectList(params).then(response =>{
-        const res = response.data
-        this.tables.subjects.items = res.data
-        this.paginations.subject.from = res.meta.from
-        this.paginations.subject.to = res.meta.to
-        this.paginations.subject.totalRows = res.meta.total
-        this.tables.subjects.isBusy = false
+      const { subjects } = this.tables
+      const { subject } = this.paginations
+
+      subjects.isBusy = true
+
+			var params = { paginate: false }
+      this.getSubjectList(params).then(({ data }) => {
+        subjects.items = data
+        subject.totalRows = data.length
+        this.recordDetails(subject)
+        subjects.isBusy = false
       })
     },
     onSubjectEntry(){
+      const { subject, subject: { fields } } = this.forms
+      const { subjects } = this.tables
+
+      subject.isProcessing = true
+      reset(subject)
       if(this.entryMode == "Add"){
-        this.addSubject(this.forms.subject.fields)
-          .then(response => {
-            const res = response
-            const { subject } = this.paginations
-            if(subject.totalRows % subject.perPage == 0){
-              subject.totalRows++
-            }
-            if(subject.page == subject.totalRows){
-              this.loadSubjects()
-            }
-            else {
-              subject.page = subject.totalRows
-            }
-            this.showNotification("success", "Subject created successfully.")
+        this.addSubject(fields)
+          .then(({ data }) => {
+            this.addRow(subjects, this.paginations.subject, data)
+            subject.isProcessing = false
+            showNotification(this, "success", "Subject created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
-            const err = error.response.data.errors
-            if(err){
-              var key = Object.keys(err)[0]
-              this.showNotification("danger", err[key])
-              this.$refs[key].focus()
-            }
+            const errors = error.response.data.errors
+            subject.isProcessing = false
+            validate(subject, errors)
           })
       }
       else {
         const { fields } = this.forms.subject
         this.updateSubject(fields, fields.id)
-          .then(response => {
-            const res = response.data
-            this.loadSubjects()
-            this.showNotification("success", "Subject updated successfully.")
+          .then(({ data }) => {
+            subject.isProcessing = false
+            this.updateRow(subjects, data)
+            showNotification(this, "success", "Subject updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
-            const err = error.response.data.errors
-            if(err){
-              var key = Object.keys(err)[0]
-              this.showNotification("danger", err[key])
-              this.$refs[key].focus()
-            }
+            const errors = error.response.data.errors
+            subject.isProcessing = false
+            validate(subject, errors)
           })
       }
     },
     onSubjectDelete(){
-      const { id } = this.forms.subject.fields
+      const { subject, subject: { fields: { id } } } = this.forms
+      const { subjects } = this.tables
+      subject.isProcessing = true
       this.deleteSubject(id)
-        .then(response => {
-          this.loadSubjects()
-          this.showNotification("success", "Subject deleted successfully.")
+        .then(({ data }) => {
+          subject.isProcessing = false
+          this.deleteRow(subjects, this.paginations.subject, id)
+          showNotification(this, "success", "Subject deleted successfully.")
           this.showModalConfirmation = false
         })
     },
-    clearFields(){
-      var keyField = this.forms.subject.fields
-      for(var key in keyField){
-        if (typeof keyField[key] !== "object") {
-          if(typeof keyField[key] == "number"){
-            keyField[key] = 0
-          }
-          else{
-            keyField[key] = null
-          }
-        } 
-        else {
-          var innerFields = keyField[key]
-          for (var innerKey in innerFields) {
-            innerFields[innerKey] = null
-          }
-        }
-      }
-    },
     setSubjectUpdate(row){
-      for(var key in this.forms.subject.fields){
-        this.forms.subject.fields[key] = row.item[key]
-      }
+      const { subject, subject: { fields } } = this.forms
+      copyValue(row.item, fields)
+      reset(subject)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
     computeTotalAmount(){
       const { fields } = this.forms.subject
+      fields.totalUnits = fields.units + fields.labs
       fields.totalAmount = (fields.units * fields.amountPerUnit) + (fields.labs * fields.amountPerLab)
     },
-    showNotification(variant, msg){
-      this.$bvToast.toast(msg, {
-        title: "Notification",
-        variant: variant,
-        solid: true
-      })
+    onCreate(){
+      const { subject } = this.forms
+      reset(subject)
+      clearFields(subject.fields)
+      subject.fields.units = 0
+      subject.fields.amountPerUnit = 0
+      subject.fields.labs = 0
+      subject.fields.amountPerLab = 0
+      this.entryMode='Add'
+      this.showModalEntry = true
+    },
+    checkRights(userType) {
+      const userGroupId = localStorage.getItem('userGroupId')
+      const userGroup = UserGroups.getEnum(Number(userGroupId))
+      let result = true
+			if (userGroup) {
+				if (userGroup.userType == userType) {
+          result = false
+        }
+      }
+      
+      if (UserGroups.SUPER_USER.id == userGroup.id) {
+				result = false
+      }
+      
+			return result
     }
 	}
 }

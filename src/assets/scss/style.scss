@@ -1,5 +1,6 @@
 // If you want to override variables do it here
 @import "variables";
+@import "shared";
 
 // Import styles
 @import "~@coreui/coreui/scss/coreui";
@@ -16,4 +17,25 @@
   width: 1.2rem;
   height: 1.2rem;
   font-size: 1.2rem;
+}
+
+label.required:before {
+  content: '* ';
+  color: red;
+}
+
+.btn-save {
+  min-width: 100px;
+}
+
+.btn-close {
+  min-width: 100px;
+}
+
+.col-auto {
+
+  @include for-size(phone-only) {
+      width: 100%;
+      text-align: center;
+  }
 }

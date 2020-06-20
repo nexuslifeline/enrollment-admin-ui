@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<b-overlay :show="isLoaded" rounded="sm">
+		<b-overlay :show="isLoading" rounded="sm">
 			<b-row>
 				<b-col md=12>
 					<b-card>
@@ -8,7 +8,10 @@
 							<b-row>
 								<b-col md=12>
 									<b-tabs pills> 						
-										<b-tab v-for="schoolCategory in options.schoolCategories.items" :key="schoolCategory.id" 
+										<b-tab 
+											v-for="schoolCategory in options.schoolCategories.values" 
+											:key="schoolCategory.id" 
+											:active="schoolCategoryId === schoolCategory.id"
 											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
 											:title="schoolCategory.name"/>
 									</b-tabs>
@@ -16,27 +19,37 @@
 							</b-row>
 							<hr>
 							<h4>Curriculum</h4>
-							<p>Lorem ipsum dolor sit amet.</p>
+							<p>Details about the subjects comprising the Course or Program.</p>
 							<b-row v-show="options.courses.items.length	> 0">
 								<b-col offset-md="2" md=10>
 									<b-alert show>
 										<b-row>
 											<b-col md=3>
-												<b-form-select v-model="forms.curriculum.fields.courseId">
+												<b-form-select 
+													@change="loadSubjectsOfLevelList()" 
+													v-model="forms.curriculum.fields.courseId">
 													<template v-slot:first>
 														<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 													</template>
-													<b-form-select-option v-for="course in options.courses.items" :key="course.id" :value="course.id">
+													<b-form-select-option
+														v-for="course in options.courses.items" 
+														:key="course.id" 
+														:value="course.id">
 														{{course.name}}
 													</b-form-select-option>
 												</b-form-select>
 											</b-col>
 											<b-col md=3>
-												<b-form-select v-model="forms.curriculum.fields.semesterId">
+												<b-form-select 
+													@change="loadSubjectsOfLevelList()" 
+													v-model="forms.curriculum.fields.semesterId">
 													<template v-slot:first>
 														<b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
 													</template>
-													<b-form-select-option v-for="semester in options.semesters.items" :key="semester.id" :value="semester.id">
+													<b-form-select-option 
+														v-for="semester in options.semesters.values"
+														:key="semester.id" 
+														:value="semester.id">
 														{{semester.name}}
 													</b-form-select-option>
 												</b-form-select>
@@ -49,7 +62,7 @@
 								<b-col md=6 offset-md="6">
 									<b-button class="float-right" variant="outline-primary"
 										@click="showModalSubjects=true">
-										<b-icon-plus-circle></b-icon-plus-circle> ADD NEW SUBJECT
+										<v-icon name="plus-circle" /> ADD NEW SUBJECT
 									</b-button>
 								</b-col>
 							</b-row>
@@ -71,7 +84,7 @@
 											<b-button 
                         @click="removeSubject(row)" 
                         size="sm" variant="danger">
-                        <b-icon-x></b-icon-x>
+                        <v-icon name="trash" />
                       </b-button>
 										</template>
 									</b-table>
@@ -80,10 +93,16 @@
 						</b-card-body>
 						<template v-slot:footer>
 							<b-button 
-                class="float-right" 
+								:disabled="forms.curriculum.isProcessing"
+                class="float-right btn-save" 
                 @click="updateCurriculum()" 
                 variant="outline-primary">
-                Update
+								<v-icon 
+									v-if="forms.curriculum.isProcessing"
+									name="sync"
+									spin
+									class="mr-2" />
+                Save
               </b-button>
 						</template>
 					</b-card>
@@ -115,12 +134,15 @@
 						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields"
             :filter="filters.subject.criteria"
-						:busy="tables.subjects.isBusy2">
+						:busy="tables.subjects.isBusy2"
+            :current-page="paginations.subject.page"
+            :per-page="paginations.subject.perPage"
+            @filtered="onFiltered($event, paginations.subject)">
 						<template v-slot:cell(action)="row">
 							<b-button 
                 @click="addSubject(row)" 
                 size="sm" variant="success">
-                <b-icon-plus></b-icon-plus>
+                <v-icon name="plus" />
               </b-button>
 						</template>
 					</b-table>
@@ -135,7 +157,7 @@
                 :per-page="paginations.subject.perPage"
                 size="sm"
                 align="end"
-                @input="loadSubjects()"
+                @input="recordDetails(paginations.subject)"
               />
             </b-col>
           </b-row>
@@ -149,15 +171,19 @@
 </template>
 <script>
 import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi } from "../../mixins/api"
+import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
+import { showNotification } from '../../helpers/forms'
+import Tables from '../../helpers/tables'
 export default {
 	name: "Curriculum",
-	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi ],
+	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi, SubjectApi, Tables ],
 	data() {
 		return {
 			showModalSubjects: false,
-			isLoaded: false,
+			isLoading: false,
 			forms: {
 				curriculum: {
+					isProcessing: false,
 					fields: {
 						schoolCategoryId: null,
 						levelId: null,
@@ -182,20 +208,27 @@ export default {
 							key: "name",
 							label: "SUBJECT",
 							tdClass: "align-middle",
-							thStyle: {width: "25%"}
+							thStyle: {width: "20%"}
 						},
 						{
 							key: "description",
 							label: "DESCRIPTION",
 							tdClass: "align-middle",
-							thStyle: {width: "35%"}
+							thStyle: {width: "30%"}
+            },
+            {
+							key: "labs",
+							label: "LAB UNITS",
+							tdClass: "align-middle text-right",
+							thClass: "text-right",
+							thStyle: {width: "15%"}
 						},
 						{
 							key: "units",
-							label: "UNITS",
+							label: "LEC UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "20%"}
+							thStyle: {width: "15%"}
 						},
 						{
 							key: "action",
@@ -222,136 +255,149 @@ export default {
         }
       },
 			options: {
-				schoolCategories: {
-					items: []
-				},
+				schoolCategories: SchoolCategories,
 				levels: {
 					items: []
 				},
 				courses: {
 					items: []
 				},
-				semesters: {
-					items: []
-				}
+				semesters: Semesters
 			},
-			levelIndex: 0
+			levelIndex: 0,
+			schoolCategoryId: null
 		}
 	},
 	created(){
-		this.loadSchoolCategoryList()
-		this.loadSemesterList()
+		this.checkRights()
 		this.loadSubjects()
 	},
 	methods: {
-		loadSchoolCategoryList(){
-			this.isLoaded = true
-			var params = { paginate: false }
-			this.getSchoolCategoryList(params)
-				.then(response => {
-					const res = response.data
-					this.options.schoolCategories.items = res
-					this.loadLevelsOfSchoolCategoryList(res[0].id)
-					this.isLoaded = false
-				})
-				.catch(error => {
-					console.log(error)
-				})
-		},
 		loadLevelsOfSchoolCategoryList(id){
-			this.isLoaded = true
+			this.isLoading = true
+			this.options.courses.items = []
 			this.forms.curriculum.fields.schoolCategoryId = id
-			var params = { paginate: false }
+			let params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(id, params)
-				.then(response => {
-					const res = response.data
-					this.options.levels.items = res
+				.then(({ data }) => {
+					this.options.levels.items = data
 					this.levelIndex = 0
-					this.loadCoursesOfLevelList(res[0].id)
-					this.isLoaded = false
+					if (data.length > 0) {
+						this.loadCoursesOfLevelList(data[0].id)
+					} else {
+						this.forms.curriculum.fields.subjects = []
+					}
+					this.isLoading = false
 				})
 				.catch(error => {
 					console.log(error)
 				})
 		},
-		loadSubjectsOfLevelList(id){
-      this.tables.subjects.isBusy = true
-      const { courseId, semesterId } = this.forms.curriculum.fields
-			var params = { courseId, semesterId , paginate : false }
-			this.getSubjectsOfLevelList(id, params)
-				.then(response => {
-					const res = response.data
-					this.forms.curriculum.fields.subjects = res
-					this.tables.subjects.isBusy = false
+		loadSubjectsOfLevelList(){
+      const { subjects } = this.tables
+      subjects.isBusy = true
+      const { fields, fields: { levelId, courseId, semesterId } } = this.forms.curriculum
+			let params = { courseId, semesterId , paginate : false }
+			this.getSubjectsOfLevelList(levelId, params)
+				.then(({ data }) => {
+					fields.subjects = data
+					subjects.isBusy = false
 			});
 		},
 		loadCoursesOfLevelList(levelId){
-			this.isLoaded = true
+			this.isLoading = true
       this.forms.curriculum.fields.levelId = levelId
       const { schoolCategoryId } = this.forms.curriculum.fields
-			var params = { paginate: false, schoolCategoryId }
+			let params = { paginate: false, schoolCategoryId }
 			this.getCoursesOfLevelList(levelId, params)
-				.then(response => {
-					const res = response.data
-					this.options.courses.items = res
+				.then(({ data }) => {
+          const { courses, semesters } = this.options
+					courses.items = data
 
-					if(res.length > 0){
-						this.forms.curriculum.fields.semesterId = this.options.semesters.items[0].id
-						this.forms.curriculum.fields.courseId = this.options.courses.items[0].id
+					if(data.length > 0){
+						this.forms.curriculum.fields.semesterId = semesters.getEnum(1).id
+						this.forms.curriculum.fields.courseId = courses.items[0].id
 					}
 					
-					this.loadSubjectsOfLevelList(levelId)
-					this.isLoaded = false
+					this.loadSubjectsOfLevelList()
+					this.isLoading = false
 				})
 		},
 		loadSemesterList(){
-			this.isLoaded = true
-			var params = { paginate: false }
+			this.isLoading = true
+			let params = { paginate: false }
 			this.getSemesterList(params)
-				.then(response => {
-					const res = response.data
-					this.options.semesters.items = res
-					this.isLoaded = false
+				.then(({ data }) => {
+					this.options.semesters.items = data
+					this.isLoading = false
 				})
 		},
 		updateCurriculum(){
-			var data = { subjects : [] }
+			let data = { subjects : [] }
+			const { curriculum, curriculum: { fields } } = this.forms
+			
+			curriculum.isProcessing = true
 
-			this.forms.curriculum.fields.subjects.forEach(s => {
+			fields.subjects.forEach(s => {
 				data.subjects.push({
-					courseId: this.forms.curriculum.fields.courseId,
-					semesterId: this.forms.curriculum.fields.semesterId,
-					schoolCategoryId: this.forms.curriculum.fields.schoolCategoryId,
+					courseId: fields.courseId,
+					semesterId: fields.semesterId,
+					schoolCategoryId: fields.schoolCategoryId,
 					subjectId: s.id
 				})
 			})
-      const { levelId } = this.forms.curriculum.fields
-			this.updateSubjectsOfLevel(levelId, data)
-				.then(response => {
-					console.log(response)
-				})
-		},
-		loadSubjects(){
-      this.tables.subjects.isBusy2 = true
-      const { perPage, page } = this.paginations.subject
-			var params = { paginate: true, perPage: this.paginations.subject.perPage, page: this.paginations.subject.page }
+
+			this.updateSubjectsOfLevel(fields.levelId, data)
+				.then(({ data }) => {
+					curriculum.isProcessing = false
+					showNotification(this, 'success', 'Curriculum is updated.')
+          //console.log(res)
+        })
+        .catch(error => {
+					curriculum.isProcessing = false
+          showNotification(this, 'danger', 'Error in updating curriculum.')
+        })
+    },
+    loadSubjects(){
+      const { subjects } = this.tables
+      const { subject } = this.paginations
+      subjects.isBusy2 = true
+			let params = { paginate: false }
 			this.getSubjectList(params)
-				.then(response => {
-					const res = response.data
-          this.tables.subjects.items = res.data
-          this.paginations.subject.from = res.meta.from
-					this.paginations.subject.to = res.meta.to
-					this.paginations.subject.totalRows = res.meta.total
-					this.paginations.subject.pages = res.meta.lastPage
-					this.tables.subjects.isBusy2 = false
+				.then(({ data }) => {
+          subjects.items = data
+          subject.totalRows = data.length
+          this.recordDetails(subject)
+					subjects.isBusy2 = false
 				})
-		},
-		addSubject(row){
-			console.log(row)
-			this.forms.curriculum.fields.subjects.push(row.item)
+    },
+		addSubject(row){ 
+      const { fields } = this.forms.curriculum
+      const { item } = row
+      // check if subject exist in the table
+      const result = fields.subjects.find(subject => subject.id === item.id)
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
+			fields.subjects.push(item)
 		},
 		removeSubject(row){
 			this.forms.curriculum.fields.subjects.splice(row.index, 1);
+		},
+		checkRights(){
+			const userGroupId = localStorage.getItem('userGroupId')
+			const userGroup = UserGroups.getEnum(Number(userGroupId))
+			let result = false
+			if (userGroup) {
+				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+			}
+
+			if (UserGroups.SUPER_USER.id == userGroup.id) {
+				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+			}
+			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
 		}
 	}
 }
