@@ -104,7 +104,7 @@ function configRoutes () {
           path: 'subject',
           name: 'Subject',
           component: Subject,
-          meta: { requiresAuth: true, userType: 1 }
+          meta: { requiresAuth: true }
         },
         {
           path: 'course',

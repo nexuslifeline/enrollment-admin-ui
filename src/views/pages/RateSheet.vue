@@ -105,14 +105,14 @@
                     <b-col md=6>
                       <!-- <b-row>
                         <b-col md=7>
-                          <h6 class="font-weight-bold pt-1">UPON ENROLLMENT FEE : </h6>
+                          <h6 class="font-weight-bold pt-1">ENTRANCE FEE : </h6>
                         </b-col>
                         <b-col md=5>
                           <b-form-input v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input>
                         </b-col>
                       </b-row> -->
                       <b-form-group
-                        label="UPON ENROLLMENT FEE"
+                        label="ENTRANCE FEE"
                         label-for="enrollmentFee"
                         label-cols="5">
                         <vue-autonumeric
@@ -216,7 +216,7 @@
 <script>
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
 import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
-import { showNotification } from '../../helpers/forms'
+import { showNotification, formatNumber } from '../../helpers/forms'
 import Tables from '../../helpers/tables'
 export default {
 	name: "RateSheet",
@@ -337,7 +337,7 @@ export default {
         total += Number(fee.pivot.amount)
       })
 
-      return total.toFixed(2)
+      return formatNumber(total)
     },
     levelName() {
       const { fields } = this.forms.rateSheet
@@ -435,13 +435,20 @@ export default {
 				})
 		},
     addFee(row){
-      //console.log(row)
-      this.forms.rateSheet.fields.fees.push({ 
-        id: row.item.id,
-        name : row.item.name,
-        isIntegrated: row.item.isIntegrated,
-        description: row.item.description,
-        pivot:{ schoolFeeId: row.item.id, amount: 0.00, notes: "" }
+      const { fields } = this.forms.rateSheet
+      const { item } = row
+      // check if rate sheet exist in the table
+      const result = fields.fees.find(fee => fee.id === item.id)
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
+      fields.fees.push({ 
+        id: item.id,
+        name : item.name,
+        isIntegrated: item.isIntegrated,
+        description: item.description,
+        pivot:{ schoolFeeId: item.id, amount: 0.00, notes: "" }
       })
     },
 		removeFee(row){

@@ -225,7 +225,7 @@ export default {
 						},
 						{
 							key: "units",
-							label: "UNITS",
+							label: "LEC UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "15%"}
@@ -371,8 +371,16 @@ export default {
 					subjects.isBusy2 = false
 				})
     },
-		addSubject(row){
-			this.forms.curriculum.fields.subjects.push(row.item)
+		addSubject(row){ 
+      const { fields } = this.forms.curriculum
+      const { item } = row
+      // check if subject exist in the table
+      const result = fields.subjects.find(subject => subject.id === item.id)
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
+			fields.subjects.push(item)
 		},
 		removeSubject(row){
 			this.forms.curriculum.fields.subjects.splice(row.index, 1);

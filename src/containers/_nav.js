@@ -29,14 +29,14 @@ export const navs = () => {
         items: [
           {
             _name: 'CSidebarNavItem',
-            name: 'Students',
+            name: 'Student Admission',
             to: '/student',
             icon: 'cil-user',
             class: checkRights(1)
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Student Fee',
+            name: 'Student Assessment Fee',
             to: '/studentfee',
             icon: 'cil-layers',
             class: checkRights(2)
@@ -44,39 +44,56 @@ export const navs = () => {
         ]
       },
       {
-        _name: 'CSidebarNavItem',
-        name: 'Rate Sheet',
-        to: '/ratesheet',
+        _name: 'CSidebarNavDropdown',
+        name: 'Registrar',
+        route: '/subject',
         icon: 'cil-layers',
-        _class: checkRights(2)
+        items: [
+      // Registrar
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Subject',
+            to: '/subject',
+            icon: 'cil-layers',
+            // _class: checkRights(1)
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Course',
+            to: '/course',
+            icon: 'cil-layers',
+            class: checkRights(1)
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Curriculum',
+            to: '/curriculum',
+            icon: 'cil-layers',
+            class: checkRights(1)
+          },
+        ]
       },
+      // Finance
       {
-        _name: 'CSidebarNavItem',
-        name: 'Curriculum',
-        to: '/curriculum',
+        _name: 'CSidebarNavDropdown',
+        name: 'Finance',
+        route: '/schoolfee',
         icon: 'cil-layers',
-        _class: checkRights(1)
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Subject',
-        to: '/subject',
-        icon: 'cil-layers',
-        _class: checkRights(1)
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Course',
-        to: '/course',
-        icon: 'cil-layers',
-        _class: checkRights(1)
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'School Fee',
-        to: '/schoolfee',
-        icon: 'cil-layers',
-        _class: checkRights(2)
+        _class: checkRights(2),
+        items: [
+          {
+            _name: 'CSidebarNavItem',
+            name: 'School Fee',
+            to: '/schoolfee',
+            icon: 'cil-layers'
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Rate Sheet',
+            to: '/ratesheet',
+            icon: 'cil-layers'
+          }
+        ],
       },
       {
         _name: 'CSidebarNavItem',

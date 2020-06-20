@@ -197,7 +197,7 @@
                       <b-row>
                         <b-col md=8>
                           <b-form inline>
-                            <label class="font-weight-bold pt-1 mr-2">UPON ENROLLMENT FEE:</label>
+                            <label class="font-weight-bold pt-1 mr-2">ENTRANCE FEE:</label>
                             <vue-autonumeric
                               class="form-control text-right"
                               v-model="data.item.enrollmentFee"
@@ -324,7 +324,7 @@
 <script>
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
 import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups } from "../../helpers/enum"
-import { showNotification } from "../../helpers/forms"
+import { showNotification, formatNumber } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 export default {
 	name: "StudentFee",
@@ -396,21 +396,21 @@ export default {
 						},
 						{
 							key: "units",
-							label: "UNITS",
+							label: "LEC UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER UNIT",
+							label: "AMOUNT PER LEC UNIT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "13%"}
 						},
 						{
 							key: "labs",
-							label: "LABS",
+							label: "LAB UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
@@ -686,6 +686,13 @@ export default {
       this.showModalFees = true
     },
 		addFee(row) {
+      const { item } = row
+      // check if rate sheet exist in the table
+      const result = this.studentFees.find(fee => fee.id === item.id)
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
       this.studentFees.push({ 
         id: row.item.id,
         name : row.item.name,
@@ -728,7 +735,7 @@ export default {
         subjects.forEach(s => {
           amount += Number(s.totalAmount)
         })
-        return amount.toFixed(2)
+        return formatNumber(amount)
       }
     },
     feesTotalAmount() {
@@ -737,7 +744,7 @@ export default {
         fees.forEach(fee => {
           amount += Number(fee.pivot.amount)
         })
-        return amount.toFixed(2)
+        return formatNumber(amount)
       }
     }
   }

@@ -506,21 +506,21 @@ export default {
 						},
 						{
 							key: "units",
-							label: "UNITS",
+							label: "LEC UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER UNIT",
+							label: "AMOUNT PER LEC UNIT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "13%"}
 						},
 						{
 							key: "labs",
-							label: "LABS",
+							label: "LAB UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
@@ -825,6 +825,13 @@ export default {
       this.showModalSubjects = true
     },
 		addSubject(row){
+      const { item } = row
+      // check if subject exist in the table
+      const result = this.studentSubjects.find(subject => subject.id === item.id)
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
 			this.studentSubjects.push(row.item)
 		},
 		removeSubject(subjects, row){

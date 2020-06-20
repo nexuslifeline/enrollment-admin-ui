@@ -146,10 +146,11 @@
       </b-row>
       <b-row>
         <b-col md=6>
-          <b-form-group label="Units">
+          <b-form-group label="Lecture Units">
             <vue-autonumeric
               @input="computeTotalAmount()"
               ref="units"
+              :disabled="checkRights(1)"
               v-model='forms.subject.fields.units'
               :class="'form-control text-right'"
               :options="[{ 
@@ -161,10 +162,11 @@
           </b-form-group>
         </b-col>
         <b-col md=6>
-          <b-form-group label="Amount per Unit">
+          <b-form-group label="Amount per Lecture Units">
             <vue-autonumeric
               @input="computeTotalAmount()"
               ref="amountPerUnit"
+              :disabled="checkRights(2)"
               v-model='forms.subject.fields.amountPerUnit'
               :class="'form-control text-right'"
               :options="[{ 
@@ -177,10 +179,11 @@
       </b-row>
       <b-row>
         <b-col md=6>
-          <b-form-group label="Labs">
+          <b-form-group label="Lab Units">
             <vue-autonumeric
               @input="computeTotalAmount()"
               ref="labs"
+              :disabled="checkRights(1)"
               v-model='forms.subject.fields.labs'
               :class="'form-control text-right'"
               :options="[{ 
@@ -192,10 +195,11 @@
           </b-form-group>
         </b-col>
         <b-col md=6>
-          <b-form-group label="Amount per Lab">
+          <b-form-group label="Amount per Lab Units">
             <vue-autonumeric
               @input="computeTotalAmount()"
               ref="amountPerLab"
+              :disabled="checkRights(2)"
               v-model='forms.subject.fields.amountPerLab'
               :class="'form-control text-right'"
               :options="[{ 
@@ -207,7 +211,22 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col offset-md=6 md=6>
+        <b-col md=6>
+          <b-form-group label="Total Units">
+            <vue-autonumeric
+              :disabled="true"
+              ref="totalUnits"
+              v-model='forms.subject.fields.totalUnits'
+              :class="'form-control text-right'"
+              :options="[{ 
+                decimalPlaces: 0,
+                minimumValue: 0, 
+                modifyValueOnWheel: false, 
+                emptyInputBehavior: 0 }]">
+            </vue-autonumeric>
+          </b-form-group>
+        </b-col>
+        <b-col md=6>
           <b-form-group label="Total Amount">
             <vue-autonumeric
               :disabled="true"
@@ -289,12 +308,14 @@ const subjectFields = {
   amountPerUnit: null,
   labs: null,
   amountPerLab: null,
+  totalUnits: null,
   totalAmount: null
 }
 
 import { SubjectApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
+import { UserGroups } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 export default {
 	name: "Subject",
@@ -336,21 +357,21 @@ export default {
 						},
 						{
 							key: "units",
-							label: "UNITS",
+							label: "LEC UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER UNIT",
+							label: "AMOUNT PER LEC UNIT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "13%"}
 						},
 						{
 							key: "labs",
-							label: "LABS",
+							label: "LAB UNITS",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
@@ -470,6 +491,7 @@ export default {
     },
     computeTotalAmount(){
       const { fields } = this.forms.subject
+      fields.totalUnits = fields.units + fields.labs
       fields.totalAmount = (fields.units * fields.amountPerUnit) + (fields.labs * fields.amountPerLab)
     },
     onCreate(){
@@ -482,6 +504,22 @@ export default {
       subject.fields.amountPerLab = 0
       this.entryMode='Add'
       this.showModalEntry = true
+    },
+    checkRights(userType) {
+      const userGroupId = localStorage.getItem('userGroupId')
+      const userGroup = UserGroups.getEnum(Number(userGroupId))
+      let result = true
+			if (userGroup) {
+				if (userGroup.userType == userType) {
+          result = false
+        }
+      }
+      
+      if (UserGroups.SUPER_USER.id == userGroup.id) {
+				result = false
+      }
+      
+			return result
     }
 	}
 }
