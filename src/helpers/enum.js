@@ -99,28 +99,32 @@ export const Fees = new Enum({
 });
 
 export const DegreeTypes = new Enum({
-  ASSOCIATE_DEGREE: { id: 1, name: 'Associate Degree', levels: [
+  SENIOR_HIGH: { id: 1, name: 'Senior High', levels: [
+    { levelId: 13, schoolCategoryId: 4 }, 
+    { levelId: 14, schoolCategoryId: 4 }
+  ]},
+  ASSOCIATE_DEGREE: { id: 2, name: 'Associate Degree', levels: [
     { levelId: 15, schoolCategoryId: 5 }, 
     { levelId: 16, schoolCategoryId: 5 },
     { levelId: 17, schoolCategoryId: 5 },
   ]},
-  BACHELORS_DEGREE_4_YEARS: { id: 2, name: "Bachelor's Degree (4 yrs)", levels: [
+  BACHELORS_DEGREE_4_YEARS: { id: 3, name: "Bachelor's Degree (4 yrs)", levels: [
     { levelId: 15, schoolCategoryId: 5 }, 
     { levelId: 16, schoolCategoryId: 5 },
     { levelId: 17, schoolCategoryId: 5 },
     { levelId: 18, schoolCategoryId: 5 }
   ]},
-  BACHELORS_DEGREE_5_YEARS: { id: 3, name: "Bachelor's Degree (5 yrs)", levels: [
+  BACHELORS_DEGREE_5_YEARS: { id: 4, name: "Bachelor's Degree (5 yrs)", levels: [
     { levelId: 15, schoolCategoryId: 5 }, 
     { levelId: 16, schoolCategoryId: 5 },
     { levelId: 17, schoolCategoryId: 5 },
     { levelId: 18, schoolCategoryId: 5 },
     { levelId: 19, schoolCategoryId: 5 },
   ]},
-  MASTERS_DEGREE: { id: 4, name: "Master's Degree", levels: [
+  MASTERS_DEGREE: { id: 5, name: "Master's Degree", levels: [
     { levelId: 20, schoolCategoryId: 6 }
   ]},
-  DOCTORATE_DEGREE: { id: 5, name: 'Doctorate Degree', levels: [
+  DOCTORATE_DEGREE: { id: 6, name: 'Doctorate Degree', levels: [
     { levelId: 21, schoolCategoryId: 6 }
   ]},
 });
