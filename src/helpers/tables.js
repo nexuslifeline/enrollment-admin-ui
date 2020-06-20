@@ -10,14 +10,17 @@ export default {
     addRow(table, pagination, data){
       table.items.unshift(data)
       pagination.totalRows++
+      this.recordDetails(pagination)
     },
     updateRow(table, data){
       const index = table.items.findIndex(i => i.id === data.id)
       copyValue(data, table.items[index])
     },
-    deleteRow(table, id){
+    deleteRow(table, pagination, id){
       const index = table.items.findIndex(i => i.id === id)
       this.$delete(table.items, index)
+      pagination.totalRows--
+      this.recordDetails(pagination)
     },
     onFiltered(items, pagination){
       pagination.totalRows = items.length

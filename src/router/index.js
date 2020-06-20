@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import store from '@/store'
+import { UserGroups } from '../helpers/enum'
 
 // Containers
 const TheContainer = () => import('@/containers/TheContainer')
@@ -42,7 +43,17 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-// if logged in redirect to dashboard
+  // check current user type, super user = 0, registrar = 1, finance = 2
+  if (to.matched.some(route => route.meta.userType)) {
+    const userGroupId = localStorage.getItem('userGroupId')
+    const userGroup = UserGroups.getEnum(Number(userGroupId))
+    if (to.meta.userType !== userGroup.userType && userGroup.userType !== 0) {
+      next({ name: from.name })
+      return
+    }
+  }
+
+// if logged in redirect to prev route
   if(to.path === '/login' && store.state.isLoggedIn) {
       next({name: from.name})
       return
@@ -63,61 +74,61 @@ function configRoutes () {
           path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true }
         },
         {
           path: 'student',
           name: 'Student',
           component: Student,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 1 }
         },
         {
           path: 'studentfee',
           name: 'Student Fee',
           component: StudentFee,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 2 }
         },
         {
           path: 'ratesheet',
           name: 'Rate Sheet',
           component: RateSheet,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 2 }
         },
         {
           path: 'curriculum',
           name: 'Curriculum',
           component: Curriculum,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 1 }
         },
         {
           path: 'subject',
           name: 'Subject',
           component: Subject,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 1 }
         },
         {
           path: 'course',
           name: 'Course',
           component: Course,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 1 }
         },
         {
           path: 'schoolfee',
           name: 'School Fee',
           component: SchoolFee,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 2 }
         },
         {
           path: 'user',
           name: 'User',
           component: User,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 0 }
         },
         {
           path: 'usergroup',
           name: 'User Group',
           component: UserGroup,
-          meta: {requiresAuth: true}
+          meta: { requiresAuth: true, userType: 0 }
         }
       ]
     },

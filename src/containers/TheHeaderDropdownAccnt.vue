@@ -9,7 +9,7 @@
       <CHeaderNavLink>
         <div class="c-avatar">
           <img
-            src="img/avatars/6.jpg"
+            src="img/avatars/default-user.jpg"
             class="c-avatar-img "
           />
         </div>
@@ -76,16 +76,18 @@ export default {
   methods: {
     logout(){
       if(localStorage.adminAccessToken) {
+        localStorage.clear();
         this.$http.post('api/v1/logout', [], {
             headers: {
               Authorization: 'Bearer ' + localStorage.getItem('adminAccessToken')
             }
           }).then(response => {
-            localStorage.removeItem('adminAccessToken')
+            //localStorage.removeItem('adminAccessToken')
             this.$store.commit('logoutUser')
             this.$router.push({ name: 'Login' })
           }).catch(err => {
               console.log(err)
+              this.$router.push({ name: 'Login' })
           });
       }
     }

@@ -37,6 +37,15 @@
                   :per-page="paginations.user.perPage"
                   :filter="filters.user.criteria"
                   @filtered="onFiltered($event, paginations.user)">
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon 
+                        name="spinner" 
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -99,6 +108,7 @@
           <b-form-group >
             <label class="required">Password</label>
             <b-form-input 
+              :disabled="entryMode === 'Edit'"
               type="password"
               v-model="forms.user.fields.password" 
               :state="forms.user.states.password" />
@@ -109,6 +119,7 @@
           <b-form-group >
             <label class="required">Confirm Password</label>
             <b-form-input 
+              :disabled="entryMode === 'Edit'"
               type="password"
               v-model="forms.user.fields.passwordConfirmation" />
           </b-form-group>
@@ -173,14 +184,20 @@
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
-          class="float-left" 
+          class="float-left btn-close" 
           @click="showModalEntry=false">
           Close
         </b-button>
-        <b-button 
+        <b-button
+          :disabled="forms.user.isProcessing"
           variant="outline-primary" 
-          class="float-right" 
+          class="float-right btn-save" 
           @click="onUserEntry()">
+          <v-icon
+            v-if="forms.user.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
@@ -197,13 +214,20 @@
       Are you sure you want to delete this user group?
       <div slot="modal-footer">
         <b-button 
+          :disabled="forms.user.isProcessing"
           variant="outline-primary" 
-          class="mr-2" 
+          class="mr-2 btn-save" 
           @click="onUserGroupDelete()">
+          <v-icon
+            v-if="forms.user.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
           Yes
         </b-button>
         <b-button 
           variant="outline-danger" 
+          class="btn-close"
           @click="showModalConfirmation=false">
           No
         </b-button>            
@@ -239,6 +263,7 @@ export default {
       entryMode: "",
       forms: {
         user: {
+          isProcessing: false,
           fields: { ...userFields },
           states: { ...userFields },
           errors: { ...userFields }
@@ -328,17 +353,19 @@ export default {
     onUserEntry(){
       const { user, user: { fields } } = this.forms
       const { users } = this.tables
+      user.isProcessing = true
       reset(user)
       if(this.entryMode == "Add"){
         this.addPersonnel(fields)
           .then(({ data }) => {
-            const { user } = this.paginations
-            this.addRow(users, user, data)
+            this.addRow(users, this.paginations.user, data)
+            user.isProcessing = false
             showNotification(this, "success", "User created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            user.isProcessing = false
             validate(user, errors)
           })
       }
@@ -346,21 +373,25 @@ export default {
         this.updatePersonnel(fields, fields.id)
           .then(({ data }) => {
             this.updateRow(users, data)
+            user.isProcessing = false
             showNotification(this, "success", "User updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            user.isProcessing = false
             validate(user, errors)
           })
       }
     },
     onUserGroupDelete(){
-      const { id } = this.forms.user.fields
+      const { user, user: { fields: { id } } } = this.forms
       const { users } = this.tables
+      user.isProcessing = true
       this.deletePersonnel(id)
         .then(({ data }) => {
-          this.deleteRow(users, id)
+          this.deleteRow(users, this.paginations.user, id)
+          user.isProcessing = false
           showNotification(this, "success", "User deleted successfully.")
           this.showModalConfirmation = false
         })

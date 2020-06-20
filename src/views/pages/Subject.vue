@@ -49,6 +49,15 @@
                   :per-page="paginations.subject.perPage"
                   :filter="filters.subject.criteria"
                   @filtered="onFiltered($event, paginations.subject)">
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon 
+                        name="spinner" 
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -218,14 +227,20 @@
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
-          class="float-left" 
+          class="float-left btn-close" 
           @click="showModalEntry=false">
           Close
         </b-button>
         <b-button 
+          :disabled="forms.subject.isProcessing"
           variant="outline-primary" 
-          class="float-right" 
+          class="float-right btn-save" 
           @click="onSubjectEntry()">
+          <v-icon
+            v-if="forms.subject.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
@@ -243,11 +258,17 @@
       <div slot="modal-footer">
         <b-button 
           variant="outline-primary" 
-          class="mr-2" 
+          class="mr-2 btn-save" 
           @click="onSubjectDelete()">
+          <v-icon 
+            v-if="forms.subject.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
           Yes
         </b-button>
         <b-button 
+          class="btn-close"
           variant="outline-danger" 
           @click="showModalConfirmation=false">
           No
@@ -285,6 +306,7 @@ export default {
       entryMode: "",
       forms: {
         subject: {
+          isProcessing: false,
           fields: { ...subjectFields },
           states: { ...subjectFields },
           errors: { ...subjectFields }
@@ -394,17 +416,20 @@ export default {
     onSubjectEntry(){
       const { subject, subject: { fields } } = this.forms
       const { subjects } = this.tables
+
+      subject.isProcessing = true
       reset(subject)
       if(this.entryMode == "Add"){
         this.addSubject(fields)
           .then(({ data }) => {
-            const { subject } = this.paginations
-            this.addRow(subjects, subject, data)
+            this.addRow(subjects, this.paginations.subject, data)
+            subject.isProcessing = false
             showNotification(this, "success", "Subject created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            subject.isProcessing = false
             validate(subject, errors)
           })
       }
@@ -412,22 +437,26 @@ export default {
         const { fields } = this.forms.subject
         this.updateSubject(fields, fields.id)
           .then(({ data }) => {
+            subject.isProcessing = false
             this.updateRow(subjects, data)
             showNotification(this, "success", "Subject updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
+            subject.isProcessing = false
             validate(subject, errors)
           })
       }
     },
     onSubjectDelete(){
-      const { id } = this.forms.subject.fields
+      const { subject, subject: { fields: { id } } } = this.forms
       const { subjects } = this.tables
+      subject.isProcessing = true
       this.deleteSubject(id)
         .then(({ data }) => {
-          this.deleteRow(subjects, id)
+          subject.isProcessing = false
+          this.deleteRow(subjects, this.paginations.subject, id)
           showNotification(this, "success", "Subject deleted successfully.")
           this.showModalConfirmation = false
         })
@@ -447,6 +476,10 @@ export default {
       const { subject } = this.forms
       reset(subject)
       clearFields(subject.fields)
+      subject.fields.units = 0
+      subject.fields.amountPerUnit = 0
+      subject.fields.labs = 0
+      subject.fields.amountPerLab = 0
       this.entryMode='Add'
       this.showModalEntry = true
     }

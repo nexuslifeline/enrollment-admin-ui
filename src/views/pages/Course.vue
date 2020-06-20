@@ -50,6 +50,15 @@
                   :per-page="paginations.course.perPage"
                   :filter="filters.course.criteria"
                   @filtered="onFiltered($event, paginations.course)">
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon 
+                        name="spinner" 
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
                   <template v-slot:cell(action)="row">
                     <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
@@ -157,14 +166,20 @@
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
-          class="float-left" 
+          class="float-left btn-close" 
           @click="showModalEntry=false">
           Close
         </b-button>
         <b-button 
+          :disabled="forms.course.isProcessing"
           variant="outline-primary" 
-          class="float-right" 
+          class="float-right btn-save" 
           @click="onCourseEntry()">
+          <v-icon
+            v-if="forms.course.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
           Save
         </b-button>
 			</div> <!-- modal footer buttons -->
@@ -183,12 +198,18 @@
       <div slot="modal-footer">
         <b-button 
           variant="outline-primary" 
-          class="mr-2" 
+          class="mr-2 btn-save" 
           @click="onCourseDelete()">
+          <v-icon
+            v-if="forms.course.isProcessing"
+            name="sync" 
+            spin
+            class="mr-2" />
           Yes
         </b-button>
         <b-button 
           variant="outline-danger" 
+          class="btn-close"
           @click="showModalConfirmation=false">
           No
         </b-button>            
@@ -222,6 +243,7 @@ export default {
       entryMode: "",
       forms: {
         course: {
+          isProcessing: false,
           fields: { ...courseFields },
           states: { ...courseFields },
           errors: { ...courseFields }
@@ -293,42 +315,55 @@ export default {
     onCourseEntry(){
       const { course, course: { fields } } = this.forms
       const { courses } = this.tables
-      let degreeType = DegreeTypes.getEnum(this.forms.course.fields.degreeTypeId)
+      fields.levels = []
+      course.isProcessing = true
+
+      const degreeType = DegreeTypes.getEnum(this.forms.course.fields.degreeTypeId)
       if (degreeType) {
-        fields.levels = degreeType.levels
+        degreeType.levels.forEach(level => {
+          fields.levels.push({
+            levelId: level.levelId,
+            schoolCategoryId: level.schoolCategoryId
+          })
+        });
       }
       reset(course)
       if (this.entryMode == "Add") {
         this.addCourse(fields)
           .then(({ data }) => {
-            const { course } = this.paginations
-            this.addRow(courses, course, data)
+            this.addRow(courses, this.paginations.course, data)
+            course.isProcessing = false
             showNotification(this, "success", "Course created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
+            course.isProcessing = false
             const errors = error.response.data.errors
             validate(course, errors)
           })
       } else {
         this.updateCourse(fields, fields.id)
           .then(({ data }) => {
+            course.isProcessing = false
             this.updateRow(courses, data)
             showNotification(this, "success", "Course updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
+            course.isProcessing = false
             const errors = error.response.data.errors
             validate(course, errors)
           })
       }
     },
     onCourseDelete(){
-      const { id } = this.forms.course.fields
+      const { course, course: { fields: { id } } } = this.forms
       const { courses } = this.tables
+      course.isProcessing = true
       this.deleteCourse(id)
         .then(({ data }) => {
-          this.deleteRow(courses, id)
+          course.isProcessing = false
+          this.deleteRow(courses, this.paginations.course, id)
           showNotification(this, "success", "Course deleted successfully.")
           this.showModalConfirmation = false
         })
@@ -344,6 +379,7 @@ export default {
       const { course } = this.forms
       reset(course)
       clearFields(course.fields)
+      course.fields.degreeTypeId = null
       this.entryMode='Add'
       this.showModalEntry = true
     }
