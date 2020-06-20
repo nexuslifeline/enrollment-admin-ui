@@ -90,9 +90,6 @@ export default {
   mixins: [AuthApi],
   data() {
     return {
-      username: null,
-      password: null,
-      version: process.env.VUE_APP_VERSION,
       forms: {
         auth: {
           isProcessing: false,
@@ -101,6 +98,7 @@ export default {
           errors: {...fields}
         }
       },
+      version: process.env.VUE_APP_VERSION
     }
   },
   methods: {

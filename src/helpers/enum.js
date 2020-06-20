@@ -118,17 +118,10 @@ export const DegreeTypes = new Enum({
     { levelId: 19, schoolCategoryId: 5 },
   ]},
   MASTERS_DEGREE: { id: 4, name: "Master's Degree", levels: [
-    { levelId: 20, schoolCategoryId: 6 }, 
-    { levelId: 21, schoolCategoryId: 6 }
+    { levelId: 20, schoolCategoryId: 6 }
   ]},
   DOCTORATE_DEGREE: { id: 5, name: 'Doctorate Degree', levels: [
-    { levelId: 22, schoolCategoryId: 6 }, 
-    { levelId: 23, schoolCategoryId: 6 },
-    { levelId: 24, schoolCategoryId: 6 }, 
-    { levelId: 25, schoolCategoryId: 6 },
-    { levelId: 26, schoolCategoryId: 6 }, 
-    { levelId: 27, schoolCategoryId: 6 },
-    { levelId: 28, schoolCategoryId: 6 }
+    { levelId: 21, schoolCategoryId: 6 }
   ]},
 });
 

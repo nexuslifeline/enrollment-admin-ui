@@ -825,6 +825,13 @@ export default {
       this.showModalSubjects = true
     },
 		addSubject(row){
+      const { item } = row
+      // check if subject exist in the table
+      const result = this.studentSubjects.find(subject => subject.id === item.id)
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
 			this.studentSubjects.push(row.item)
 		},
 		removeSubject(subjects, row){
