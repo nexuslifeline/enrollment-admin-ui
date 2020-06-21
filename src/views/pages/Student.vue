@@ -490,54 +490,54 @@ export default {
 							key: "code",
 							label: "Code",
 							tdClass: "align-middle",
-							thStyle: {width: "8%"}
+							thStyle: {width: "6%"}
 						},
 						{
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: {width: "15%"}
+							thStyle: {width: "12%"}
 						},
 						{
 							key: "description",
-							label: "DESCRIPTION",
+							label: "Description",
 							tdClass: "align-middle",
 							thStyle: {width: "auto"}
 						},
 						{
 							key: "units",
-							label: "LEC UNITS",
+							label: "Lec Units",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER LEC UNIT",
+							label: "Amount per Lec Unit",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "13%"}
+							thStyle: {width: "16%"}
 						},
 						{
 							key: "labs",
-							label: "LAB UNITS",
+							label: "Lab Units",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "8%"}
             },
             {
 							key: "amountPerLab",
-							label: "AMOUNT PER LAB",
+							label: "Amount per Lab",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "13%"}
             },
             {
 							key: "totalAmount",
-							label: "TOTAL AMOUNT",
+							label: "Total Amount",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "15%"}
+							thStyle: {width: "12%"}
 						},
 						{
 							key: "action",
