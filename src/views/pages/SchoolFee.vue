@@ -258,7 +258,7 @@ export default {
       const { schoolFee } = this.paginations
       schoolFees.isBusy = true
 
-			var params = { paginate: false }
+			let params = { paginate: false }
       this.getSchoolFeeList(params).then(({ data }) =>{
         schoolFees.items = data
         schoolFee.totalRows = data.length

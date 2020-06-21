@@ -609,7 +609,7 @@ export default {
 				})
 		},
 		loadCourseList(){
-			var params = { paginate: false }
+			let params = { paginate: false }
 			this.getCourseList(params)
 			.then(response => {
 				const res = response.data
