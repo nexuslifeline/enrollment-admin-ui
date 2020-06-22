@@ -141,7 +141,7 @@
                         </b-col>
                         <b-col md=6 v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
                           <b-button class="float-right" variant="outline-primary"
-                            @click="onAddSubject(data.item.subjects)">
+                            @click="onAddSubject(data.item)">
                             <v-icon name="plus-circle" /> ADD NEW SUBJECT
                           </b-button>
                         </b-col>
@@ -233,7 +233,10 @@
 				<b-col md=12>
           <div v-if="file.src">
             <center>
-              <b-img v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'" :src="file.src" />
+              <b-img
+                fluid 
+                v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'" 
+                :src="file.src" />
               <b-embed
                 v-else
                 type="iframe"
@@ -247,6 +250,8 @@
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
+          class="float-right"
+          variant="outline-danger"
           @click="showModalPreview=false">
           Close
         </b-button>
@@ -338,7 +343,24 @@
 			<b-row> <!-- modal body -->
 				<b-col md=12>
           <b-row class="mb-2">
-            <b-col offset-md="8" md="4">
+            <b-col md="4">
+              <b-form-select
+                v-if="showDepartment"
+                @change="filterByDepartment()"
+                v-model="filters.subject.departmentId">
+                <template v-slot:first>
+                  <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
+                </template>
+                <b-form-select-option :value="null">None</b-form-select-option>
+                <b-form-select-option
+                  v-for="department in options.departments.items" 
+                  :key="department.id" 
+                  :value="department.id">
+                  {{department.name}}
+                </b-form-select-option>
+              </b-form-select>
+            </b-col>
+            <b-col offset-md="4" md="4">
               <b-form-input
                 v-model="filters.subject.criteria"
                 type="text" 
@@ -348,7 +370,7 @@
           </b-row>
 					<b-table
 						small hover outlined show-empty
-						:items.sync="tables.subjects.items"
+						:items.sync="tables.subjects.filteredItems"
 						:fields="tables.subjects.fields"
             :filter="filters.subject.criteria"
 						:busy="tables.subjects.isBusy"
@@ -381,14 +403,19 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button class="float-left" @click="showModalSubjects=false">Close</b-button>
+				<b-button 
+        class="float-right" 
+        variant="outline-danger"
+        @click="showModalSubjects=false">
+        Close
+      </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
     <!-- Modal Subject -->
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi } from "../../mixins/api"
+import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
@@ -413,7 +440,7 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, Tables],
+	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, Tables],
 	data() {
 		return {
       showModalPreview: false,
@@ -546,7 +573,8 @@ export default {
 							thStyle: {width: "5%"}
 						}
           ],
-					items: []
+          items: [],
+          filteredItems: []
         },
         files: {
 					isBusy: false,
@@ -590,16 +618,21 @@ export default {
 					transcriptStatusId: null
         },
         subject: {
-          criteria: null
+          criteria: null,
+          departmentId: null
         }
 			},
 			options: {
 				courses: {
 					items: []
-				},
+        },
+        departments: {
+          items: []
+        },
 				schoolCategories: SchoolCategories
       },
-			isProcessing: false,
+      isProcessing: false,
+      showDepartment: false,
 			schoolCategoryId: null,
       studentSubjects: [],
       row: []
@@ -608,7 +641,7 @@ export default {
 	created(){
 		this.checkRights()
     this.loadCourseList()
-    this.loadSubjects()
+    this.loadDepartmentList()
 	},
 	methods: {
     setApproval(row) {
@@ -749,7 +782,15 @@ export default {
 					student.totalRows = res.meta.total
 					students.isBusy = false
 				})
-		},
+    },
+    loadDepartmentList(){
+      let params = { paginate: false }
+      const { departments } = this.options
+      this.getDepartmentList(params)
+        .then(({ data }) => {
+          departments.items = data
+        })
+    },
 		loadCourseList(){
 			let params = { paginate: false }
 			this.getCourseList(params)
@@ -807,22 +848,32 @@ export default {
           this.showModalPreview = true
         })
     },
-    loadSubjects(){
+    loadSubjects(schoolCategoryId){
       const { subjects } = this.tables
       const { subject } = this.paginations
+      subjects.items = []
+
+      if ([SchoolCategories.SENIOR_HIGH_SCHOOL.id, SchoolCategories.COLLEGE.id, SchoolCategories.GRADUATE_SCHOOL.id].includes(schoolCategoryId)) {
+        this.showDepartment = true
+      }
+
       subjects.isBusy = true
-			let params = { paginate: false }
+      let params = { paginate: false, schoolCategoryId }
+      
 			this.getSubjectList(params)
 				.then(({ data }) => {
           subjects.items = data
+          subjects.filteredItems = data
           subject.totalRows = data.length
           this.recordDetails(subject)
 					subjects.isBusy = false
 				})
     },
-    onAddSubject(subjects){
-      this.studentSubjects = subjects
+    onAddSubject(row){
+      this.studentSubjects = row.subjects
       this.showModalSubjects = true
+      this.showDepartment = false
+      this.loadSubjects(row.schoolCategoryId)
     },
 		addSubject(row){
       const { item } = row
@@ -846,7 +897,19 @@ export default {
 				this.schoolCategoryId = userGroup.schoolCategoryId
 			}
 			this.loadTranscript()
-		}
+    },
+    filterByDepartment() {
+      const { subjects } = this.tables
+      const { subject } = this.paginations
+      const { departmentId } = this.filters.subject
+      if (departmentId) {
+        subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+      }
+      else {
+        subjects.filteredItems = subjects.items
+      }
+      this.onFiltered(subjects.filteredItems, subject)
+    }
   },
 }
 </script>

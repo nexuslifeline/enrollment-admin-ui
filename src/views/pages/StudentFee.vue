@@ -195,21 +195,31 @@
                     </b-table>
                     <template v-slot:footer>
                       <b-row>
-                        <b-col md=8>
-                          <b-form inline>
-                            <label class="font-weight-bold pt-1 mr-2">ENTRANCE FEE:</label>
+                        <b-col md=4>
+                          <b-form-group
+                            label="INITIAL FEE TOTAL :"
+                            label-for="enrollmentFee"
+                            label-class="font-weight-bold"
+                            label-cols="4">
                             <vue-autonumeric
                               class="form-control text-right"
                               v-model="data.item.enrollmentFee"
                               :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                             </vue-autonumeric>
-                            <label class="font-weight-bold pt-1 mr-2 ml-5">PREVIOUS BALANCE:</label>
+                          </b-form-group>
+                        </b-col>
+                        <b-col md=4>
+                          <b-form-group
+                            label="PREVIOUS BALANCE :"
+                            label-for="enrollmentFee"
+                            label-class="font-weight-bold"
+                            label-cols="4">
                             <vue-autonumeric
                               class="form-control text-right"
                               v-model="data.item.previousBalance"
                               :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                             </vue-autonumeric>
-                          </b-form>
+                          </b-form-group>
                         </b-col>
                         <b-col md=2>
                           <h5 class="float-right font-weight-bold">Total</h5>
@@ -316,7 +326,12 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button class="float-left" @click="showModalFees=false">Close</b-button>
+				<b-button 
+          class="float-right"
+          variant="outline-danger"
+          @click="showModalFees=false">
+          Close
+        </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 	</div> <!-- main container -->
@@ -554,19 +569,22 @@ export default {
       const index = applicationId ? 0 : 1
 
       let fees = []
+      let totalAmount = 0
 
       row.item.fees.forEach(fee => {
 				fees.push({ 
           schoolFeeId: fee.id, 
           amount: fee.pivot.amount, 
           notes: fee.pivot.notes 
-        })  
+        })
+        totalAmount += fee.pivot.amount
       })
 
       const data = {
         ...applicationAdmission[index],
         studentFee: {
           studentFeeStatusId: StudentFeeStatuses.APPROVED.id,
+          totalAmount,
           enrollmentFee: enrollmentFee
         },
         id: transcriptId,
