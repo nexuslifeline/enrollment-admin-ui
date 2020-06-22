@@ -179,7 +179,12 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button class="float-left" @click="showModalSubjects=false">Close</b-button>
+				<b-button 
+          class="float-right" 
+          variant="outline-danger" 
+          @click="showModalSubjects=false">
+          Close
+        </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 	</div> <!-- main container -->
@@ -431,8 +436,15 @@ export default {
     },
     filterByDepartment() {
       const { subjects } = this.tables
+      const { subject } = this.paginations
       const { departmentId } = this.filters.subject
-      subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+      if (departmentId) {
+        subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+      }
+      else {
+        subjects.filteredItems = subjects.items
+      }
+      this.onFiltered(subjects.filteredItems, subject)
     }
 	}
 }
