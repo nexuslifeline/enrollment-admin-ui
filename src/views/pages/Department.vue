@@ -11,14 +11,14 @@
                   <b-col md=8>
                     <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <v-icon name="plus-circle" /> ADD NEW USER GROUP
+                      <v-icon name="plus-circle" /> ADD NEW DEPARTMENT
                     </b-button>
                   </b-col>
                   <b-col md=4>
                     <b-form-input
-                      v-model="filters.userGroup.criteria"
+                      v-model="filters.department.criteria"
                       type="text" 
-                      placeholder="Search">
+                      placeholder="Search" >
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -30,13 +30,14 @@
               <b-col md=12>
                 <b-table
 									small hover outlined show-empty
-									:fields="tables.userGroups.fields"
-                  :busy="tables.userGroups.isBusy"
-                  :items="tables.userGroups.items"
-                  :current-page="paginations.userGroup.page"
-                  :per-page="paginations.userGroup.perPage"
-                  :filter="filters.userGroup.criteria"
-                  @filtered="onFiltered($event, paginations.userGroup)">
+									:fields="tables.departments.fields"
+                  :busy="tables.departments.isBusy"
+                  :items="tables.departments.items"
+                  :current-page="paginations.department.page"
+                  :per-page="paginations.department.perPage"
+                  :filter="filters.department.criteria"
+                  @filtered="onFiltered($event, paginations.department)">
+                  <!-- :filter="filters.department.criteria> -->
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
                       <v-icon 
@@ -56,7 +57,7 @@
                         Edit
                       </b-dropdown-item>
                       <b-dropdown-item 
-                        @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true">
+                        @click="forms.department.fields.id = row.item.id, showModalConfirmation = true">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -64,16 +65,16 @@
 								</b-table>
                 <b-row>
                   <b-col md=6>
-                    Showing {{ paginations.userGroup.from }} to {{ paginations.userGroup.to }} of {{ paginations.userGroup.totalRows }} records.
+                    Showing {{ paginations.department.from }} to {{ paginations.department.to }} of {{ paginations.department.totalRows }} records.
                     </b-col>
                   <b-col md=6>
                     <b-pagination
-                      v-model="paginations.userGroup.page"
-                      :total-rows="paginations.userGroup.totalRows"
-                      :per-page="paginations.userGroup.perPage"
+                      v-model="paginations.department.page"
+                      :total-rows="paginations.department.totalRows"
+                      :per-page="paginations.department.perPage"
                       size="sm"
                       align="end"
-                      @input="recordDetails(paginations.userGroup)" />
+                      @input="recordDetails(paginations.department)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -85,56 +86,43 @@
     </b-row>
     <!-- Modal Entry -->
     <b-modal 
-      @shown="$refs.code.focus()"
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					User Group - {{ entryMode }}
+        Department - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
 			<b-row> 
-				<b-col md=6>
-          <b-form-group >
-            <label class="required">Code</label>
-            <b-form-input 
-              ref="code" 
-              v-model="forms.userGroup.fields.code" 
-              :state="forms.userGroup.states.code" />
-            <b-form-invalid-feedback>
-              {{forms.userGroup.errors.code}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-        <b-col md=6>
+        <b-col md=12>
           <b-form-group >
             <label class="required">Name</label>
             <b-form-input 
               ref="name" 
-              v-model="forms.userGroup.fields.name" 
-              :state="forms.userGroup.states.name" />
+              v-model="forms.department.fields.name"
+              :state="forms.department.states.name" />
             <b-form-invalid-feedback>
-              {{forms.userGroup.errors.name}}
+              {{forms.department.errors.name}}
             </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
 			</b-row>
       <b-row>
         <b-col md=12>
-          <b-form-group>
-            <label class="required">Description</label>
-            <b-form-textarea 
-              ref="description" 
-              v-model="forms.userGroup.fields.description" 
-              :state="forms.userGroup.states.description" />
-            <b-form-invalid-feedback>
-              {{forms.userGroup.errors.description}}
-            </b-form-invalid-feedback>
+           <b-form-group >
+              <label class="required">Description</label>
+              <b-form-textarea 
+                ref="description" 
+                v-model="forms.department.fields.description" 
+                :state="forms.department.states.description"/>
+              <b-form-invalid-feedback>
+                {{forms.department.errors.description}}
+              </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
-      
-      <!-- modal body -->
+     
+      <!-- end modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           variant="outline-danger" 
@@ -143,13 +131,13 @@
           Close
         </b-button>
         <b-button 
-          :disabled="forms.userGroup.isProcessing"
+          :disabled="forms.department.isProcessing"
           variant="outline-primary" 
           class="float-right btn-save" 
-          @click="onUserGroupEntry()">
-          <v-icon
-            v-if="forms.userGroup.isProcessing"
-            name="sync" 
+          @click="onDepartmentEntry()">
+          <v-icon 
+            v-if="forms.department.isProcessing"
+            name="sync"
             spin
             class="mr-2" />
           Save
@@ -157,23 +145,25 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
     <!-- End Modal Entry -->
+
     <!-- Modal Confirmation -->
     <b-modal 
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
       <div slot="modal-title">
-          Delete User Group
+          Delete Department
       </div>
-      Are you sure you want to delete this user group?
+      Are you sure you want to delete this Department ?
       <div slot="modal-footer">
-        <b-button 
+        <b-button
+          :disabled="forms.department.isProcessing"
           variant="outline-primary" 
           class="mr-2 btn-save" 
-          @click="onUserGroupDelete()">
-          <v-icon
-            v-if="forms.userGroup.isProcessing"
-            name="sync" 
+          @click="onDepartmentDelete()">
+          <v-icon 
+            v-if="forms.department.isProcessing"
+            name="sync"
             spin
             class="mr-2" />
           Yes
@@ -191,43 +181,36 @@
 </template>
 <script>
 
-const userGroupFields = {
+const departmentFields = {
   id: null,
-  code: null,
   name: null,
-  description: null
+  description: null,
 }
 
-import { UserGroupApi } from "../../mixins/api"
-import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
+import { DepartmentApi } from "../../mixins/api"
+import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 export default {
-	name: "UserGroup",
-	mixins: [ UserGroupApi, Tables ],
+	name: "department",
+	mixins: [ DepartmentApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: "",
       forms: {
-        userGroup: {
+        department: {
           isProcessing: false,
-          fields: { ...userGroupFields },
-          states: { ...userGroupFields },
-          errors: { ...userGroupFields }
+          fields: { ...departmentFields },
+          states: { ...departmentFields },
+          errors: { ...departmentFields }
         }
       },
 			tables: {
-				userGroups: {
+				departments: {
           isBusy: false,
 					fields: [
-            {
-							key: "code",
-							label: "Code",
-							tdClass: "align-middle",
-							thStyle: {width: "20%"}
-						},
 						{
 							key: "name",
 							label: "Name",
@@ -251,7 +234,7 @@ export default {
 				}
       },
       paginations: {
-				userGroup: {
+				department: {
 					from: 0,
 					to: 0,
 					totalRows: 0,
@@ -260,90 +243,90 @@ export default {
 				}
       },
       filters: {
-        userGroup: {
+        department: {
           criteria: null
         }
       }
 		}
 	},
 	created(){
-		this.loadUserGroups()
+		this.loadDepartments()
 	},
 	methods: {
-		loadUserGroups(){
-      const { userGroups } = this.tables
-      const { userGroup, userGroup: { perPage, page } } = this.paginations
+		loadDepartments(){
+      const { departments } = this.tables
+      const { department } = this.paginations
+      departments.isBusy = true
 
-      userGroups.isBusy = true
-
-			let params = { paginate: false }
-      this.getUserGroupList(params).then(({ data }) =>{
-        userGroups.items = data
-        userGroup.totalRows = data.length
-        this.recordDetails(userGroup)
-        userGroups.isBusy = false
+			var params = { paginate: false }
+      this.getDepartmentList(params).then(({ data }) =>{
+        departments.items = data
+        department.totalRows = data.length
+        this.recordDetails(department)
+        departments.isBusy = false
       })
     },
-    onUserGroupEntry(){
-      const { userGroup, userGroup: { fields } } = this.forms
-      const { userGroups } = this.tables
-      userGroup.isProcessing = true
-      reset(userGroup)
+    onDepartmentEntry(){
+      const { department, department: { fields } } = this.forms
+      const { departments } = this.tables
+      department.isProcessing = true
+      reset(department)
       if(this.entryMode == "Add"){
-        this.addUserGroup(fields)
+        this.addDepartment(fields)
           .then(({ data }) => {
-            this.addRow(userGroups, this.paginations.userGroup, data)
-            userGroup.isProcessing = false
-            showNotification(this, "success", "User group created successfully.")
+            this.addRow(departments, this.paginations.department, data)
+            department.isProcessing = false
+            showNotification(this, "success", "Department created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            userGroup.isProcessing = false
-            validate(userGroup, errors)
+            department.isProcessing = false
+            validate(department, errors)
           })
       }
       else {
-        this.updateUserGroup(fields, fields.id)
+        const { fields } = this.forms.department
+        this.updateDepartment(fields, fields.id)
           .then(({ data }) => {
-            this.updateRow(userGroups, data)
-            userGroup.isProcessing = false
-            showNotification(this, "success", "User group updated successfully.")
+            this.updateRow(departments, data)
+            department.isProcessing = false
+            showNotification(this, "success", "Department updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            userGroup.isProcessing = false
-            validate(userGroup, errors)
+            department.isProcessing = false
+            validate(department, errors)
           })
       }
     },
-    onUserGroupDelete(){
-      const { userGroup, userGroup: { fields: { id } } } = this.forms
-      const { userGroups } = this.tables
-      userGroup.isProcessing = true
-      this.deleteUserGroup(id)
+    onDepartmentDelete(){
+      const { department, department: { fields: { id } } } = this.forms
+      const { departments } = this.tables
+      department.isProcessing = true
+      this.deleteDepartment(id)
         .then(({ data }) => {
-          this.deleteRow(userGroups, this.paginations.userGroup, id)
-          userGroup.isProcessing = false
-          showNotification(this, "success", "User group deleted successfully.")
+          this.deleteRow(departments, this.paginations.department, id)
+          department.isProcessing = false
+          showNotification(this, "success", "Department deleted successfully.")
           this.showModalConfirmation = false
         })
     },
     setUpdate(row){
-      const { userGroup, userGroup: { fields } } = this.forms
+      const { department, department: { fields } } = this.forms
       copyValue(row.item, fields)
-      reset(userGroup)
+      reset(department)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
     setCreate(){
-      const { userGroup } = this.forms
-      reset(userGroup)
-      clearFields(userGroup.fields)
+      const { department } = this.forms
+      reset(department)
+      clearFields(department.fields)
       this.entryMode='Add'
       this.showModalEntry = true
-    }
+    },
 	}
 }
 </script>

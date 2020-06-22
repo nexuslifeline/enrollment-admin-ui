@@ -18,7 +18,8 @@ export const showNotification = (instance, variant, msg) => {
   instance.$bvToast.toast(msg, {
     title: "Notification",
     variant: variant,
-    solid: true
+    solid: true,
+    autoHideDelay: 2000,
   })
 }
 

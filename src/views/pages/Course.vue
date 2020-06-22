@@ -304,7 +304,7 @@ export default {
 
       courses.isBusy = true
 
-			var params = { paginate: false }
+			let params = { paginate: false }
       this.getCourseList(params).then(({ data }) =>{
         courses.items = data
         course.totalRows = data.length
