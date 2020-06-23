@@ -79,6 +79,11 @@
                     :items.sync="forms.rateSheet.fields.fees"
                     :fields="tables.rateSheetFees.fields"
                     :busy="tables.rateSheetFees.isBusy">
+                    <template v-slot:cell(isInitialFee)="row">
+                      <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
+                      <b-form-checkbox
+                        v-model="row.item.isInitialFee" />
+                    </template>
                     <template v-slot:cell(pivot.amount)="row">
                       <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <vue-autonumeric
@@ -96,7 +101,7 @@
                   </b-table>
                   <hr>
                   <b-row>
-                    <b-col md=6>
+                    <b-col md=4>
                       <!-- <b-row>
                         <b-col md=7>
                           <h6 class="font-weight-bold pt-1">ENTRANCE FEE : </h6>
@@ -106,25 +111,25 @@
                         </b-col>
                       </b-row> -->
                       <b-form-group
-                        label="ENTRANCE FEE"
+                        label="INITIAL FEE TOTAL"
                         label-for="enrollmentFee"
-                        label-cols="5">
+                        label-class="font-weight-bold"
+                        label-cols="4">
                         <vue-autonumeric
                           id="enrollmentFee"
-                          v-model="forms.rateSheet.fields.enrollmentFee"
-                          class="form-control text-right"
-                          style="width: 70%"
+                          v-model="initialFeeTotal"
+                          class="form-control text-right w-75"
                           :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                         </vue-autonumeric>
                         <!-- <b-form-input id="enrollmentFee" v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input> -->
                       </b-form-group>
                     </b-col>
-                    <b-col md=6 >
+                    <b-col offset-md=2 md=6 >
                       <b-row>
-                        <b-col md=9>
+                        <b-col sm=9>
                           <h6 class="font-weight-bold pt-1 float-right">TOTAL : </h6>
                         </b-col>
-                        <b-col md=3>
+                        <b-col sm=3>
                           <h6 class="font-weight-bold pt-1 float-right">{{ totalAmount }}</h6>
                         </b-col>
                       </b-row>
@@ -202,7 +207,12 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button class="float-left" @click="showModalFees=false">Close</b-button>
+				<b-button
+          class="float-right" 
+          variant="outline-danger"
+          @click="showModalFees=false">
+          Close
+        </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 	</div> <!-- main container -->
@@ -246,14 +256,21 @@ export default {
 							key: "pivot.notes",
 							label: "NOTES",
 							tdClass: "align-middle",
-							thStyle: {width: "40%"}
-						},
+							thStyle: {width: "35%"}
+            },
+            {
+							key: "isInitialFee",
+							label: "INITIAL FEE",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+            },
 						{
 							key: "pivot.amount",
 							label: "AMOUNT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "30%"}
+							thStyle: {width: "25%"}
             },
             {
 							key: "action",
@@ -325,9 +342,25 @@ export default {
     this.loadFees()
   },
   computed: {
+    initialFeeTotal: {
+      get: function () {
+        let total = 0
+        const { fees } = this.forms.rateSheet.fields
+        fees.forEach(fee => {
+          if (fee.isInitialFee) {
+            total += Number(fee.pivot.amount)
+          }
+        })
+        this.forms.rateSheet.fields.enrollmentFee = total
+        return total
+      },
+      set: function (newValue) {
+        this.forms.rateSheet.fields.enrollmentFee = newValue
+      }
+    },
     totalAmount(){
       let total = 0
-      this.forms.rateSheet.fields.fees.forEach(fee =>{
+      this.forms.rateSheet.fields.fees.forEach(fee => {
         total += Number(fee.pivot.amount)
       })
 
