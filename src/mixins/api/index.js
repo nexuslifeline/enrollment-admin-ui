@@ -12,3 +12,6 @@ export { default as AdmissionFileApi } from './AdmissionFile';
 export { default as UserGroupApi } from './UserGroup';
 export { default as PersonnelApi } from './Personnel';
 export { default as DepartmentApi } from './Department';
+export { default as PaymentApi } from './Payment';
+export { default as PaymentFileApi } from './PaymentFile';
+export { default as BillingApi } from './Billing';

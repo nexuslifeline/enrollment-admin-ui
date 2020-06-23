@@ -155,3 +155,8 @@ export const UserGroups = new Enum({
 //   MASTERS_DEGREE: { id: 4, name: "Master's Degree" },
 //   DOCTORATE_DEGREE: { id: 5, name: 'Doctorate Degree' }
 // });
+
+export const BillingStatuses = new Enum({
+  PAID: { id: 1, name: 'Paid' },
+  UNPAID: { id: 2, name: 'Unpaid' },
+});

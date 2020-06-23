@@ -41,6 +41,12 @@ export const navs = () => {
             icon: 'cil-layers',
             class: checkRights(2)
           },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Payment',
+            to: '/payment',
+            icon: 'cil-layers'
+          },
         ]
       },
       {
