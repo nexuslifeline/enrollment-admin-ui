@@ -5,11 +5,11 @@
 				<b-card>
           <b-row class="mb-2"> <!-- row button and search input -->
             <b-col md="8">
-              <b-form-radio-group @input="loadPayments()" v-model="filters.payment.billingStatusId">
+              <b-form-radio-group @input="loadPaymentList()" v-model="filters.payment.paymentStatusId">
                 <b-form-radio :value="null">Show All</b-form-radio>
                 <b-form-radio 
-                  v-for="status in billingStatuses.values" 
-                  :value="status.id" 
+                  v-for="status in paymentStatuses.values"
+                  :value="status.id"
                   :key="status.id">
                 {{ status.name }}
                 </b-form-radio>
@@ -20,7 +20,7 @@
               <b-form-input
                 v-model="filters.payment.criteria"
                 debounce="500"
-                @update="loadPayments()"
+                @update="loadPaymentList()"
                 type="text" 
                 placeholder="Search">
               </b-form-input>
@@ -35,8 +35,16 @@
             <template v-slot:cell(action)="row">
               <v-icon name="caret-down" @click="loadDetails(row)" />
             </template>
+            <template v-slot:cell(paymentStatusId)="data">
+              <b-badge
+                :variant="data.item.paymentStatusId === paymentStatuses.APPROVED.id
+                  ? 'primary' 
+                  : data.item.paymentStatusId === paymentStatuses.PENDING.id ? 'warning' : 'danger'">
+                {{ paymentStatuses.getEnum(data.item.paymentStatusId).name }}
+              </b-badge>
+            </template>
             <template v-slot:row-details="data">
-              <b-overlay :show="isLoading" rounded="sm">
+              <b-overlay :show="data.item.isLoading" rounded="sm">
                 <b-card>
                   <b-row class="justify-content-md-center">
                     <b-col md=8>
@@ -78,10 +86,18 @@
                           </template>
                         </b-table>
                       </div>
-                      <b-button
-                        @click="setApproval(data)"
-                        class="float-right my-2" 
-                        variant="outline-primary">Approve</b-button>
+                      <b-row v-if="data.item.paymentStatusId === paymentStatuses.PENDING.id">
+                        <b-col md=12>
+                          <b-button
+                            @click="setDisapproval(data)"
+                            class="float-right my-2" 
+                            variant="outline-danger">Reject</b-button>
+                          <b-button
+                            @click="setApproval(data)"
+                            class="float-right my-2 mr-2" 
+                            variant="outline-primary">Approve</b-button>
+                        </b-col>
+                      </b-row>
                     </b-col>
                   </b-row>
                 </b-card>
@@ -148,24 +164,27 @@
     <!-- Modal Preview -->
 		<!-- Modal Approval Confirmation -->
 		<b-modal 
-			v-model="showModalConfirmation"
+			v-model="showModalApproval"
 			centered
 			header-bg-variant="success"
 			header-text-variant="light"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					Payment Approval
+					Finalize Approval
 			</div> <!-- modal title -->
-			<b-row> <!-- modal body -->
+      <b-row> <!-- modal body -->
 				<b-col md=12>
-					Are you sure you want to approve this payment?
+					<label>Notes</label>
+					<b-textarea 
+            v-model="forms.payment.fields.approvalNotes"
+						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
           class="float-left" 
-          @click="showModalConfirmation=false">
+          @click="showModalApproval=false">
           Cancel
         </b-button>
 				<b-button 
@@ -183,12 +202,51 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Approval Confirmation -->
+    <!-- Modal Reject --> 
+		<b-modal 
+			v-model="showModalRejection"
+			centered
+			header-bg-variant="danger"
+			header-text-variant="light"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+					Confirm Rejection
+			</div> <!-- modal title -->
+			<b-row> <!-- modal body -->
+				<b-col md=12>
+					<label>Reason</label>
+					<b-textarea
+            v-model="forms.payment.fields.disapprovalNotes"
+						rows=7 />
+				</b-col>
+			</b-row> <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button 
+          class="float-left" 
+          @click="showModalRejection=false">
+          Cancel
+        </b-button>
+				<b-button 
+          @click="onDisapproval()"
+          class="float-right" variant="outline-primary">
+					Confirm
+				</b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+		<!-- Modal Reject -->
 	</div> <!-- main container -->
 </template>
 <script>
+
+const paymentFields = {
+  approvalNotes: null,
+  disapprovalNotes: null
+}
+
 import { PaymentApi, PaymentFileApi, BillingApi } from "../../mixins/api"
-import { BillingStatuses } from "../../helpers/enum"
-import { showNotification, formatNumber } from "../../helpers/forms"
+import { PaymentStatuses } from "../../helpers/enum"
+import { showNotification, formatNumber, clearFields } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 
 export default {
@@ -197,14 +255,20 @@ export default {
 	data() {
 		return {
       showModalPreview: false,
-			showModalConfirmation: false,
+			showModalApproval: false,
       showModalRejection: false,
-      showModalSubjects: false,
 			isLoading: false,
-      billingStatuses: BillingStatuses,
+      paymentStatuses: PaymentStatuses,
       file: {
         type: null,
         src: null
+      },
+      forms: {
+        payment: {
+          fields: { ...paymentFields },
+          states: { ...paymentFields },
+          errors: { ...paymentFields }
+        }
       },
 			tables: {
 				payments: {
@@ -237,6 +301,13 @@ export default {
               formatter: (value) => {
                 return formatNumber(value)
               }
+            },
+            	{
+							key: "paymentStatusId",
+							label: "Status",
+              tdClass: "align-middle text-center",
+              thClass: "text-center",
+              thStyle: { width: "10%"}
 						},
 						{
 							key: "action",
@@ -295,7 +366,7 @@ export default {
 			filters: {
 				payment: {
 					criteria: null,
-					billingStatusId: null
+					paymentStatusId: null
         }
       },
       isProcessing: false,
@@ -309,13 +380,13 @@ export default {
     loadPaymentList() {
       const { payments } = this.tables
       const { payment, payment: { perPage, page } } = this.paginations
-      const { billingStatusId, criteria } = this.filters.payment
+      const { paymentStatusId, criteria } = this.filters
       payments.isBusy = true
 			let params = { 
 				paginate: true, 
         perPage, 
         page, 
-        billingStatusId,
+        paymentStatusId,
         criteria }
       
       this.getPaymentList(params)
@@ -328,14 +399,57 @@ export default {
         })
     },
     setApproval(row) {
-      this.showModalConfirmation = true
+      clearFields(this.forms.payment)
+      this.showModalApproval = true
+      this.row = row.item
     },
     onApproval() {
-      
+      const { id } = this.row
+      const { approvalNotes } = this.forms.payment.fields
+      const data = {
+        approvalNotes,
+        paymentStatusId: PaymentStatuses.APPROVED.id
+      }
+      this.isProcessing = true
+      this.updatePayment(data, id)
+        .then(({ data }) => {
+          this.row.paymentStatusId = PaymentStatuses.APPROVED.id
+          this.isProcessing = false
+          this.showModalApproval = false
+          showNotification(this, "success", "Approved Successfully.")
+        }).catch((error) => {
+          console.log(error)
+          this.isProcessing = false;
+        });
+    },
+    setDisapproval(row){
+      clearFields(this.forms.payment)
+      this.row = row.item
+      this.showModalRejection = true
+    },
+    onDisapproval() {
+      const { id } = this.row
+      const { disapprovalNotes } = this.forms.payment.fields
+      const data = {
+        disapprovalNotes,
+        paymentStatusId: PaymentStatuses.REJECTED.id
+      }
+
+      this.isProcessing = true
+      this.updatePayment(data, id)
+        .then(({ data }) => {
+          this.row.paymentStatusId = PaymentStatuses.REJECTED.id
+          this.isProcessing = false
+          this.showModalRejection = false
+          showNotification(this, "success", "Rejected Successfully.")
+        }).catch((error) => {
+          console.log(error)
+          this.isProcessing = false;
+        });
     },
     loadDetails(row) {
       if (!row.detailsShowing) {
-        this.isLoading = true
+        this.$set(row.item, 'isLoading', true)
         const { billingId, id } = row.item
         const params = { paginate: false }
         this.getBilling(billingId)
@@ -344,9 +458,15 @@ export default {
             this.getPaymentFileList(id, params)
               .then(({ data }) => {
                 this.$set(row.item, 'files', data)
-                this.isLoading = false
-              })
-          })
+                row.item.isLoading = false
+              }).catch((error) => {
+                console.log(error)
+                row.item.isLoading = false
+              });
+          }).catch((error) => {
+            console.log(error)
+            row.item.isLoading = false
+          });
       }
       row.toggleDetails()
     },

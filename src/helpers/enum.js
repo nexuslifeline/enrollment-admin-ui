@@ -160,3 +160,14 @@ export const BillingStatuses = new Enum({
   PAID: { id: 1, name: 'Paid' },
   UNPAID: { id: 2, name: 'Unpaid' },
 });
+
+export const BillingTypes = new Enum({
+  INITIAL_FEE: { id: 1, name: 'Initial Fee' },
+  BILLING: { id: 2, name: 'Billing' },
+});
+
+export const PaymentStatuses = new Enum({
+  PENDING: { id: 1, name: 'Pending' },
+  APPROVED: { id: 2, name: 'Approved' },
+  REJECTED: { id: 3, name: 'Rejected' }
+});
