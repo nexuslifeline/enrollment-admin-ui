@@ -685,9 +685,7 @@ export default {
       let subjects = []
 
       this.row.subjects.forEach(subject => {
-				subjects.push({
-					subjectId: subject.id
-				})
+				subjects.push(subject.id)
       })
       
       studentFee.schoolYearId = this.row.schoolYearId,

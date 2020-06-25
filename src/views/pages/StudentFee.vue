@@ -68,7 +68,12 @@
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
-										<b-avatar rounded blank size="3rem" :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"></b-avatar>										<!-- <b-img rounded blank blank-color="#ccc" width="64" alt="placeholder"></b-img> -->
+										<b-avatar 
+                      rounded 
+                      blank 
+                      size="64" 
+                      :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                      :src="avatar(data.item.student)" />										
 									</template>
 								  <span>{{ data.item.student.name }}</span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
@@ -96,7 +101,7 @@
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<v-icon name="caret-down" @click="loadDetails(row)" />
+								<v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
                 <b-overlay :show="isLoading" rounded="sm">
@@ -762,6 +767,13 @@ export default {
 				this.schoolCategoryId = userGroup.schoolCategoryId
 			}
 			this.loadTranscript()
+    },
+    avatar(student){
+      let src = ''
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+      }
+      return src
     }
   },
   computed: {
@@ -782,7 +794,7 @@ export default {
         })
         return formatNumber(amount)
       }
-    }
+    },
   }
 }
 </script>
