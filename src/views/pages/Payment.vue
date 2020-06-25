@@ -49,7 +49,7 @@
                   <b-row class="justify-content-md-center">
                     <b-col md=8>
                       <div v-if="data.item.billing">
-                        <h5>{{ data.item.billing.student.name }}</h5>
+                        <h5>{{ data.item.billing.student.firstName + ' ' + data.item.billing.student.middleName + ' ' + data.item.billing.student.lastName  }}</h5>
                         <b-row class="mb-2">
                           <b-col md=6>
                             Billing No. : {{ data.item.billing.billingNo }}<br>
@@ -380,7 +380,7 @@ export default {
     loadPaymentList() {
       const { payments } = this.tables
       const { payment, payment: { perPage, page } } = this.paginations
-      const { paymentStatusId, criteria } = this.filters
+      const { paymentStatusId, criteria } = this.filters.payment
       payments.isBusy = true
 			let params = { 
 				paginate: true, 
