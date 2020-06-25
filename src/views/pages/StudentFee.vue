@@ -338,7 +338,7 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
-import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups, BillingTypes, BillingStatuses } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 export default {
@@ -353,7 +353,6 @@ export default {
 			tables: {
 				students: {
 					isBusy: false,
-					filterIncludedFields: ["firstName", "lastName"],
 					fields: [
 						{
 							key: "name",
@@ -549,11 +548,16 @@ export default {
 	methods: {
     approveFees(row) {
       const { 
-        id: transcriptId,
-        applicationId,
-        admissionId,
-        enrollmentFee
-      } = row.item
+        item,
+        item: {
+          id: transcriptId,
+          applicationId,
+          admissionId,
+          enrollmentFee,
+          previousBalance,
+          student
+        }
+      } = row
 
       const applicationAdmission = [
         { application: {
@@ -588,7 +592,21 @@ export default {
           enrollmentFee: enrollmentFee
         },
         id: transcriptId,
-        fees
+        fees,
+        billing: {
+          dueDate: '2020-08-24',
+          totalAmount: enrollmentFee,
+          studentId: student.id,
+          billingTypeId: BillingTypes.INITIAL_FEE.id,
+          billingStatusId: BillingStatuses.UNPAID.id,
+          schoolYearId: item.schoolYearId,
+          semesterId: item.semesterId,
+          previousBalance
+        },
+        billingItem: {
+          item: 'Registration Fee',
+          amount: enrollmentFee
+        }
       }
 
       this.isProcessing = true;

@@ -25,6 +25,7 @@ const SchoolFee = () => import('@/views/pages/SchoolFee')
 const UserGroup = () => import('@/views/pages/UserGroup')
 const User = () => import('@/views/pages/User')
 const Department = () => import('@/views/pages/Department')
+const Payment = () => import('@/views/pages/Payment')
 
 Vue.use(Router)
 
@@ -88,6 +89,12 @@ function configRoutes () {
           name: 'Student Fee',
           component: StudentFee,
           meta: { requiresAuth: true, userType: 2 }
+        },
+        {
+          path: 'payment',
+          name: 'Payment',
+          component: Payment,
+          meta: { requiresAuth: true }
         },
         {
           path: 'ratesheet',
