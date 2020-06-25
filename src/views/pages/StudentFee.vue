@@ -101,7 +101,7 @@
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<v-icon name="caret-down" @click="loadDetails(row)" />
+								<v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
                 <b-overlay :show="isLoading" rounded="sm">
