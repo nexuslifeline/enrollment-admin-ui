@@ -560,7 +560,6 @@ export default {
       }
       else if (this.entryMode == "Edit User") {
         const data = { user: user.fields }
-        console.log(personnel)
         this.updatePersonnel(data, id)
           .then(({ data }) => {
             this.updateRow(users, data)

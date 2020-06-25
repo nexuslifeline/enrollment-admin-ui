@@ -174,7 +174,8 @@
 													<b-button 
 														@click="previewFile(row)" 
 														size="sm" variant="secondary">
-														<b-icon-search></b-icon-search>
+														<v-icon 
+                              name="search"/>
 													</b-button>
 												</template>
 											</b-table>
@@ -330,7 +331,7 @@
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
-		<!-- Modal Approval -->
+		<!-- Modal Reject -->
     <!-- Modal Subject -->
     <b-modal 
 			v-model="showModalSubjects"
@@ -717,7 +718,6 @@ export default {
       });
     },
     setDisapproval(row) {
-      console.log(row)
       this.row = row.item
       this.showModalRejection = true
     },
