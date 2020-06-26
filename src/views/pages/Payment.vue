@@ -39,7 +39,7 @@
               <b-badge
                 :variant="data.item.paymentStatusId === paymentStatuses.APPROVED.id
                   ? 'primary' 
-                  : data.item.paymentStatusId === paymentStatuses.PENDING.id ? 'warning' : 'danger'">
+                  : data.item.paymentStatusId === paymentStatuses.SUBMITTED.id ? 'warning' : 'danger'">
                 {{ paymentStatuses.getEnum(data.item.paymentStatusId).name }}
               </b-badge>
             </template>

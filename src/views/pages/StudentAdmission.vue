@@ -10,16 +10,41 @@
 									<b-tab 
 										@click="filters.student.schoolCategoryId = null, loadTranscript()"
 										active
+										:disabled="schoolCategoryId !== null"
 										title="All" />
 									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
 										:key="schoolCategory.id"
 										:title="schoolCategory.name"
-										:active="schoolCategoryId == schoolCategory.id"
+										:active="schoolCategoryId === schoolCategory.id"
+										:disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
                     @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
 								</b-tabs>
 							</b-col>
 							<b-col md=3>
-								<b-form-select @change="loadTranscript()" v-model="filters.student.courseId" class="float-right w-100">
+								
+							</b-col>
+						</b-row>
+						<hr>
+						<b-row class="mb-2"> <!-- row button and search input -->
+							<b-col md="6">
+								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
+									<b-form-radio :value="null">Show All</b-form-radio>
+									<b-form-radio 
+										v-for="status in transcriptStatuses.values" 
+										:value="status.id" 
+										:key="status.id">
+										{{ status.name }}
+									</b-form-radio>
+								</b-form-radio-group>
+							</b-col>
+							<b-col md="3">
+								<b-form-select
+									v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id || 
+										filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id || 
+										filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id" 
+									@change="loadTranscript()" 
+									v-model="filters.student.courseId" 
+									class="float-right">
 									<template v-slot:first>
 										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 									</template>
@@ -32,22 +57,7 @@
 									</b-form-select-option>
 								</b-form-select>
 							</b-col>
-						</b-row>
-						<hr>
-						<b-row class="mb-2"> <!-- row button and search input -->
-							<b-col md="8">
-								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
-									<b-form-radio :value="null">Show All</b-form-radio>
-									<b-form-radio 
-										v-for="status in transcriptStatuses.values" 
-										:value="status.id" 
-										:key="status.id">
-										{{ status.name }}
-									</b-form-radio>
-								</b-form-radio-group>
-							</b-col>
-
-							<b-col md="4">
+							<b-col md="3">
 								<b-form-input
 									v-model="filters.student.criteria"
                   debounce="500"
@@ -67,8 +77,12 @@
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
-										<b-avatar rounded blank size="3rem" :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"></b-avatar>
-										<!-- <b-img rounded blank blank-color="#ccc" width="64" alt="placeholder"></b-img> -->
+										<b-avatar 
+                      rounded 
+                      blank 
+                      size="64" 
+                      :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                      :src="avatar(data.item.student)" />
 									</template>
 									<span>{{ data.item.student.name }}</span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
@@ -92,22 +106,9 @@
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
-									<template v-slot:button-content>
-										<v-icon name="ellipsis-v" />
-									</template>
-									<b-dropdown-item 
-                    v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
-                    @click="setApproval(row)">
-                    Approve
-                  </b-dropdown-item>
-									<b-dropdown-item 
-                    v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
-                    @click="setDisapproval(row)">
-                    Reject
-                  </b-dropdown-item>
-									<b-dropdown-item @click="loadDetails(row)">{{ row.detailsShowing ? 'Hide' : 'View' }} Details</b-dropdown-item>
-								</b-dropdown>
+								<v-icon 
+									:name="row.detailsShowing ? 'caret-down' : 'caret-left'" 
+									@click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
 								<b-overlay :show="isLoading" rounded="sm">
@@ -194,6 +195,11 @@
 									</b-card>
 									<b-button
                     v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                    @click="setDisapproval(data)"
+                    class="float-right my-2 mr-2" 
+                    variant="outline-danger">Reject</b-button>
+									<b-button
+                    v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
                     @click="setApproval(data)"
                     class="float-right m-2" 
                     variant="outline-primary">Approve</b-button>
@@ -274,7 +280,7 @@
 				<b-col md=12>
 					<label>Notes</label>
 					<b-textarea 
-            v-model="forms.applicationAdmission.fields.ApprovalNotes"
+            v-model="forms.applicationAdmission.fields.approvalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
@@ -475,7 +481,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "45%"},
+							thStyle: { width: "43%"},
 							formatter: (value, key, item) => {
 								if(!item.student.middleName){
 									item.student.middleName = ""
@@ -492,15 +498,16 @@ export default {
 						// },
 						{
 							key: "education",
-							label: "Education",
+							label: "Education Level",
 							tdClass: "align-middle",
-              thStyle: { width: "45%"}
+              thStyle: { width: "43%"}
 						},
 						{
 							key: "status",
-							label: "Status",
-							tdClass: "align-middle",
-							thStyle: { width: "8%"}
+							label: "Admission Status",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: { width: "12%"}
 						},
 						{
 							key: "action",
@@ -907,7 +914,14 @@ export default {
         subjects.filteredItems = subjects.items
       }
       this.onFiltered(subjects.filteredItems, subject)
+		},
+		avatar(student){
+      let src = ''
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+      }
+      return src
     }
-  },
+	},
 }
 </script>

@@ -24,20 +24,20 @@ export const navs = () => {
       {
         _name: 'CSidebarNavDropdown',
         name: 'For Approval',
-        route: '/student',
+        route: '/studentadmission',
         icon: 'cil-layers',
         items: [
           {
             _name: 'CSidebarNavItem',
             name: 'Student Admission',
-            to: '/student',
+            to: '/studentadmission',
             icon: 'cil-user',
             class: checkRights(1)
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Student Assessment Fee',
-            to: '/studentfee',
+            to: '/studentassessmentfee',
             icon: 'cil-layers',
             class: checkRights(2)
           },

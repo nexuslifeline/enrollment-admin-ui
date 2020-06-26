@@ -7,12 +7,14 @@
             <b-card-body>
               <b-row>
                 <b-col md=12>
-                  <b-tabs pills>			
-                    <b-tab v-for="schoolCategory in options.schoolCategories.values" 
-                      :key="schoolCategory.id" 
-                      :active="schoolCategoryId == schoolCategory.id"
-                      @click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
-                      :title="schoolCategory.name"/>
+                  <b-tabs pills>						
+										<b-tab 
+											v-for="schoolCategory in options.schoolCategories.values" 
+											:key="schoolCategory.id" 
+											:disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
+											:active="schoolCategoryId === schoolCategory.id"
+											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
+											:title="schoolCategory.name"/>
                   </b-tabs>
                 </b-col>
               </b-row>
