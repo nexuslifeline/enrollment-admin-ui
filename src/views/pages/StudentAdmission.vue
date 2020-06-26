@@ -137,11 +137,33 @@
 									<b-card>
 										<div v-if="data.item.subjects">
 											<b-row class="mb-3">
-                        <b-col md=6>
+                        <b-col md=12>
                           <h5 class="pt-2">SUBJECTS</h5>
                         </b-col>
-                        <b-col md=6 v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
-                          <b-button class="float-right" variant="outline-primary"
+                      </b-row>
+                      <b-row class="mb-3">
+                        <b-col md=4>
+                          <b-form-group 
+                              label="Section"
+                              label-cols-sm="3"
+                          >
+                            <b-form-select 
+                              v-model="data.item.sectionId"
+                              >
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
+                              </template>
+                              <b-form-select-option 
+                                v-for="section in filterSection(data)" 
+                                :key="section.id" 
+                                :value="section.id">
+                                {{ section.name }}
+                              </b-form-select-option>
+                            </b-form-select>
+                          </b-form-group>
+                        </b-col>
+                        <b-col md=2 offset-md="6" v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
+                          <b-button class="float-right" variant="outline-primary" block
                             @click="onAddSubject(data.item)">
                             <v-icon name="plus-circle" /> ADD NEW SUBJECT
                           </b-button>
@@ -422,13 +444,14 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi } from "../../mixins/api"
+import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 
 const transcriptFields = {
-  transcriptStatusId: null
+  transcriptStatusId: null,
+  sectionId: null,
 }
 
 const studentFeeFields = {
@@ -447,7 +470,7 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, Tables],
+	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables],
 	data() {
 		return {
       showModalPreview: false,
@@ -462,7 +485,9 @@ export default {
       },
       forms: {
         transcript: {
-          fields: { ...transcriptFields }
+          fields: { ...transcriptFields },
+          states: { ...transcriptFields },
+          errors: { ...transcriptFields }
         },
         studentFee: {
           fields: { ...studentFeeFields}
@@ -637,7 +662,10 @@ export default {
         departments: {
           items: []
         },
-				schoolCategories: SchoolCategories
+        schoolCategories: SchoolCategories,
+        sections: {
+          items: []
+        }
       },
       isProcessing: false,
       showDepartment: false,
@@ -650,6 +678,7 @@ export default {
 		this.checkRights()
     this.loadCourseList()
     this.loadDepartmentList()
+    this.loadSections()
 	},
 	methods: {
     setApproval(row) {
@@ -703,7 +732,9 @@ export default {
       studentFee.transcriptId = transcriptId
 
       transcript.transcriptStatusId = TranscriptStatuses.FINALIZED.id
+      transcript.sectionId =  this.row.sectionId
 
+      console.log(transcript.sectionId)
       const data = {
         ...applicationAdmission[index],
         studentFee,
@@ -765,6 +796,7 @@ export default {
       });
     },
 		loadTranscript(){
+      console.log('loaded transcript')
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
@@ -785,7 +817,8 @@ export default {
 					student.from = res.meta.from
 					student.to = res.meta.to
 					student.totalRows = res.meta.total
-					students.isBusy = false
+          students.isBusy = false
+          this.forms.transcript.sectionId = res.data.sectionId
 				})
     },
     loadDepartmentList(){
@@ -811,13 +844,15 @@ export default {
 					admissionId
 				} = row.item
 
-				const params = { paginate: false }
+        const params = { paginate: false }
+        
 				this.isLoading = true
 				this.getSubjectsOfTranscript(transcriptId, params)
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
 						this.isLoading = false
-				})
+        })
+        
 				if (admissionId) {
 					this.isLoading = true
 					this.getAdmissionFileList(admissionId, params)
@@ -825,10 +860,10 @@ export default {
 							this.$set(row.item, 'files', data)
 							this.isLoading = false
 					})
-				}
+        }
 			}
 			row.toggleDetails()
-		},
+    },
     getName(item, child){
       if (item) {
         let value = item[child]
@@ -873,6 +908,13 @@ export default {
           this.recordDetails(subject)
 					subjects.isBusy = false
 				})
+    },
+    loadSections() {
+      let params = { paginate: false };
+        this.getSectionList(params).then(({ data }) => {
+          console.log(data)
+          this.options.sections.items = data;
+        });
     },
     onAddSubject(row){
       this.studentSubjects = row.subjects
@@ -921,6 +963,16 @@ export default {
         src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
       }
       return src
+    },
+    filterSection(data) {
+      console.log(data)
+      const sect=
+         this.options.sections.items.filter(s => 
+          s.schoolYearId === data.item.schoolYearId 
+              && s.levelId === data.item.levelId 
+                  && s.courseId === data.item.courseId 
+                    && s.semesterId === data.item.semesterId )
+      return sect
     }
 	},
 }

@@ -26,6 +26,7 @@ const UserGroup = () => import('@/views/pages/UserGroup')
 const User = () => import('@/views/pages/User')
 const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
+const Section = () => import('@/views/pages/Section')
 
 Vue.use(Router)
 
@@ -107,6 +108,12 @@ function configRoutes () {
           name: 'Curriculum',
           component: Curriculum,
           meta: { requiresAuth: true, userType: 1 }
+        },
+        {
+          path: 'section',
+          name: 'Section',
+          component: Section,
+          meta: { requiresAuth: true }
         },
         {
           path: 'department',
