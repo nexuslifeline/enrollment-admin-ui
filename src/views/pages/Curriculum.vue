@@ -11,7 +11,7 @@
 										<b-tab 
 											v-for="schoolCategory in options.schoolCategories.values" 
 											:key="schoolCategory.id" 
-											:disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
+											:disabled="userGroupId ? false : schoolCategoryId !== schoolCategory.id"
 											:active="schoolCategoryId === schoolCategory.id"
 											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
 											:title="schoolCategory.name"/>
@@ -291,7 +291,8 @@ export default {
         }
 			},
 			levelIndex: 0,
-			schoolCategoryId: null
+      schoolCategoryId: null,
+      userGroupId: null
 		}
 	},
 	created(){
@@ -423,7 +424,8 @@ export default {
 			}
 
 			if (UserGroups.SUPER_USER.id == userGroup.id) {
-				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+        this.schoolCategoryId = SchoolCategories.getEnum(1).id
+        this.userGroupId = UserGroups.SUPER_USER.id
 			}
       this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
     },
