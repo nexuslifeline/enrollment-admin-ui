@@ -86,7 +86,7 @@
                           </template>
                         </b-table>
                       </div>
-                      <b-row v-if="data.item.paymentStatusId === paymentStatuses.PENDING.id">
+                      <b-row v-if="data.item.paymentStatusId === paymentStatuses.SUBMITTED.id">
                         <b-col md=12>
                           <b-button
                             @click="setDisapproval(data)"
