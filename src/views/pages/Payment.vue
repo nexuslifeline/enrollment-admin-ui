@@ -33,7 +33,7 @@
             :items="tables.payments.items"
             :busy="tables.payments.isBusy">
             <template v-slot:cell(action)="row">
-              <v-icon name="caret-down" @click="loadDetails(row)" />
+              <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
             </template>
             <template v-slot:cell(paymentStatusId)="data">
               <b-badge
@@ -49,7 +49,7 @@
                   <b-row class="justify-content-md-center">
                     <b-col md=8>
                       <div v-if="data.item.billing">
-                        <h5>{{ data.item.billing.student.firstName + ' ' + data.item.billing.student.middleName + ' ' + data.item.billing.student.lastName  }}</h5>
+                        <h5>{{ data.item.billing.student.firstName }} {{ data.item.billing.student.middleName ? data.item.billing.student.middleName : '' }} {{ data.item.billing.student.lastName }}</h5>
                         <b-row class="mb-2">
                           <b-col md=6>
                             Billing No. : {{ data.item.billing.billingNo }}<br>
@@ -275,22 +275,33 @@ export default {
 					isBusy: false,
 					fields: [
             {
+							key: "student.name",
+							label: "Student",
+							tdClass: "align-middle",
+              thStyle: { width: "15%"},
+              formatter: (value, key, item) => {
+                item.student.middleName = item.student.middleName ? item.student.middleName : ''
+                item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
+                return item.student.name
+              }
+						},
+            {
 							key: "datePaid",
 							label: "Date Paid",
 							tdClass: "align-middle",
-              thStyle: { width: "15%"}
+              thStyle: { width: "10%"}
 						},
 						{
 							key: "referenceNo",
 							label: "Ref No.",
 							tdClass: "align-middle",
-							thStyle: { width: "30%"}
+							thStyle: { width: "20%"}
             },
             {
 							key: "paymentMode.name",
 							label: "Payment Mode",
 							tdClass: "align-middle",
-              thStyle: { width: "30%"}
+              thStyle: { width: "25%"}
 						},
 						{
 							key: "amount",

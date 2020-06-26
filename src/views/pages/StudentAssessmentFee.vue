@@ -100,13 +100,13 @@
               <template v-slot:cell(status)="data">
 								<b-badge
 									:variant="(data.item.applicationId ? 
-                  data.item.application.applicationStatusId === applicationStatuses.APPROVED.id : 
-                  data.item.admission.applicationStatusId === applicationStatuses.APPROVED.id)
-										? 'primary' 
-										: 'warning'">
+                  data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
+                  data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
+										? 'warning' 
+										: 'primary'">
 									{{ (data.item.applicationId ? 
-                  data.item.application.applicationStatusId === applicationStatuses.APPROVED.id : 
-                  data.item.admission.applicationStatusId === applicationStatuses.APPROVED.id) ? 'Approved' : 'Pending' }}
+                  data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
+                  data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) ? 'Pending' : 'Approved' }}
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
