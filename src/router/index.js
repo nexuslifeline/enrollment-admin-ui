@@ -95,7 +95,7 @@ function configRoutes () {
           path: 'payment',
           name: 'Payment',
           component: Payment,
-          meta: { requiresAuth: true }
+          meta: { requiresAuth: true, userType: 2 }
         },
         {
           path: 'ratesheet',

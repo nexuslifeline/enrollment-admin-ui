@@ -445,6 +445,12 @@
       </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
+    <div v-if="showModalPreview" class="preview__modal-description">
+      <div class="mx-auto">
+        Filename : {{ file.name }}<br>
+        Notes : {{ file.notes }}
+      </div>
+    </div>
     <!-- Modal Subject -->
 	</div> <!-- main container -->
 </template>
@@ -486,7 +492,9 @@ export default {
 			transcriptStatuses: TranscriptStatuses,
       file: {
         type: null,
-        src: null
+        src: null,
+        name: null,
+        notes: null
       },
       forms: {
         transcript: {
@@ -620,7 +628,14 @@ export default {
             {
 							key: "name",
 							label: "Filename",
-							tdClass: "align-middle"
+							tdClass: "align-middle",
+              thStyle: { width: "40%" }
+						},
+            {
+							key: "notes",
+							label: "Notes",
+							tdClass: "align-middle",
+              thStyle: { width: "auto" }
 						},
 						{
               key: "action",
@@ -877,9 +892,11 @@ export default {
       return ''
     },
     previewFile(row) {
-      const { admissionId, id } = row.item
+      const { paymentId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
+      this.file.name = name
+      this.file.notes = notes
       this.getAdmissionFilePreview(admissionId, id)
         .then(response => {
           this.file.type = response.headers.contentType
@@ -978,3 +995,19 @@ export default {
 	},
 }
 </script>
+<style scoped lang="scss">
+ .preview__modal-description {
+    z-index: 5000;
+    position: fixed;
+    height: 50px;
+    background-color: white;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 30px;
+  }
+</style>
