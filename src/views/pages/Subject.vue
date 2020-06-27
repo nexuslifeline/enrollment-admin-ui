@@ -172,13 +172,7 @@
             <label class="required">Department</label>
             <b-form-select 
               v-model="forms.subject.fields.departmentId"
-              :state="forms.subject.states.departmentId"
-              :disabled="
-                  forms.subject.fields.schoolCategoryId === null || 
-                  forms.subject.fields.schoolCategoryId === options.schoolCategories.PRE_SCHOOL.id || 
-                  forms.subject.fields.schoolCategoryId === options.schoolCategories.PRIMARY_SCHOOL.id || 
-                  forms.subject.fields.schoolCategoryId === options.schoolCategories.JUNIOR_HIGH_SCHOOL.id"
-              >
+              :state="forms.subject.states.departmentId">
               <template v-slot:first>
                 <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
               </template>

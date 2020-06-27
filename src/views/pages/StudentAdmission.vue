@@ -91,6 +91,11 @@
                   </small>
 								</b-media>
 							</template>
+              <template v-slot:cell(contact)="data">
+                Email : {{ data.item.student.email }} <br>
+                <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+                <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+              </template>
 							<template v-slot:cell(education)="data">
 								<span>{{ getName(data.item, 'level') + " " 
                   + getName(data.item, 'semester') + " " 
@@ -506,7 +511,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "43%"},
+							thStyle: { width: "30%"},
 							formatter: (value, key, item) => {
 								if(!item.student.middleName){
 									item.student.middleName = ""
@@ -514,18 +519,18 @@ export default {
 								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							} 
 						},
-						// {
-						// 	key: "name",
-						// 	label: "",
-						// 	tdClass: "align-middle",
-						// 	thStyle: { width: "45%" },
+						{
+							key: "contact",
+							label: "Contact Info",
+							tdClass: "align-middle",
+							thStyle: { width: "30%" },
 							
-						// },
+						},
 						{
 							key: "education",
 							label: "Education Level",
 							tdClass: "align-middle",
-              thStyle: { width: "43%"}
+              thStyle: { width: "25%"}
 						},
 						{
 							key: "status",
@@ -734,7 +739,6 @@ export default {
       transcript.transcriptStatusId = TranscriptStatuses.FINALIZED.id
       transcript.sectionId =  this.row.sectionId
 
-      console.log(transcript.sectionId)
       const data = {
         ...applicationAdmission[index],
         studentFee,
@@ -796,7 +800,6 @@ export default {
       });
     },
 		loadTranscript(){
-      console.log('loaded transcript')
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
@@ -912,7 +915,6 @@ export default {
     loadSections() {
       let params = { paginate: false };
         this.getSectionList(params).then(({ data }) => {
-          console.log(data)
           this.options.sections.items = data;
         });
     },
@@ -965,7 +967,6 @@ export default {
       return src
     },
     filterSection(data) {
-      console.log(data)
       const sect=
          this.options.sections.items.filter(s => 
           s.schoolYearId === data.item.schoolYearId 

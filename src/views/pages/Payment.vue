@@ -32,6 +32,28 @@
             :fields="tables.payments.fields"
             :items="tables.payments.items"
             :busy="tables.payments.isBusy">
+            <template v-slot:cell(name)="data">
+              <b-media>
+                <template v-slot:aside>
+                  <b-avatar 
+                    rounded 
+                    blank 
+                    size="64" 
+                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                    :src="avatar(data.item.student)" />
+                </template>
+                <span>{{ data.item.student.name }}</span><br>
+                <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+                <small>Address : {{ data.item.student.address ? 
+                  data.item.student.address.currentCompleteAddress : "" }}
+                </small>
+              </b-media>
+            </template>
+            <template v-slot:cell(contact)="data">
+              Email : {{ data.item.student.email }} <br>
+              <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+              <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+            </template>
             <template v-slot:cell(action)="row">
               <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
             </template>
@@ -275,15 +297,22 @@ export default {
 					isBusy: false,
 					fields: [
             {
-							key: "student.name",
+							key: "name",
 							label: "Student",
 							tdClass: "align-middle",
-              thStyle: { width: "15%"},
+              thStyle: { width: "20%"},
               formatter: (value, key, item) => {
                 item.student.middleName = item.student.middleName ? item.student.middleName : ''
                 item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
                 return item.student.name
               }
+            },
+            {
+							key: "contact",
+							label: "Contact Info",
+							tdClass: "align-middle",
+							thStyle: { width: "15%" },
+							
 						},
             {
 							key: "datePaid",
@@ -295,13 +324,13 @@ export default {
 							key: "referenceNo",
 							label: "Ref No.",
 							tdClass: "align-middle",
-							thStyle: { width: "20%"}
+							thStyle: { width: "15%"}
             },
             {
 							key: "paymentMode.name",
 							label: "Payment Mode",
 							tdClass: "align-middle",
-              thStyle: { width: "25%"}
+              thStyle: { width: "20%"}
 						},
 						{
 							key: "amount",
@@ -495,6 +524,14 @@ export default {
           reader.readAsDataURL(file);
           this.showModalPreview = true
         })
+    },
+    avatar(student){
+      let src = ''
+      console.log(student.photo)
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+      }
+      return src
     },
     
   },
