@@ -79,8 +79,8 @@
                             Due Date. : {{ data.item.billing.dueDate }}
                           </b-col>
                           <b-col md=6>
-                            Paid Amount : <b>{{ data.item.amount }}</b><br>
-                            Total Amount : {{ data.item.billing.totalAmount }}<br>
+                            Paid Amount : <b>{{ formatNumber(data.item.amount) }}</b><br>
+                            Total Amount : {{ formatNumber(data.item.billing.totalAmount) }}<br>
                             Billing Type : {{ data.item.billing.billingType.name }}
                           </b-col>
                         </b-row>
@@ -289,6 +289,7 @@ export default {
       showModalRejection: false,
 			isLoading: false,
       paymentStatuses: PaymentStatuses,
+      formatNumber: formatNumber,
       file: {
         type: null,
         src: null,
@@ -381,7 +382,10 @@ export default {
               label: "Amount",
               tdClass: "align-middle text-right",
               thClass: "text-right",
-							thStyle: { width: "auto" }
+              thStyle: { width: "auto" },
+              formatter: (value) => {
+                return formatNumber(value)
+              }
             }
           ],
 					items: []
