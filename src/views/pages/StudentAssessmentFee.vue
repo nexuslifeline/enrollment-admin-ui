@@ -91,6 +91,11 @@
                   </small>
 								</b-media>
 							</template>
+              <template v-slot:cell(contact)="data">
+                Email : {{ data.item.student.email }} <br>
+                <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+                <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+              </template>
 							<template v-slot:cell(education)="data">
 								<span>{{ getName(data.item, 'level') + " " 
                   + getName(data.item, 'semester') + " " 
@@ -117,11 +122,11 @@
 							<template v-slot:row-details="data">
                 <b-overlay :show="isLoading" rounded="sm">
                   <b-row class="m-2">
-                    <b-col md="3">
+                    <b-col md="2">
                       <h6>Level</h6>
                       <h6>{{ getName(data.item, 'level') }}</h6>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="2">
                       <div v-show="getName(data.item, 'course') != ''">
                         <h6>Course</h6>
                         <h6>{{ getName(data.item, 'course') }}</h6>
@@ -136,6 +141,10 @@
                     <b-col md="2">
                       <h6>School Year</h6>
                       <h6>{{ getName(data.item, 'schoolYear') }}</h6>
+                    </b-col>
+                    <b-col md="2">
+                      <h6>Section</h6>
+                      <h6>{{ getName(data.item, 'section') }}</h6>
                     </b-col>
                     <b-col md="2">
                       <h6>Student Type</h6>
@@ -416,19 +425,26 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "43%"},
+							thStyle: { width: "30%"},
 							formatter: (value, key, item) => {
 								if(!item.student.middleName){
 									item.student.middleName = ""
 								}
 								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							} 
+            },
+            {
+							key: "contact",
+							label: "Contact Info",
+							tdClass: "align-middle",
+							thStyle: { width: "30%" },
+							
 						},
 						{
 							key: "education",
 							label: "Education Level",
 							tdClass: "align-middle",
-							thStyle: { width: "43%"}
+							thStyle: { width: "25%"}
             },
             {
 							key: "status",
