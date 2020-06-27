@@ -10,16 +10,41 @@
 									<b-tab 
 										@click="filters.student.schoolCategoryId = null, loadTranscript()"
 										active
+										:disabled="schoolCategoryId !== null"
 										title="All" />
 									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
 										:key="schoolCategory.id"
 										:title="schoolCategory.name"
-										:active="schoolCategoryId == schoolCategory.id"
+										:active="schoolCategoryId === schoolCategory.id"
+										:disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
                     @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
 								</b-tabs>
 							</b-col>
 							<b-col md=3>
-								<b-form-select @change="loadTranscript()" v-model="filters.student.courseId" class="float-right w-100">
+								
+							</b-col>
+						</b-row>
+						<hr>
+						<b-row class="mb-2"> <!-- row button and search input -->
+							<b-col md="6">
+								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
+									<b-form-radio :value="null">Show All</b-form-radio>
+									<b-form-radio 
+										v-for="status in transcriptStatuses.values" 
+										:value="status.id" 
+										:key="status.id">
+										{{ status.name }}
+									</b-form-radio>
+								</b-form-radio-group>
+							</b-col>
+							<b-col md="3">
+								<b-form-select
+									v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id || 
+										filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id || 
+										filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id" 
+									@change="loadTranscript()" 
+									v-model="filters.student.courseId" 
+									class="float-right">
 									<template v-slot:first>
 										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 									</template>
@@ -32,22 +57,7 @@
 									</b-form-select-option>
 								</b-form-select>
 							</b-col>
-						</b-row>
-						<hr>
-						<b-row class="mb-2"> <!-- row button and search input -->
-							<b-col md="8">
-								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
-									<b-form-radio :value="null">Show All</b-form-radio>
-									<b-form-radio 
-										v-for="status in transcriptStatuses.values" 
-										:value="status.id" 
-										:key="status.id">
-										{{ status.name }}
-									</b-form-radio>
-								</b-form-radio-group>
-							</b-col>
-
-							<b-col md="4">
+							<b-col md="3">
 								<b-form-input
 									v-model="filters.student.criteria"
                   debounce="500"
@@ -67,8 +77,12 @@
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
-										<b-avatar rounded blank size="3rem" :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"></b-avatar>
-										<!-- <b-img rounded blank blank-color="#ccc" width="64" alt="placeholder"></b-img> -->
+										<b-avatar 
+                      rounded 
+                      blank 
+                      size="64" 
+                      :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                      :src="avatar(data.item.student)" />
 									</template>
 									<span>{{ data.item.student.name }}</span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
@@ -92,22 +106,9 @@
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
-									<template v-slot:button-content>
-										<v-icon name="ellipsis-v" />
-									</template>
-									<b-dropdown-item 
-                    v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
-                    @click="setApproval(row)">
-                    Approve
-                  </b-dropdown-item>
-									<b-dropdown-item 
-                    v-if="row.item.transcriptStatusId === transcriptStatuses.DRAFT.id" 
-                    @click="setDisapproval(row)">
-                    Reject
-                  </b-dropdown-item>
-									<b-dropdown-item @click="loadDetails(row)">{{ row.detailsShowing ? 'Hide' : 'View' }} Details</b-dropdown-item>
-								</b-dropdown>
+								<v-icon 
+									:name="row.detailsShowing ? 'caret-down' : 'caret-left'" 
+									@click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
 								<b-overlay :show="isLoading" rounded="sm">
@@ -136,11 +137,33 @@
 									<b-card>
 										<div v-if="data.item.subjects">
 											<b-row class="mb-3">
-                        <b-col md=6>
+                        <b-col md=12>
                           <h5 class="pt-2">SUBJECTS</h5>
                         </b-col>
-                        <b-col md=6 v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
-                          <b-button class="float-right" variant="outline-primary"
+                      </b-row>
+                      <b-row class="mb-3">
+                        <b-col md=4>
+                          <b-form-group 
+                              label="Section"
+                              label-cols-sm="3"
+                          >
+                            <b-form-select 
+                              v-model="data.item.sectionId"
+                              >
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
+                              </template>
+                              <b-form-select-option 
+                                v-for="section in filterSection(data)" 
+                                :key="section.id" 
+                                :value="section.id">
+                                {{ section.name }}
+                              </b-form-select-option>
+                            </b-form-select>
+                          </b-form-group>
+                        </b-col>
+                        <b-col md=2 offset-md="6" v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
+                          <b-button class="float-right" variant="outline-primary" block
                             @click="onAddSubject(data.item)">
                             <v-icon name="plus-circle" /> ADD NEW SUBJECT
                           </b-button>
@@ -192,6 +215,11 @@
 											</b-row>
 										</template> -->
 									</b-card>
+									<b-button
+                    v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                    @click="setDisapproval(data)"
+                    class="float-right my-2 mr-2" 
+                    variant="outline-danger">Reject</b-button>
 									<b-button
                     v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
                     @click="setApproval(data)"
@@ -274,7 +302,7 @@
 				<b-col md=12>
 					<label>Notes</label>
 					<b-textarea 
-            v-model="forms.applicationAdmission.fields.ApprovalNotes"
+            v-model="forms.applicationAdmission.fields.approvalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
@@ -416,13 +444,14 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi } from "../../mixins/api"
+import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
 import { showNotification } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 
 const transcriptFields = {
-  transcriptStatusId: null
+  transcriptStatusId: null,
+  sectionId: null,
 }
 
 const studentFeeFields = {
@@ -441,7 +470,7 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, Tables],
+	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables],
 	data() {
 		return {
       showModalPreview: false,
@@ -456,7 +485,9 @@ export default {
       },
       forms: {
         transcript: {
-          fields: { ...transcriptFields }
+          fields: { ...transcriptFields },
+          states: { ...transcriptFields },
+          errors: { ...transcriptFields }
         },
         studentFee: {
           fields: { ...studentFeeFields}
@@ -475,7 +506,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "45%"},
+							thStyle: { width: "43%"},
 							formatter: (value, key, item) => {
 								if(!item.student.middleName){
 									item.student.middleName = ""
@@ -492,15 +523,16 @@ export default {
 						// },
 						{
 							key: "education",
-							label: "Education",
+							label: "Education Level",
 							tdClass: "align-middle",
-              thStyle: { width: "45%"}
+              thStyle: { width: "43%"}
 						},
 						{
 							key: "status",
-							label: "Status",
-							tdClass: "align-middle",
-							thStyle: { width: "8%"}
+							label: "Admission Status",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: { width: "12%"}
 						},
 						{
 							key: "action",
@@ -630,7 +662,10 @@ export default {
         departments: {
           items: []
         },
-				schoolCategories: SchoolCategories
+        schoolCategories: SchoolCategories,
+        sections: {
+          items: []
+        }
       },
       isProcessing: false,
       showDepartment: false,
@@ -643,6 +678,7 @@ export default {
 		this.checkRights()
     this.loadCourseList()
     this.loadDepartmentList()
+    this.loadSections()
 	},
 	methods: {
     setApproval(row) {
@@ -696,7 +732,9 @@ export default {
       studentFee.transcriptId = transcriptId
 
       transcript.transcriptStatusId = TranscriptStatuses.FINALIZED.id
+      transcript.sectionId =  this.row.sectionId
 
+      console.log(transcript.sectionId)
       const data = {
         ...applicationAdmission[index],
         studentFee,
@@ -758,6 +796,7 @@ export default {
       });
     },
 		loadTranscript(){
+      console.log('loaded transcript')
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
@@ -778,7 +817,8 @@ export default {
 					student.from = res.meta.from
 					student.to = res.meta.to
 					student.totalRows = res.meta.total
-					students.isBusy = false
+          students.isBusy = false
+          this.forms.transcript.sectionId = res.data.sectionId
 				})
     },
     loadDepartmentList(){
@@ -804,13 +844,15 @@ export default {
 					admissionId
 				} = row.item
 
-				const params = { paginate: false }
+        const params = { paginate: false }
+        
 				this.isLoading = true
 				this.getSubjectsOfTranscript(transcriptId, params)
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
 						this.isLoading = false
-				})
+        })
+        
 				if (admissionId) {
 					this.isLoading = true
 					this.getAdmissionFileList(admissionId, params)
@@ -818,10 +860,10 @@ export default {
 							this.$set(row.item, 'files', data)
 							this.isLoading = false
 					})
-				}
+        }
 			}
 			row.toggleDetails()
-		},
+    },
     getName(item, child){
       if (item) {
         let value = item[child]
@@ -867,6 +909,13 @@ export default {
 					subjects.isBusy = false
 				})
     },
+    loadSections() {
+      let params = { paginate: false };
+        this.getSectionList(params).then(({ data }) => {
+          console.log(data)
+          this.options.sections.items = data;
+        });
+    },
     onAddSubject(row){
       this.studentSubjects = row.subjects
       this.showModalSubjects = true
@@ -907,7 +956,24 @@ export default {
         subjects.filteredItems = subjects.items
       }
       this.onFiltered(subjects.filteredItems, subject)
+		},
+		avatar(student){
+      let src = ''
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+      }
+      return src
+    },
+    filterSection(data) {
+      console.log(data)
+      const sect=
+         this.options.sections.items.filter(s => 
+          s.schoolYearId === data.item.schoolYearId 
+              && s.levelId === data.item.levelId 
+                  && s.courseId === data.item.courseId 
+                    && s.semesterId === data.item.semesterId )
+      return sect
     }
-  },
+	},
 }
 </script>

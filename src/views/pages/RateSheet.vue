@@ -7,12 +7,14 @@
             <b-card-body>
               <b-row>
                 <b-col md=12>
-                  <b-tabs pills>			
-                    <b-tab v-for="schoolCategory in options.schoolCategories.values" 
-                      :key="schoolCategory.id" 
-                      :active="schoolCategoryId == schoolCategory.id"
-                      @click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
-                      :title="schoolCategory.name"/>
+                  <b-tabs pills>						
+										<b-tab 
+											v-for="schoolCategory in options.schoolCategories.values" 
+											:key="schoolCategory.id" 
+											:disabled="userGroupId ? false : schoolCategoryId !== schoolCategory.id"
+											:active="schoolCategoryId === schoolCategory.id"
+											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
+											:title="schoolCategory.name"/>
                   </b-tabs>
                 </b-col>
               </b-row>
@@ -333,7 +335,8 @@ export default {
 				semesters: Semesters
       },
       levelIndex: 0,
-      schoolCategoryI: null
+      schoolCategoryI: null,
+      userGroupId: null
 		}
 	},
 	created(){
@@ -534,7 +537,8 @@ export default {
       }
       
       if (UserGroups.SUPER_USER.id == userGroup.id) {
-				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+        this.schoolCategoryId = SchoolCategories.getEnum(1).id
+        this.userGroupId = UserGroups.SUPER_USER.id
 			}
 			this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
 		}
