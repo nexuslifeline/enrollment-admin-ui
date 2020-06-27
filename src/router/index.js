@@ -15,8 +15,8 @@ const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
 
-const Student = () => import('@/views/pages/Student')
-const StudentFee = () => import('@/views/pages/StudentFee')
+const StudentAdmission = () => import('@/views/pages/StudentAdmission')
+const StudentAssessmentFee = () => import('@/views/pages/StudentAssessmentFee')
 const RateSheet = () => import('@/views/pages/RateSheet')
 const Curriculum = () => import('@/views/pages/Curriculum')
 const Subject = () => import('@/views/pages/Subject')
@@ -26,6 +26,7 @@ const UserGroup = () => import('@/views/pages/UserGroup')
 const User = () => import('@/views/pages/User')
 const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
+const Section = () => import('@/views/pages/Section')
 
 Vue.use(Router)
 
@@ -79,15 +80,15 @@ function configRoutes () {
           meta: { requiresAuth: true }
         },
         {
-          path: 'student',
-          name: 'Student',
-          component: Student,
+          path: 'studentadmission',
+          name: 'Student Admission',
+          component: StudentAdmission,
           meta: { requiresAuth: true, userType: 1 }
         },
         {
-          path: 'studentfee',
-          name: 'Student Fee',
-          component: StudentFee,
+          path: 'studentassessmentfee',
+          name: 'Student Assessment Fee',
+          component: StudentAssessmentFee,
           meta: { requiresAuth: true, userType: 2 }
         },
         {
@@ -107,6 +108,12 @@ function configRoutes () {
           name: 'Curriculum',
           component: Curriculum,
           meta: { requiresAuth: true, userType: 1 }
+        },
+        {
+          path: 'section',
+          name: 'Section',
+          component: Section,
+          meta: { requiresAuth: true }
         },
         {
           path: 'department',
