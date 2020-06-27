@@ -74,10 +74,12 @@
                         <h5>{{ data.item.billing.student.firstName }} {{ data.item.billing.student.middleName ? data.item.billing.student.middleName : '' }} {{ data.item.billing.student.lastName }}</h5>
                         <b-row class="mb-2">
                           <b-col md=6>
+                            Reference No. : <b>{{ data.item.referenceNo }}</b><br>
                             Billing No. : {{ data.item.billing.billingNo }}<br>
                             Due Date. : {{ data.item.billing.dueDate }}
                           </b-col>
                           <b-col md=6>
+                            Paid Amount : <b>{{ data.item.amount }}</b><br>
                             Total Amount : {{ data.item.billing.totalAmount }}<br>
                             Billing Type : {{ data.item.billing.billingType.name }}
                           </b-col>
