@@ -11,6 +11,7 @@
 										<b-tab 
 											v-for="schoolCategory in options.schoolCategories.values" 
 											:key="schoolCategory.id" 
+											:disabled="userGroupId ? false : schoolCategoryId !== schoolCategory.id"
 											:active="schoolCategoryId === schoolCategory.id"
 											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
 											:title="schoolCategory.name"/>
@@ -179,7 +180,12 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button class="float-left" @click="showModalSubjects=false">Close</b-button>
+				<b-button 
+          class="float-right" 
+          variant="outline-danger" 
+          @click="showModalSubjects=false">
+          Close
+        </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 	</div> <!-- main container -->
@@ -285,7 +291,8 @@ export default {
         }
 			},
 			levelIndex: 0,
-			schoolCategoryId: null
+      schoolCategoryId: null,
+      userGroupId: null
 		}
 	},
 	created(){
@@ -417,7 +424,8 @@ export default {
 			}
 
 			if (UserGroups.SUPER_USER.id == userGroup.id) {
-				this.schoolCategoryId = SchoolCategories.getEnum(1).id
+        this.schoolCategoryId = SchoolCategories.getEnum(1).id
+        this.userGroupId = UserGroups.SUPER_USER.id
 			}
       this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId)
     },
@@ -431,8 +439,15 @@ export default {
     },
     filterByDepartment() {
       const { subjects } = this.tables
+      const { subject } = this.paginations
       const { departmentId } = this.filters.subject
-      subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+      if (departmentId) {
+        subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+      }
+      else {
+        subjects.filteredItems = subjects.items
+      }
+      this.onFiltered(subjects.filteredItems, subject)
     }
 	}
 }

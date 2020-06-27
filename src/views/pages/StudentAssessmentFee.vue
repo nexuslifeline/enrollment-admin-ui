@@ -6,36 +6,26 @@
 					<b-card-body>
 						<b-row>
 							<b-col md=9>
-								<b-tabs pills>
-									<b-tab 
-										@click="filters.student.schoolCategoryId = null, loadTranscript()"
-										active
-										title="All" />
-									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
-										:key="schoolCategory.id"
-										:title="schoolCategory.name"
-										:active="schoolCategoryId == schoolCategory.id"
+                <b-tabs pills>
+                  <b-tab 
+                    @click="filters.student.schoolCategoryId = null, loadTranscript()"
+                    active
+                    :disabled="schoolCategoryId !== null"
+                    title="All" />
+                  <b-tab v-for="schoolCategory in options.schoolCategories.values" 
+                    :key="schoolCategory.id"
+                    :title="schoolCategory.name"
+                    :active="schoolCategoryId === schoolCategory.id"
+                    :disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
                     @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
-								</b-tabs>
+                </b-tabs>
 							</b-col>
 							<b-col md=3>
-								<b-form-select @change="loadTranscript()" v-model="filters.student.courseId" class="float-right w-100">
-									<template v-slot:first>
-										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
-									</template>
-                  <b-form-select-option :value="null">None</b-form-select-option>
-									<b-form-select-option 
-										v-for="course in options.courses.items" 
-										:key="course.id" 
-										:value="course.id">
-										{{course.name}}
-									</b-form-select-option>
-								</b-form-select>
 							</b-col>
 						</b-row>
 						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
-							<b-col md="8">
+							<b-col md="6">
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.applicationStatusId">
 									<b-form-radio :value="null">Show All</b-form-radio>
 									<b-form-radio 
@@ -48,8 +38,27 @@
 									</b-form-radio>
 								</b-form-radio-group>
 							</b-col>
-
-							<b-col md="4">
+              <b-col md="3">
+                <b-form-select
+                  v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id || 
+                    filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id || 
+                    filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id" 
+                  @change="loadTranscript()" 
+                  v-model="filters.student.courseId" 
+                  class="float-right">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                  </template>
+                  <b-form-select-option :value="null">None</b-form-select-option>
+                  <b-form-select-option 
+                    v-for="course in options.courses.items" 
+                    :key="course.id" 
+                    :value="course.id">
+                    {{course.name}}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-col>
+							<b-col md="3">
 								<b-form-input
 									v-model="filters.student.criteria"
                   debounce="500"
@@ -68,7 +77,12 @@
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
-										<b-avatar rounded blank size="3rem" :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"></b-avatar>										<!-- <b-img rounded blank blank-color="#ccc" width="64" alt="placeholder"></b-img> -->
+										<b-avatar 
+                      rounded 
+                      blank 
+                      size="64" 
+                      :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                      :src="avatar(data.item.student)" />										
 									</template>
 								  <span>{{ data.item.student.name }}</span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
@@ -77,6 +91,11 @@
                   </small>
 								</b-media>
 							</template>
+              <template v-slot:cell(contact)="data">
+                Email : {{ data.item.student.email }} <br>
+                <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+                <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+              </template>
 							<template v-slot:cell(education)="data">
 								<span>{{ getName(data.item, 'level') + " " 
                   + getName(data.item, 'semester') + " " 
@@ -86,26 +105,28 @@
               <template v-slot:cell(status)="data">
 								<b-badge
 									:variant="(data.item.applicationId ? 
-                  data.item.application.applicationStatusId === applicationStatuses.APPROVED.id : 
-                  data.item.admission.applicationStatusId === applicationStatuses.APPROVED.id)
-										? 'primary' 
-										: 'warning'">
-									{{ applicationStatuses.getEnum(data.item.applicationId ? 
-                    data.item.application.applicationStatusId : 
-                    data.item.admission.applicationStatusId).name }}
+                  data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
+                  data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
+										? 'warning' 
+										: 'primary'">
+									{{ (data.item.applicationId ? 
+                  data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
+                  data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) ? 'Pending' : 'Approved' }}
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<v-icon name="caret-down" @click="loadDetails(row)" />
+								<v-icon 
+                  :name="row.detailsShowing ? 'caret-down' : 'caret-left'" 
+                  @click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
                 <b-overlay :show="isLoading" rounded="sm">
                   <b-row class="m-2">
-                    <b-col md="3">
+                    <b-col md="2">
                       <h6>Level</h6>
                       <h6>{{ getName(data.item, 'level') }}</h6>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="2">
                       <div v-show="getName(data.item, 'course') != ''">
                         <h6>Course</h6>
                         <h6>{{ getName(data.item, 'course') }}</h6>
@@ -120,6 +141,10 @@
                     <b-col md="2">
                       <h6>School Year</h6>
                       <h6>{{ getName(data.item, 'schoolYear') }}</h6>
+                    </b-col>
+                    <b-col md="2">
+                      <h6>Section</h6>
+                      <h6>{{ getName(data.item, 'section') }}</h6>
                     </b-col>
                     <b-col md="2">
                       <h6>Student Type</h6>
@@ -195,21 +220,31 @@
                     </b-table>
                     <template v-slot:footer>
                       <b-row>
-                        <b-col md=8>
-                          <b-form inline>
-                            <label class="font-weight-bold pt-1 mr-2">ENTRANCE FEE:</label>
+                        <b-col md=4>
+                          <b-form-group
+                            label="INITIAL FEE TOTAL :"
+                            label-for="enrollmentFee"
+                            label-class="font-weight-bold"
+                            label-cols="4">
                             <vue-autonumeric
                               class="form-control text-right"
                               v-model="data.item.enrollmentFee"
                               :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                             </vue-autonumeric>
-                            <label class="font-weight-bold pt-1 mr-2 ml-5">PREVIOUS BALANCE:</label>
+                          </b-form-group>
+                        </b-col>
+                        <b-col md=4>
+                          <b-form-group
+                            label="PREVIOUS BALANCE :"
+                            label-for="enrollmentFee"
+                            label-class="font-weight-bold"
+                            label-cols="4">
                             <vue-autonumeric
                               class="form-control text-right"
                               v-model="data.item.previousBalance"
                               :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                             </vue-autonumeric>
-                          </b-form>
+                          </b-form-group>
                         </b-col>
                         <b-col md=2>
                           <h5 class="float-right font-weight-bold">Total</h5>
@@ -226,7 +261,7 @@
                         v-if="data.item.applicationId ? 
                           data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
                           data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id" 
-                        @click="approveFees(data)"
+                        @click="setApproveFees(data)"
                         class="float-right mr-2"
                         variant="outline-primary">
                         <v-icon
@@ -316,14 +351,59 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button class="float-left" @click="showModalFees=false">Close</b-button>
+				<b-button 
+          class="float-right"
+          variant="outline-danger"
+          @click="showModalFees=false">
+          Close
+        </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
+    <!-- Modal Approval -->
+		<b-modal 
+			v-model="showModalApproval"
+			centered
+			header-bg-variant="success"
+			header-text-variant="light"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+					Finalize Approval
+			</div> <!-- modal title -->
+			<b-row> <!-- modal body -->
+				<b-col md=12>
+					<label>Notes</label>
+					<b-textarea 
+            v-model="approvalNotes"
+						rows=7 />
+				</b-col>
+			</b-row> <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button 
+          class="float-left" 
+          @click="showModalApproval=false">
+          Cancel
+        </b-button>
+				<b-button 
+          @click="approveFees()"
+          class="float-right" 
+          variant="outline-primary">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
+					Confirm
+				</b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+		<!-- Modal Approval -->
 	</div> <!-- main container -->
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
-import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups, BillingTypes, BillingStatuses } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 export default {
@@ -331,38 +411,47 @@ export default {
 	mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi, Tables],
 	data() {
 		return {
-			showModalFees: false,
+      showModalFees: false,
+      showModalApproval: false,
+      approvalNotes: null,
       applicationStatuses: ApplicationStatuses,
       fees: Fees,
       isProcessing: false,
 			tables: {
 				students: {
 					isBusy: false,
-					filterIncludedFields: ["firstName", "lastName"],
 					fields: [
 						{
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "45%"},
+							thStyle: { width: "30%"},
 							formatter: (value, key, item) => {
 								if(!item.student.middleName){
 									item.student.middleName = ""
 								}
 								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							} 
+            },
+            {
+							key: "contact",
+							label: "Contact Info",
+							tdClass: "align-middle",
+							thStyle: { width: "30%" },
+							
 						},
 						{
 							key: "education",
-							label: "Education",
+							label: "Education Level",
 							tdClass: "align-middle",
-							thStyle: { width: "45%"}
+							thStyle: { width: "25%"}
             },
             {
 							key: "status",
-							label: "Status",
-							tdClass: "align-middle",
-							thStyle: { width: "8%"}
+							label: "Assessment Status",
+              tdClass: "align-middle text-center",
+              thClass: "text-center",
+							thStyle: { width: "12%"}
 						},
 						{
 							key: "action",
@@ -523,7 +612,8 @@ export default {
 				schoolCategories: SchoolCategories
       },
       schoolCategoryId: null,
-      studentFees: []
+      studentFees: [],
+      row: []
 		}
 	},
 	created(){
@@ -532,13 +622,23 @@ export default {
     this.loadFees()
 	},
 	methods: {
-    approveFees(row) {
+    setApproveFees(row) {
+      this.approvalNotes = null
+      this.row = row
+      this.showModalApproval = true
+    },
+    approveFees() {
       const { 
-        id: transcriptId,
-        applicationId,
-        admissionId,
-        enrollmentFee
-      } = row.item
+        item,
+        item: {
+          id: transcriptId,
+          applicationId,
+          admissionId,
+          enrollmentFee,
+          previousBalance,
+          student
+        }
+      } = this.row
 
       const applicationAdmission = [
         { application: {
@@ -554,30 +654,49 @@ export default {
       const index = applicationId ? 0 : 1
 
       let fees = []
+      let totalAmount = 0
 
-      row.item.fees.forEach(fee => {
+      item.fees.forEach(fee => {
 				fees.push({ 
           schoolFeeId: fee.id, 
           amount: fee.pivot.amount, 
           notes: fee.pivot.notes 
-        })  
+        })
+        totalAmount += fee.pivot.amount
       })
 
       const data = {
         ...applicationAdmission[index],
         studentFee: {
           studentFeeStatusId: StudentFeeStatuses.APPROVED.id,
-          enrollmentFee: enrollmentFee
+          totalAmount,
+          enrollmentFee: enrollmentFee,
+          approvalNotes: this.approvalNotes
         },
         id: transcriptId,
-        fees
+        fees,
+        billing: {
+          dueDate: '2020-08-24',
+          totalAmount: enrollmentFee,
+          studentId: student.id,
+          billingTypeId: BillingTypes.INITIAL_FEE.id,
+          billingStatusId: BillingStatuses.UNPAID.id,
+          schoolYearId: item.schoolYearId,
+          semesterId: item.semesterId,
+          previousBalance
+        },
+        billingItem: {
+          item: 'Registration Fee',
+          amount: enrollmentFee
+        }
       }
 
       this.isProcessing = true;
       this.updateTranscript(data, transcriptId).then(({ data }) => {
         const form = applicationId ? 'application' : 'admission'
-        row.item[form].applicationStatusId = ApplicationStatuses.APPROVED.id
+        item[form].applicationStatusId = ApplicationStatuses.APPROVED.id
         this.isProcessing = false
+        this.showModalApproval = false
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
         console.log(error)
@@ -726,6 +845,13 @@ export default {
 				this.schoolCategoryId = userGroup.schoolCategoryId
 			}
 			this.loadTranscript()
+    },
+    avatar(student){
+      let src = ''
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+      }
+      return src
     }
   },
   computed: {
@@ -746,7 +872,7 @@ export default {
         })
         return formatNumber(amount)
       }
-    }
+    },
   }
 }
 </script>
