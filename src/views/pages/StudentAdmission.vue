@@ -457,7 +457,7 @@
 <script>
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
-import { showNotification } from "../../helpers/forms"
+import { showNotification, formatNumber } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 
 const transcriptFields = {
@@ -610,7 +610,10 @@ export default {
 							label: "Total Amount",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "12%"}
+              thStyle: {width: "12%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
 						},
 						{
 							key: "action",
