@@ -91,6 +91,11 @@
                   </small>
 								</b-media>
 							</template>
+              <template v-slot:cell(contact)="data">
+                Email : {{ data.item.student.email }} <br>
+                <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+                <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+              </template>
 							<template v-slot:cell(education)="data">
 								<span>{{ getName(data.item, 'level') + " " 
                   + getName(data.item, 'semester') + " " 
@@ -440,6 +445,12 @@
       </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
+    <div v-if="showModalPreview" class="preview__modal-description">
+      <div class="mx-auto">
+        Filename : {{ file.name }}<br>
+        Notes : {{ file.notes }}
+      </div>
+    </div>
     <!-- Modal Subject -->
 	</div> <!-- main container -->
 </template>
@@ -481,7 +492,9 @@ export default {
 			transcriptStatuses: TranscriptStatuses,
       file: {
         type: null,
-        src: null
+        src: null,
+        name: null,
+        notes: null
       },
       forms: {
         transcript: {
@@ -506,7 +519,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "43%"},
+							thStyle: { width: "30%"},
 							formatter: (value, key, item) => {
 								if(!item.student.middleName){
 									item.student.middleName = ""
@@ -514,18 +527,18 @@ export default {
 								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							} 
 						},
-						// {
-						// 	key: "name",
-						// 	label: "",
-						// 	tdClass: "align-middle",
-						// 	thStyle: { width: "45%" },
+						{
+							key: "contact",
+							label: "Contact Info",
+							tdClass: "align-middle",
+							thStyle: { width: "30%" },
 							
-						// },
+						},
 						{
 							key: "education",
 							label: "Education Level",
 							tdClass: "align-middle",
-              thStyle: { width: "43%"}
+              thStyle: { width: "25%"}
 						},
 						{
 							key: "status",
@@ -615,7 +628,14 @@ export default {
             {
 							key: "name",
 							label: "Filename",
-							tdClass: "align-middle"
+							tdClass: "align-middle",
+              thStyle: { width: "40%" }
+						},
+            {
+							key: "notes",
+							label: "Notes",
+							tdClass: "align-middle",
+              thStyle: { width: "auto" }
 						},
 						{
               key: "action",
@@ -734,7 +754,6 @@ export default {
       transcript.transcriptStatusId = TranscriptStatuses.FINALIZED.id
       transcript.sectionId =  this.row.sectionId
 
-      console.log(transcript.sectionId)
       const data = {
         ...applicationAdmission[index],
         studentFee,
@@ -796,7 +815,6 @@ export default {
       });
     },
 		loadTranscript(){
-      console.log('loaded transcript')
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
@@ -874,9 +892,11 @@ export default {
       return ''
     },
     previewFile(row) {
-      const { admissionId, id } = row.item
+      const { paymentId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
+      this.file.name = name
+      this.file.notes = notes
       this.getAdmissionFilePreview(admissionId, id)
         .then(response => {
           this.file.type = response.headers.contentType
@@ -912,7 +932,6 @@ export default {
     loadSections() {
       let params = { paginate: false };
         this.getSectionList(params).then(({ data }) => {
-          console.log(data)
           this.options.sections.items = data;
         });
     },
@@ -965,7 +984,6 @@ export default {
       return src
     },
     filterSection(data) {
-      console.log(data)
       const sect=
          this.options.sections.items.filter(s => 
           s.schoolYearId === data.item.schoolYearId 
@@ -977,3 +995,19 @@ export default {
 	},
 }
 </script>
+<style scoped lang="scss">
+ .preview__modal-description {
+    z-index: 5000;
+    position: fixed;
+    height: 50px;
+    background-color: white;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 30px;
+  }
+</style>

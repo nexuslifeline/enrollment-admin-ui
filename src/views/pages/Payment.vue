@@ -32,6 +32,28 @@
             :fields="tables.payments.fields"
             :items="tables.payments.items"
             :busy="tables.payments.isBusy">
+            <template v-slot:cell(name)="data">
+              <b-media>
+                <template v-slot:aside>
+                  <b-avatar 
+                    rounded 
+                    blank 
+                    size="64" 
+                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                    :src="avatar(data.item.student)" />
+                </template>
+                <span>{{ data.item.student.name }}</span><br>
+                <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+                <small>Address : {{ data.item.student.address ? 
+                  data.item.student.address.currentCompleteAddress : "" }}
+                </small>
+              </b-media>
+            </template>
+            <template v-slot:cell(contact)="data">
+              Email : {{ data.item.student.email }} <br>
+              <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+              <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+            </template>
             <template v-slot:cell(action)="row">
               <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
             </template>
@@ -52,11 +74,13 @@
                         <h5>{{ data.item.billing.student.firstName }} {{ data.item.billing.student.middleName ? data.item.billing.student.middleName : '' }} {{ data.item.billing.student.lastName }}</h5>
                         <b-row class="mb-2">
                           <b-col md=6>
+                            Reference No. : <b>{{ data.item.referenceNo }}</b><br>
                             Billing No. : {{ data.item.billing.billingNo }}<br>
                             Due Date. : {{ data.item.billing.dueDate }}
                           </b-col>
                           <b-col md=6>
-                            Total Amount : {{ data.item.billing.totalAmount }}<br>
+                            Paid Amount : <b>{{ formatNumber(data.item.amount) }}</b><br>
+                            Total Amount : {{ formatNumber(data.item.billing.totalAmount) }}<br>
                             Billing Type : {{ data.item.billing.billingType.name }}
                           </b-col>
                         </b-row>
@@ -234,6 +258,12 @@
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
+    <div v-if="showModalPreview" class="preview__modal-description">
+      <div class="mx-auto">
+        Filename : {{ file.name }}<br>
+        Notes : {{ file.notes }}
+      </div>
+    </div>
 		<!-- Modal Reject -->
 	</div> <!-- main container -->
 </template>
@@ -259,9 +289,12 @@ export default {
       showModalRejection: false,
 			isLoading: false,
       paymentStatuses: PaymentStatuses,
+      formatNumber: formatNumber,
       file: {
         type: null,
-        src: null
+        src: null,
+        name: null,
+        notes: null
       },
       forms: {
         payment: {
@@ -275,15 +308,22 @@ export default {
 					isBusy: false,
 					fields: [
             {
-							key: "student.name",
+							key: "name",
 							label: "Student",
 							tdClass: "align-middle",
-              thStyle: { width: "15%"},
+              thStyle: { width: "20%"},
               formatter: (value, key, item) => {
                 item.student.middleName = item.student.middleName ? item.student.middleName : ''
                 item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
                 return item.student.name
               }
+            },
+            {
+							key: "contact",
+							label: "Contact Info",
+							tdClass: "align-middle",
+							thStyle: { width: "15%" },
+							
 						},
             {
 							key: "datePaid",
@@ -295,13 +335,13 @@ export default {
 							key: "referenceNo",
 							label: "Ref No.",
 							tdClass: "align-middle",
-							thStyle: { width: "20%"}
+							thStyle: { width: "15%"}
             },
             {
 							key: "paymentMode.name",
 							label: "Payment Mode",
 							tdClass: "align-middle",
-              thStyle: { width: "25%"}
+              thStyle: { width: "20%"}
 						},
 						{
 							key: "amount",
@@ -342,7 +382,10 @@ export default {
               label: "Amount",
               tdClass: "align-middle text-right",
               thClass: "text-right",
-							thStyle: { width: "auto" }
+              thStyle: { width: "auto" },
+              formatter: (value) => {
+                return formatNumber(value)
+              }
             }
           ],
 					items: []
@@ -353,7 +396,14 @@ export default {
             {
 							key: "name",
 							label: "Filename",
-							tdClass: "align-middle"
+							tdClass: "align-middle",
+              thStyle: { width: "40%" }
+						},
+            {
+							key: "notes",
+							label: "Notes",
+							tdClass: "align-middle",
+              thStyle: { width: "auto" }
 						},
 						{
               key: "action",
@@ -482,9 +532,11 @@ export default {
       row.toggleDetails()
     },
     previewFile(row) {
-      const { paymentId, id } = row.item
+      const { paymentId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
+      this.file.name = name
+      this.file.notes = notes
       this.getPaymentFilePreview(paymentId, id)
         .then(response => {
           this.file.type = response.headers.contentType
@@ -496,7 +548,31 @@ export default {
           this.showModalPreview = true
         })
     },
+    avatar(student){
+      let src = ''
+      console.log(student.photo)
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+      }
+      return src
+    },
     
   },
 }
 </script>
+<style scoped lang="scss">
+ .preview__modal-description {
+    z-index: 5000;
+    position: fixed;
+    height: 50px;
+    background-color: white;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 30px;
+  }
+</style>
