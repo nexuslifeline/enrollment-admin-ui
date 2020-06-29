@@ -500,6 +500,7 @@ export default {
         section: { fields },
       } = this.forms;
       const { sections } = this.tables;
+
       section.isProcessing = true;
       reset(section);
       if (this.entryMode == "Add") {
@@ -561,12 +562,18 @@ export default {
         section: { fields },
       } = this.forms;
 
-      //this.loadLevelsOfSchoolCategoryList(row.item.schoolCategoryId)
-      //this.loadCoursesOfLevelList(row.item.levelId)
-
-      copyValue(row.item, fields);
-      console.log(fields)
+      fields.id = row.item.id
+      fields.name = row.item.name
+      fields.description = row.item.description
+      fields.schoolYearId = row.item.schoolYearId
+      fields.schoolCategoryId = row.item.schoolCategoryId
       this.loadLevelsOfSchoolCategoryList()
+      fields.levelId = row.item.levelId
+      this.loadCoursesOfLevelList(row.item.levelId)
+      fields.courseId = row.item.courseId
+      fields.semesterId = row.item.semesterId
+
+      
       reset(section);
       this.entryMode = "Edit";
       this.showModalEntry = true;
