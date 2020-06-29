@@ -211,7 +211,7 @@
                           v-if="(data.item.applicationId ? 
                               data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
                               data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) 
-                              && row.item.id !== fees.TUITION_FEE.id"
+                              && row.item.id !== fees.TUITION_FEE_PER_UNIT.id"
                           @click="removeFee(data.item.fees, row)" 
                           size="sm" variant="danger">
                           <v-icon name="trash" />
@@ -777,7 +777,7 @@ export default {
                   ]
 
                   if (schoolCategories.indexOf(schoolCategoryId) !== -1) {
-                    const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
+                    const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE_PER_UNIT.id)
                     let amount = 0
                     let notes = ""
                     
@@ -791,8 +791,8 @@ export default {
                       tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
                     } else {
                       row.item.fees.unshift({
-                        id: Fees.TUITION_FEE.id,
-                        name : Fees.TUITION_FEE.name,
+                        id: Fees.TUITION_FEE_PER_UNIT.id,
+                        name : Fees.TUITION_FEE_PER_UNIT.name,
                         pivot:{ amount: amount, notes: notes }
                       })
                     }
@@ -829,6 +829,11 @@ export default {
 		addFee(row) {
       const { item } = row
       // check if rate sheet exist in the table
+      if (item.id in [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id]) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
+      
       const result = this.studentFees.find(fee => fee.id === item.id)
       if (result) {
         showNotification(this, 'danger', item.name + ' is already added.')

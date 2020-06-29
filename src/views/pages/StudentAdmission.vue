@@ -457,7 +457,7 @@
 <script>
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
-import { showNotification } from "../../helpers/forms"
+import { showNotification, formatNumber } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 
 const transcriptFields = {
