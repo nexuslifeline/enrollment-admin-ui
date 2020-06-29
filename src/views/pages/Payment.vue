@@ -550,7 +550,6 @@ export default {
     },
     avatar(student){
       let src = ''
-      console.log(student.photo)
       if (student.photo) {
         src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
       }

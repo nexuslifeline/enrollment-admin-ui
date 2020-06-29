@@ -120,7 +120,7 @@
                   @click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
-                <b-overlay :show="isLoading" rounded="sm">
+                <b-overlay :show="data.item.isLoading" rounded="sm">
                   <b-row class="m-2">
                     <b-col md="2">
                       <h6>Level</h6>
@@ -516,7 +516,10 @@ export default {
 							label: "TOTAL AMOUNT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "15%"}
+              thStyle: {width: "15%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
             }
           ],
 					items: []
@@ -742,51 +745,70 @@ export default {
 					levelId,
 					courseId,
           semesterId,
-          schoolCategoryId
+          schoolCategoryId,
+          application,
+          admission
 				} = row.item
 
 				const params = { paginate: false }
-				this.isLoading = true
+				this.$set(row.item, 'isLoading', true)
 				this.getSubjectsOfTranscript(transcriptId, params)
 					.then(({ data }) => {
-						this.$set(row.item, 'subjects', data)
-            const rateSheetParams = { levelId, courseId, semesterId  }
-            this.getRateSheetList(rateSheetParams)
-              .then(({ data }) => {
-                const res = data.data
-                this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
-                this.$set(row.item, 'previousBalance', 0)
-                this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
-              
-                const schoolCategories = [
-                  SchoolCategories.SENIOR_HIGH_SCHOOL.id,
-                  SchoolCategories.COLLEGE.id,
-                  SchoolCategories.GRADUATE_SCHOOL.id
-                ]
+            this.$set(row.item, 'subjects', data)
+            let applicationStatusId = null
+            if (application) {
+              applicationStatusId = application.applicationStatusId
+            } else {
+              applicationStatusId = admission.applicationStatusId
+            }
+            if (applicationStatusId === ApplicationStatuses.SUBMITTED.id) {
+              const rateSheetParams = { levelId, courseId, semesterId  }
+              this.getRateSheetList(rateSheetParams)
+                .then(({ data }) => {
+                  const res = data.data
+                  this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
+                  this.$set(row.item, 'previousBalance', 0)
+                  this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
+                
+                  const schoolCategories = [
+                    SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+                    SchoolCategories.COLLEGE.id,
+                    SchoolCategories.GRADUATE_SCHOOL.id
+                  ]
 
-                if (schoolCategories.indexOf(schoolCategoryId) !== -1) {
-                  const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
-                  let amount = 0
-                  let notes = ""
-                  
-                  row.item.subjects.forEach(subject => {
-                    amount += Number(subject.totalAmount)
-                    notes += subject.code + ", "
-                  })
-
-                  if(tuitionFee) {
-                    tuitionFee.pivot.amount = amount
-                    tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
-                  } else {
-                    row.item.fees.unshift({
-                      id: Fees.TUITION_FEE.id,
-                      name : Fees.TUITION_FEE.name,
-                      pivot:{ amount: amount, notes: notes }
+                  if (schoolCategories.indexOf(schoolCategoryId) !== -1) {
+                    const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
+                    let amount = 0
+                    let notes = ""
+                    
+                    row.item.subjects.forEach(subject => {
+                      amount += Number(subject.totalAmount)
+                      notes += subject.code + ", "
                     })
+
+                    if(tuitionFee) {
+                      tuitionFee.pivot.amount = amount
+                      tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
+                    } else {
+                      row.item.fees.unshift({
+                        id: Fees.TUITION_FEE.id,
+                        name : Fees.TUITION_FEE.name,
+                        pivot:{ amount: amount, notes: notes }
+                      })
+                    }
                   }
-                }
-                this.isLoading = false
-              })
+                  row.item.isLoading = false
+                })
+            } else {
+              this.getStudentFeeOfTranscript(transcriptId)
+                .then(({ data }) => {
+                  this.$set(row.item, 'enrollmentFee', data.enrollmentFee)
+                  this.$set(row.item, 'previousBalance', data.billings[0].previousBalance )
+                  this.$set(row.item, 'fees', data.studentFeeItems)
+                  row.item.isLoading = false
+                })
+              
+            }
 				})
 			}
 			row.toggleDetails()

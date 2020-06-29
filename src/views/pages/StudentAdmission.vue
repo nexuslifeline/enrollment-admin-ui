@@ -610,7 +610,10 @@ export default {
 							label: "Total Amount",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "12%"}
+              thStyle: {width: "12%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
 						},
 						{
 							key: "action",
