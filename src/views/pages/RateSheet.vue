@@ -468,16 +468,18 @@ export default {
       const { fields } = this.forms.rateSheet
       const { item } = row
       // check if rate sheet exist in the table
-      if (item.id in [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id]) {
+      const result1 = fields.fees.find(fee => fee.id === item.id)
+    
+      let result2
+      if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
+        result2 = fields.fees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
+      }
+
+      if (result1 || result2) {
         showNotification(this, 'danger', item.name + ' is already added.')
         return
       }
 
-      const result = fields.fees.find(fee => fee.id === item.id)
-      if (result) {
-        showNotification(this, 'danger', item.name + ' is already added.')
-        return
-      }
       fields.fees.push({ 
         id: item.id,
         name : item.name,

@@ -829,16 +829,18 @@ export default {
 		addFee(row) {
       const { item } = row
       // check if rate sheet exist in the table
-      if (item.id in [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id]) {
+      const result1 = this.studentFees.find(fee => fee.id === item.id)
+    
+      let result2
+      if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
+        result2 = this.studentFees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
+      }
+
+      if (result1 || result2) {
         showNotification(this, 'danger', item.name + ' is already added.')
         return
       }
       
-      const result = this.studentFees.find(fee => fee.id === item.id)
-      if (result) {
-        showNotification(this, 'danger', item.name + ' is already added.')
-        return
-      }
       this.studentFees.push({ 
         id: row.item.id,
         name : row.item.name,
