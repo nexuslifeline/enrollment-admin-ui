@@ -185,7 +185,7 @@
             <b-form-select 
               v-model="forms.section.fields.levelId"
               :state="forms.section.states.levelId"
-              @input="loadCoursesOfLevelList()"
+              @change="loadCoursesOfLevelList()"
               >
               <template v-slot:first>
                 <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
@@ -343,7 +343,7 @@ import { SchoolCategories, Semesters } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 import SchoolYear from '../../mixins/api/SchoolYear';
 export default {
-  name: "section",
+  name: "ClassSection",
   mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, Tables],
   data() {
     return {
@@ -467,11 +467,8 @@ export default {
       const { schoolYears } = this.options;
       let params = { paginate: false };
       this.getSchoolYearList(params).then(({ data }) => {
-        console.log(data)
         schoolYears.items = data;
       });
-
-      console.log(schoolYears.items)
     },
     loadLevelsOfSchoolCategoryList(){
       this.forms.section.fields.semesterId = null
@@ -481,10 +478,7 @@ export default {
       let params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(this.forms.section.fields.schoolCategoryId, params)
 				.then(({ data }) => {
-					this.options.levels.items = data
-					if (data.length > 0) {
-						this.loadCoursesOfLevelList(data[0].id)
-					}
+          this.options.levels.items = data
 				})
 				.catch(error => {
 					console.log(error)
@@ -498,7 +492,6 @@ export default {
 				.then(({ data }) => {
           const { courses } = this.options
           courses.items = data
-          console.log(data)
         })
 		},
     onSectionEntry() {
@@ -572,6 +565,7 @@ export default {
       //this.loadCoursesOfLevelList(row.item.levelId)
 
       copyValue(row.item, fields);
+      console.log(fields)
       this.loadLevelsOfSchoolCategoryList()
       reset(section);
       this.entryMode = "Edit";
@@ -581,6 +575,11 @@ export default {
       const { section } = this.forms;
       reset(section);
       clearFields(section.fields);
+      section.fields.schoolCategoryId = null
+      section.fields.schoolYearId = null
+      section.fields.levelId = null
+      section.fields.courseId = null
+      section.fields.semesterId = null
       this.entryMode = "Add";
       this.showModalEntry = true;
     },
