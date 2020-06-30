@@ -782,7 +782,7 @@ export default {
                     
                     row.item.subjects.forEach(subject => {
                       amount += Number(subject.totalAmount)
-                      notes += subject.code + ", "
+                      notes += subject.name + ", "
                     })
 
                     if(tuitionFee) {
