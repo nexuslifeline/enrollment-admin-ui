@@ -221,7 +221,7 @@
 </template>
 <script>
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
-import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups, Fees } from "../../helpers/enum"
 import { showNotification, formatNumber } from '../../helpers/forms'
 import Tables from '../../helpers/tables'
 export default {
@@ -468,11 +468,18 @@ export default {
       const { fields } = this.forms.rateSheet
       const { item } = row
       // check if rate sheet exist in the table
-      const result = fields.fees.find(fee => fee.id === item.id)
-      if (result) {
+      const result1 = fields.fees.find(fee => fee.id === item.id)
+    
+      let result2
+      if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
+        result2 = fields.fees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
+      }
+
+      if (result1 || result2) {
         showNotification(this, 'danger', item.name + ' is already added.')
         return
       }
+
       fields.fees.push({ 
         id: item.id,
         name : item.name,

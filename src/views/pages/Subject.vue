@@ -20,13 +20,30 @@
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
-                  <b-col md=8 class="bottom-space">
+                  <b-col md=6 class="bottom-space">
                     <b-button variant="outline-primary" 
                       @click="onCreate()">
                       <v-icon name="plus-circle" /> ADD NEW SUBJECT
                     </b-button>
                   </b-col>
-                  <b-col md=4>
+                  <b-col md=3>
+                     <b-form-select
+                      @change="filterBySchoolCategory()" 
+                      v-model="filters.subject.schoolCategoryId" 
+                      class="float-right">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
+                      </template>
+                      <b-form-select-option :value="null">None</b-form-select-option>
+                      <b-form-select-option 
+                        v-for="category in options.schoolCategories.values" 
+                        :key="category.id" 
+                        :value="category.id">
+                        {{category.name}}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </b-col>
+                  <b-col md=3>
                     <b-form-input
                       v-model="filters.subject.criteria"
                       type="text" 
@@ -44,7 +61,7 @@
 									small hover outlined show-empty
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
-                  :items="tables.subjects.items" 
+                  :items="tables.subjects.filteredItems" 
                   :current-page="paginations.subject.page"
                   :per-page="paginations.subject.perPage"
                   :filter="filters.subject.criteria"
@@ -456,7 +473,8 @@ export default {
 							thStyle: { width: "40px"}
             }
           ],
-          items:[]
+          items: [],
+          filteredItems: []
 				}
       },
       paginations: {
@@ -470,7 +488,8 @@ export default {
       },
       filters: {
         subject: {
-          criteria: null
+          criteria: null,
+          schoolCategoryId: null
         }
       },
       options: {
@@ -496,6 +515,7 @@ export default {
       this.getSubjectList(params)
         .then(({ data }) => {
           subjects.items = data
+          subjects.filteredItems = data
           subject.totalRows = data.length
           this.recordDetails(subject)
           subjects.isBusy = false
@@ -597,6 +617,18 @@ export default {
       }
       
 			return result
+    },
+    filterBySchoolCategory() {
+      const { subjects } = this.tables
+      const { subject } = this.paginations
+      const { schoolCategoryId } = this.filters.subject
+      if (schoolCategoryId) {
+        subjects.filteredItems = subjects.items.filter(s => s.schoolCategoryId === schoolCategoryId)
+      }
+      else {
+        subjects.filteredItems = subjects.items
+      }
+      this.onFiltered(subjects.filteredItems, subject)
     }
 	}
 }
