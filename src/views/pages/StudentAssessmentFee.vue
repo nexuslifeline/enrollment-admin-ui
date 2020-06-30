@@ -211,7 +211,7 @@
                           v-if="(data.item.applicationId ? 
                               data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
                               data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) 
-                              && row.item.id !== fees.TUITION_FEE_PER_UNIT.id"
+                              && (row.item.id !== fees.TUITION_FEE_PER_UNIT.id && row.item.id !== fees.TUITION_FEE.id)"
                           @click="removeFee(data.item.fees, row)" 
                           size="sm" variant="danger">
                           <v-icon name="trash" />
@@ -771,7 +771,6 @@ export default {
                   this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
                 
                   const schoolCategories = [
-                    SchoolCategories.SENIOR_HIGH_SCHOOL.id,
                     SchoolCategories.COLLEGE.id,
                     SchoolCategories.GRADUATE_SCHOOL.id
                   ]

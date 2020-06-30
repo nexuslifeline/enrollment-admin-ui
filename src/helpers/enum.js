@@ -42,7 +42,8 @@ export const SchoolCategories = new Enum({
   JUNIOR_HIGH_SCHOOL: { id: 3, name: 'Junior High School' },
   SENIOR_HIGH_SCHOOL: { id: 4, name: 'Senior High School' },
   COLLEGE: { id: 5, name: 'College' },
-  GRADUATE_SCHOOL: { id: 6, name: 'Graduate School' }
+  GRADUATE_SCHOOL: { id: 6, name: 'Graduate School' },
+  VOCATIONAL: { id: 7, name: 'Vocational' }
 });
 
 export const AdmissionSteps = new Enum({

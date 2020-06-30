@@ -335,7 +335,7 @@ export default {
 				semesters: Semesters
       },
       levelIndex: 0,
-      schoolCategoryI: null,
+      schoolCategoryId: null,
       userGroupId: null
 		}
 	},
@@ -380,6 +380,7 @@ export default {
 	methods: {
 		loadLevelsOfSchoolCategoryList(id){
       this.isLoaded = true
+      this.schoolCategoryId = id
       const params = { paginate: false }
       //const { rateSheet } = this.forms
       const { levels, courses } = this.options
@@ -403,7 +404,7 @@ export default {
     loadCoursesOfLevelList(levelId){
       this.isLoaded = true
       const { rateSheet } =  this.forms
-      const params = { paginate: false, schoolCategoryId: this.forms.rateSheet.fields.schoolCategoryId }
+      const params = { paginate: false }
       const { courses, semesters } = this.options
       rateSheet.fields.levelId = levelId
       rateSheet.fields.semesterId = null
@@ -468,14 +469,28 @@ export default {
       const { fields } = this.forms.rateSheet
       const { item } = row
       // check if rate sheet exist in the table
-      const result1 = fields.fees.find(fee => fee.id === item.id)
-    
-      let result2
-      if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
-        result2 = fields.fees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
+
+      const schoolCategoriesTuitionPerUnit = [
+        SchoolCategories.COLLEGE.id,
+        SchoolCategories.GRADUATE_SCHOOL.id
+      ]
+
+      if (schoolCategoriesTuitionPerUnit.includes(this.schoolCategoryId)) {
+        if (item.id === Fees.TUITION_FEE.id) {
+          showNotification(this, 'danger', Fees.TUITION_FEE.name + " can't be add.")
+          return
+        }
+      }
+      else {
+        if (item.id === Fees.TUITION_FEE_PER_UNIT.id) {
+          showNotification(this, 'danger', Fees.TUITION_FEE_PER_UNIT.name + " can't be add.")
+          return
+        }
       }
 
-      if (result1 || result2) {
+      const result = fields.fees.find(fee => fee.id === item.id)
+
+      if (result) {
         showNotification(this, 'danger', item.name + ' is already added.')
         return
       }

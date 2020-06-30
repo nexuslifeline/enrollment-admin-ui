@@ -219,15 +219,15 @@ export default {
 					isBusy: false,
 					isBusy2: false,
 					fields: [
-						{
-							key: "code",
-							label: "CODE",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
-						},
+						// {
+						// 	key: "code",
+						// 	label: "CODE",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "15%"}
+						// },
 						{
 							key: "name",
-							label: "SUBJECT",
+							label: "SUBJECT CODE",
 							tdClass: "align-middle",
 							thStyle: {width: "20%"}
 						},
@@ -361,16 +361,19 @@ export default {
 				})
 		},
 		updateCurriculum(){
-			let data = { subjects : [] }
-			const { curriculum, curriculum: { fields } } = this.forms
+      const { curriculum, curriculum: { fields } } = this.forms
+      
+      let data = { 
+        subjects : [], 					
+        courseId: fields.courseId,
+        semesterId: fields.semesterId,
+        schoolCategoryId: fields.schoolCategoryId, 
+      }
 			
 			curriculum.isProcessing = true
 
 			fields.subjects.forEach(s => {
 				data.subjects.push({
-					courseId: fields.courseId,
-					semesterId: fields.semesterId,
-					schoolCategoryId: fields.schoolCategoryId,
 					subjectId: s.id
 				})
 			})
@@ -382,7 +385,11 @@ export default {
           //console.log(res)
         })
         .catch(error => {
-					curriculum.isProcessing = false
+          curriculum.isProcessing = false
+          if (error.response.data.errors.subjects) {
+            showNotification(this, 'danger', error.response.data.errors.subjects)
+            return
+          }
           showNotification(this, 'danger', 'Error in updating curriculum.')
         })
     },
