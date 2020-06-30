@@ -122,7 +122,7 @@
 			</div> <!-- modal title -->
       <!-- modal body -->
 			<b-row> 
-				<b-col md=6>
+				<!-- <b-col md=6>
           <b-form-group >
             <label class="required">Code</label>
             <b-form-input 
@@ -133,10 +133,10 @@
               {{forms.subject.errors.code}}
             </b-form-invalid-feedback>
           </b-form-group>
-				</b-col>
-        <b-col md=6>
+				</b-col> -->
+        <b-col md=12>
           <b-form-group >
-            <label class="required">Name</label>
+            <label class="required">Subject Code</label>
             <b-form-input 
               ref="name" 
               v-model="forms.subject.fields.name" 
@@ -401,15 +401,15 @@ export default {
 				subjects: {
           isBusy: false,
 					fields: [
-            {
-							key: "code",
-							label: "Code",
-							tdClass: "align-middle",
-							thStyle: {width: "6%"}
-						},
+            // {
+						// 	key: "code",
+						// 	label: "Code",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "6%"}
+						// },
 						{
 							key: "name",
-							label: "Name",
+							label: "SUBJECT CODE",
 							tdClass: "align-middle",
 							thStyle: {width: "12%"}
 						},
