@@ -77,6 +77,15 @@
 										:items.sync="forms.curriculum.fields.subjects"
 										:fields="tables.subjects.fields"
 										:busy="tables.subjects.isBusy">
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon 
+                          name="spinner" 
+                          spin
+                          class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
 										<template v-slot:cell(action)="row">
 											<b-button 
                         @click="removeSubject(row)" 

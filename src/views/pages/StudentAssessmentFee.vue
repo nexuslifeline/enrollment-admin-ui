@@ -465,15 +465,15 @@ export default {
 				subjects: {
 					isBusy: false,
 					fields: [
-            {
-							key: "code",
-							label: "Code",
-							tdClass: "align-middle",
-							thStyle: {width: "8%"}
-						},
+            // {
+						// 	key: "code",
+						// 	label: "Code",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "8%"}
+						// },
 						{
 							key: "name",
-							label: "Name",
+							label: "Subject Code",
 							tdClass: "align-middle",
 							thStyle: {width: "15%"}
 						},

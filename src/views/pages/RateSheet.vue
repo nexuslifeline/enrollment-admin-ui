@@ -81,6 +81,15 @@
                     :items.sync="forms.rateSheet.fields.fees"
                     :fields="tables.rateSheetFees.fields"
                     :busy="tables.rateSheetFees.isBusy">
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon 
+                          name="spinner" 
+                          spin
+                          class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
                     <template v-slot:cell(isInitialFee)="row">
                       <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <b-form-checkbox
