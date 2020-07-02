@@ -7,7 +7,7 @@
 						<b-card-body>
 							<b-row>
 								<b-col md=12>
-									<b-tabs pills> 						
+									<b-tabs pills>
 										<b-tab 
 											v-for="schoolCategory in options.schoolCategories.values" 
 											:key="schoolCategory.id" 
