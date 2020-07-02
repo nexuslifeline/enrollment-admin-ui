@@ -2,11 +2,6 @@ module.exports = {
   lintOnSave: false,
   runtimeCompiler: true,
   configureWebpack: {
-    //Necessary to run npm link https://webpack.js.org/configuration/resolve/#resolve-symlinks
-    //entry  : './src/vueAutonumericTest.js',
-    // output : {
-    //     filename: './dist/bundle.js'
-    // },
     resolve: {
        symlinks: false,
        alias: {
@@ -20,7 +15,7 @@ module.exports = {
   },
   outputDir: process.env.NODE_ENV === 'production'
     ? 'release-stc-admin/'
-    : 'dev-stc-admin',
+    : 'dev-stc-admin/',
   transpileDependencies: [
     '@coreui/utils'
   ],

@@ -7,7 +7,7 @@
 						<b-card-body>
 							<b-row>
 								<b-col md=12>
-									<b-tabs pills> 						
+									<b-tabs pills>
 										<b-tab 
 											v-for="schoolCategory in options.schoolCategories.values" 
 											:key="schoolCategory.id" 
@@ -77,6 +77,15 @@
 										:items.sync="forms.curriculum.fields.subjects"
 										:fields="tables.subjects.fields"
 										:busy="tables.subjects.isBusy">
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon 
+                          name="spinner" 
+                          spin
+                          class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
 										<template v-slot:cell(action)="row">
 											<b-button 
                         @click="removeSubject(row)" 
@@ -219,15 +228,15 @@ export default {
 					isBusy: false,
 					isBusy2: false,
 					fields: [
-						{
-							key: "code",
-							label: "CODE",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
-						},
+						// {
+						// 	key: "code",
+						// 	label: "CODE",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "15%"}
+						// },
 						{
 							key: "name",
-							label: "SUBJECT",
+							label: "SUBJECT CODE",
 							tdClass: "align-middle",
 							thStyle: {width: "20%"}
 						},
@@ -361,16 +370,19 @@ export default {
 				})
 		},
 		updateCurriculum(){
-			let data = { subjects : [] }
-			const { curriculum, curriculum: { fields } } = this.forms
+      const { curriculum, curriculum: { fields } } = this.forms
+      
+      let data = { 
+        subjects : [], 					
+        courseId: fields.courseId,
+        semesterId: fields.semesterId,
+        schoolCategoryId: fields.schoolCategoryId, 
+      }
 			
 			curriculum.isProcessing = true
 
 			fields.subjects.forEach(s => {
 				data.subjects.push({
-					courseId: fields.courseId,
-					semesterId: fields.semesterId,
-					schoolCategoryId: fields.schoolCategoryId,
 					subjectId: s.id
 				})
 			})
@@ -382,7 +394,11 @@ export default {
           //console.log(res)
         })
         .catch(error => {
-					curriculum.isProcessing = false
+          curriculum.isProcessing = false
+          if (error.response.data.errors.subjects) {
+            showNotification(this, 'danger', error.response.data.errors.subjects)
+            return
+          }
           showNotification(this, 'danger', 'Error in updating curriculum.')
         })
     },

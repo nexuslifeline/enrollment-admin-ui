@@ -28,7 +28,7 @@
                   </b-col>
                   <b-col md=3>
                      <b-form-select
-                      @change="filterBySchoolCategory()" 
+                      @input="filterBySchoolCategory()" 
                       v-model="filters.subject.schoolCategoryId" 
                       class="float-right">
                       <template v-slot:first>
@@ -58,7 +58,7 @@
             <b-row >
               <b-col md=12>
                 <b-table
-									small hover outlined show-empty
+									small hover outlined show-empty responsive
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
                   :items="tables.subjects.filteredItems" 
@@ -116,194 +116,227 @@
     <b-modal 
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
+      size="lg"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
 					Subjects - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
-			<b-row> 
-				<b-col md=6>
-          <b-form-group >
-            <label class="required">Code</label>
-            <b-form-input 
-              ref="code" 
-              v-model="forms.subject.fields.code" 
-              :state="forms.subject.states.code" />
-            <b-form-invalid-feedback>
-              {{forms.subject.errors.code}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-        <b-col md=6>
-          <b-form-group >
-            <label class="required">Name</label>
-            <b-form-input 
-              ref="name" 
-              v-model="forms.subject.fields.name" 
-              :state="forms.subject.states.name" />
-            <b-form-invalid-feedback>
-              {{forms.subject.errors.name}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-			</b-row>
-      <b-row>
-        <b-col md=12>
-          <b-form-group>
-            <label class="required">Description</label>
-            <b-form-textarea 
-              ref="description" 
-              v-model="forms.subject.fields.description" 
-              :state="forms.subject.states.description" />
-            <b-form-invalid-feedback>
-              {{forms.subject.errors.description}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row> 
-				<b-col md=6>
-          <b-form-group >
-            <label class="required">School Category</label>
-            <b-form-select 
-              v-model="forms.subject.fields.schoolCategoryId"
-              :state="forms.subject.states.schoolCategoryId"
-              @input="forms.subject.fields.departmentId=null">
-              <template v-slot:first>
-                <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
-              </template>
-              <b-form-select-option 
-                v-for="schoolCategory in options.schoolCategories.values" 
-                :key="schoolCategory.id" 
-                :value="schoolCategory.id">
-                {{schoolCategory.name}}
-              </b-form-select-option>
-            </b-form-select>
-            <b-form-invalid-feedback>
-              {{forms.subject.errors.schoolCategoryId}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-        <b-col md=6>
-          <b-form-group >
-            <label class="required">Department</label>
-            <b-form-select 
-              v-model="forms.subject.fields.departmentId"
-              :state="forms.subject.states.departmentId">
-              <template v-slot:first>
-                <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
-              </template>
-              <b-form-select-option 
-                v-for="department in options.departments.items" 
-                :key="department.id" 
-                :value="department.id">
-                {{department.name}}
-              </b-form-select-option>
-            </b-form-select>
-            <b-form-invalid-feedback>
-              {{forms.subject.errors.departmentId}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-			</b-row>
       <b-row>
         <b-col md=6>
-          <b-form-group label="Lecture Units">
-            <vue-autonumeric
-              @input="computeTotalAmount()"
-              ref="units"
-              :disabled="checkRights(1)"
-              v-model='forms.subject.fields.units'
-              :class="'form-control text-right'"
-              :options="[{ 
-                decimalPlaces: 0,
-                minimumValue: 0, 
-                modifyValueOnWheel: false, 
-                emptyInputBehavior: 0 }]">
-            </vue-autonumeric>
-          </b-form-group>
+          <b-row> 
+            <!-- <b-col md=6>
+              <b-form-group >
+                <label class="required">Code</label>
+                <b-form-input 
+                  ref="code" 
+                  v-model="forms.subject.fields.code" 
+                  :state="forms.subject.states.code" />
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.code}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col> -->
+            <b-col md=12>
+              <b-form-group >
+                <label class="required">Subject Code</label>
+                <b-form-input 
+                  ref="name" 
+                  v-model="forms.subject.fields.name" 
+                  :state="forms.subject.states.name" />
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.name}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=12>
+              <b-form-group>
+                <label class="required">Description</label>
+                <b-form-textarea 
+                  ref="description" 
+                  v-model="forms.subject.fields.description" 
+                  :state="forms.subject.states.description" />
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.description}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=6>
+              <b-form-group label="Lecture Units">
+                <vue-autonumeric
+                  @input="computeTotalAmount()"
+                  ref="units"
+                  :disabled="checkRights(1)"
+                  v-model='forms.subject.fields.units'
+                  :class="'form-control text-right'"
+                  :options="[{ 
+                    decimalPlaces: 0,
+                    minimumValue: 0, 
+                    modifyValueOnWheel: false, 
+                    emptyInputBehavior: 0 }]">
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+            <b-col md=6>
+              <b-form-group label="Amount per Lecture Units">
+                <vue-autonumeric
+                  @input="computeTotalAmount()"
+                  ref="amountPerUnit"
+                  :disabled="checkRights(2)"
+                  v-model='forms.subject.fields.amountPerUnit'
+                  :class="'form-control text-right'"
+                  :options="[{ 
+                    minimumValue: 0, 
+                    modifyValueOnWheel: false, 
+                    emptyInputBehavior: 0 }]">
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=6>
+              <b-form-group label="Lab Units">
+                <vue-autonumeric
+                  @input="computeTotalAmount()"
+                  ref="labs"
+                  :disabled="checkRights(1)"
+                  v-model='forms.subject.fields.labs'
+                  :class="'form-control text-right'"
+                  :options="[{ 
+                    decimalPlaces: 0,
+                    minimumValue: 0, 
+                    modifyValueOnWheel: false, 
+                    emptyInputBehavior: 0 }]">
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+            <b-col md=6>
+              <b-form-group label="Amount per Lab Units">
+                <vue-autonumeric
+                  @input="computeTotalAmount()"
+                  ref="amountPerLab"
+                  :disabled="checkRights(2)"
+                  v-model='forms.subject.fields.amountPerLab'
+                  :class="'form-control text-right'"
+                  :options="[{ 
+                    minimumValue: 0, 
+                    modifyValueOnWheel: false, 
+                    emptyInputBehavior: 0 }]">
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=6>
+              <b-form-group label="Total Units">
+                <vue-autonumeric
+                  :disabled="true"
+                  ref="totalUnits"
+                  v-model='forms.subject.fields.totalUnits'
+                  :class="'form-control text-right'"
+                  :options="[{ 
+                    decimalPlaces: 0,
+                    minimumValue: 0, 
+                    modifyValueOnWheel: false, 
+                    emptyInputBehavior: 0 }]">
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+            <b-col md=6>
+              <b-form-group label="Total Amount">
+                <vue-autonumeric
+                  :disabled="true"
+                  ref="totalAmount"
+                  v-model='forms.subject.fields.totalAmount'
+                  :class="'form-control text-right'"
+                  :options="[{ 
+                    minimumValue: 0, 
+                    modifyValueOnWheel: false, 
+                    emptyInputBehavior: 0 }]">
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+          </b-row>
         </b-col>
         <b-col md=6>
-          <b-form-group label="Amount per Lecture Units">
-            <vue-autonumeric
-              @input="computeTotalAmount()"
-              ref="amountPerUnit"
-              :disabled="checkRights(2)"
-              v-model='forms.subject.fields.amountPerUnit'
-              :class="'form-control text-right'"
-              :options="[{ 
-                minimumValue: 0, 
-                modifyValueOnWheel: false, 
-                emptyInputBehavior: 0 }]">
-            </vue-autonumeric>
-          </b-form-group>
+          <b-row> 
+            <b-col md=12>
+              <b-form-group >
+                <label class="required">School Category</label>
+                <b-form-select
+                  v-model="forms.subject.fields.schoolCategoryId"
+                  :state="forms.subject.states.schoolCategoryId"
+                  @change="loadSubjectPrerequisite()">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
+                  </template>
+                  <b-form-select-option 
+                    v-for="schoolCategory in options.schoolCategories.values" 
+                    :key="schoolCategory.id" 
+                    :value="schoolCategory.id">
+                    {{schoolCategory.name}}
+                  </b-form-select-option>
+                </b-form-select>
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.schoolCategoryId}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=12>
+              <b-form-group >
+                <label class="required">Department</label>
+                <b-form-select 
+                  v-model="forms.subject.fields.departmentId"
+                  :state="forms.subject.states.departmentId">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
+                  </template>
+                  <b-form-select-option 
+                    v-for="department in options.departments.items" 
+                    :key="department.id" 
+                    :value="department.id">
+                    {{department.name}}
+                  </b-form-select-option>
+                </b-form-select>
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.departmentId}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=12>
+              <b-form-group >
+                <label>Prerequisites 
+                  <v-icon
+                    v-if="isLoading"
+                    class="ml-2"
+                    name="spinner" 
+                    spin/>
+                </label>
+                <Select2
+                  multiple
+                  :disabled="isLoading"
+                  v-model="forms.subject.fields.prerequisites"
+                  :allowClear="false">
+                  <option 
+                    v-for="subject in options.subjects.items"
+                    :key="subject.id" 
+                    :value="subject.id">
+                    {{subject.name}}
+                  </option>
+                </Select2>
+              </b-form-group>
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
-      <b-row>
-        <b-col md=6>
-          <b-form-group label="Lab Units">
-            <vue-autonumeric
-              @input="computeTotalAmount()"
-              ref="labs"
-              :disabled="checkRights(1)"
-              v-model='forms.subject.fields.labs'
-              :class="'form-control text-right'"
-              :options="[{ 
-                decimalPlaces: 0,
-                minimumValue: 0, 
-                modifyValueOnWheel: false, 
-                emptyInputBehavior: 0 }]">
-            </vue-autonumeric>
-          </b-form-group>
-        </b-col>
-        <b-col md=6>
-          <b-form-group label="Amount per Lab Units">
-            <vue-autonumeric
-              @input="computeTotalAmount()"
-              ref="amountPerLab"
-              :disabled="checkRights(2)"
-              v-model='forms.subject.fields.amountPerLab'
-              :class="'form-control text-right'"
-              :options="[{ 
-                minimumValue: 0, 
-                modifyValueOnWheel: false, 
-                emptyInputBehavior: 0 }]">
-            </vue-autonumeric>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md=6>
-          <b-form-group label="Total Units">
-            <vue-autonumeric
-              :disabled="true"
-              ref="totalUnits"
-              v-model='forms.subject.fields.totalUnits'
-              :class="'form-control text-right'"
-              :options="[{ 
-                decimalPlaces: 0,
-                minimumValue: 0, 
-                modifyValueOnWheel: false, 
-                emptyInputBehavior: 0 }]">
-            </vue-autonumeric>
-          </b-form-group>
-        </b-col>
-        <b-col md=6>
-          <b-form-group label="Total Amount">
-            <vue-autonumeric
-              :disabled="true"
-              ref="totalAmount"
-              v-model='forms.subject.fields.totalAmount'
-              :class="'form-control text-right'"
-              :options="[{ 
-                minimumValue: 0, 
-                modifyValueOnWheel: false, 
-                emptyInputBehavior: 0 }]">
-            </vue-autonumeric>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      
       <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button 
@@ -373,17 +406,20 @@ const subjectFields = {
   labs: null,
   amountPerLab: null,
   totalUnits: null,
-  totalAmount: null
+  totalAmount: null,
+  prerequisites: []
 }
 
 import { SubjectApi, DepartmentApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import { UserGroups, SchoolCategories } from '../../helpers/enum'
+import Select2 from '../components/Select2'
 import Tables from '../../helpers/tables'
 export default {
 	name: "Subject",
-	mixins: [ SubjectApi, DepartmentApi, Tables ],
+  mixins: [ SubjectApi, DepartmentApi, Tables ],
+  components: { Select2 },
 	data() {
 		return {
       showModalEntry: false,
@@ -401,15 +437,15 @@ export default {
 				subjects: {
           isBusy: false,
 					fields: [
-            {
-							key: "code",
-							label: "Code",
-							tdClass: "align-middle",
-							thStyle: {width: "6%"}
-						},
+            // {
+						// 	key: "code",
+						// 	label: "Code",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "6%"}
+						// },
 						{
 							key: "name",
-							label: "Name",
+							label: "SUBJECT CODE",
 							tdClass: "align-middle",
 							thStyle: {width: "12%"}
 						},
@@ -496,8 +532,12 @@ export default {
         schoolCategories: SchoolCategories,
         departments: {
           items: []
+        },
+        subjects: {
+          items: []
         }
-      }
+      },
+      isLoading: false
 		}
 	},
 	created(){
@@ -579,8 +619,14 @@ export default {
     },
     setSubjectUpdate(row){
       const { subject, subject: { fields } } = this.forms
-      copyValue(row.item, fields)
+      const { prerequisites, ...newFields } = fields
+      copyValue(row.item, fields, Object.keys(newFields))
       reset(subject)
+      this.loadSubjectPrerequisite()
+      console.log(row.item)
+      row.item.prerequisites.forEach(p => {
+        fields.prerequisites.push(p.pivot.prerequisiteSubjectId)
+      })
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
@@ -590,15 +636,16 @@ export default {
       fields.totalAmount = (fields.units * fields.amountPerUnit) + (fields.labs * fields.amountPerLab)
     },
     onCreate(){
-      const { subject } = this.forms
+      const { subject, subject: { fields } } = this.forms
       reset(subject)
-      clearFields(subject.fields)
-      subject.fields.units = 0
-      subject.fields.amountPerUnit = 0
-      subject.fields.labs = 0
-      subject.fields.amountPerLab = 0
-      subject.fields.departmentId = null
-      subject.fields.schoolCategoryId = null
+      clearFields(fields)
+      fields.units = 0
+      fields.amountPerUnit = 0
+      fields.labs = 0
+      fields.amountPerLab = 0
+      fields.departmentId = null
+      fields.schoolCategoryId = null
+      fields.prerequisites = []
       this.entryMode='Add'
       this.showModalEntry = true
     },
@@ -618,6 +665,17 @@ export default {
       
 			return result
     },
+    loadSubjectPrerequisite(){
+      this.isLoading = true
+      const { schoolCategoryId } = this.forms.subject.fields
+      const { subjects } = this.options
+      let params = { paginate: false, schoolCategoryId }
+      this.getSubjectList(params)
+        .then(({ data }) => {
+          subjects.items = data
+          this.isLoading = false
+        })
+    },
     filterBySchoolCategory() {
       const { subjects } = this.tables
       const { subject } = this.paginations
@@ -629,7 +687,7 @@ export default {
         subjects.filteredItems = subjects.items
       }
       this.onFiltered(subjects.filteredItems, subject)
-    }
+    },
 	}
 }
 </script>
