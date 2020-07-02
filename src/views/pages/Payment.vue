@@ -139,7 +139,7 @@
                 :per-page="paginations.payment.perPage"
                 size="sm"
                 align="end"
-                @input="loadPayments()"
+                @input="loadPaymentList()"
               />
             </b-col>
           </b-row>
