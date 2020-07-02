@@ -447,7 +447,7 @@ export default {
 							key: "name",
 							label: "SUBJECT CODE",
 							tdClass: "align-middle",
-							thStyle: {width: "12%"}
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "description",
@@ -466,6 +466,18 @@ export default {
 							label: "SCHOOL CATEGORY",
 							tdClass: "align-middle",
 							thStyle: {width: "10%"}
+            },
+            {
+							key: "prerequisites",
+							label: "PREREQUISITE",
+							tdClass: "align-middle",
+              thStyle: {width: "10%"},
+              formatter: (value, key, item) => {
+                 if (value.length > 0) {
+                   return Array.prototype.map.call(value, function(subject) { return subject.name; }).join(",");
+                 }
+                 return ''
+              }
 						},
 						{
 							key: "units",
@@ -476,7 +488,7 @@ export default {
             },
             {
 							key: "amountPerUnit",
-							label: "AMOUNT PER LEC",
+							label: "AMT PER LEC",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "10%"}
@@ -490,14 +502,14 @@ export default {
             },
             {
 							key: "amountPerLab",
-							label: "AMOUNT PER LAB",
+							label: "AMT PER LAB",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "10%"}
             },
             {
 							key: "totalAmount",
-							label: "TOTAL AMOUNT",
+							label: "TOTAL AMT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
 							thStyle: {width: "10%"}
@@ -620,13 +632,16 @@ export default {
     setSubjectUpdate(row){
       const { subject, subject: { fields } } = this.forms
       const { prerequisites, ...newFields } = fields
+      fields.prerequisites = []
+
       copyValue(row.item, fields, Object.keys(newFields))
       reset(subject)
       this.loadSubjectPrerequisite()
-      console.log(row.item)
+
       row.item.prerequisites.forEach(p => {
         fields.prerequisites.push(p.pivot.prerequisiteSubjectId)
       })
+      
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
