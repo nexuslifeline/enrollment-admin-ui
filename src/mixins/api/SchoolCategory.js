@@ -16,6 +16,9 @@ export default {
     },
     getLevelsOfSchoolCategoryList(schoolCategoryId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/school-categories/${schoolCategoryId}/levels`, { params: params })
-    }
+    },
+    getCoursesOfSchoolCategoryList(schoolCategoryId, params){
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/school-categories/${schoolCategoryId}/courses`, { params: params });
+    },
   }
 }

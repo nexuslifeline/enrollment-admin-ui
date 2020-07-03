@@ -27,7 +27,7 @@
                     </b-button>
                   </b-col>
                   <b-col md=3>
-                     <b-form-select
+                    <b-form-select
                       @input="filterBySchoolCategory()" 
                       v-model="filters.subject.schoolCategoryId" 
                       class="float-right">
@@ -474,7 +474,7 @@ export default {
               thStyle: {width: "10%"},
               formatter: (value, key, item) => {
                  if (value.length > 0) {
-                   return Array.prototype.map.call(value, function(subject) { return subject.name; }).join(",");
+                   return value.map(subject => { return subject.name; }).join(", ");
                  }
                  return ''
               }
