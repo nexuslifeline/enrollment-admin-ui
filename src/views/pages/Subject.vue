@@ -27,7 +27,7 @@
                     </b-button>
                   </b-col>
                   <b-col md=3>
-                     <b-form-select
+                    <b-form-select
                       @input="filterBySchoolCategory()" 
                       v-model="filters.subject.schoolCategoryId" 
                       class="float-right">
@@ -466,6 +466,18 @@ export default {
 							label: "SCHOOL CATEGORY",
 							tdClass: "align-middle",
 							thStyle: {width: "10%"}
+            },
+            {
+							key: "prerequisites",
+							label: "PREREQUISITE",
+							tdClass: "align-middle",
+              thStyle: {width: "10%"},
+              formatter: (value, key, item) => {
+                 if (value.length > 0) {
+                   return value.map(subject => { return subject.name; }).join(", ");
+                 }
+                 return ''
+              }
 						},
 						{
 							key: "units",
