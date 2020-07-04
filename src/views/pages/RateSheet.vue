@@ -95,9 +95,17 @@
                       <b-form-checkbox
                         v-model="row.item.isInitialFee" />
                     </template>
+                    <template v-slot:cell(isComputedByUnits)="row">
+                      <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
+                      <b-form-checkbox
+                        v-if="row.item.id === fees.TUITION_FEE.id"
+                        v-model="forms.rateSheet.fields.isComputedByUnits" 
+                        @input="$event ? row.item.pivot.amount = 0 : ''" />
+                    </template>
                     <template v-slot:cell(pivot.amount)="row">
                       <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <vue-autonumeric
+                        :disabled="forms.rateSheet.fields.isComputedByUnits && row.item.id === fees.TUITION_FEE.id"
                         v-model="row.item.pivot.amount"
                         class="form-control text-right" 
                         :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
@@ -239,7 +247,8 @@ export default {
 	data() {
 		return {
       isLoaded: false,
-      showModalFees: false,      
+      showModalFees: false, 
+      fees: Fees,     
       forms: {
         rateSheet: {
           isProcessing: false,
@@ -249,6 +258,7 @@ export default {
             courseId: null,
             semesterId: null,
             enrollmentFee: 0,
+            isComputedByUnits: null,
             fees: []
           }
         }
@@ -267,7 +277,7 @@ export default {
 							key: "pivot.notes",
 							label: "NOTES",
 							tdClass: "align-middle",
-							thStyle: {width: "35%"}
+							thStyle: {width: "25%"}
             },
             {
 							key: "isInitialFee",
@@ -276,12 +286,19 @@ export default {
 							thClass: "text-center",
 							thStyle: {width: "10%"}
             },
+            {
+							key: "isComputedByUnits",
+							label: "COMPUTED BY UNITS",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "15%"}
+            },
 						{
 							key: "pivot.amount",
 							label: "AMOUNT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "25%"}
+							thStyle: {width: "20%"}
             },
             {
 							key: "action",
@@ -479,23 +496,23 @@ export default {
       const { item } = row
       // check if rate sheet exist in the table
 
-      const schoolCategoriesTuitionPerUnit = [
-        SchoolCategories.COLLEGE.id,
-        SchoolCategories.GRADUATE_SCHOOL.id
-      ]
+      // const schoolCategoriesTuitionPerUnit = [
+      //   SchoolCategories.COLLEGE.id,
+      //   SchoolCategories.GRADUATE_SCHOOL.id
+      // ]
 
-      if (schoolCategoriesTuitionPerUnit.includes(this.schoolCategoryId)) {
-        if (item.id === Fees.TUITION_FEE.id) {
-          showNotification(this, 'danger', Fees.TUITION_FEE.name + " can't be add.")
-          return
-        }
-      }
-      else {
-        if (item.id === Fees.TUITION_FEE_PER_UNIT.id) {
-          showNotification(this, 'danger', Fees.TUITION_FEE_PER_UNIT.name + " can't be add.")
-          return
-        }
-      }
+      // if (schoolCategoriesTuitionPerUnit.includes(this.schoolCategoryId)) {
+      //   if (item.id === Fees.TUITION_FEE.id) {
+      //     showNotification(this, 'danger', Fees.TUITION_FEE.name + " can't be add.")
+      //     return
+      //   }
+      // }
+      // else {
+      //   if (item.id === Fees.TUITION_FEE_PER_UNIT.id) {
+      //     showNotification(this, 'danger', Fees.TUITION_FEE_PER_UNIT.name + " can't be add.")
+      //     return
+      //   }
+      // }
 
       const result = fields.fees.find(fee => fee.id === item.id)
 
@@ -519,10 +536,7 @@ export default {
       const { rateSheet, rateSheet: { fields } } = this.forms
       rateSheet.isProcessing = true
       const data = { 
-        levelId: fields.levelId, 
-        courseId: fields.courseId, 
-        semesterId: fields.semesterId, 
-        enrollmentFee: fields.enrollmentFee, 
+        ...fields,
         fees:[] 
       }
 
@@ -538,7 +552,7 @@ export default {
       if(fields.id === null){
         this.addRateSheet(data)
           .then(({ data }) => {
-            this.forms.rateSheet.fields.id = data.id
+            fields.id = data.id
             rateSheet.isProcessing = false
             showNotification(this, 'success', 'Rate Sheet is updated.')
             //console.log(res)

@@ -211,7 +211,7 @@
                           v-if="(data.item.applicationId ? 
                               data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id : 
                               data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) 
-                              && (row.item.id !== fees.TUITION_FEE_PER_UNIT.id && row.item.id !== fees.TUITION_FEE.id)"
+                              && row.item.id !== fees.TUITION_FEE.id"
                           @click="removeFee(data.item.fees, row)" 
                           size="sm" variant="danger">
                           <v-icon name="trash" />
@@ -769,14 +769,9 @@ export default {
                   this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
                   this.$set(row.item, 'previousBalance', 0)
                   this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
-                
-                  const schoolCategories = [
-                    SchoolCategories.COLLEGE.id,
-                    SchoolCategories.GRADUATE_SCHOOL.id
-                  ]
 
-                  if (schoolCategories.indexOf(schoolCategoryId) !== -1) {
-                    const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE_PER_UNIT.id)
+                  if (res[0].isComputedByUnits) {
+                    const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
                     let amount = 0
                     let notes = ""
                     
@@ -790,8 +785,8 @@ export default {
                       tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
                     } else {
                       row.item.fees.unshift({
-                        id: Fees.TUITION_FEE_PER_UNIT.id,
-                        name : Fees.TUITION_FEE_PER_UNIT.name,
+                        id: Fees.TUITION_FEE.id,
+                        name : Fees.TUITION_FEE.name,
                         pivot:{ amount: amount, notes: notes }
                       })
                     }
@@ -828,14 +823,14 @@ export default {
 		addFee(row) {
       const { item } = row
       // check if rate sheet exist in the table
-      const result1 = this.studentFees.find(fee => fee.id === item.id)
+      const result = this.studentFees.find(fee => fee.id === item.id)
     
-      let result2
-      if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
-        result2 = this.studentFees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
-      }
+      // let result2
+      // if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
+      //   result2 = this.studentFees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
+      // }
 
-      if (result1 || result2) {
+      if (result) {
         showNotification(this, 'danger', item.name + ' is already added.')
         return
       }
