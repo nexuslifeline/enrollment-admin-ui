@@ -840,7 +840,9 @@ export default {
 			})
 		},
 		removeSubject(row){
-			this.forms.curriculum.fields.subjects.splice(row.index, 1);
+      const { subjects } = this.forms.curriculum.fields
+      const index = subjects.findIndex(i => i.id === row.item.id)
+			subjects.splice(index, 1);
 		},
 		checkRights(){
 			const userGroupId = localStorage.getItem('userGroupId')
