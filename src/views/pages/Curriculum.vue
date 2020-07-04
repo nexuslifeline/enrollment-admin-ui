@@ -132,6 +132,17 @@
 											{{ forms.curriculum.errors.major }}
 										</b-form-invalid-feedback>
 									</b-form-group>
+                  <b-form-group>
+										<label>Notes</label>
+										<b-form-textarea
+                      cols=3
+											v-model="forms.curriculum.fields.notes"
+											:state="forms.curriculum.states.notes">
+										</b-form-textarea>
+										<b-form-invalid-feedback>
+											{{ forms.curriculum.errors.notes }}
+										</b-form-invalid-feedback>
+									</b-form-group>
 								</b-col>
 								<b-col md=6>
 									<b-row>
@@ -447,7 +458,8 @@ const curriculumFields = {
 	major: null,
 	schoolCategoryId: null,
 	courseId: null,
-	effectiveYear: null,
+  effectiveYear: null,
+  notes: null,
 	subjects: null
 }
 
@@ -499,7 +511,7 @@ export default {
 							thStyle: {width: "15%"}
 						},
 						{
-							key: "courseId",
+							key: "course.name",
 							label: "Course",
 							tdClass: "align-middle",
 							thStyle: {width: "15%"}
