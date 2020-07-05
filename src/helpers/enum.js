@@ -97,8 +97,8 @@ export const Semesters = new Enum({
 });
 
 export const Fees = new Enum({
-  TUITION_FEE_PER_UNIT: { id: 1, name: 'Tuition Fee per Unit' },
-  TUITION_FEE: { id: 2, name: 'Tuition Fee' }
+  // TUITION_FEE_PER_UNIT: { id: 2, name: 'Tuition Fee per Unit' },
+  TUITION_FEE: { id: 1, name: 'Tuition Fee' }
 });
 
 export const DegreeTypes = new Enum({
