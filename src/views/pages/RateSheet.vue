@@ -374,17 +374,19 @@ export default {
     initialFeeTotal: {
       get: function () {
         let total = 0
-        const { fees } = this.forms.rateSheet.fields
+        const { fields, fields: { fees } } = this.forms.rateSheet
         fees.forEach(fee => {
           if (fee.isInitialFee) {
             total += Number(fee.pivot.amount)
           }
         })
-        this.forms.rateSheet.fields.enrollmentFee = total
+        fields.enrollmentFee = total
         return total
       },
       set: function (newValue) {
-        this.forms.rateSheet.fields.enrollmentFee = newValue
+        const { fields } = this.forms.rateSheet
+        fields.enrollmentFee = newValue
+        return newValue
       }
     },
     totalAmount(){
@@ -408,8 +410,9 @@ export default {
       this.isLoaded = true
       this.schoolCategoryId = id
       const params = { paginate: false }
-      //const { rateSheet } = this.forms
+      const { fields } = this.forms.rateSheet
       const { levels, courses } = this.options
+      fields.isComputedByUnits = false
       courses.items = []
 			this.getLevelsOfSchoolCategoryList(id, params)
 				.then(({ data }) => {
@@ -418,7 +421,7 @@ export default {
           if (data.length > 0) {
             this.loadCoursesOfLevelList(data[0].id)
           } else {
-            this.forms.rateSheet.fields.fees = []
+            fields.fees = []
           }
           //rateSheet.fields.levelId = res[0].id
           this.isLoaded = false
@@ -496,17 +499,16 @@ export default {
       const { item } = row
       // check if rate sheet exist in the table
 
-      // const schoolCategoriesTuitionPerUnit = [
-      //   SchoolCategories.COLLEGE.id,
-      //   SchoolCategories.GRADUATE_SCHOOL.id
-      // ]
+      const schoolCategoriesTuitionPerUnit = [
+        SchoolCategories.COLLEGE.id,
+        SchoolCategories.GRADUATE_SCHOOL.id
+      ]
 
-      // if (schoolCategoriesTuitionPerUnit.includes(this.schoolCategoryId)) {
-      //   if (item.id === Fees.TUITION_FEE.id) {
-      //     showNotification(this, 'danger', Fees.TUITION_FEE.name + " can't be add.")
-      //     return
-      //   }
-      // }
+      if (schoolCategoriesTuitionPerUnit.includes(this.schoolCategoryId)) {
+        if (item.id === Fees.TUITION_FEE.id) {
+          fields.isComputedByUnits = true
+        }
+      }
       // else {
       //   if (item.id === Fees.TUITION_FEE_PER_UNIT.id) {
       //     showNotification(this, 'danger', Fees.TUITION_FEE_PER_UNIT.name + " can't be add.")

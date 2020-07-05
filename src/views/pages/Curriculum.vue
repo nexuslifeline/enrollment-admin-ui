@@ -167,11 +167,10 @@
 													{{ forms.curriculum.errors.schoolCategoryId }}
 												</b-form-invalid-feedback>
 											</b-form-group>
-											<b-form-group>
+											<b-form-group v-if="checkSchoolCategory() && forms.curriculum.fields.schoolCategoryId != null">
 												<label>Course</label>
 												<b-form-select
 													@change="loadLevelsOfCourse()"
-													:disabled="!checkSchoolCategory()"
 													v-model="forms.curriculum.fields.courseId"
 													:state="forms.curriculum.states.courseId">
 													<template v-slot:first>
@@ -182,6 +181,25 @@
 														:key="course.id" 
 														:value="course.id">
 														{{course.name}}
+													</b-form-select-option>
+												</b-form-select>
+												<b-form-invalid-feedback>
+													{{ forms.curriculum.errors.courseId }}
+												</b-form-invalid-feedback>
+											</b-form-group>
+                      <b-form-group v-else-if="!checkSchoolCategory() && forms.curriculum.fields.schoolCategoryId != null">
+												<label>Level</label>
+												<b-form-select
+													@change="getSelectedLevel()"
+													v-model="selectedLevelId">
+													<template v-slot:first>
+														<b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
+													</template>
+													<b-form-select-option 
+														v-for="level in options.levels.items" 
+														:key="level.id" 
+														:value="level.id">
+														{{level.name}}
 													</b-form-select-option>
 												</b-form-select>
 												<b-form-invalid-feedback>
@@ -210,7 +228,7 @@
 									<b-col md=12>
 										<b-list-group>				
 											<b-list-group-item										
-												v-for="level in options.levels.items" 
+												v-for="level in levels" 
 												:key="level.id">
 												<div v-b-toggle="'level' + level.id" class="d-flex justify-content-between align-items-center">
 													<h5>{{ level.name }}</h5>
@@ -223,8 +241,11 @@
 												</div>
 												<b-collapse :id="'level' + level.id" class="mt-2" role="tabpanel">
 													<div v-if="checkSchoolCategory()">
+                            <b-form-checkbox class="mb-2" @input="semesters = $event ? options.semesters.values.length : 2">
+                              Show All Semesters
+                            </b-form-checkbox>
 														<b-card
-															v-for="semester in options.semesters.values"
+															v-for="semester in options.semesters.values.slice(0, semesters)"
 															:key="semester.id">
 															<b-row>
 																<b-col md=9>
@@ -632,7 +653,10 @@ export default {
 			levelId: null,
 			semester: null,
       schoolCategoryId: null,
-      userGroupId: null
+      userGroupId: null,
+      semesters: 2,
+      selectedLevelId: null,
+      levels: []
 		}
 	},
 	created(){
@@ -656,27 +680,30 @@ export default {
           curriculums.isBusy = false
         })
     },
-		loadLevelsOfSchoolCategoryList() {
+		loadLevelsOfSchoolCategoryList(getSelectedLevel = false) {
 			this.loadSubjects()
 			const { fields, fields: { schoolCategoryId } } = this.forms.curriculum
-      const { levels } = this.options
-      levels.items = []
+      this.levels = []
+
       if (this.entryMode === "Add") {
         fields.courseId = null
         fields.subjects = []
-        
-        if (this.checkSchoolCategory()) {
-          this.loadCoursesOfSchoolCategoryList()
-          return		
-        }
+      }
+
+      if (this.checkSchoolCategory()) {
+        this.loadCoursesOfSchoolCategoryList()
+        return		
       }
       
-			this.isLoading = true
+      this.selectedLevelId = null
       let params = { paginate: false }
 			this.getLevelsOfSchoolCategoryList(schoolCategoryId, params)
 				.then(({ data }) => {
-					this.options.levels.items = data
-					this.isLoading = false
+          this.options.levels.items = data
+          if (getSelectedLevel) {
+            this.selectedLevelId = fields.subjects[0].pivot.levelId
+            this.getSelectedLevel()
+          }
 				})
 				.catch(error => {
 					console.log(error)
@@ -708,8 +735,7 @@ export default {
 			let params = { paginate: false }
 			this.getLevelsOfCourse(courseId, params)
 				.then(({ data }) => {
-          const { levels } = this.options
-					levels.items = data
+					this.levels = data
 					this.isLoading = false
 				})
 		},
@@ -731,8 +757,7 @@ export default {
       fields.schoolCategoryId = null
       fields.courseId = null
       fields.subjects = []
-      const { levels } = this.options
-      levels.items = []
+      this.levels = []
       
     },
     setUpdate(id) {
@@ -740,9 +765,18 @@ export default {
       const { curriculum, curriculum: { fields } } = this.forms
       this.getCurriculum(id)
         .then(({ data }) => {
+          console.log(data)
           copyValue(data, fields)
           reset(curriculum)
-          this.loadLevelsOfSchoolCategoryList()
+          let getSelectedLevel = false
+          if (this.checkSchoolCategory()) {
+            this.loadLevelsOfCourse()
+          } else {
+            if (data.subjects.length > 0) {
+              getSelectedLevel = true
+            }
+          }
+          this.loadLevelsOfSchoolCategoryList(getSelectedLevel)
           this.showEntry = true
         })
     },
@@ -773,6 +807,7 @@ export default {
 				})
 			})
 
+      reset(curriculum)
       if(this.entryMode === "Add") {
         this.addCurriculum(data)
           .then(({ data }) => {
@@ -905,7 +940,13 @@ export default {
 				(subject.pivot.levelId === levelId && subject.pivot.semesterId === semesterId)
 			)
 			return filteredSubjects
-		}
+    },
+    getSelectedLevel() {
+      this.isLoading = true
+      this.levels = [this.options.levels.items.find(level => level.id === this.selectedLevelId)]
+      this.isLoading = false
+      // console.log(this.levels)
+    }
 	}
 }
 </script>
