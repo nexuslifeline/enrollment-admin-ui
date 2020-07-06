@@ -67,6 +67,11 @@
 												<template v-slot:button-content>
 													<v-icon name="ellipsis-v" />
 												</template>
+                        <b-dropdown-item
+                          @click="setViewDetails(row)"
+													>
+													View Details
+												</b-dropdown-item>
 												<b-dropdown-item
                           @click="setUpdate(row.item.id)"
 													>
@@ -78,6 +83,16 @@
 												</b-dropdown-item>
 											</b-dropdown>
 										</template>
+                    <template v-slot:row-details="data">
+                      <b-card>
+                        <b-row>
+                          <b-col md=12>
+                            <h6>{{ data.item.course ? `Course : ${data.item.course.name}` : `Level : ${data.item.level.name}` }}</h6>
+                            <h6>Curriculum Name : {{data.item.name}}</h6>
+                          </b-col>
+                        </b-row>
+                      </b-card>
+                    </template>
 									</b-table>
 									<b-row>
 										<b-col md=6>
@@ -999,6 +1014,12 @@ export default {
         }
       }
     },
+    setViewDetails(row) {
+      if (!row.detailsShowing) {
+
+      }
+      row.toggleDetails()
+    }
   },
 }
 </script>
