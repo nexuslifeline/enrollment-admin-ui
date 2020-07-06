@@ -17,3 +17,4 @@ export { default as PaymentFileApi } from './PaymentFile';
 export { default as BillingApi } from './Billing';
 export { default as SectionApi } from './Section';
 export { default as SchoolYearApi } from './SchoolYear';
+export { default as CurriculumApi } from './Curriculum';

@@ -16,6 +16,9 @@ export default {
     },
     deleteCourse(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/courses/${id}`);
-    }
+    },
+    getLevelsOfCourse(courseId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/courses/${courseId}/levels`, { params: params })
+    },
   }
 }
