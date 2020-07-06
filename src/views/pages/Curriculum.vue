@@ -70,7 +70,7 @@
                         <b-dropdown-item
                           @click="setViewDetails(row)"
 													>
-													View Details
+													{{row.detailsShowing ? 'Hide' : 'View'}} Details
 												</b-dropdown-item>
 												<b-dropdown-item
                           @click="setUpdate(row.item.id)"
@@ -86,9 +86,64 @@
                     <template v-slot:row-details="data">
                       <b-card>
                         <b-row>
-                          <b-col md=12>
-                            <h6>{{ data.item.course ? `Course : ${data.item.course.name}` : `Level : ${data.item.level.name}` }}</h6>
+                          <b-col md=4>
                             <h6>Curriculum Name : {{data.item.name}}</h6>
+                            <h6>{{ data.item.course ? `Course : ${data.item.course.name}` : `Level : ${data.item.level.name}` }}</h6>
+                          </b-col>
+                          <b-col md=4>
+                            <h6>Major : {{data.item.major}}</h6>
+                            <h6>Effectivity Year : {{data.item.effectiveYear}}</h6>
+                          </b-col>
+                          <b-col md=4>
+                            <h6>Notes : {{ data.item.notes }}</h6>
+                          </b-col>
+                        </b-row>
+                        <b-row v-if="data.item.subjects && data.item.levels">
+                          <b-col md=12>
+                            
+                            <div 
+                              v-for="level in data.item.levels"
+                              :key="level.id + '-' + level.semesterId ? level.semesterId : ''">
+                              <hr>
+                              <h6>{{level.name}} {{level.semesterId ? `- ${options.semesters.getEnum(level.semesterId).name}` : ''}} </h6>
+                              <b-table
+                                class="table-preview"
+                                responsive small hover outlined show-empty
+                                :items="filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)"
+                                :fields="tables.previewSubjects.fields"
+                                :busy="data.item.isBusy">
+                                <template v-slot:table-busy>
+                                  <div class="text-center my-2">
+                                    <v-icon 
+                                      name="spinner" 
+                                      spin
+                                      class="mr-2" />
+                                    <strong>Loading...</strong>
+                                  </div>
+                                </template>
+                                <template v-slot:custom-foot>
+                                  <b-tr class="font-weight-bold">
+                                    <b-td colspan=2 class="text-right">
+                                      <span class="text-danger">Total Units </span>
+                                    </b-td>
+                                    <b-td class="text-center">
+                                      <span class="text-danger">{{ totalLabs(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)) }}</span>
+                                    </b-td>
+                                    <b-td class="text-center">
+                                      <span class="text-danger">{{ totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)) }}</span>
+                                    </b-td>
+                                    <b-td></b-td>
+                                  </b-tr>
+                                  
+                                </template>
+                                <!-- <template v-slot:foot(labs)="data">
+                                  <i>{{ data.label }}</i>
+                                </template>
+                                <template v-slot:foot(units)="data">
+                                  <i>{{ data.label }}</i>
+                                </template> -->
+                              </b-table>
+                            </div>
                           </b-col>
                         </b-row>
                       </b-card>
@@ -642,7 +697,50 @@ export default {
 					],
           items: [],
           filteredItems: []
-				}
+        },
+        previewSubjects: {
+          isBusy: false,
+          fields: [
+            {
+							key: "name",
+							label: "Subject Code",
+							tdClass: "align-middle",
+							thStyle: {width: "15%"}
+						},
+						{
+							key: "description",
+							label: "Description",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
+            },
+            {
+							key: "labs",
+							label: "Lab Units",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+						},
+						{
+							key: "units",
+							label: "Lec Units",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+						},
+            {
+							key: "prerequisites",
+							label: "Prerequisites",
+							tdClass: "align-middle",
+              thStyle: {width: "30%"},
+              formatter: (value, key, item) => {
+                if (value.length > 0) {
+                   return value.map(subject => { return subject.name; }).join(", ");
+                }
+                return ''
+              }
+            },
+          ]
+        }
 			},
       paginations: {
 				subject: {
@@ -1016,11 +1114,63 @@ export default {
     },
     setViewDetails(row) {
       if (!row.detailsShowing) {
-
+        this.$set(row.item, 'isBusy', true)
+        this.getCurriculum(row.item.id)
+          .then(({ data }) => {
+            this.$set(row.item, 'subjects', data.subjects)
+            if (data.schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id || data.schoolCategoryId === SchoolCategories.COLLEGE.id) {
+              // let distinctSemesters = [...new Set(data.subjects.map(subject => subject.pivot.semesterId))]
+              let levelsWithSemester = []
+              let params = { paginate: false }
+              this.getLevelsOfCourse(data.courseId, params)
+                .then(({ data }) => {
+                  data.forEach(level => {
+                    let distinctSemesters = [...new Set(row.item.subjects.filter(subject => subject.pivot.levelId === level.id).map(subject => subject.pivot.semesterId))]
+                    distinctSemesters.forEach(semester => {
+                      levelsWithSemester.push({
+                        ...level,
+                        semesterId: semester
+                      })
+                    })
+                  })
+                })
+              this.$set(row.item, 'levels', levelsWithSemester)
+                
+            } else {
+              this.$set(row.item, 'levels', [data.level])
+            }
+            row.item.isBusy = false
+          })
       }
       row.toggleDetails()
-    }
+    },
+    filterPreviewSubjects(subjects, levelId, semesterId) {
+			let filteredSubjects = subjects.filter(subject =>
+				(subject.pivot.levelId === levelId && subject.pivot.semesterId === semesterId)
+			)
+			return filteredSubjects
+    },
   },
+  computed: {
+    totalUnits() {
+      return subjects => {
+        let units = 0
+        subjects.forEach(s => {
+          units += Number(s.units)
+        })
+        return units
+      }
+    },
+    totalLabs() {
+      return subjects => {
+        let labs = 0
+        subjects.forEach(s => {
+          labs += Number(s.labs)
+        })
+        return labs
+      }
+    }
+  }
 }
 </script>
 <style>
@@ -1028,4 +1178,7 @@ export default {
 	.not-collapsed .when-closed {
 		display: none;
 	}
+  .table-preview table tr:last-child {
+    border: none!important;
+  }
 </style>
