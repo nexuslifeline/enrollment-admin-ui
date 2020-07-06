@@ -128,6 +128,16 @@
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
+            <label >Major</label>
+            <b-form-input 
+              ref="major" 
+              v-model="forms.course.fields.major"
+              :state="forms.course.states.major" />
+            <b-form-invalid-feedback>
+              {{forms.course.errors.major}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group>
             <label class="required">Degree Types</label>
             <b-form-select 
               v-model="forms.course.fields.degreeTypeId" 
@@ -224,6 +234,7 @@ const courseFields = {
   id: null,
   name: null,
   description: null,
+  major: null,
   degreeTypeId: null,
   levels: null
 }
@@ -257,13 +268,19 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: {width: "30%"}
+							thStyle: {width: "20%"}
 						},
 						{
 							key: "description",
 							label: "DESCRIPTION",
 							tdClass: "align-middle",
 							thStyle: {width: "auto"}
+            },
+            {
+							key: "major",
+							label: "MAJOR",
+							tdClass: "align-middle",
+							thStyle: {width: "30%"}
 						},
             {
               key: "action",
