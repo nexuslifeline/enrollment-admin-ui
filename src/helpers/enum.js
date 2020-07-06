@@ -92,13 +92,13 @@ export const StudentFeeStatuses = new Enum({
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Semester', description: 'First Semester' },
   SECOND_SEM: { id: 2, name: '2nd Semester', description: 'Second Semester' },
-  THIRD_SEM: { id: 3, name: '3rd Semster', description: 'Third Semester' },
+  THIRD_SEM: { id: 3, name: '3rd Semester', description: 'Third Semester' },
   SUMMER: { id: 4, name: 'Summer', description: 'Summer' }
 });
 
 export const Fees = new Enum({
-  // TUITION_FEE_PER_UNIT: { id: 2, name: 'Tuition Fee per Unit' },
-  TUITION_FEE: { id: 1, name: 'Tuition Fee' }
+  // TUITION_FEE_PER_UNIT: { id: 1, name: 'Tuition Fee per Unit' },
+  TUITION_FEE: { id: 2, name: 'Tuition Fee' }
 });
 
 export const DegreeTypes = new Enum({
@@ -129,6 +129,9 @@ export const DegreeTypes = new Enum({
   ]},
   DOCTORATE_DEGREE: { id: 6, name: 'Doctorate Degree', levels: [
     { levelId: 21, schoolCategoryId: 6 }
+  ]},
+  VOCATIONAL_DEGREE: { id: 7, name: 'Vocational Degree', levels: [
+    { levelId: 22, schoolCategoryId: 7 }
   ]},
 });
 
