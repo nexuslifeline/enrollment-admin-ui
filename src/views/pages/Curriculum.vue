@@ -167,9 +167,17 @@
 													{{ forms.curriculum.errors.schoolCategoryId }}
 												</b-form-invalid-feedback>
 											</b-form-group>
-											<b-form-group v-if="checkSchoolCategory() && forms.curriculum.fields.schoolCategoryId != null">
-												<label>Course</label>
+											<b-form-group>
+												<label>
+                          Course 
+                          <v-icon
+                            v-if="options.courses.isLoading"
+                            name="spinner"
+                            spin />
+                        </label>
 												<b-form-select
+                          :disabled="(!checkSchoolCategory() || forms.curriculum.fields.schoolCategoryId == null) 
+                            || options.courses.isLoading"
 													@change="loadLevelsOfCourse()"
 													v-model="forms.curriculum.fields.courseId"
 													:state="forms.curriculum.states.courseId">
@@ -187,11 +195,32 @@
 													{{ forms.curriculum.errors.courseId }}
 												</b-form-invalid-feedback>
 											</b-form-group>
-                      <b-form-group v-else-if="!checkSchoolCategory() && forms.curriculum.fields.schoolCategoryId != null">
-												<label>Level</label>
+										</b-col>
+										<b-col md=6>
+											<b-form-group>
+												<label class="required">Effective Year</label>
+												<b-form-input
+                          type="number"
+													v-model="forms.curriculum.fields.effectiveYear"
+													:state="forms.curriculum.states.effectiveYear">
+												</b-form-input>
+												<b-form-invalid-feedback>
+													{{ forms.curriculum.errors.effectiveYear }}
+												</b-form-invalid-feedback>
+											</b-form-group>
+                      <b-form-group>
+												<label>
+                          Level
+                          <v-icon
+                            v-if="options.levels.isLoading"
+                            name="spinner"
+                            spin />
+                        </label>
 												<b-form-select
+                          :disabled="(checkSchoolCategory() || forms.curriculum.fields.schoolCategoryId == null)
+                            || options.levels.isLoading"
 													@change="getSelectedLevel()"
-													v-model="selectedLevelId">
+													v-model="forms.curriculum.fields.levelId">
 													<template v-slot:first>
 														<b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
 													</template>
@@ -204,19 +233,6 @@
 												</b-form-select>
 												<b-form-invalid-feedback>
 													{{ forms.curriculum.errors.courseId }}
-												</b-form-invalid-feedback>
-											</b-form-group>
-										</b-col>
-										<b-col md=6>
-											<b-form-group>
-												<label class="required">Effective Year</label>
-												<b-form-input
-                          type="number"
-													v-model="forms.curriculum.fields.effectiveYear"
-													:state="forms.curriculum.states.effectiveYear">
-												</b-form-input>
-												<b-form-invalid-feedback>
-													{{ forms.curriculum.errors.effectiveYear }}
 												</b-form-invalid-feedback>
 											</b-form-group>
 										</b-col>
@@ -240,12 +256,12 @@
                           </span>
 												</div>
 												<b-collapse :id="'level' + level.id" class="mt-2" role="tabpanel">
-													<div v-if="checkSchoolCategory()">
-                            <b-form-checkbox class="mb-2" @input="semesters = $event ? options.semesters.values.length : 2">
+													<div v-if="checkSchoolCategory() && forms.curriculum.fields.courseId !== null">
+                            <b-form-checkbox class="mb-2" @input="getSemesters(level, $event)">
                               Show All Semesters
                             </b-form-checkbox>
 														<b-card
-															v-for="semester in options.semesters.values.slice(0, semesters)"
+															v-for="semester in filterSemester(level)"
 															:key="semester.id">
 															<b-row>
 																<b-col md=9>
@@ -478,7 +494,8 @@ const curriculumFields = {
 	name: null,
 	major: null,
 	schoolCategoryId: null,
-	courseId: null,
+  courseId: null,
+  levelId: null,
   effectiveYear: null,
   notes: null,
 	subjects: null
@@ -640,9 +657,11 @@ export default {
 			options: {
 				schoolCategories: SchoolCategories,
 				levels: {
+          isLoading: false,
 					items: []
 				},
 				courses: {
+          isLoading: false,
 					items: []
 				},
         semesters: Semesters,
@@ -651,11 +670,9 @@ export default {
         }
 			},
 			levelId: null,
-			semester: null,
       schoolCategoryId: null,
       userGroupId: null,
-      semesters: 2,
-      selectedLevelId: null,
+      semesters: [],
       levels: []
 		}
 	},
@@ -684,28 +701,33 @@ export default {
 			this.loadSubjects()
 			const { fields, fields: { schoolCategoryId } } = this.forms.curriculum
       this.levels = []
-
+      
       if (this.entryMode === "Add") {
-        fields.courseId = null
+        
         fields.subjects = []
       }
 
       if (this.checkSchoolCategory()) {
+        fields.levelId = null
         this.loadCoursesOfSchoolCategoryList()
         return		
       }
-      
-      this.selectedLevelId = null
+      fields.courseId = null
       let params = { paginate: false }
+      const { levels } = this.options
+      levels.isLoading = true
 			this.getLevelsOfSchoolCategoryList(schoolCategoryId, params)
 				.then(({ data }) => {
-          this.options.levels.items = data
+          levels.items = data
+          levels.isLoading = false
           if (getSelectedLevel) {
-            this.selectedLevelId = fields.subjects[0].pivot.levelId
             this.getSelectedLevel()
+            return
           }
+          fields.levelId = null
 				})
 				.catch(error => {
+          levels.isLoading = false
 					console.log(error)
 				})
 		},
@@ -722,16 +744,22 @@ export default {
 		},
 		loadCoursesOfSchoolCategoryList() {
       const { schoolCategoryId } = this.forms.curriculum.fields
-			let params = { paginate: false }
+      const { courses } = this.options
+      let params = { paginate: false }
+      courses.isLoading = true
 			this.getCoursesOfSchoolCategoryList(schoolCategoryId, params)
 				.then(({ data }) => {
-          const { courses } = this.options
-					courses.items = data
+          courses.items = data
+          courses.isLoading = false
 				})
 		},
 		loadLevelsOfCourse() {
 			this.isLoading = true
-			const { courseId } = this.forms.curriculum.fields
+      const { fields, fields: { courseId } } = this.forms.curriculum
+      const { items } = this.options.courses
+      if (items.length > 0) {
+        fields.major = items.find(i => i.id === courseId).major
+      }
 			let params = { paginate: false }
 			this.getLevelsOfCourse(courseId, params)
 				.then(({ data }) => {
@@ -765,7 +793,6 @@ export default {
       const { curriculum, curriculum: { fields } } = this.forms
       this.getCurriculum(id)
         .then(({ data }) => {
-          console.log(data)
           copyValue(data, fields)
           reset(curriculum)
           let getSelectedLevel = false
@@ -930,8 +957,7 @@ export default {
 			const { schoolCategoryId } = this.forms.curriculum.fields
 			const { schoolCategories } = this.options
 			let result = (schoolCategoryId === schoolCategories.SENIOR_HIGH_SCHOOL.id || 
-										schoolCategoryId === schoolCategories.COLLEGE.id || 
-											schoolCategoryId === schoolCategories.GRADUATE_SCHOOL.id)
+										schoolCategoryId === schoolCategories.COLLEGE.id)
 			return result
 		},
 		filterSubjects(levelId, semesterId = null) {
@@ -943,11 +969,37 @@ export default {
     },
     getSelectedLevel() {
       this.isLoading = true
-      this.levels = [this.options.levels.items.find(level => level.id === this.selectedLevelId)]
+      this.levels = [this.options.levels.items.find(level => level.id === this.forms.curriculum.fields.levelId)]
       this.isLoading = false
       // console.log(this.levels)
-    }
-	}
+    },
+    getSemesters(level, event) {
+      this.$set(level, 'isShowAll', event)
+    },
+    filterSemester(level) {
+      let defaultSemesters = this.options.semesters.values.slice(0, 2)
+      // return defaultSemesters
+      if (level.isShowAll) {
+        return this.options.semesters.values
+      } else {
+        if (this.entryMode === "Add") {
+          return defaultSemesters
+        } else {
+          const { subjects } = this.forms.curriculum.fields
+          let filteredSubjects = subjects.filter(subject =>
+            subject.pivot.levelId === level.id
+          )
+          let distinctSemesters = [...new Set(filteredSubjects.map(x => x.pivot.semesterId))]
+          distinctSemesters.forEach(d => {
+            if (!defaultSemesters.map(x => x.id).includes(d)) {
+              defaultSemesters.push(Semesters.getEnum(d))
+            }
+          })
+          return defaultSemesters
+        }
+      }
+    },
+  },
 }
 </script>
 <style>

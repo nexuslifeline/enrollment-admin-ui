@@ -92,7 +92,7 @@ export const StudentFeeStatuses = new Enum({
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Semester', description: 'First Semester' },
   SECOND_SEM: { id: 2, name: '2nd Semester', description: 'Second Semester' },
-  THIRD_SEM: { id: 3, name: '3rd Semster', description: 'Third Semester' },
+  THIRD_SEM: { id: 3, name: '3rd Semester', description: 'Third Semester' },
   SUMMER: { id: 4, name: 'Summer', description: 'Summer' }
 });
 

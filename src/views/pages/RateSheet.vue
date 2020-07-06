@@ -99,13 +99,15 @@
                       <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <b-form-checkbox
                         v-if="row.item.id === fees.TUITION_FEE.id"
-                        v-model="forms.rateSheet.fields.isComputedByUnits" 
+                        v-model="forms.rateSheet.fields.isComputedByUnits"
+                        :value=1
+                        :unchecked-value=0
                         @input="$event ? row.item.pivot.amount = 0 : ''" />
                     </template>
                     <template v-slot:cell(pivot.amount)="row">
                       <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <vue-autonumeric
-                        :disabled="forms.rateSheet.fields.isComputedByUnits && row.item.id === fees.TUITION_FEE.id"
+                        :disabled="forms.rateSheet.fields.isComputedByUnits === 1 && row.item.id === fees.TUITION_FEE.id"
                         v-model="row.item.pivot.amount"
                         class="form-control text-right" 
                         :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
@@ -412,7 +414,7 @@ export default {
       const params = { paginate: false }
       const { fields } = this.forms.rateSheet
       const { levels, courses } = this.options
-      fields.isComputedByUnits = false
+      // fields.isComputedByUnits = false
       courses.items = []
 			this.getLevelsOfSchoolCategoryList(id, params)
 				.then(({ data }) => {
@@ -470,6 +472,7 @@ export default {
             rateSheet.fields.courseId = data.data[0].courseId
             rateSheet.fields.semesterId = data.data[0].semesterId
             rateSheet.fields.enrollmentFee = data.data[0].enrollmentFee
+            rateSheet.fields.isComputedByUnits = data.data[0].isComputedByUnits
             rateSheet.fields.fees = data.data[0].fees
           }
           rateSheetFees.isBusy = false
