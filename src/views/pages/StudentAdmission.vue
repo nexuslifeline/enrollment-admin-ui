@@ -53,7 +53,7 @@
 										v-for="course in options.courses.items" 
 										:key="course.id" 
 										:value="course.id">
-										{{course.name}}
+										{{course.name}} {{course.major ? `- ${course.major}` : ''}}
 									</b-form-select-option>
 								</b-form-select>
 							</b-col>
