@@ -11,12 +11,12 @@
                   <b-col md=8>
                     <b-button variant="outline-primary" 
                       @click="setCreate()">
-                      <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE
+                      <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE CATEGORY
                     </b-button>
                   </b-col>
                   <b-col md=4>
                     <b-form-input
-                      v-model="filters.schoolFee.criteria"
+                      v-model="filters.schoolFeeCategory.criteria"
                       type="text" 
                       placeholder="Search" >
                     </b-form-input>
@@ -30,14 +30,14 @@
               <b-col md=12>
                 <b-table
 									small hover outlined show-empty
-									:fields="tables.schoolFees.fields"
-                  :busy="tables.schoolFees.isBusy"
-                  :items="tables.schoolFees.items"
-                  :current-page="paginations.schoolFee.page"
-                  :per-page="paginations.schoolFee.perPage"
-                  :filter="filters.schoolFee.criteria"
-                  @filtered="onFiltered($event, paginations.schoolFee)">
-                  <!-- :filter="filters.schoolFee.criteria> -->
+									:fields="tables.schoolFeeCategories.fields"
+                  :busy="tables.schoolFeeCategories.isBusy"
+                  :items="tables.schoolFeeCategories.items"
+                  :current-page="paginations.schoolFeeCategory.page"
+                  :per-page="paginations.schoolFeeCategory.perPage"
+                  :filter="filters.schoolFeeCategory.criteria"
+                  @filtered="onFiltered($event, paginations.schoolFeeCategory)">
+                  <!-- :filter="filters.schoolFeeCategory.criteria> -->
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
                       <v-icon 
@@ -57,7 +57,7 @@
                         Edit
                       </b-dropdown-item>
                       <b-dropdown-item 
-                        @click="forms.schoolFee.fields.id = row.item.id, showModalConfirmation = true">
+                        @click="forms.schoolFeeCategory.fields.id = row.item.id, showModalConfirmation = true">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -65,16 +65,16 @@
 								</b-table>
                 <b-row>
                   <b-col md=6>
-                    Showing {{ paginations.schoolFee.from }} to {{ paginations.schoolFee.to }} of {{ paginations.schoolFee.totalRows }} records.
+                    Showing {{ paginations.schoolFeeCategory.from }} to {{ paginations.schoolFeeCategory.to }} of {{ paginations.schoolFeeCategory.totalRows }} records.
                     </b-col>
                   <b-col md=6>
                     <b-pagination
-                      v-model="paginations.schoolFee.page"
-                      :total-rows="paginations.schoolFee.totalRows"
-                      :per-page="paginations.schoolFee.perPage"
+                      v-model="paginations.schoolFeeCategory.page"
+                      :total-rows="paginations.schoolFeeCategory.totalRows"
+                      :per-page="paginations.schoolFeeCategory.perPage"
                       size="sm"
                       align="end"
-                      @input="recordDetails(paginations.schoolFee)" />
+                      @input="recordDetails(paginations.schoolFeeCategory)" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -90,7 +90,7 @@
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					School Fees - {{ entryMode }}
+					School Fee Category - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
 			<b-row> 
@@ -99,10 +99,10 @@
             <label class="required">Name</label>
             <b-form-input 
               ref="name" 
-              v-model="forms.schoolFee.fields.name"
-              :state="forms.schoolFee.states.name" />
+              v-model="forms.schoolFeeCategory.fields.name"
+              :state="forms.schoolFeeCategory.states.name" />
             <b-form-invalid-feedback>
-              {{forms.schoolFee.errors.name}}
+              {{forms.schoolFeeCategory.errors.name}}
             </b-form-invalid-feedback>
           </b-form-group>
 				</b-col>
@@ -113,36 +113,11 @@
               <label class="required">Description</label>
               <b-form-textarea 
                 ref="description" 
-                v-model="forms.schoolFee.fields.description" 
-                :state="forms.schoolFee.states.description"/>
+                v-model="forms.schoolFeeCategory.fields.description" 
+                :state="forms.schoolFeeCategory.states.description"/>
               <b-form-invalid-feedback>
-                {{forms.schoolFee.errors.description}}
+                {{forms.schoolFeeCategory.errors.description}}
               </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-row>
-
-      <b-row>
-        <b-col md=12>
-          <b-form-group >
-            <label class="required">School Fee Category</label>
-            <b-form-select 
-              v-model="forms.schoolFee.fields.schoolFeeCategoryId"
-              :state="forms.schoolFee.states.schoolFeeCategoryId"
-              >
-              <template v-slot:first>
-                <b-form-select-option :value="null" disabled>-- School Fee Category --</b-form-select-option>
-              </template>
-              <b-form-select-option 
-                v-for="schoolFeeCategory in options.schoolFeeCategories.items" 
-                :key="schoolFeeCategory.id" 
-                :value="schoolFeeCategory.id">
-                {{ schoolFeeCategory.name }}
-              </b-form-select-option>
-            </b-form-select>
-            <b-form-invalid-feedback>
-              {{ forms.schoolFee.errors.schoolFeeCategoryId }}
-            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-row>
@@ -156,12 +131,12 @@
           Close
         </b-button>
         <b-button 
-          :disabled="forms.schoolFee.isProcessing"
+          :disabled="forms.schoolFeeCategory.isProcessing"
           variant="outline-primary" 
           class="float-right btn-save" 
           @click="onSchoolFeeEntry()">
           <v-icon 
-            v-if="forms.schoolFee.isProcessing"
+            v-if="forms.schoolFeeCategory.isProcessing"
             name="sync"
             spin
             class="mr-2" />
@@ -177,17 +152,17 @@
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
       <div slot="modal-title">
-          Delete School Fee
+          Delete School Fee Category
       </div>
-      Are you sure you want to delete this School Fee ?
+      Are you sure you want to delete this School Fee Category ?
       <div slot="modal-footer">
         <b-button
-          :disabled="forms.schoolFee.isProcessing"
+          :disabled="forms.schoolFeeCategory.isProcessing"
           variant="outline-primary" 
           class="mr-2 btn-save" 
           @click="onSchoolFeeDelete()">
           <v-icon 
-            v-if="forms.schoolFee.isProcessing"
+            v-if="forms.schoolFeeCategory.isProcessing"
             name="sync"
             spin
             class="mr-2" />
@@ -206,35 +181,34 @@
 </template>
 <script>
 
-const schoolFeeFields = {
+const schoolFeeCategoryFields = {
   id: null,
   name: null,
   description: null,
-  schoolFeeCategoryId: null
 }
 
-import { SchoolFeeApi, SchoolFeeCategoryApi } from "../../mixins/api"
+import { SchoolFeeCategoryApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 export default {
-	name: "schoolFee",
-	mixins: [ SchoolFeeApi, SchoolFeeCategoryApi, Tables ],
+	name: "schoolFeeCategory",
+	mixins: [ SchoolFeeCategoryApi, Tables ],
 	data() {
 		return {
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: "",
       forms: {
-        schoolFee: {
+        schoolFeeCategory: {
           isProcessing: false,
-          fields: { ...schoolFeeFields },
-          states: { ...schoolFeeFields },
-          errors: { ...schoolFeeFields }
+          fields: { ...schoolFeeCategoryFields },
+          states: { ...schoolFeeCategoryFields },
+          errors: { ...schoolFeeCategoryFields }
         }
       },
 			tables: {
-				schoolFees: {
+				schoolFeeCategories: {
           isBusy: false,
 					fields: [
 						{
@@ -248,12 +222,6 @@ export default {
 							label: "DESCRIPTION",
 							tdClass: "align-middle",
 							thStyle: {width: "auto"}
-            },
-            {
-							key: "schoolFeeCategory.name",
-							label: "School Category",
-							tdClass: "align-middle",
-							thStyle: {width: "30%"}
 						},
             {
               key: "action",
@@ -265,13 +233,8 @@ export default {
           items:[]
 				}
       },
-      options: {
-        schoolFeeCategories: {
-          items: []
-        }
-      },
       paginations: {
-				schoolFee: {
+				schoolFeeCategory: {
 					from: 0,
 					to: 0,
 					totalRows: 0,
@@ -280,96 +243,87 @@ export default {
 				}
       },
       filters: {
-        schoolFee: {
+        schoolFeeCategory: {
           criteria: null
         }
       }
 		}
 	},
 	created(){
-    this.loadSchoolFees()
-    this.loadSchoolFeeCategories()
-
+		this.loadSchoolFees()
 	},
 	methods: {
 		loadSchoolFees(){
-      const { schoolFees } = this.tables
-      const { schoolFee } = this.paginations
-      schoolFees.isBusy = true
+      const { schoolFeeCategories } = this.tables
+      const { schoolFeeCategory } = this.paginations
+      schoolFeeCategories.isBusy = true
 
-			let params = { paginate: false }
-      this.getSchoolFeeList(params).then(({ data }) =>{
-        schoolFees.items = data
-        schoolFee.totalRows = data.length
-        this.recordDetails(schoolFee)
-        schoolFees.isBusy = false
-      })
-    },
-    loadSchoolFeeCategories() {
-      const { schoolFeeCategories } = this.options
 			let params = { paginate: false }
       this.getSchoolFeeCategoryList(params).then(({ data }) =>{
         schoolFeeCategories.items = data
+        schoolFeeCategory.totalRows = data.length
+        this.recordDetails(schoolFeeCategory)
+        schoolFeeCategories.isBusy = false
       })
     },
     onSchoolFeeEntry(){
-      const { schoolFee, schoolFee: { fields } } = this.forms
-      const { schoolFees } = this.tables
-      schoolFee.isProcessing = true
-      reset(schoolFee)
+      const { schoolFeeCategory, schoolFeeCategory: { fields } } = this.forms
+      const { schoolFeeCategories } = this.tables
+      schoolFeeCategory.isProcessing = true
+      reset(schoolFeeCategory)
       if(this.entryMode == "Add"){
-        this.addSchoolFee(fields)
+        this.addSchoolFeeCategory(fields)
           .then(({ data }) => {
-            this.addRow(schoolFees, this.paginations.schoolFee, data)
-            schoolFee.isProcessing = false
-            showNotification(this, "success", "School Fee created successfully.")
+            this.addRow(schoolFeeCategories, this.paginations.schoolFeeCategory, data)
+            schoolFeeCategory.isProcessing = false
+            showNotification(this, "success", "School Fee Category created successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            schoolFee.isProcessing = false
-            validate(schoolFee, errors)
+            schoolFeeCategory.isProcessing = false
+            validate(schoolFeeCategory, errors)
           })
       }
       else {
-        const { fields } = this.forms.schoolFee
-        this.updateSchoolFee(fields, fields.id)
+        const { fields } = this.forms.schoolFeeCategory
+        this.updateSchoolFeeCategory(fields, fields.id)
           .then(({ data }) => {
-            this.updateRow(schoolFees, data)
-            schoolFee.isProcessing = false
-            showNotification(this, "success", "School Fee updated successfully.")
+            this.updateRow(schoolFeeCategories, data)
+            schoolFeeCategory.isProcessing = false
+            showNotification(this, "success", "School Fee Category updated successfully.")
             this.showModalEntry = false
           })
           .catch(error => {
             const errors = error.response.data.errors
-            schoolFee.isProcessing = false
-            validate(schoolFee, errors)
+            schoolFeeCategory.isProcessing = false
+            validate(schoolFeeCategory, errors)
           })
       }
     },
     onSchoolFeeDelete(){
-      const { schoolFee, schoolFee: { fields: { id } } } = this.forms
-      const { schoolFees } = this.tables
-      schoolFee.isProcessing = true
-      this.deleteSchoolFee(id)
+      const { schoolFeeCategory, schoolFeeCategory: { fields: { id } } } = this.forms
+      const { schoolFeeCategories } = this.tables
+      schoolFeeCategory.isProcessing = true
+      this.deleteSchoolFeeCategory(id)
         .then(({ data }) => {
-          this.deleteRow(schoolFees, this.paginations.schoolFee, id)
-          schoolFee.isProcessing = false
-          showNotification(this, "success", "School Fee deleted successfully.")
+          this.deleteRow(schoolFeeCategories, this.paginations.schoolFeeCategory, id)
+          schoolFeeCategory.isProcessing = false
+          showNotification(this, "success", "School Fee Category deleted successfully.")
           this.showModalConfirmation = false
         })
     },
     setUpdate(row){
-      const { schoolFee, schoolFee: { fields } } = this.forms
+      const { schoolFeeCategory, schoolFeeCategory: { fields } } = this.forms
       copyValue(row.item, fields)
-      reset(schoolFee)
+      reset(schoolFeeCategory)
       this.entryMode = "Edit"
       this.showModalEntry = true
     },
     setCreate(){
-      const { schoolFee } = this.forms
-      reset(schoolFee)
-      clearFields(schoolFee.fields)
+      const { schoolFeeCategory } = this.forms
+      reset(schoolFeeCategory)
+      clearFields(schoolFeeCategory.fields)
       this.entryMode='Add'
       this.showModalEntry = true
     },
