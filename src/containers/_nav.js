@@ -104,6 +104,12 @@ export const navs = () => {
         items: [
           {
             _name: 'CSidebarNavItem',
+            name: 'School Fee Category',
+            to: '/schoolfeecategory',
+            icon: 'cil-layers'
+          },
+          {
+            _name: 'CSidebarNavItem',
             name: 'School Fee',
             to: '/schoolfee',
             icon: 'cil-layers'

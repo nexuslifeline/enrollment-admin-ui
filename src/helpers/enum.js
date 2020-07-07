@@ -151,6 +151,8 @@ export const UserGroups = new Enum({
   FINANCE_COLLEGE: { id: 11, name: 'Finance - College', schoolCategoryId: 5, userType: 2 },
   REGISTRAR_GRADUATE_SCHOOL: { id: 12, name: 'Registrar - Graduate School', schoolCategoryId: 6, userType: 1 },
   FINANCE_GRADUATE_SCHOOL: { id: 13, name: 'Finance - Graduate School', schoolCategoryId: 6, userType: 2 },
+  REGISTRAR_VOCATIONAL: { id: 14, name: 'Registrar - Vocational', schoolCategoryId: 7, userType: 1 },
+  FINANCE_VOCATIONAL: { id: 15, name: 'Finance - Vocational', schoolCategoryId: 7, userType: 2 },
 });
 
 // export const DegreeTypeLevels = new Enum({
