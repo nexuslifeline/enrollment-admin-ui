@@ -310,7 +310,7 @@
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row>
+          <!-- <b-row>
             <b-col md=12>
               <b-form-group >
                 <label>Prerequisites 
@@ -334,7 +334,7 @@
                 </Select2>
               </b-form-group>
             </b-col>
-          </b-row>
+          </b-row> -->
         </b-col>
       </b-row>
       <!-- modal body -->
@@ -406,12 +406,11 @@ const subjectFields = {
   labs: null,
   amountPerLab: null,
   totalUnits: null,
-  totalAmount: null,
-  prerequisites: []
+  totalAmount: null
 }
 
 import { SubjectApi, DepartmentApi } from "../../mixins/api"
-import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
+import { validate, reset, clearFields, showNotification, formatNumber } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import { UserGroups, SchoolCategories } from '../../helpers/enum'
 import Select2 from '../components/Select2'
@@ -467,18 +466,18 @@ export default {
 							tdClass: "align-middle",
 							thStyle: {width: "10%"}
             },
-            {
-							key: "prerequisites",
-							label: "PREREQUISITE",
-							tdClass: "align-middle",
-              thStyle: {width: "10%"},
-              formatter: (value, key, item) => {
-                 if (value.length > 0) {
-                   return value.map(subject => { return subject.name; }).join(", ");
-                 }
-                 return ''
-              }
-						},
+            // {
+						// 	key: "prerequisites",
+						// 	label: "PREREQUISITE",
+						// 	tdClass: "align-middle",
+            //   thStyle: {width: "10%"},
+            //   formatter: (value, key, item) => {
+            //      if (value.length > 0) {
+            //        return value.map(subject => { return subject.name; }).join(", ");
+            //      }
+            //      return ''
+            //   }
+						// },
 						{
 							key: "units",
 							label: "LEC UNITS",
@@ -491,7 +490,10 @@ export default {
 							label: "AMT PER LEC",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "10%"}
+              thStyle: {width: "10%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
 						},
 						{
 							key: "labs",
@@ -505,14 +507,20 @@ export default {
 							label: "AMT PER LAB",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "10%"}
+              thStyle: {width: "10%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
             },
             {
 							key: "totalAmount",
 							label: "TOTAL AMT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "10%"}
+              thStyle: {width: "10%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
             },
             {
               key: "action",
@@ -631,16 +639,17 @@ export default {
     },
     setSubjectUpdate(row){
       const { subject, subject: { fields } } = this.forms
-      const { prerequisites, ...newFields } = fields
-      fields.prerequisites = []
+      // const { prerequisites, ...newFields } = fields
+      // fields.prerequisites = []
 
-      copyValue(row.item, fields, Object.keys(newFields))
+      // copyValue(row.item, fields, Object.keys(newFields))
+      copyValue(row.item, fields)
       reset(subject)
       this.loadSubjectPrerequisite()
 
-      row.item.prerequisites.forEach(p => {
-        fields.prerequisites.push(p.pivot.prerequisiteSubjectId)
-      })
+      // row.item.prerequisites.forEach(p => {
+      //   fields.prerequisites.push(p.pivot.prerequisiteSubjectId)
+      // })
       
       this.entryMode = "Edit"
       this.showModalEntry = true
@@ -660,7 +669,7 @@ export default {
       fields.amountPerLab = 0
       fields.departmentId = null
       fields.schoolCategoryId = null
-      fields.prerequisites = []
+      // fields.prerequisites = []
       this.entryMode='Add'
       this.showModalEntry = true
     },
