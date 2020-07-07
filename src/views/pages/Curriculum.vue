@@ -389,6 +389,12 @@
 																				<strong>Loading...</strong>
 																			</div>
 																		</template>
+                                    <template v-slot:cell(labs)="row">
+                                      {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                    </template>
+                                    <template v-slot:cell(units)="row">
+                                      {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                    </template>
                                     <template v-slot:cell(prerequisites)="row">
 																			<Select2
                                         class="w-100"
@@ -406,14 +412,20 @@
 																		</template>
                                     <template v-slot:custom-foot>
                                       <b-tr class="font-weight-bold">
-                                        <b-td colspan=2 class="text-right">
+                                        <b-td colspan=3 class="text-right">
                                           <span class="text-danger">Total Units </span>
                                         </b-td>
                                         <b-td class="text-center">
-                                          <span class="text-danger">{{ totalLabs(filterSubjects(level.id, semester.id)) }}</span>
+                                          <span class="text-danger">
+                                            {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                              totalLabs(filterSubjects(level.id, semester.id)) }}
+                                          </span>
                                         </b-td>
                                         <b-td class="text-center">
-                                          <span class="text-danger">{{ totalUnits(filterSubjects(level.id, semester.id)) }}</span>
+                                          <span class="text-danger">
+                                            {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                            totalUnits(filterSubjects(level.id, semester.id)) }}
+                                          </span>
                                         </b-td>
                                         <b-td></b-td>
                                       </b-tr>
@@ -456,6 +468,12 @@
 																			<strong>Loading...</strong>
 																		</div>
 																	</template>
+                                  <template v-slot:cell(labs)="row">
+                                    {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                  </template>
+                                  <template v-slot:cell(units)="row">
+                                    {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                  </template>
                                   <template v-slot:cell(prerequisites)="row">
                                     <Select2
                                       class="w-100"
@@ -477,10 +495,16 @@
                                         <span class="text-danger">Total Units </span>
                                       </b-td>
                                       <b-td class="text-center">
-                                        <span class="text-danger">{{ totalLabs(filterSubjects(level.id)) }}</span>
+                                        <span class="text-danger">
+                                          {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                            totalLabs(filterSubjects(level.id)) }}
+                                        </span>
                                       </b-td>
                                       <b-td class="text-center">
-                                        <span class="text-danger">{{ totalUnits(filterSubjects(level.id)) }}</span>
+                                        <span class="text-danger">
+                                          {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                          totalUnits(filterSubjects(level.id)) }}
+                                        </span>
                                       </b-td>
                                       <b-td></b-td>
                                     </b-tr>
@@ -566,12 +590,16 @@
 					<b-table
 						small hover outlined show-empty
 						:items.sync="tables.subjects.filteredItems"
-						:fields="tables.subjects.fields"
+						:fields="tables.subjects.fields2"
             :filter="filters.subject.criteria"
 						:busy="tables.subjects.isBusy2"
             :current-page="paginations.subject.page"
             :per-page="paginations.subject.perPage"
             @filtered="onFiltered($event, paginations.subject)">
+            <template class="d-none" v-slot:cell(prerequisites)>
+						  <b-tr class="d-none">
+						  </b-tr>
+						</template>
 						<template v-slot:cell(action)="row">
 							<b-button 
                 @click="addSubject(row)" 
@@ -788,6 +816,46 @@ export default {
               //   }
               //   return ''
               // }
+            },
+            {
+							key: "labs",
+							label: "LAB UNITS",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+						},
+						{
+							key: "units",
+							label: "LEC UNITS",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+						},
+						{
+							key: "action",
+							label: "",
+							tdClass: "align-middle text-center",
+							thStyle: {width: "5%"}
+						}
+          ],
+          fields2: [
+						// {
+						// 	key: "code",
+						// 	label: "CODE",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "15%"}
+						// },
+						{
+							key: "name",
+							label: "SUBJECT CODE",
+							tdClass: "align-middle",
+							thStyle: {width: "18%"}
+						},
+						{
+							key: "description",
+							label: "DESCRIPTION",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
             },
             {
 							key: "labs",
