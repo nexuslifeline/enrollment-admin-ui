@@ -97,10 +97,12 @@
                           <b-row>
                             <b-col md=4>
                               <h6>Curriculum Name : {{data.item.name}}</h6>
-                              <h6>{{ data.item.course ? `Course : ${data.item.course.name}` : `Level : ${data.item.level.name}` }}</h6>
+                              <h6 v-if="data.item.course">{{ `Course : ${data.item.course.name}`}}</h6>
+                              <h6 v-if="data.item.level">{{`Level : ${data.item.level.name}` }}</h6>
                             </b-col>
                             <b-col md=4>
-                              <h6>Major : {{data.item.major}}</h6>
+                              <h6>Description : {{data.item.description}}</h6>
+                              <h6 v-if="data.item.course">Major : {{data.item.course.major}}</h6>
                               <h6>Effectivity Year : {{data.item.effectiveYear}}</h6>
                             </b-col>
                             <b-col md=4>
@@ -134,7 +136,7 @@
                                     {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
                                   </template>
                                   <template v-slot:cell(units)="row">
-                                    {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                    {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                                   </template>
                                   <template v-slot:custom-foot>
                                     <b-tr class="font-weight-bold">
@@ -144,13 +146,19 @@
                                       <b-td class="text-center">
                                         <span class="text-danger">
                                           {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                              totalLabs(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)) }}
+                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'labs') }}
                                         </span>
                                       </b-td>
                                       <b-td class="text-center">
                                         <span class="text-danger">
                                           {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)) }}
+                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'units') }}
+                                        </span>
+                                      </b-td>
+                                      <b-td class="text-center">
+                                        <span class="text-danger">
+                                          {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'totalUnits') }}
                                         </span>
                                       </b-td>
                                       <b-td></b-td>
@@ -190,10 +198,12 @@
 			<b-row>
 				<b-col md=12>
 					<b-card>
-						<b-card-header>
-							<h4>Curriculum - {{entryMode}}</h4>
-							<p>Details about the subjects comprising the Course or Program.</p>
-						</b-card-header>
+							<h5 slot="header">
+                <span>
+                  Curriculum - {{entryMode}} <br>
+                  <small>Details about the subjects comprising the Course or Program.</small>
+                </span>
+              </h5>
 						<b-card-body>
 							<b-row>
 								<b-col md=6>
@@ -208,14 +218,15 @@
 										</b-form-invalid-feedback>
 									</b-form-group>
 									<b-form-group>
-										<label>Major</label>
-										<b-form-input
+										<label>Description</label>
+										<b-form-textarea
                       debounce="500"
-											v-model="forms.curriculum.fields.major"
-											:state="forms.curriculum.states.major">
-										</b-form-input>
+                      cols=3
+											v-model="forms.curriculum.fields.description"
+											:state="forms.curriculum.states.description">
+										</b-form-textarea>
 										<b-form-invalid-feedback>
-											{{ forms.curriculum.errors.major }}
+											{{ forms.curriculum.errors.description }}
 										</b-form-invalid-feedback>
 									</b-form-group>
                   <b-form-group>
@@ -277,7 +288,7 @@
 														v-for="course in options.courses.items" 
 														:key="course.id" 
 														:value="course.id">
-														{{course.name}} {{course.major ? `- ${course.major}` : ''}}
+														{{course.description}} {{course.major ? `(${course.major})` : ''}}
 													</b-form-select-option>
 												</b-form-select>
 												<b-form-invalid-feedback>
@@ -331,7 +342,7 @@
                           v-model="forms.curriculum.fields.active"
                           :value=1
                           :unchecked-value=0>
-                          Active
+                          New
                         </b-form-checkbox>
                       </b-form-group>
 										</b-col>
@@ -393,7 +404,7 @@
                                       {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
                                     </template>
                                     <template v-slot:cell(units)="row">
-                                      {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                      {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                                     </template>
                                     <template v-slot:cell(prerequisites)="row">
 																			<Select2
@@ -418,13 +429,19 @@
                                         <b-td class="text-center">
                                           <span class="text-danger">
                                             {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
-                                              totalLabs(filterSubjects(level.id, semester.id)) }}
+                                              totalUnits(filterSubjects(level.id, semester.id), 'labs') }}
                                           </span>
                                         </b-td>
                                         <b-td class="text-center">
                                           <span class="text-danger">
                                             {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
-                                            totalUnits(filterSubjects(level.id, semester.id)) }}
+                                              totalUnits(filterSubjects(level.id, semester.id), 'units') }}
+                                          </span>
+                                        </b-td>
+                                        <b-td class="text-center">
+                                          <span class="text-danger">
+                                            {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                              totalUnits(filterSubjects(level.id, semester.id), 'totalUnits') }}
                                           </span>
                                         </b-td>
                                         <b-td></b-td>
@@ -472,7 +489,7 @@
                                     {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
                                   </template>
                                   <template v-slot:cell(units)="row">
-                                    {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                    {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                                   </template>
                                   <template v-slot:cell(prerequisites)="row">
                                     <Select2
@@ -497,13 +514,19 @@
                                       <b-td class="text-center">
                                         <span class="text-danger">
                                           {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
-                                            totalLabs(filterSubjects(level.id)) }}
+                                            totalUnits(filterSubjects(level.id), 'labs') }}
                                         </span>
                                       </b-td>
                                       <b-td class="text-center">
                                         <span class="text-danger">
                                           {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
-                                          totalUnits(filterSubjects(level.id)) }}
+                                            totalUnits(filterSubjects(level.id), 'units') }}
+                                        </span>
+                                      </b-td>
+                                      <b-td class="text-center">
+                                        <span class="text-danger">
+                                          {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                            totalUnits(filterSubjects(level.id), 'totalUnits') }}
                                         </span>
                                       </b-td>
                                       <b-td></b-td>
@@ -678,7 +701,7 @@ import Select2 from '../components/Select2'
 const curriculumFields = {
   id: null,
 	name: null,
-	major: null,
+	description: null,
 	schoolCategoryId: null,
   courseId: null,
   levelId: null,
@@ -716,31 +739,31 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: {width: "auto"}
-						},
-						{
-							key: "major",
-							label: "Major",
+							thStyle: {width: "15%"}
+            },
+            {
+              key: "description",
+							label: "Description",
 							tdClass: "align-middle",
-							thStyle: {width: "12%"}
+							thStyle: {width: "auto"}
             },
             {
 							key: "effectiveYear",
 							label: "Effective Year",
 							tdClass: "align-middle",
-							thStyle: {width: "10%"}
+							thStyle: {width: "8%"}
 						},
 						{
 							key: "schoolCategory.name",
 							label: "School Category",
 							tdClass: "align-middle",
-							thStyle: {width: "12%"}
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "course.name",
 							label: "Course",
 							tdClass: "align-middle",
-              thStyle: {width: "12%"},
+              thStyle: {width: "10%"},
               formatter: (value) => {
                 if (value) {
                   return value
@@ -750,10 +773,16 @@ export default {
               }
             },
             {
+							key: "course.major",
+							label: "Major",
+							tdClass: "align-middle",
+							thStyle: {width: "10%"}
+            },
+            {
 							key: "level.name",
 							label: "Level",
 							tdClass: "align-middle",
-              thStyle: {width: "12%"},
+              thStyle: {width: "8%"},
               formatter: (value) => {
                 if (value) {
                   return value
@@ -770,7 +799,7 @@ export default {
             },
             {
 							key: "active",
-							label: "Active",
+							label: "Status",
 							tdClass: "align-middle",
 							thStyle: {width: "5%"}
 						},
@@ -778,7 +807,7 @@ export default {
 							key: "action",
 							label: "",
 							tdClass: "align-middle text-center",
-							thStyle: {width: "5%"}
+							thStyle: {width: "40px"}
 						}
 					],
 					items: []
@@ -830,6 +859,13 @@ export default {
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: {width: "10%"}
+            },
+            {
+							key: "totalUnits",
+							label: "TOTAL UNITS",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "action",
@@ -870,6 +906,13 @@ export default {
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: {width: "10%"}
+            },
+            {
+							key: "totalUnits",
+							label: "TOTAL UNITS",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "action",
@@ -906,6 +949,13 @@ export default {
 						{
 							key: "units",
 							label: "Lec Units",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+            },
+            {
+							key: "totalUnits",
+							label: "Total Units",
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: {width: "10%"}
@@ -1061,9 +1111,9 @@ export default {
 		loadLevelsOfCourse() {
       const { fields, fields: { courseId } } = this.forms.curriculum
       const { items } = this.options.courses
-      if (items.length > 0) {
-        fields.major = items.find(i => i.id === courseId).major
-      }
+      // if (items.length > 0) {
+      //   fields.description = items.find(i => i.id === courseId).description
+      // }
       if (this.checkSchoolCategory()) {
         this.isLoading = true
         let params = { paginate: false }
@@ -1112,10 +1162,9 @@ export default {
           if (this.checkSchoolCategory()) {
             this.loadLevelsOfCourse()
           } else {
-            if (data.subjects.length > 0) {
-              getSelectedLevel = true
-            }
+            getSelectedLevel = true
           }
+          console.log(getSelectedLevel)
           this.loadLevelsOfSchoolCategoryList(getSelectedLevel)
           this.showEntry = true
         })
@@ -1161,6 +1210,7 @@ export default {
             this.addRow(curriculums, this.paginations.curriculum, data)
             curriculum.isProcessing = false
             showNotification(this, "success", "Curriculum created successfully.")
+            this.updateOldCurriculum(data.active, data.id)
             this.showEntry = false
           })
           .catch(error => {
@@ -1174,6 +1224,7 @@ export default {
             curriculum.isProcessing = false
             this.updateRow(curriculums, data)
             showNotification(this, "success", "Curriculum updated successfully.")
+            this.updateOldCurriculum(data.active, data.id)
             this.showEntry = false
           })
           .catch(error => {
@@ -1190,7 +1241,34 @@ export default {
       this.deleteCurriculum(id)
         .then(({ data }) => {
           curriculum.isProcessing = false
+          let row = curriculums.items.find(c => c.id === id)
           this.deleteRow(curriculums, this.paginations.curriculum, id)
+          if (row.active) {
+            let latestYear = Math.max(...curriculums.items.map(c => c.effectiveYear), 0)
+            let curr = curriculums.items.find(c => c.effectiveYear === latestYear)
+
+            const data = {
+              name: curr.name,
+              schoolCategoryId: curr.schoolCategoryId,
+              courseId: curr.courseId,
+              levelId: curr.levelId,
+              effectiveYear: curr.effectiveYear,
+              active: 1
+            }
+
+            this.updateCurriculum(data, curr.id)
+              .then(({ data }) => {
+                this.updateRow(curriculums, data)
+              })
+              .catch(error => {
+                const errors = error.response.data.errors
+                curriculum.isProcessing = false
+                validate(curriculum, errors)
+              })
+          }
+          
+          
+
           showNotification(this, "success", "Curriculum deleted successfully.")
           this.showModalConfirmation = false
         })
@@ -1226,7 +1304,8 @@ export default {
         return
       }
 			fields.subjects.push({
-				...item,
+        ...item,
+        prerequisites: [],
 				pivot: { 
 					levelId: this.levelId,
 					semesterId: this.semesterId
@@ -1367,26 +1446,35 @@ export default {
 			)
 			return filteredSubjects
     },
+    updateOldCurriculum(isActive, id) {
+      console.log(isActive)
+      if (isActive) {
+        let curriculum = this.tables.curriculums.items.find(c => c.active === isActive && c.id !== id)
+        if (curriculum) {
+          curriculum.active = 0
+        }
+      }
+    }
   },
   computed: {
     totalUnits() {
-      return subjects => {
+      return (subjects, field) => {
         let units = 0
         subjects.forEach(s => {
-          units += Number(s.units)
+          units += Number(s[field])
         })
         return units
       }
     },
-    totalLabs() {
-      return subjects => {
-        let labs = 0
-        subjects.forEach(s => {
-          labs += Number(s.labs)
-        })
-        return labs
-      }
-    }
+    // totalLabs() {
+    //   return subjects => {
+    //     let labs = 0
+    //     subjects.forEach(s => {
+    //       labs += Number(s.labs)
+    //     })
+    //     return labs
+    //   }
+    // }
   }
 }
 </script>
