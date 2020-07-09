@@ -1247,7 +1247,6 @@ export default {
           this.deleteRow(curriculums, this.paginations.curriculum, id)
 
           if (row.active) {
-            console.log(curriculums.items)
             let curricula = curriculums.items.filter(c => 
               c.active === 0 &&
               c.schoolCategoryId === row.schoolCategoryId &&
@@ -1258,29 +1257,30 @@ export default {
 
             // return
             let latestYear = Math.max(...curricula.map(c => c.effectiveYear), 0)
-            let curr = curricula.find(c => Number(c.effectiveYear) === latestYear)
+            let latestId = Math.max(...curricula.map(c => c.id), 0)
+            let curr = curricula.find(c => Number(c.effectiveYear) === latestYear && c.id === latestId)
 
-            const data = {
-              name: curr.name,
-              schoolCategoryId: curr.schoolCategoryId,
-              courseId: curr.courseId,
-              levelId: curr.levelId,
-              effectiveYear: curr.effectiveYear,
-              active: 1
+            if (curr) {
+              const data = {
+                name: curr.name,
+                schoolCategoryId: curr.schoolCategoryId,
+                courseId: curr.courseId,
+                levelId: curr.levelId,
+                effectiveYear: curr.effectiveYear,
+                active: 1
+              }
+
+              this.updateCurriculum(data, curr.id)
+                .then(({ data }) => {
+                  this.updateRow(curriculums, data)
+                })
+                .catch(error => {
+                  const errors = error.response.data.errors
+                  // curriculum.isProcessing = false
+                  // validate(curriculum, errors)
+                })
             }
-
-            this.updateCurriculum(data, curr.id)
-              .then(({ data }) => {
-                this.updateRow(curriculums, data)
-              })
-              .catch(error => {
-                const errors = error.response.data.errors
-                // curriculum.isProcessing = false
-                // validate(curriculum, errors)
-              })
           }
-          
-          
 
           showNotification(this, "success", "Curriculum deleted successfully.")
           this.showModalConfirmation = false
