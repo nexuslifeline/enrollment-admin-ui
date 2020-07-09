@@ -136,13 +136,13 @@ export const navs = () => {
         icon: 'cil-layers',
         _class: checkRights(0)
       },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Student',
-        to: '/student',
-        icon: 'cil-layers',
-        _class: checkRights(0)
-      }
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Student',
+      //   to: '/student',
+      //   icon: 'cil-layers',
+      //   _class: checkRights(0)
+      // }
     ]
   }]
 }

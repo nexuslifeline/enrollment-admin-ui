@@ -53,7 +53,7 @@
 										v-for="course in options.courses.items" 
 										:key="course.id" 
 										:value="course.id">
-										{{course.name}} {{course.major ? `- ${course.major}` : ''}}
+										{{course.description}} {{course.major ? `(${course.major})` : ''}}
 									</b-form-select-option>
 								</b-form-select>
 							</b-col>
@@ -378,7 +378,7 @@
 				<b-col md=12>
           <b-row class="mb-2">
             <b-col md="4">
-              <b-form-select
+              <!-- <b-form-select
                 v-if="showDepartment"
                 @change="filterByDepartment()"
                 v-model="filters.subject.departmentId">
@@ -392,7 +392,7 @@
                   :value="department.id">
                   {{department.name}}
                 </b-form-select-option>
-              </b-form-select>
+              </b-form-select> -->
             </b-col>
             <b-col offset-md="4" md="4">
               <b-form-input
@@ -404,7 +404,7 @@
           </b-row>
 					<b-table
 						small hover outlined show-empty
-						:items.sync="tables.subjects.filteredItems"
+						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields"
             :filter="filters.subject.criteria"
 						:busy="tables.subjects.isBusy"
@@ -700,7 +700,7 @@ export default {
 	created(){
 		this.checkRights()
     this.loadCourseList()
-    this.loadDepartmentList()
+    // this.loadDepartmentList()
     this.loadSections()
 	},
 	methods: {
@@ -926,7 +926,7 @@ export default {
 			this.getSubjectList(params)
 				.then(({ data }) => {
           subjects.items = data
-          subjects.filteredItems = data
+          // subjects.filteredItems = data
           subject.totalRows = data.length
           this.recordDetails(subject)
 					subjects.isBusy = false
@@ -967,18 +967,18 @@ export default {
 			}
 			this.loadTranscript()
     },
-    filterByDepartment() {
-      const { subjects } = this.tables
-      const { subject } = this.paginations
-      const { departmentId } = this.filters.subject
-      if (departmentId) {
-        subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
-      }
-      else {
-        subjects.filteredItems = subjects.items
-      }
-      this.onFiltered(subjects.filteredItems, subject)
-		},
+    // filterByDepartment() {
+    //   const { subjects } = this.tables
+    //   const { subject } = this.paginations
+    //   const { departmentId } = this.filters.subject
+    //   if (departmentId) {
+    //     subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+    //   }
+    //   else {
+    //     subjects.filteredItems = subjects.items
+    //   }
+    //   this.onFiltered(subjects.filteredItems, subject)
+		// },
 		avatar(student){
       let src = ''
       if (student.photo) {
