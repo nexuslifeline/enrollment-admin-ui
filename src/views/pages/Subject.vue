@@ -116,14 +116,13 @@
     <b-modal 
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
-      size="lg"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
 					Subjects - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
       <b-row>
-        <b-col md=6>
+        <b-col md=12>
           <b-row> 
             <!-- <b-col md=6>
               <b-form-group >
@@ -164,6 +163,78 @@
               </b-form-group>
             </b-col>
           </b-row>
+          <b-row> 
+            <b-col md=12>
+              <b-form-group >
+                <label class="required">School Category</label>
+                <b-form-select
+                  v-model="forms.subject.fields.schoolCategoryId"
+                  :state="forms.subject.states.schoolCategoryId"
+                  @change="loadSubjectPrerequisite()">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
+                  </template>
+                  <b-form-select-option 
+                    v-for="schoolCategory in options.schoolCategories.values" 
+                    :key="schoolCategory.id" 
+                    :value="schoolCategory.id">
+                    {{schoolCategory.name}}
+                  </b-form-select-option>
+                </b-form-select>
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.schoolCategoryId}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <!-- <b-row>
+            <b-col md=12>
+              <b-form-group >
+                <label class="required">Department</label>
+                <b-form-select 
+                  v-model="forms.subject.fields.departmentId"
+                  :state="forms.subject.states.departmentId">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
+                  </template>
+                  <b-form-select-option 
+                    v-for="department in options.departments.items" 
+                    :key="department.id" 
+                    :value="department.id">
+                    {{department.name}}
+                  </b-form-select-option>
+                </b-form-select>
+                <b-form-invalid-feedback>
+                  {{forms.subject.errors.departmentId}}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row> -->
+          <!-- <b-row>
+            <b-col md=12>
+              <b-form-group >
+                <label>Prerequisites 
+                  <v-icon
+                    v-if="isLoading"
+                    class="ml-2"
+                    name="spinner" 
+                    spin/>
+                </label>
+                <Select2
+                  multiple
+                  :disabled="isLoading"
+                  v-model="forms.subject.fields.prerequisites"
+                  :allowClear="false">
+                  <option 
+                    v-for="subject in options.subjects.items"
+                    :key="subject.id" 
+                    :value="subject.id">
+                    {{subject.name}}
+                  </option>
+                </Select2>
+              </b-form-group>
+            </b-col>
+          </b-row> -->
           <b-row>
             <b-col md=6>
               <b-form-group label="Lecture Units">
@@ -261,80 +332,6 @@
               </b-form-group>
             </b-col>
           </b-row>
-        </b-col>
-        <b-col md=6>
-          <b-row> 
-            <b-col md=12>
-              <b-form-group >
-                <label class="required">School Category</label>
-                <b-form-select
-                  v-model="forms.subject.fields.schoolCategoryId"
-                  :state="forms.subject.states.schoolCategoryId"
-                  @change="loadSubjectPrerequisite()">
-                  <template v-slot:first>
-                    <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
-                  </template>
-                  <b-form-select-option 
-                    v-for="schoolCategory in options.schoolCategories.values" 
-                    :key="schoolCategory.id" 
-                    :value="schoolCategory.id">
-                    {{schoolCategory.name}}
-                  </b-form-select-option>
-                </b-form-select>
-                <b-form-invalid-feedback>
-                  {{forms.subject.errors.schoolCategoryId}}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col md=12>
-              <b-form-group >
-                <label class="required">Department</label>
-                <b-form-select 
-                  v-model="forms.subject.fields.departmentId"
-                  :state="forms.subject.states.departmentId">
-                  <template v-slot:first>
-                    <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
-                  </template>
-                  <b-form-select-option 
-                    v-for="department in options.departments.items" 
-                    :key="department.id" 
-                    :value="department.id">
-                    {{department.name}}
-                  </b-form-select-option>
-                </b-form-select>
-                <b-form-invalid-feedback>
-                  {{forms.subject.errors.departmentId}}
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <!-- <b-row>
-            <b-col md=12>
-              <b-form-group >
-                <label>Prerequisites 
-                  <v-icon
-                    v-if="isLoading"
-                    class="ml-2"
-                    name="spinner" 
-                    spin/>
-                </label>
-                <Select2
-                  multiple
-                  :disabled="isLoading"
-                  v-model="forms.subject.fields.prerequisites"
-                  :allowClear="false">
-                  <option 
-                    v-for="subject in options.subjects.items"
-                    :key="subject.id" 
-                    :value="subject.id">
-                    {{subject.name}}
-                  </option>
-                </Select2>
-              </b-form-group>
-            </b-col>
-          </b-row> -->
         </b-col>
       </b-row>
       <!-- modal body -->
@@ -454,12 +451,12 @@ export default {
 							tdClass: "align-middle",
 							thStyle: {width: "auto"}
             },
-            {
-							key: "department.name",
-							label: "DEPARTMENT",
-							tdClass: "align-middle",
-							thStyle: {width: "8%"}
-            },
+            // {
+						// 	key: "department.name",
+						// 	label: "DEPARTMENT",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "8%"}
+            // },
             {
 							key: "schoolCategory.name",
 							label: "SCHOOL CATEGORY",
@@ -562,7 +559,7 @@ export default {
 	},
 	created(){
     this.loadSubjects()
-    this.loadDepartments()
+    // this.loadDepartments()
 	},
 	methods: {
 		loadSubjects(){

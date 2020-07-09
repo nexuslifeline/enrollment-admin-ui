@@ -125,13 +125,13 @@
       <b-row>
         <b-col md=12>
           <b-form-group >
-            <label class="required">School Fee Category</label>
+            <label>School Fee Category</label>
             <b-form-select 
               v-model="forms.schoolFee.fields.schoolFeeCategoryId"
               :state="forms.schoolFee.states.schoolFeeCategoryId"
               >
               <template v-slot:first>
-                <b-form-select-option :value="null" disabled>-- School Fee Category --</b-form-select-option>
+                <b-form-select-option :value="null" >-- N/A --</b-form-select-option>
               </template>
               <b-form-select-option 
                 v-for="schoolFeeCategory in options.schoolFeeCategories.items" 

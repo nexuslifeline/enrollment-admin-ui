@@ -587,7 +587,7 @@
 				<b-col md=12>
           <b-row class="mb-2">
             <b-col md="4">
-              <b-form-select
+              <!-- <b-form-select
                 v-if="checkSchoolCategory()"
                 @change="filterByDepartment()"
                 v-model="filters.subject.departmentId">
@@ -600,7 +600,7 @@
                   :value="department.id">
                   {{department.name}}
                 </b-form-select-option>
-              </b-form-select>
+              </b-form-select> -->
             </b-col>
             <b-col offset-md="4" md="4">
               <b-form-input
@@ -612,7 +612,7 @@
           </b-row>
 					<b-table
 						small hover outlined show-empty
-						:items.sync="tables.subjects.filteredItems"
+						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields2"
             :filter="filters.subject.criteria"
 						:busy="tables.subjects.isBusy2"
@@ -1025,7 +1025,7 @@ export default {
 	created(){
     this.loadCurriculums()
     this.checkRights()
-    this.loadDepartments()
+    // this.loadDepartments()
 	},
 	methods: {
     loadCurriculums() {
@@ -1164,7 +1164,6 @@ export default {
           } else {
             getSelectedLevel = true
           }
-          console.log(getSelectedLevel)
           this.loadLevelsOfSchoolCategoryList(getSelectedLevel)
           this.showEntry = true
         })
@@ -1210,7 +1209,7 @@ export default {
             this.addRow(curriculums, this.paginations.curriculum, data)
             curriculum.isProcessing = false
             showNotification(this, "success", "Curriculum created successfully.")
-            this.updateOldCurriculum(data.active, data.id)
+            this.updateOldCurriculum(data)
             this.showEntry = false
           })
           .catch(error => {
@@ -1224,7 +1223,7 @@ export default {
             curriculum.isProcessing = false
             this.updateRow(curriculums, data)
             showNotification(this, "success", "Curriculum updated successfully.")
-            this.updateOldCurriculum(data.active, data.id)
+            this.updateOldCurriculum(data)
             this.showEntry = false
           })
           .catch(error => {
@@ -1243,9 +1242,21 @@ export default {
           curriculum.isProcessing = false
           let row = curriculums.items.find(c => c.id === id)
           this.deleteRow(curriculums, this.paginations.curriculum, id)
+
           if (row.active) {
-            let latestYear = Math.max(...curriculums.items.map(c => c.effectiveYear), 0)
-            let curr = curriculums.items.find(c => c.effectiveYear === latestYear)
+            console.log(curriculums.items)
+            let curricula = curriculums.items.filter(c => 
+              c.active === 0 &&
+              c.schoolCategoryId === row.schoolCategoryId &&
+              c.levelId === row.levelId &&
+              c.courseId === row.courseId &&
+              c.id !== row.id
+            )
+
+            // console.log(curricula)
+            // return
+            let latestYear = Math.max(...curricula.map(c => c.effectiveYear), 0)
+            let curr = curricula.find(c => c.effectiveYear === latestYear)
 
             const data = {
               name: curr.name,
@@ -1262,8 +1273,8 @@ export default {
               })
               .catch(error => {
                 const errors = error.response.data.errors
-                curriculum.isProcessing = false
-                validate(curriculum, errors)
+                // curriculum.isProcessing = false
+                // validate(curriculum, errors)
               })
           }
           
@@ -1282,7 +1293,7 @@ export default {
 			this.getSubjectList(params)
 				.then(({ data }) => {
           subjects.items = data
-          subjects.filteredItems = data
+          // subjects.filteredItems = data
           subject.totalRows = data.length
           this.recordDetails(subject)
 					subjects.isBusy2 = false
@@ -1340,18 +1351,18 @@ export default {
           departments.items = data
         })
     },
-    filterByDepartment() {
-      const { subjects } = this.tables
-      const { subject } = this.paginations
-      const { departmentId } = this.filters.subject
-      if (departmentId) {
-        subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
-      }
-      else {
-        subjects.filteredItems = subjects.items
-      }
-      this.onFiltered(subjects.filteredItems, subject)
-		},
+    // filterByDepartment() {
+    //   const { subjects } = this.tables
+    //   const { subject } = this.paginations
+    //   const { departmentId } = this.filters.subject
+    //   if (departmentId) {
+    //     subjects.filteredItems = subjects.items.filter(s => s.departmentId === departmentId)
+    //   }
+    //   else {
+    //     subjects.filteredItems = subjects.items
+    //   }
+    //   this.onFiltered(subjects.filteredItems, subject)
+		// },
 		checkSchoolCategory(isGradSchoolVoc = false) {
 			const { schoolCategoryId } = this.forms.curriculum.fields
       const { schoolCategories } = this.options
@@ -1446,10 +1457,15 @@ export default {
 			)
 			return filteredSubjects
     },
-    updateOldCurriculum(isActive, id) {
-      console.log(isActive)
-      if (isActive) {
-        let curriculum = this.tables.curriculums.items.find(c => c.active === isActive && c.id !== id)
+    updateOldCurriculum(data) {
+      if (data.active) {
+        let curriculum = this.tables.curriculums.items.find(c => 
+          c.active === data.active &&
+          c.schoolCategoryId === data.schoolCategoryId &&
+          c.levelId === data.levelId &&
+          c.courseId === data.courseId &&
+          c.id !== data.id
+        )
         if (curriculum) {
           curriculum.active = 0
         }
