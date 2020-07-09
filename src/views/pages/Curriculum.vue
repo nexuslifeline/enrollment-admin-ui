@@ -176,7 +176,7 @@
 									<b-row>
 										<b-col md=6>
 											Showing {{ paginations.curriculum.from }} to {{ paginations.curriculum.to }} of {{ paginations.curriculum.totalRows }} records.
-											</b-col>
+                    </b-col>
 										<b-col md=6>
 											<b-pagination
 												v-model="paginations.curriculum.page"
@@ -1217,7 +1217,7 @@ export default {
             const errors = error.response.data.errors
             curriculum.isProcessing = false
             validate(curriculum, errors)
-            showNotification(this, "danger", "Please fill up all the required fields.")
+            this.showBulletedNotification(errors)
           })
       } else {
         this.updateCurriculum(data, fields.id)
@@ -1232,7 +1232,7 @@ export default {
             const errors = error.response.data.errors
             curriculum.isProcessing = false
             validate(curriculum, errors)
-            showNotification(this, "danger", "Please fill up all the required fields.")
+            this.showBulletedNotification(errors)
           })
       }
     },
@@ -1472,6 +1472,18 @@ export default {
           curriculum.active = 0
         }
       }
+    },
+    showBulletedNotification(errors) {
+      const h = this.$createElement
+      const errorList = []
+      Object.keys(errors).forEach((key) => {
+        errorList.push(h('li', errors[key][0]))
+      })
+      const vNodesMsg = h(
+        'ul',
+        errorList
+      )
+      showNotification(this, "danger", vNodesMsg)
     }
   },
   computed: {
