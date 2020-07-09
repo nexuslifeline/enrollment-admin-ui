@@ -45,7 +45,8 @@
 							<b-row >
 								<b-col md=12>
 									<b-table
-										small hover outlined show-empty responsive
+										small hover outlined show-empty
+                    :responsive="tables.curriculums.items.length > 3"
 										:fields="tables.curriculums.fields"
 										:busy="tables.curriculums.isBusy"
 										:items.sync="tables.curriculums.items" 
@@ -739,19 +740,19 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: {width: "15%"}
-            },
-            {
-              key: "description",
-							label: "Description",
-							tdClass: "align-middle",
 							thStyle: {width: "auto"}
             },
+            // {
+            //   key: "description",
+						// 	label: "Description",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "auto"}
+            // },
             {
 							key: "effectiveYear",
 							label: "Effective Year",
 							tdClass: "align-middle",
-							thStyle: {width: "8%"}
+							thStyle: {width: "10%"}
 						},
 						{
 							key: "schoolCategory.name",
@@ -1216,6 +1217,7 @@ export default {
             const errors = error.response.data.errors
             curriculum.isProcessing = false
             validate(curriculum, errors)
+            showNotification(this, "danger", "Please fill up all the required fields.")
           })
       } else {
         this.updateCurriculum(data, fields.id)
@@ -1230,6 +1232,7 @@ export default {
             const errors = error.response.data.errors
             curriculum.isProcessing = false
             validate(curriculum, errors)
+            showNotification(this, "danger", "Please fill up all the required fields.")
           })
       }
     },
@@ -1253,10 +1256,9 @@ export default {
               c.id !== row.id
             )
 
-            // console.log(curricula)
             // return
             let latestYear = Math.max(...curricula.map(c => c.effectiveYear), 0)
-            let curr = curricula.find(c => c.effectiveYear === latestYear)
+            let curr = curricula.find(c => Number(c.effectiveYear) === latestYear)
 
             const data = {
               name: curr.name,
