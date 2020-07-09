@@ -1257,8 +1257,9 @@ export default {
 
             // return
             let latestYear = Math.max(...curricula.map(c => c.effectiveYear), 0)
-            let latestId = Math.max(...curricula.map(c => c.id), 0)
-            let curr = curricula.find(c => Number(c.effectiveYear) === latestYear && c.id === latestId)
+            let curr = curricula.filter(c => Number(c.effectiveYear) === latestYear)
+            let latestId = Math.max(...curr.map(c => c.id), 0)
+            curr = curr.find(c => c.id === latestId)
 
             if (curr) {
               const data = {
