@@ -29,6 +29,13 @@ export const navs = () => {
         items: [
           {
             _name: 'CSidebarNavItem',
+            name: 'Evaluation',
+            to: '/evaluation',
+            icon: 'cil-user',
+            class: checkRights(1)
+          },
+          {
+            _name: 'CSidebarNavItem',
             name: 'Student Admission',
             to: '/studentadmission',
             icon: 'cil-user',

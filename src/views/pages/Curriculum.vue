@@ -1125,15 +1125,6 @@ export default {
           })
       }
 		},
-		loadSemesterList(){
-			this.isLoading = true
-			let params = { paginate: false }
-			this.getSemesterList(params)
-				.then(({ data }) => {
-					this.options.semesters.items = data
-					this.isLoading = false
-				})
-    },
     setCreate() {
       const { curriculum, curriculum: { fields } } = this.forms
       reset(curriculum)

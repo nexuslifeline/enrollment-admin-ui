@@ -89,6 +89,12 @@ export const StudentFeeStatuses = new Enum({
   APPROVED: { id: 2, name: 'Approved' },
 });
 
+export const EvaluationStatuses = new Enum({
+  SUBMITTED: { id: 2, name: 'Pending' },
+  APPROVED: { id: 3, name: 'Approved' },
+  REJECTED: { id: 4, name: 'Rejected' }
+})
+
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Semester', description: 'First Semester' },
   SECOND_SEM: { id: 2, name: '2nd Semester', description: 'Second Semester' },
