@@ -178,21 +178,20 @@
                                 [Set Curriculum]
                               </b-link>
                             </div>
-                            <b-form-group v-else>
-                              <b-form-select
-                                @change="loadStudentCurriculum($event, data), data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit"
-                                v-model="data.item.studentCurriculumId">
-                                <template v-slot:first>
-                                  <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
-                                </template>
-                                <b-form-select-option 
-                                  v-for="curriculum in data.item.curriculums" 
-                                  :key="curriculum.id" 
-                                  :value="curriculum.id">
-                                  {{ curriculum.name }}
-                                </b-form-select-option>
-                              </b-form-select>
-                            </b-form-group>
+                            <b-form-select
+                              v-else
+                              @change="loadStudentCurriculum($event, data), data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit"
+                              v-model="data.item.studentCurriculumId">
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
+                              </template>
+                              <b-form-select-option 
+                                v-for="curriculum in data.item.curriculums" 
+                                :key="curriculum.id" 
+                                :value="curriculum.id">
+                                {{ curriculum.name }}
+                              </b-form-select-option>
+                            </b-form-select>
                           </div>
                           <small><i>(Please specify the curriculum that the student is using.)</i></small>
                         </b-col>
@@ -619,7 +618,7 @@
 </template>
 <script>
 import { EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi } from "../../mixins/api"
-import { SchoolCategories, EvaluationStatuses, Semesters, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, EvaluationStatuses, Semesters, UserGroups, StudentCategories } from "../../helpers/enum"
 import { showNotification, formatNumber, clearFields } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
@@ -1006,12 +1005,18 @@ export default {
                   const activeCurriculum = data.find(c => c.active === 1)
                   if (activeCurriculum) {
                     item.curriculumId = activeCurriculum.id
-                    item.isLoading = false
+                    if (item.studentCategoryId === StudentCategories.NEW.id) {
+                      item.studentCurriculumId = activeCurriculum.id
+                      item.studentCurriculum = activeCurriculum
+                    }
                   } else {
                     this.$set(item, 'curriculumMsg', true)
+                    item.isLoading = false
+                    return
                   }
                 }
                 this.loadCurriculum(item.curriculumId, row)
+                item.isLoading = false
               } else {
                 this.$set(item, 'curriculumMsg', true)
                 item.isLoading = false

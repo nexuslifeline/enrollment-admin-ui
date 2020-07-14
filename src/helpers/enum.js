@@ -33,7 +33,8 @@ export const StudentTypes = new Enum({
 
 export const StudentCategories = new Enum({
   NEW: { id: 1, name: 'New Student' },
-  OLD: { id: 2, name: 'Old Student' }
+  OLD: { id: 2, name: 'Old Student' },
+  TRANSFEREE: { id: 3, name: 'Transferee' }
 });
 
 export const SchoolCategories = new Enum({
