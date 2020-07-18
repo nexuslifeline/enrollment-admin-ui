@@ -764,29 +764,31 @@ export default {
               this.getRateSheetList(rateSheetParams)
                 .then(({ data }) => {
                   const res = data.data
-                  this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
-                  this.$set(row.item, 'previousBalance', 0)
-                  this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
+                  if (res.length > 0) {
+                    this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
+                    this.$set(row.item, 'previousBalance', 0)
+                    this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
 
-                  if (res[0].isComputedByUnits) {
-                    const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
-                    let amount = 0
-                    let notes = ""
-                    
-                    row.item.subjects.forEach(subject => {
-                      amount += Number(subject.totalAmount)
-                      notes += subject.name + ", "
-                    })
-
-                    if(tuitionFee) {
-                      tuitionFee.pivot.amount = amount
-                      tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
-                    } else {
-                      row.item.fees.unshift({
-                        id: Fees.TUITION_FEE.id,
-                        name : Fees.TUITION_FEE.name,
-                        pivot:{ amount: amount, notes: notes }
+                    if (res[0].isComputedByUnits) {
+                      const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
+                      let amount = 0
+                      let notes = ""
+                      
+                      row.item.subjects.forEach(subject => {
+                        amount += Number(subject.totalAmount)
+                        notes += subject.name + ", "
                       })
+
+                      if(tuitionFee) {
+                        tuitionFee.pivot.amount = amount
+                        tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
+                      } else {
+                        row.item.fees.unshift({
+                          id: Fees.TUITION_FEE.id,
+                          name : Fees.TUITION_FEE.name,
+                          pivot:{ amount: amount, notes: notes }
+                        })
+                      }
                     }
                   }
                   row.item.isLoading = false

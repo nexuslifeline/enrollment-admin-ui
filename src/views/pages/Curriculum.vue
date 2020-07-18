@@ -301,6 +301,7 @@
 											<b-form-group>
 												<label class="required">Effective Year</label>
 												<b-form-input
+                          no-wheel
                           debounce="500"
                           type="number"
 													v-model="forms.curriculum.fields.effectiveYear"
