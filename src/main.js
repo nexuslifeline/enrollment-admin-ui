@@ -17,6 +17,7 @@ import 'vue-awesome/icons/ellipsis-v'
 import 'vue-awesome/icons/caret-left'
 import 'vue-awesome/icons/caret-down'
 import 'vue-awesome/icons/search'
+import 'vue-awesome/icons/pen'
 import Icon from 'vue-awesome/components/Icon'
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'

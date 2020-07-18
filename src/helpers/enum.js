@@ -33,7 +33,8 @@ export const StudentTypes = new Enum({
 
 export const StudentCategories = new Enum({
   NEW: { id: 1, name: 'New Student' },
-  OLD: { id: 2, name: 'Old Student' }
+  OLD: { id: 2, name: 'Old Student' },
+  TRANSFEREE: { id: 3, name: 'Transferee' }
 });
 
 export const SchoolCategories = new Enum({
@@ -88,6 +89,12 @@ export const StudentFeeStatuses = new Enum({
   DRAFT: { id: 1, name: 'Draft/Pending' },
   APPROVED: { id: 2, name: 'Approved' },
 });
+
+export const EvaluationStatuses = new Enum({
+  SUBMITTED: { id: 2, name: 'Pending' },
+  APPROVED: { id: 3, name: 'Approved' },
+  REJECTED: { id: 4, name: 'Rejected' }
+})
 
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Semester', description: 'First Semester' },

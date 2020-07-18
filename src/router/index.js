@@ -15,6 +15,7 @@ const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
 
+const Evaluation = () => import('@/views/pages/Evaluation')
 const StudentAdmission = () => import('@/views/pages/StudentAdmission')
 const StudentAssessmentFee = () => import('@/views/pages/StudentAssessmentFee')
 const RateSheet = () => import('@/views/pages/RateSheet')
@@ -80,6 +81,12 @@ function configRoutes () {
           name: 'Dashboard',
           component: Dashboard,
           meta: { requiresAuth: true }
+        },
+        {
+          path: 'evaluation',
+          name: 'Evaluation',
+          component: Evaluation,
+          meta: { requiresAuth: true, userType: 1 }
         },
         {
           path: 'studentadmission',

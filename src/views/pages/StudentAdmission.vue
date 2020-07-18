@@ -6,19 +6,11 @@
 					<b-card-body>
 						<b-row>
 							<b-col md=9>
-								<b-tabs pills>
-									<b-tab 
-										@click="filters.student.schoolCategoryId = null, loadTranscript()"
-										active
-										:disabled="schoolCategoryId !== null"
-										title="All" />
-									<b-tab v-for="schoolCategory in options.schoolCategories.values" 
-										:key="schoolCategory.id"
-										:title="schoolCategory.name"
-										:active="schoolCategoryId === schoolCategory.id"
-										:disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
-                    @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
-								</b-tabs>
+								<SchoolCategoryTabs
+                  :showAll="true" 
+                  :schoolCategoryId="schoolCategoryId"
+                  @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
+                  @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
 							</b-col>
 							<b-col md=3>
 								
@@ -458,6 +450,7 @@
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
 import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
+import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
 
 const transcriptFields = {
@@ -481,7 +474,10 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-	mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables],
+  mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables],
+  components: {
+    SchoolCategoryTabs
+  },
 	data() {
 		return {
       showModalPreview: false,
@@ -895,7 +891,7 @@ export default {
       return ''
     },
     previewFile(row) {
-      const { paymentId, id, name, notes } = row.item
+      const { admissionId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
       this.file.name = name

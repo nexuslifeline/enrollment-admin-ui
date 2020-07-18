@@ -7,17 +7,11 @@
 						<b-row>
 							<b-col md=9>
                 <b-tabs pills>
-                  <b-tab 
-                    @click="filters.student.schoolCategoryId = null, loadTranscript()"
-                    active
-                    :disabled="schoolCategoryId !== null"
-                    title="All" />
-                  <b-tab v-for="schoolCategory in options.schoolCategories.values" 
-                    :key="schoolCategory.id"
-                    :title="schoolCategory.name"
-                    :active="schoolCategoryId === schoolCategory.id"
-                    :disabled="schoolCategoryId === null ? false : schoolCategoryId !== schoolCategory.id"
-                    @click="filters.student.schoolCategoryId = schoolCategory.id, loadTranscript()"/>
+                  <SchoolCategoryTabs
+                    :showAll="true" 
+                    :schoolCategoryId="schoolCategoryId"
+                    @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
+                    @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
                 </b-tabs>
 							</b-col>
 							<b-col md=3>
@@ -405,10 +399,14 @@
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
 import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups, BillingTypes, BillingStatuses } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
+import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
 export default {
 	name: "StudentFee",
-	mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi, Tables],
+  mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi, Tables],
+  components: {
+    SchoolCategoryTabs
+  },
 	data() {
 		return {
       showModalFees: false,
