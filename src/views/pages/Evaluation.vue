@@ -92,6 +92,14 @@
                   <!-- {{ data.item.enrolledYear ? `Enrolled Year: ${data.item.enrolledYear}` : '' }} -->
                 </span>
 							</template>
+              <template v-slot:cell(studentCategory.name)="{ item: { studentCategory, studentCategoryId } }">
+								<b-badge
+                  :variant="studentCategoryId === studentCategories.NEW.id 
+										? 'success' 
+										: studentCategoryId === studentCategories.OLD.id ? 'primary' : 'warning'">
+									{{ studentCategory.name }}
+								</b-badge>
+							</template>
 							<template v-slot:cell(status)="data">
 								<b-badge
 									:variant="data.item.evaluationStatusId === evaluationStatuses.APPROVED.id 
@@ -130,43 +138,66 @@
                     <b-card>
                       <b-row>
                         <b-col md="4">
-                          <div class="d-flex flex-row">
+                          <div class="d-flex flex-row font-weight-bold">
+                            <i><u>Student Information</u></i>
+                          </div>
+                          <div class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-first">Student Number </div>
                             <div> : <b>{{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</b></div>
                           </div>
-                          <div class="d-flex flex-row">
+                          <div class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-first">Name </div>
                             <div> : <b>{{ data.item.student.name }}</b></div>
                           </div>
-                          <div class="d-flex flex-row mt-2">
+                          <div class="d-flex flex-row font-weight-bold mt-2">
+                            <i><u>Current Academic Application</u></i>
+                          </div>
+                          <div class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-first">Level </div>
                             <div> : <b>{{ getName(data.item, 'level') }}</b></div>
                           </div>
-                          <div v-if="data.item.course" class="d-flex flex-row">
+                          <div v-if="data.item.course" class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-first">Course </div>
                             <div> : <b>{{ data.item.course.description }}</b></div>
                           </div>
+                          <div v-if="data.item.course" class="d-flex flex-row pl-2">
+                            <div class="evaluation__form-details-first">Semester </div>
+                            <div> : <b>{{ semesters.getEnum(data.item.semesterId).name }}</b></div>
+                          </div>
                         </b-col>
                         <b-col md="4">
-                          <div class="d-flex flex-row">
+                          <div class="d-flex flex-row font-weight-bold">
+                            <i><u>Previous Education</u></i>
+                          </div>
+                          <div class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-second">Last School Attended </div>
                             <div> : <b>{{ data.item.lastSchoolAttended }}</b></div>
                           </div>
-                          <div class="d-flex flex-row">
+                          <div class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-second">Last Year Attended </div>
                             <div> : <b>{{ data.item.lastYearAttended }}</b></div>
                           </div>
-                          <div v-if="data.item.enrolledYear" class="d-flex flex-row">
+                          <div v-if="data.item.enrolledYear" class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-second">Enrolled Year </div>
                             <div> : <b>{{ data.item.enrolledYear }}</b></div>
                           </div>
                         </b-col>
                         <b-col md="4">
-                          <div class="d-flex flex-row">
-                            <div class="evaluation__form-details-first">Student Category </div>
-                            <div> : <b>{{ data.item.studentCategory.name }}</b></div>
+                          <div class="d-flex flex-row font-weight-bold">
+                            <i><u>Student Category & Curriculum</u></i>
                           </div>
-                          <div class="d-flex flex-row">
+                          <div class="d-flex flex-row pl-2">
+                            <div class="evaluation__form-details-first">Student Category </div>
+                            <div> : 
+                              <b-badge
+                                :variant="data.item.studentCategoryId === studentCategories.NEW.id 
+                                  ? 'success' 
+                                  : data.item.studentCategoryId === studentCategories.OLD.id ? 'primary' : 'warning'">
+                                {{ data.item.studentCategory.name }}
+                              </b-badge>
+                            </div>
+                          </div>
+                          <div class="d-flex flex-row pl-2">
                             <div class="evaluation__form-details-first">Curriculum </div>
                             <div v-if="!data.item.studentCurriculumEdit"> 
                               : <span :class="`font-weight-bold ${!data.item.studentCurriculum ? 'text-danger' : ''}`">
@@ -193,7 +224,7 @@
                               </b-form-select-option>
                             </b-form-select>
                           </div>
-                          <small><i>(Please specify the curriculum that the student is using.)</i></small>
+                          <small class="pl-2"><i>(Please specify the curriculum that the student is using.)</i></small>
                         </b-col>
                       </b-row>
                     </b-card>
@@ -643,7 +674,9 @@ export default {
       showModalRejection: false,
       showModalSubjects: false,
 			isLoading: false,
-			evaluationStatuses: EvaluationStatuses,
+      evaluationStatuses: EvaluationStatuses,
+      semesters: Semesters,
+      studentCategories: StudentCategories,
       file: {
         type: null,
         src: null,
@@ -849,7 +882,6 @@ export default {
       },
       isProcessing: false,
       schoolCategoryId: null,
-      semesters: Semesters,
       row: []
 		}
 	},
@@ -984,14 +1016,23 @@ export default {
           item,
           item: {  
             id, 
-            schoolCategoryId
+            schoolCategoryId,
+            levelId,
+            courseId
           }
         } = row
         this.$set(item, 'isLoading', true)
         this.$set(item, 'curriculumEdit', false)
         this.$set(item, 'studentCurriculumEdit', false)
         this.$set(item, 'curriculums', false)
-        const params = { paginate: false, schoolCategoryId }
+
+        let params = { paginate: false, schoolCategoryId, levelId}
+
+        if (schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id || 
+          schoolCategoryId === SchoolCategories.COLLEGE.id) {
+          params = { paginate: false, schoolCategoryId, courseId }
+        }
+        
         item.isLoading = true
         this.getEvaluationFileList(id, { paginate: false })
         .then(({ data }) => {
@@ -1016,7 +1057,7 @@ export default {
                   }
                 }
                 this.loadCurriculum(item.curriculumId, row)
-                item.isLoading = false
+                // item.isLoading = false
               } else {
                 this.$set(item, 'curriculumMsg', true)
                 item.isLoading = false
