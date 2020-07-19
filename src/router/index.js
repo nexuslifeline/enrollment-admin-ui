@@ -90,7 +90,7 @@ function configRoutes () {
         },
         {
           path: 'studentadmission',
-          name: 'Student Admission',
+          name: 'Student Subject Enlistment',
           component: StudentAdmission,
           meta: { requiresAuth: true, userType: 1 }
         },
