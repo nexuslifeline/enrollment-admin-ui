@@ -137,94 +137,114 @@
                     </b-card>
                     <b-card>
                       <b-row>
-                        <b-col md="4">
-                          <div class="d-flex flex-row font-weight-bold">
-                            <i><u>Student Information</u></i>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Student Number </div>
-                            <div> : <b>{{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</b></div>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Name </div>
-                            <div> : <b>{{ data.item.student.name }}</b></div>
-                          </div>
-                          <div class="d-flex flex-row font-weight-bold mt-2">
-                            <i><u>Current Academic Application</u></i>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Level </div>
-                            <div> : <b>{{ getName(data.item, 'level') }}</b></div>
-                          </div>
-                          <div v-if="data.item.course" class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Course </div>
-                            <div> : <b>{{ data.item.course.description }}</b></div>
-                          </div>
-                          <div v-if="data.item.course" class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Semester </div>
-                            <div> : <b>{{ semesters.getEnum(data.item.semesterId).name }}</b></div>
-                          </div>
-                        </b-col>
-                        <b-col md="4">
-                          <div class="d-flex flex-row font-weight-bold">
-                            <i><u>Previous Education</u></i>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-second">Last School Attended </div>
-                            <div> : <b>{{ data.item.lastSchoolAttended }}</b></div>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-second">Last Year Attended </div>
-                            <div> : <b>{{ data.item.lastYearAttended }}</b></div>
-                          </div>
-                          <div v-if="data.item.enrolledYear" class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-second">Enrolled Year </div>
-                            <div> : <b>{{ data.item.enrolledYear }}</b></div>
-                          </div>
-                        </b-col>
-                        <b-col md="4">
-                          <div class="d-flex flex-row font-weight-bold">
-                            <i><u>Student Category & Curriculum</u></i>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Student Category </div>
-                            <div> : 
+                        <b-col md="12">
+                          <b-row class="mb-2">
+                            <b-col md=12>
+                              <span class="font-weight-bold">Student Information</span>
+                              <hr class="m-0 border-dark">
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              Student Number : <span class="font-weight-bold">{{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</span>
+                            </b-col>
+                            <b-col md=6>
+                              Name : <span class="font-weight-bold">{{ data.item.student.name }}</span>
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              Student Category : 
                               <b-badge
                                 :variant="data.item.studentCategoryId === studentCategories.NEW.id 
                                   ? 'success' 
                                   : data.item.studentCategoryId === studentCategories.OLD.id ? 'primary' : 'warning'">
                                 {{ data.item.studentCategory.name }}
                               </b-badge>
-                            </div>
-                          </div>
-                          <div class="d-flex flex-row pl-2">
-                            <div class="evaluation__form-details-first">Curriculum </div>
-                            <div v-if="!data.item.studentCurriculumEdit"> 
-                              : <span :class="`font-weight-bold ${!data.item.studentCurriculum ? 'text-danger' : ''}`">
-                                  {{ data.item.studentCurriculum ? data.item.studentCurriculum.name : 'Nothing is Set' }}
-                                </span>&nbsp;
-                              <b-link 
-                                v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
-                                @click="data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit">
-                                [Set Curriculum]
-                              </b-link>
-                            </div>
-                            <b-form-select
-                              v-else
-                              @change="loadStudentCurriculum($event, data), data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit"
-                              v-model="data.item.studentCurriculumId">
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
-                              </template>
-                              <b-form-select-option 
-                                v-for="curriculum in data.item.curriculums" 
-                                :key="curriculum.id" 
-                                :value="curriculum.id">
-                                {{ curriculum.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                          </div>
-                          <small class="pl-2"><i>(Please specify the curriculum that the student is using.)</i></small>
+                            </b-col>
+                            <b-col md=6>
+                              Contact Number : <span class="font-weight-bold">{{ data.item.student.mobileNo }}</span>
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              Email : <span class="font-weight-bold">{{ data.item.student.email }}</span>
+                            </b-col>
+                            <b-col md=6>
+                              Address : 
+                              <span class="font-weight-bold">
+                                {{ data.item.student.address ? data.item.student.address.currentCompleteAddress : "" }}
+                              </span>
+                            </b-col>
+                          </b-row>
+                          <b-row class="my-2">
+                            <b-col md=12>
+                              <span class="font-weight-bold">Previous Educational Background</span>
+                              <hr class="m-0 border-dark">
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              Last School Attended : <span class="font-weight-bold">{{ data.item.lastSchoolAttended }}</span>
+                            </b-col>
+                            <b-col md=6 v-if="data.item.enrolledYear">
+                              Enrolled Year : <span class="font-weight-bold">{{ data.item.enrolledYear }}</span>
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              Year Attended : <span class="font-weight-bold">{{ data.item.lastYearAttended }}</span>
+                            </b-col>
+                          </b-row>
+                          <b-row class="my-2">
+                            <b-col md=12>
+                              <span class="font-weight-bold">Applying for Academic Record</span>
+                              <hr class="m-0 border-dark">
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              <div class="d-flex flex-row">
+                                <div>Curriculum : </div>
+                                <div v-if="!data.item.studentCurriculumEdit">
+                                  <span :class="`font-weight-bold ${!data.item.studentCurriculum ? 'text-danger' : ''}`">
+                                    {{ data.item.studentCurriculum ? data.item.studentCurriculum.name : 'Nothing is Set' }}
+                                  </span>&nbsp;
+                                  <b-link 
+                                    v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
+                                    @click="data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit">
+                                    [Set Curriculum]
+                                  </b-link>
+                                </div>
+                                <div v-else class="w-75 ml-2">
+                                  <b-form-select
+                                    @change="loadStudentCurriculum($event, data), data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit"
+                                    v-model="data.item.studentCurriculumId">
+                                    <template v-slot:first>
+                                      <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
+                                    </template>
+                                    <b-form-select-option 
+                                      v-for="curriculum in data.item.curriculums" 
+                                      :key="curriculum.id" 
+                                      :value="curriculum.id">
+                                      {{ curriculum.name }}
+                                    </b-form-select-option>
+                                  </b-form-select>
+                                </div>
+                              </div>
+                            </b-col>
+                            <b-col md=6 v-if="data.item.course">
+                              Course : <span class="font-weight-bold">{{ data.item.course.description }}</span>
+                            </b-col>
+                          </b-row>
+                          <b-row class="pl-2">
+                            <b-col md=6>
+                              Level : <span class="font-weight-bold">{{ getName(data.item, 'level') }}</span>
+                            </b-col>
+                            <b-col md=6 v-if="data.item.course">
+                              Semester : <span class="font-weight-bold">{{ semesters.getEnum(data.item.semesterId).name }}</span>
+                            </b-col>
+                          </b-row>
                         </b-col>
                       </b-row>
                     </b-card>
