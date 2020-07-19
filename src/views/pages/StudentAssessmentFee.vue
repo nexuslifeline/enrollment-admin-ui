@@ -170,10 +170,13 @@
                   </b-card>
                   <b-card v-if="data.item.fees">
                     <b-row class="mb-3">
-                      <b-col md=6>
+                      <b-col md=4>
                         <h5 class="pt-2">STUDENT FEES</h5>
                       </b-col>
-                      <b-col md=6>
+                      <b-col md=4 class="text-center">
+                        <span v-if="data.item.msg" class="text-danger font-weight-bold">{{ data.item.msg }}</span>
+                      </b-col>
+                      <b-col md=4>
                         <b-button 
                           @click="onAddFees(data.item.fees)"
                           v-if="data.item.applicationId ? 
@@ -764,11 +767,10 @@ export default {
               this.getRateSheetList(rateSheetParams)
                 .then(({ data }) => {
                   const res = data.data
+                  this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
+                  this.$set(row.item, 'previousBalance', 0)
+                  this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
                   if (res.length > 0) {
-                    this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
-                    this.$set(row.item, 'previousBalance', 0)
-                    this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
-
                     if (res[0].isComputedByUnits) {
                       const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
                       let amount = 0
@@ -790,6 +792,8 @@ export default {
                         })
                       }
                     }
+                  } else {
+                    this.$set(row.item, 'msg', 'No rate sheet fee is set.')
                   }
                   row.item.isLoading = false
                 })

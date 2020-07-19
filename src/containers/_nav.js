@@ -36,7 +36,7 @@ export const navs = () => {
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Student Admission',
+            name: 'Student Subject Enlistment',
             to: '/studentadmission',
             icon: 'cil-user',
             class: checkRights(1)
