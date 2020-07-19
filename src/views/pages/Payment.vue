@@ -197,7 +197,41 @@
 			<div slot="modal-title"> <!-- modal title -->
 					Finalize Approval
 			</div> <!-- modal title -->
-      <b-row> <!-- modal body -->
+      <b-row class="mb-2"> <!-- modal body -->
+        <b-col md=12>
+          <h5>
+            Attach Official or Acknowledge Receipt
+          </h5>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md=12>
+          <div class="file-uploader-container">
+            <FileUploader
+              @onFileChange="onPaymentReceiptFileUpload" 
+              @onFileDrop="onPaymentReceiptFileUpload"
+            />
+          </div>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md=12>
+          <div class="file-item-container">
+            <FileItem
+              v-for="(item, index) of paymentReceiptFiles"
+              :key="index"
+              :title="item.name"
+              :description="item.notes"
+              :fileIndex="index"
+              @onFileItemSelect="onPaymentReceiptFileItemSelect"
+              @onFileItemRemove="onDeletePaymentReceiptFile"
+              @onFileItemPreview="previewPaymentReceiptFile"
+              :isBusy="item.isBusy"
+            />
+          </div>
+        </b-col>
+      </b-row>
+      <b-row>
 				<b-col md=12>
 					<label>Notes</label>
 					<b-textarea 
@@ -265,6 +299,57 @@
       </div>
     </div>
 		<!-- Modal Reject -->
+    <b-modal 
+      v-model="showPaymentReceiptFileModal"
+      centered
+      header-bg-variant="success"
+      header-text-variant="light"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+      >
+      <div slot="modal-title"> <!-- modal title -->
+        Payment Receipt File
+      </div> <!-- modal title -->
+      <b-row> <!-- modal body -->
+        <b-col md=12>
+          <label>Notes</label>
+          <b-textarea 
+            v-model="forms.paymentReceiptFile.fields.notes"
+            :state="forms.paymentReceiptFile.states.notes"
+            rows=7
+            debounce="500" />
+          <b-form-invalid-feedback>
+            {{ forms.paymentReceiptFile.errors.notes }}
+          </b-form-invalid-feedback>
+        </b-col>
+      </b-row> <!-- modal body -->
+      <div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+        <b-button 
+          class="float-left" 
+          @click="onDeletePaymentReceiptFile(selectedPaymentReceiptFileIndex)"
+          variant="outline-danger">
+          <v-icon
+            v-if="forms.paymentReceiptFile.isDeleting"
+            name="sync"
+            class="mr-2"
+            spin
+          />
+          Delete
+        </b-button>
+        <b-button 
+          @click="onUpdatePaymentReceiptFile()"
+          class="float-right" 
+          variant="outline-primary">
+          <v-icon
+            v-if="forms.paymentReceiptFile.isUpdating"
+            name="sync"
+            class="mr-2"
+            spin
+          />
+          Update
+        </b-button>
+      </div> <!-- modal footer buttons -->
+    </b-modal>  
 	</div> <!-- main container -->
 </template>
 <script>
@@ -274,14 +359,27 @@ const paymentFields = {
   disapprovalNotes: null
 }
 
-import { PaymentApi, PaymentFileApi, BillingApi } from "../../mixins/api"
+const paymentReceiptFileFields = {
+  id: null,
+  studentId: null,
+  notes: null
+}
+
+import { PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi } from "../../mixins/api"
 import { PaymentStatuses } from "../../helpers/enum"
-import { showNotification, formatNumber, clearFields } from "../../helpers/forms"
+import { showNotification, formatNumber, clearFields, reset } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
+import FileUploader from "../components/FileUploader"
+import FileItem from "../components/FileItem"
+import { copyValue } from '../../helpers/extractor'
 
 export default {
 	name: "Payment",
-	mixins: [PaymentApi, PaymentFileApi, BillingApi, Tables],
+  mixins: [PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi, Tables],
+  components: {
+    FileUploader,
+    FileItem
+  },
 	data() {
 		return {
       showModalPreview: false,
@@ -290,6 +388,9 @@ export default {
 			isLoading: false,
       paymentStatuses: PaymentStatuses,
       formatNumber: formatNumber,
+      showPaymentReceiptFileModal: false,
+      paymentReceiptFiles: [],
+      selectedPaymentReceiptFileIndex: null,
       file: {
         type: null,
         src: null,
@@ -301,6 +402,13 @@ export default {
           fields: { ...paymentFields },
           states: { ...paymentFields },
           errors: { ...paymentFields }
+        },
+        paymentReceiptFile: {
+          isUpdating: false,
+          isDeleting: false,
+          fields: { ...paymentReceiptFileFields },
+          states: { ...paymentReceiptFileFields },
+          errors: { ...paymentReceiptFileFields }
         }
       },
 			tables: {
@@ -461,8 +569,13 @@ export default {
     },
     setApproval(row) {
       clearFields(this.forms.payment)
-      this.showModalApproval = true
+      const params = { paginate: false }
       this.row = row.item
+      this.getPaymentReceiptFiles(row.item.id, params)
+      .then(({ data }) => {
+        this.paymentReceiptFiles = data
+        this.showModalApproval = true
+      })
     },
     onApproval() {
       const { id } = this.row
@@ -555,7 +668,92 @@ export default {
       }
       return src
     },
-    
+    onPaymentReceiptFileUpload(file) {
+      const formData = new FormData();
+      const { paymentReceiptFiles } = this.forms
+
+      formData.append('file', file);
+      formData.append('studentId', this.row.student.id);
+
+      this.paymentReceiptFiles.push(
+        { 
+          id: null, 
+          name: null, 
+          notes: null, 
+          isBusy: true 
+        }
+      )
+      const paymentReceiptFile = this.paymentReceiptFiles[this.paymentReceiptFiles.length - 1]
+      const { isBusy, ...paymentReceiptKeys } = paymentReceiptFile
+      this.addPaymentReceiptFile(formData, this.row.id)
+      .then(({ data }) => {
+        copyValue(data, paymentReceiptFile, Object.keys(paymentReceiptKeys))
+        paymentReceiptFile.isBusy = false
+      })
+      .catch(error => {
+        this.paymentReceiptFiles.splice(this.paymentReceiptFiles.length - 1, 1)
+      })
+    },
+    onDeletePaymentReceiptFile (index) {
+      const selectedFile = this.paymentReceiptFiles[index]
+      const { paymentReceiptFile } = this.forms
+      paymentReceiptFile.isDeleting = true
+      selectedFile.isBusy = true
+      this.deletePaymentReceiptFile(this.row.id, selectedFile.id).then(()=> {
+        paymentReceiptFile.isDeleting = false
+        this.showPaymentReceiptFileModal = false
+        this.paymentReceiptFiles.splice(index, 1);
+      }).catch((error) => {
+        paymentReceiptFile.isDeleting = false
+        selectedFile.isBusy = false
+      });
+    },
+    onPaymentReceiptFileItemSelect(idx) {
+      const { paymentReceiptFile } = this.forms
+      reset(paymentReceiptFile)
+      this.selectedPaymentReceiptFileIndex = idx
+
+      paymentReceiptFile.fields.id = this.paymentReceiptFiles[idx].id
+      paymentReceiptFile.fields.notes = this.paymentReceiptFiles[idx].notes
+
+      this.showPaymentReceiptFileModal = true
+    },
+    onUpdatePaymentReceiptFile () {
+      const { paymentReceiptFile } = this.forms
+
+      const selectedFile = this.paymentReceiptFiles[this.selectedPaymentReceiptFileIndex]
+      paymentReceiptFile.isUpdating = true
+      selectedFile.isBusy = true
+
+      this.updatePaymentReceiptFile(paymentReceiptFile.fields, this.row.id, paymentReceiptFile.fields.id).then(({ data }) => {
+        selectedFile.notes = data.notes;
+        paymentReceiptFile.isUpdating = false
+        this.showPaymentReceiptFileModal = false;
+        selectedFile.isBusy = false
+      }).catch((error) => {
+        const { errors } = error.response.data;
+        validate(paymentFile, errors);
+        paymentReceiptFile.isUpdating = false
+        selectedFile.isBusy = false
+      });
+    },
+    previewPaymentReceiptFile(index) {
+      this.file.type = null
+      this.file.src = null
+
+      const selectedFile = this.paymentReceiptFiles[index]
+
+      this.getPaymentReceiptFilePreview(this.row.id, selectedFile.id)
+        .then(response => {
+          this.file.type = response.headers.contentType
+          const file = new Blob([response.data], { type: response.headers.contentType })
+          const reader = new FileReader();
+
+          reader.onload = e => this.file.src = e.target.result
+          reader.readAsDataURL(file);
+          this.showModalPreview = true
+        })
+    },
   },
 }
 </script>
@@ -573,5 +771,17 @@ export default {
     flex-direction: row;
     align-items: center;
     padding: 0 30px;
+  }
+
+  .file-uploader-container {
+    width: 100%;
+    height: 150px;
+    margin: 20px 0 20px 0;
+
+  }
+
+  .file-item-container {
+    width: 100%;
+    height: auto;
   }
 </style>
