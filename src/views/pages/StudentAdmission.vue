@@ -92,7 +92,7 @@
 								<span>{{ getName(data.item, 'level') + " " 
                   + getName(data.item, 'semester') + " " 
                   + getName(data.item, 'studentType') }}</span><br>
-                <small>{{ getName(data.item, 'course') }}</small>
+                <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
 							</template>
 							<template v-slot:cell(status)="data">
 								<b-badge
@@ -117,7 +117,7 @@
 										<b-col md="4">
 											<div v-show="getName(data.item, 'course') != ''">
 												<h6>Course</h6>
-												<h6>{{ getName(data.item, 'course') }}</h6>
+												<h6>{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</h6>
 											</div>
 										</b-col>
 										<b-col md="2">

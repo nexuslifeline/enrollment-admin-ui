@@ -84,7 +84,7 @@ function configRoutes () {
         },
         {
           path: 'evaluation',
-          name: 'Evaluation',
+          name: 'Evaluation & Admission',
           component: Evaluation,
           meta: { requiresAuth: true, userType: 1 }
         },
