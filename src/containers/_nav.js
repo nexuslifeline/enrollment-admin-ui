@@ -29,7 +29,7 @@ export const navs = () => {
         items: [
           {
             _name: 'CSidebarNavItem',
-            name: 'Evaluation',
+            name: 'Evaluation & Admission',
             to: '/evaluation',
             icon: 'cil-user',
             class: checkRights(1)

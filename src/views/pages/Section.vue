@@ -368,7 +368,7 @@ export default {
               key: "name",
               label: "Name",
               tdClass: "align-middle",
-              thStyle: { width: "30%" },
+              thStyle: { width: "20%" },
             },
             {
               key: "description",
@@ -395,10 +395,9 @@ export default {
               thStyle: { width: "auto" },
             },
             {
-              key: "course.name",
+              key: "course.description",
               label: "Course",
-              tdClass: "align-middle",
-              thStyle: { width: "auto" },
+              tdClass: "align-middle"
             },
             {
               key: "semester.name",
