@@ -241,7 +241,7 @@
                             <b-col md=6>
                               Level : <span class="font-weight-bold">{{ getName(data.item, 'level') }}</span>
                             </b-col>
-                            <b-col md=6 v-if="data.item.course">
+                            <b-col md=6 v-if="data.item.semesterId">
                               Semester : <span class="font-weight-bold">{{ semesters.getEnum(data.item.semesterId).name }}</span>
                             </b-col>
                           </b-row>
