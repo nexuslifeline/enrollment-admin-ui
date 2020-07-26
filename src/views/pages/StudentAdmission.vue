@@ -115,7 +115,7 @@
 											<h6>{{ getName(data.item, 'level') }}</h6>
 										</b-col>
 										<b-col md="4">
-											<div v-show="getName(data.item, 'course') != ''">
+											<div v-if="getName(data.item, 'course') != ''">
 												<h6>Course</h6>
 												<h6>{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</h6>
 											</div>
