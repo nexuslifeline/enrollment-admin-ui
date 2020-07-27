@@ -141,10 +141,10 @@
                           <b-row class="mb-2">
                             <b-col md=12>
                               <span class="font-weight-bold">Student Information</span>
-                              <hr class="m-0 border-dark">
+                              <hr class="m-0 border-light">
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               Student Number : <span class="font-weight-bold">{{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</span>
                             </b-col>
@@ -152,7 +152,7 @@
                               Name : <span class="font-weight-bold">{{ data.item.student.name }}</span>
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               Student Category : 
                               <b-badge
@@ -166,7 +166,7 @@
                               Contact Number : <span class="font-weight-bold">{{ data.item.student.mobileNo }}</span>
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               Email : <span class="font-weight-bold">{{ data.item.student.email }}</span>
                             </b-col>
@@ -177,13 +177,13 @@
                               </span>
                             </b-col>
                           </b-row>
-                          <b-row class="my-2">
+                          <b-row class="my-2 pb-1">
                             <b-col md=12>
                               <span class="font-weight-bold">Previous Educational Background</span>
-                              <hr class="m-0 border-dark">
+                              <hr class="m-0 border-light">
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               Last School Attended : <span class="font-weight-bold">{{ data.item.lastSchoolAttended }}</span>
                             </b-col>
@@ -191,18 +191,18 @@
                               Enrolled Year : <span class="font-weight-bold">{{ data.item.enrolledYear }}</span>
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               Year Attended : <span class="font-weight-bold">{{ data.item.lastYearAttended }}</span>
                             </b-col>
                           </b-row>
-                          <b-row class="my-2">
+                          <b-row class="my-2 pb-1">
                             <b-col md=12>
                               <span class="font-weight-bold">Applying for Academic Record</span>
-                              <hr class="m-0 border-dark">
+                              <hr class="m-0 border-light">
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               <div class="d-flex flex-row">
                                 <div>Curriculum : </div>
@@ -237,7 +237,7 @@
                               Course : <span class="font-weight-bold">{{ data.item.course.description }}</span>
                             </b-col>
                           </b-row>
-                          <b-row class="pl-2">
+                          <b-row class="pb-1">
                             <b-col md=6>
                               Level : <span class="font-weight-bold">{{ getName(data.item, 'level') }}</span>
                             </b-col>
