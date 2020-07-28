@@ -48,7 +48,7 @@
                     </div>
                   </template>
                   <template v-slot:cell(action)="row">
-                    <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+                    <b-dropdown v-if="row.item.id !== fees.TUITION_FEE.id" right variant="link" toggle-class="text-decoration-none" no-caret>
                       <template v-slot:button-content>
                         <v-icon name="ellipsis-v" />
                       </template>
@@ -217,11 +217,13 @@ import { SchoolFeeApi, SchoolFeeCategoryApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
+import { Fees } from '../../helpers/enum'
 export default {
 	name: "schoolFee",
 	mixins: [ SchoolFeeApi, SchoolFeeCategoryApi, Tables ],
 	data() {
 		return {
+      fees: Fees,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: "",
