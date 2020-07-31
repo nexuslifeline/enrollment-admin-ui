@@ -193,7 +193,7 @@
                           </b-row>
                           <b-row class="pb-1">
                             <b-col md=6>
-                              Year Attended : <span class="font-weight-bold">{{ data.item.lastYearAttended }}</span>
+                              Year Attended : <span class="font-weight-bold">From {{ data.item.lastYearAttendedFrom }} To {{data.item.lastYearAttendedTo}}</span>
                             </b-col>
                           </b-row>
                           <b-row class="my-2 pb-1">
