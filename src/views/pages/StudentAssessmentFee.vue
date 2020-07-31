@@ -198,6 +198,7 @@
                       </template>
                       <template v-slot:cell(pivot.amount)="row">
                         <vue-autonumeric
+                          :disabled="row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1"
                           v-model="row.item.pivot.amount"
                           class="form-control text-right" 
                           :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
@@ -496,7 +497,10 @@ export default {
 							label: "AMOUNT PER LEC UNIT",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "13%"}
+              thStyle: {width: "13%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
 						},
 						{
 							key: "labs",
@@ -510,7 +514,10 @@ export default {
 							label: "AMOUNT PER LAB",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "13%"}
+              thStyle: {width: "13%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
             },
             {
 							key: "totalAmount",
@@ -640,7 +647,8 @@ export default {
           admissionId,
           enrollmentFee,
           previousBalance,
-          student
+          student,
+          isComputedByUnits
         }
       } = this.row
 
@@ -674,6 +682,7 @@ export default {
         studentFee: {
           studentFeeStatusId: StudentFeeStatuses.APPROVED.id,
           totalAmount,
+          isComputedByUnits,
           enrollmentFee: enrollmentFee,
           approvalNotes: this.approvalNotes
         },
@@ -769,6 +778,7 @@ export default {
                   const res = data.data
                   this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
                   this.$set(row.item, 'previousBalance', 0)
+                  this.$set(row.item, 'isComputedByUnits', res[0] ? res[0].isComputedByUnits : 0)
                   this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
                   if (res.length > 0) {
                     if (res[0].isComputedByUnits) {
@@ -803,6 +813,7 @@ export default {
                   this.$set(row.item, 'enrollmentFee', data.enrollmentFee)
                   this.$set(row.item, 'previousBalance', data.billings[0].previousBalance )
                   this.$set(row.item, 'fees', data.studentFeeItems)
+                  this.$set(row.item, 'isComputedByUnits', data.isComputedByUnits)
                   row.item.isLoading = false
                 })
               

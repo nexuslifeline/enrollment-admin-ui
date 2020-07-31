@@ -143,8 +143,9 @@
                           <b-form-group 
                               label="Section"
                               label-cols-sm="3"
+															label-class="required"
                           >
-                            <b-form-select 
+                            <b-form-select
                               v-model="data.item.sectionId"
                               >
                               <template v-slot:first>
@@ -764,7 +765,11 @@ export default {
         this.showModalApproval = false
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
-        console.log(error)
+				const errors = error.response.data.errors
+				if (errors['sectionId']) {
+					showNotification(this, "danger", 'Section is required.')
+					this.showModalApproval = false
+				}
         this.isProcessing = false;
       });
     },
