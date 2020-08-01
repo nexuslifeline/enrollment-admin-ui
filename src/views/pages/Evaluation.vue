@@ -911,6 +911,10 @@ export default {
 	},
 	methods: {
     setApproval(row) {
+      if (row.item.curriculumMsg) {
+        showNotification(this, 'danger', 'Please set a curriculum before approving.')
+        return
+      }
       this.row = row
       this.showModalApproval = true
     },
@@ -959,7 +963,6 @@ export default {
         this.showModalApproval = false
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
-        console.log(error)
         this.isProcessing = false;
         const errors = error.response.data.errors
         this.showBulletedNotification(errors)
@@ -1148,8 +1151,6 @@ export default {
       subjects.isBusy = true
       this.getSubjectsOfEvaluation(id, { paginate: false })
       .then(({ data }) => {
-        // console.log(data)
-        // const newSubjects = data.subjects.map(obj => ({ ...obj, isTaken: false, grade: 0, notes: '' }))
         this.$set(row.item, 'isTakenAll', false)
         this.$set(row.item, 'subjects', data)
         if (row.item.courseId) {
