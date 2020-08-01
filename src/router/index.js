@@ -30,6 +30,7 @@ const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
 const Student = () => import('@/views/pages/Student')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
+const SchoolCategory = () => import('@/views/pages/SchoolCategory')
 
 Vue.use(Router)
 
@@ -171,8 +172,13 @@ function configRoutes () {
           name: 'Student',
           component: Student,
           meta: { requiresAuth: true, userType: 0 }
+        },
+        {
+          path: 'schoolcategory',
+          name: 'School Category',
+          component: SchoolCategory,
+          meta: { requiresAuth: true, userType: 0 }
         }
-
       ]
     },
     {

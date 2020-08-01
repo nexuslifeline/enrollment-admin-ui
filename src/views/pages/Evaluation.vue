@@ -193,7 +193,7 @@
                           </b-row>
                           <b-row class="pb-1">
                             <b-col md=6>
-                              Year Attended : <span class="font-weight-bold">From {{ data.item.lastYearAttendedFrom }} To {{data.item.lastYearAttendedTo}}</span>
+                              From : <span class="font-weight-bold"> {{ data.item.lastSchoolYearFrom }} </span> To : <span  class="font-weight-bold"> {{data.item.lastSchoolYearTo}}</span>
                             </b-col>
                           </b-row>
                           <b-row class="my-2 pb-1">
@@ -335,7 +335,7 @@
                                     :disabled="data.item.evaluationStatusId !== evaluationStatuses.SUBMITTED.id"
                                     :value=1
                                     :unchecked-value=0
-                                    v-model="row.item.pivot.isTaken" />
+                                    v-model="row.item.subject.pivot.isTaken" />
                                 </template>
                                 <template v-slot:table-busy>
                                   <div class="text-center my-2">
@@ -1041,6 +1041,7 @@ export default {
             courseId
           }
         } = row
+
         this.$set(item, 'isLoading', true)
         this.$set(item, 'curriculumEdit', false)
         this.$set(item, 'studentCurriculumEdit', false)
@@ -1219,7 +1220,7 @@ export default {
     },
     toggleCheckAll(subjects, value) {
       subjects.forEach(subject => {
-        subject.isTaken = value ? 1 : 0
+        subject.pivot.isTaken = value ? 1 : 0
       })
     },
     showBulletedNotification(errors) {
