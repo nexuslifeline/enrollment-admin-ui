@@ -66,8 +66,22 @@ export const navs = () => {
       // Registrar
           {
             _name: 'CSidebarNavItem',
-            name: 'SchoolCategory',
+            name: 'School Category',
             to: '/schoolcategory',
+            icon: 'cil-layers',
+            // _class: checkRights(1)
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Semester',
+            to: '/semester',
+            icon: 'cil-layers',
+            // _class: checkRights(1)
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'School Year',
+            to: '/schoolyear',
             icon: 'cil-layers',
             // _class: checkRights(1)
           },
