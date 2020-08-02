@@ -330,12 +330,12 @@
                                     Credited
                                   </b-form-checkbox>
                                 </template>
-                                <template v-slot:cell(action)="row">
+                                <template v-slot:cell(pivot.isTaken)="row">
                                   <b-form-checkbox
                                     :disabled="data.item.evaluationStatusId !== evaluationStatuses.SUBMITTED.id"
                                     :value=1
                                     :unchecked-value=0
-                                    v-model="row.item.subject.pivot.isTaken" />
+                                    v-model="row.item.pivot.isTaken" />
                                 </template>
                                 <template v-slot:table-busy>
                                   <div class="text-center my-2">
@@ -767,7 +767,7 @@ export default {
 					isBusy: false,
 					fields: [
             {
-							key: "action",
+							key: "pivot.isTaken",
 							label: "Credited",
               tdClass: "align-middle text-center",
               thClass: "text-center",
