@@ -187,8 +187,9 @@
                             <b-col md=6>
                               Last School Attended : <span class="font-weight-bold">{{ data.item.lastSchoolAttended }}</span>
                             </b-col>
-                            <b-col md=6 v-if="data.item.enrolledYear">
-                              Enrolled Year : <span class="font-weight-bold">{{ data.item.enrolledYear }}</span>
+                            <b-col md=6>
+                              <!-- Enrolled Year : <span class="font-weight-bold">{{ data.item.enrolledYear }}</span> -->
+                              Last School Level : <span class="font-weight-bold">{{ data.item.lastSchoolLevel ? data.item.lastSchoolLevel.name : 'N/A'}}</span>
                             </b-col>
                           </b-row>
                           <b-row class="pb-1">
