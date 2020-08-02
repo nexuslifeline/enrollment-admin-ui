@@ -291,7 +291,6 @@ export default {
 	created(){
     this.loadSchoolFees()
     this.loadSchoolFeeCategories()
-
 	},
 	methods: {
 		loadSchoolFees(){

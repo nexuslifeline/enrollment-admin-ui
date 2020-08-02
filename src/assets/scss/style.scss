@@ -26,6 +26,11 @@ label.required:before {
   color: red;
 }
 
+legend.required:before {
+  content: '* ';
+  color: red;
+}
+
 .btn-save {
   min-width: 100px;
 }

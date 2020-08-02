@@ -193,7 +193,7 @@
                           </b-row>
                           <b-row class="pb-1">
                             <b-col md=6>
-                              Year Attended : <span class="font-weight-bold">From {{ data.item.lastYearAttendedFrom }} To {{data.item.lastYearAttendedTo}}</span>
+                              From : <span class="font-weight-bold"> {{ data.item.lastSchoolYearFrom }} </span> To : <span  class="font-weight-bold"> {{data.item.lastSchoolYearTo}}</span>
                             </b-col>
                           </b-row>
                           <b-row class="my-2 pb-1">
@@ -335,7 +335,7 @@
                                     :disabled="data.item.evaluationStatusId !== evaluationStatuses.SUBMITTED.id"
                                     :value=1
                                     :unchecked-value=0
-                                    v-model="row.item.pivot.isTaken" />
+                                    v-model="row.item.subject.pivot.isTaken" />
                                 </template>
                                 <template v-slot:table-busy>
                                   <div class="text-center my-2">
@@ -911,6 +911,10 @@ export default {
 	},
 	methods: {
     setApproval(row) {
+      if (row.item.curriculumMsg) {
+        showNotification(this, 'danger', 'Please set a curriculum before approving.')
+        return
+      }
       this.row = row
       this.showModalApproval = true
     },
@@ -959,7 +963,6 @@ export default {
         this.showModalApproval = false
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
-        console.log(error)
         this.isProcessing = false;
         const errors = error.response.data.errors
         this.showBulletedNotification(errors)
@@ -1041,6 +1044,7 @@ export default {
             courseId
           }
         } = row
+
         this.$set(item, 'isLoading', true)
         this.$set(item, 'curriculumEdit', false)
         this.$set(item, 'studentCurriculumEdit', false)
@@ -1148,8 +1152,6 @@ export default {
       subjects.isBusy = true
       this.getSubjectsOfEvaluation(id, { paginate: false })
       .then(({ data }) => {
-        // console.log(data)
-        // const newSubjects = data.subjects.map(obj => ({ ...obj, isTaken: false, grade: 0, notes: '' }))
         this.$set(row.item, 'isTakenAll', false)
         this.$set(row.item, 'subjects', data)
         if (row.item.courseId) {
@@ -1219,7 +1221,7 @@ export default {
     },
     toggleCheckAll(subjects, value) {
       subjects.forEach(subject => {
-        subject.isTaken = value ? 1 : 0
+        subject.pivot.isTaken = value ? 1 : 0
       })
     },
     showBulletedNotification(errors) {
