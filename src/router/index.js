@@ -187,8 +187,6 @@ function configRoutes () {
           name: 'School Category',
           component: SchoolCategory,
           meta: { requiresAuth: true, userType: 0 }
-<<<<<<< HEAD
-=======
         },
         {
           path: 'semester',
@@ -201,7 +199,6 @@ function configRoutes () {
           name: 'School Year',
           component: SchoolYear,
           meta: { requiresAuth: true, userType: 0 }
->>>>>>> origin/school-year-and-semester
         }
       ]
     },
