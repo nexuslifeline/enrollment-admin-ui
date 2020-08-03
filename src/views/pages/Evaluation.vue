@@ -141,7 +141,7 @@
                           <b-row class="mb-2">
                             <b-col md=12>
                               <span class="font-weight-bold">Student Information</span>
-                              <hr class="m-0 border-light">
+                              <hr class="bg-light mt-1 mb-0">
                             </b-col>
                           </b-row>
                           <b-row class="pb-1">
@@ -180,7 +180,7 @@
                           <b-row class="my-2 pb-1">
                             <b-col md=12>
                               <span class="font-weight-bold">Previous Educational Background</span>
-                              <hr class="m-0 border-light">
+                              <hr class="bg-light mt-1 mb-0">
                             </b-col>
                           </b-row>
                           <b-row class="pb-1">
@@ -197,10 +197,10 @@
                               From : <span class="font-weight-bold"> {{ data.item.lastSchoolYearFrom }} </span> To : <span  class="font-weight-bold"> {{data.item.lastSchoolYearTo}}</span>
                             </b-col>
                           </b-row>
-                          <b-row class="my-2 pb-1">
+                          <b-row class="my-2 pb-1 ">
                             <b-col md=12>
                               <span class="font-weight-bold">Applying for Academic Record</span>
-                              <hr class="m-0 border-light">
+                              <hr class="bg-light mt-1 mb-0">
                             </b-col>
                           </b-row>
                           <b-row class="pb-1">
@@ -235,7 +235,7 @@
                               </div>
                             </b-col>
                             <b-col md=6 v-if="data.item.course">
-                              Course : <span class="font-weight-bold">{{ data.item.course.description }}</span>
+                              Course : <span class="font-weight-bold">{{ data.item.course.description }} {{ data.item.course.major ? ' - ' + data.item.course.major  : '' }}</span>
                             </b-col>
                           </b-row>
                           <b-row class="pb-1">
