@@ -323,7 +323,7 @@
                                 :fields="tables.subjects.fields"
                                 :items="data.item.subjects"
                                 :busy="tables.subjects.isBusy">
-                                <template v-slot:head(action)>
+                                <template v-slot:head(pivot.isTaken)>
                                   <b-form-checkbox
                                     v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
                                     @input="toggleCheckAll(data.item.subjects, $event)"
@@ -485,7 +485,7 @@
                                                 </b-td>
                                               </b-tr>
                                             </template>
-                                            <template v-slot:head(action)>
+                                            <template v-slot:head(pivot.isTaken)>
                                               <b-form-checkbox
                                                 v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
                                                 @input="toggleCheckAll(filterSubjects(data, level.id, semester.id).items, $event)"
@@ -493,7 +493,7 @@
                                                 Credited
                                               </b-form-checkbox>
                                             </template>
-                                            <template v-slot:cell(action)="row">
+                                            <template v-slot:cell(pivot.isTaken)="row">
                                               <b-form-checkbox
                                                 :disabled="data.item.evaluationStatusId !== evaluationStatuses.SUBMITTED.id"
                                                 :value=1
