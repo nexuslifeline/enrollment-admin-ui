@@ -12,16 +12,25 @@ export default {
 
     },
     addStudent(data) {
-
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students`, data)
     },
     updateStudent(data, id) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/students/` + id, data)
+    },
+    deleteStudent(id) {
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/students/` + id)
     },
     getStudentInfo(){
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/studentinfo`)
     },
     updateStudentInfo(child, data, id){
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/studentinfo/` + child + `/` + id, data)
+    },
+    savePhoto(data, id){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${id}/photos`, data)
+    },
+    deletePhoto(id){
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/students/${id}/photos`)
     }
   }
 }

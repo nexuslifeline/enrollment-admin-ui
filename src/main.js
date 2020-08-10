@@ -20,6 +20,7 @@ import 'vue-awesome/icons/search'
 import 'vue-awesome/icons/pen'
 import 'vue-awesome/icons/file-pdf'
 import 'vue-awesome/icons/file-image'
+import 'vue-awesome/icons/times-circle'
 import Icon from 'vue-awesome/components/Icon'
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'

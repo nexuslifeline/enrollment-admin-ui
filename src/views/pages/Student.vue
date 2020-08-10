@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-row>
-      <b-col md=12 v-show="!showEntry">
+      <b-col md=12 v-show="!showStudentEntry">
         <b-card>
           <b-card-body>
             <!-- add button and search -->
@@ -18,7 +18,9 @@
                     <b-form-input
                       v-model="filters.student.criteria"
                       type="text" 
-                      placeholder="Search">
+                      placeholder="Search"
+                      debounce="500"
+                      @update="loadStudents()">
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -33,10 +35,7 @@
 									:fields="tables.students.fields"
                   :busy="tables.students.isBusy"
                   :items="tables.students.items"
-                  :current-page="paginations.student.page"
-                  :per-page="paginations.student.perPage"
-                  :filter="filters.student.criteria"
-                  @filtered="onFiltered($event, paginations.student)">
+                >
                   <template v-slot:cell(name)="data">
                     <b-media>
                       <template v-slot:aside>
@@ -74,8 +73,8 @@
                         <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item 
-                        @click="setUpdatePersonnel(row)" >
-                        Edit Personnel Info
+                        @click="setUpdateStudent(row)" >
+                        Edit Student Info
                       </b-dropdown-item>
                       <b-dropdown-item 
                         @click="setUpdateUser(row)" >
@@ -99,7 +98,7 @@
                       :per-page="paginations.student.perPage"
                       size="sm"
                       align="end"
-                      @input="recordDetails(paginations.student)" />
+                      @input="loadStudents()" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -108,20 +107,39 @@
           </b-card-body>
         </b-card>
       </b-col>
-      <b-col md=12 v-show="showEntry">
+      <b-col md=12 v-show="showStudentEntry">
         <b-card>
           <b-card-body>
+            <b-row class="mb-4">
+              <b-col md=12>
+                <h4>
+                  {{ entryMode === 'Add' ? 'Student - Create' : 'Student - Edit'  }}
+                </h4>
+              </b-col>
+            </b-row>
             <b-row>
               <b-col md=12>
-                <b-tabs content-class="mt-3" pills vertical nav-wrapper-class="w-25">
-                  <b-tab title="Personal Info" active>
+                <b-tabs  pills vertical nav-wrapper-class="w-25" v-model="activeTabIndex">
+                  <b-tab active>
+                    <template>
+                      <div slot="title">
+                        <span>{{ tabHeaders[0].header }}</span>
+                      </div>
+                    </template>
+                    <b-row class="mb-4">
+                      <b-col md=12>
+                        <h4>{{ tabHeaders[0].header }}</h4>
+                        <small>{{ tabHeaders[0].description }}</small>
+                      </b-col>
+                    </b-row>
                     <b-row>
                       <b-col md="6">
                         <b-form-group>
                           <label class="required">Firstname</label>
                           <b-form-input
                             v-model="forms.student.fields.firstName" 
-                            :state="forms.student.states.firstName" />
+                            :state="forms.student.states.firstName"
+                            debounce="500" />
                           <b-form-invalid-feedback>
                             {{forms.student.errors.firstName}}
                           </b-form-invalid-feedback>
@@ -129,13 +147,15 @@
                         <b-form-group>
                           <label>Middlename</label>
                           <b-form-input
-                            v-model="forms.student.fields.middleName" />
+                            v-model="forms.student.fields.middleName" 
+                            debounce="500"/>
                         </b-form-group>
                         <b-form-group>
                           <label class="required">Lastname</label>
                           <b-form-input
                             v-model="forms.student.fields.lastName" 
-                            :state="forms.student.states.lastName" />
+                            :state="forms.student.states.lastName" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.student.errors.lastName}}
                           </b-form-invalid-feedback>
@@ -145,12 +165,11 @@
                         <div class="profile-photo-container">
                           <div class="profile-photo">
                             <PhotoViewer
-                              
+                              @onPhotoChange="onPhotoChange"
+                              @onPhotoRemove="onPhotoRemove"
+                              :isBusy="isProfilePhotoBusy"
                               :imageUrl="studentPhotoUrl"
                             />
-
-                            <!-- @onPhotoChange="onPhotoChange"
-                            @onPhotoRemove="onPhotoRemove" -->
                           </div>
                         </div>
                       </b-col>
@@ -171,7 +190,8 @@
                         <b-form-group>
                           <label>Mobile No.</label>
                           <b-form-input
-                            v-model="forms.student.fields.mobileNo" />
+                            v-model="forms.student.fields.mobileNo"
+                            debounce="500" />
                         </b-form-group>
                       </b-col>
                       <b-col md="4">
@@ -194,7 +214,18 @@
                       </b-col>
                     </b-row>
                   </b-tab>
-                  <b-tab title="Address">
+                  <b-tab >
+                    <template>
+                      <div slot="title">
+                        <span>{{ tabHeaders[1].header }}</span>
+                      </div>
+                    </template>
+                    <b-row class="mb-4">
+                      <b-col md=12>
+                        <h4>{{ tabHeaders[1].header }}</h4>
+                        <small>{{ tabHeaders[1].description }}</small>
+                      </b-col>
+                    </b-row>
                     <b-row>
                       <b-col md=12>
                         <h5>Current Address</h5>
@@ -206,10 +237,22 @@
                           <label class="required">House No/Street</label>
                           <b-form-input
                             v-model="forms.address.fields.currentHouseNoStreet" 
-                            :state="forms.address.states.addressCurrentHouseNoStreet"
-                            debounce="500" />
+                            :state="forms.address.states.addressCurrentHouseNoStreet" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressCurrentHouseNoStreet}}
+                          </b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="4">
+                        <b-form-group>
+                          <label class="required">Barangay</label>
+                          <b-form-input
+                            v-model="forms.address.fields.currentBarangay" 
+                            :state="forms.address.states.addressCurrentBarangay" 
+                            debounce="500"/>
+                          <b-form-invalid-feedback>
+                            {{forms.address.errors.addressCurrentBarangay}}
                           </b-form-invalid-feedback>
                         </b-form-group>
                       </b-col>
@@ -218,22 +261,10 @@
                           <label class="required">City/Town</label>
                           <b-form-input
                             v-model="forms.address.fields.currentCityTown" 
-                            :state="forms.address.states.addressCurrentCityTown"
-                            debounce="500" />
+                            :state="forms.address.states.addressCurrentCityTown" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressCurrentCityTown}}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                      </b-col>
-                      <b-col md="4">
-                        <b-form-group>
-                          <label class="required">Province</label>
-                          <b-form-input
-                            v-model="forms.address.fields.currentProvince"
-                            :state="forms.address.states.addressCurrentProvince"
-                            debounce="500" />
-                          <b-form-invalid-feedback>
-                            {{forms.address.errors.addressCurrentProvince}}
                           </b-form-invalid-feedback>
                         </b-form-group>
                       </b-col>
@@ -241,11 +272,23 @@
                     <b-row>
                       <b-col md="4">
                         <b-form-group>
-                          <label class="required">Postal Code</label>
+                          <label class="required">Province</label>
                           <b-form-input
-                            v-model="forms.address.fields.currentPostalCode"
-                            :state="forms.address.states.addressCurrentPostalCode"
-                            debounce="500" />
+                            v-model="forms.address.fields.currentProvince" 
+                            :state="forms.address.states.addressCurrentProvince" 
+                            debounce="500"/>
+                          <b-form-invalid-feedback>
+                            {{forms.address.errors.addressCurrentProvince}}
+                          </b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="4">
+                        <b-form-group>
+                          <label class="required">Postal/Zip Code</label>
+                          <b-form-input
+                            v-model="forms.address.fields.currentPostalCode" 
+                            :state="forms.address.states.addressCurrentPostalCode" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressCurrentPostalCode}}
                           </b-form-invalid-feedback>
@@ -253,46 +296,47 @@
                       </b-col>
                       <b-col md="4">
                         <b-form-group>
-                          <label>District</label>
+                          <label >District</label>
                           <b-form-input
-                            v-model="forms.address.fields.currentDistrict"
-                            debounce="500" />
-                        </b-form-group>
-                      </b-col>
-                      <b-col md="4">
-                        <b-form-group>
-                          <label>Region</label>
-                          <b-form-input
-                            v-model="forms.address.fields.currentRegion" />
+                            v-model="forms.address.fields.currentDistrict" 
+                            debounce="500"/>
                         </b-form-group>
                       </b-col>
                     </b-row>
                     <b-row>
-                      <b-col md="6">
+                      <b-col md="4">
                         <b-form-group>
-                          <label class="required">Country</label>
-                            <b-form-select 
-                              v-model="forms.address.fields.currentCountryId"
-                              :state="forms.address.states.addressCurrentCountryId">
-                              <template v-slot:first>
-                                <b-form-select-option :value='null' disabled>--Select Country --</b-form-select-option>
-                              </template>
-                              <b-form-select-option v-for='country in options.countries.items.values' :key='country.id' :value='country.id'>
-                                {{country.name}}
-                              </b-form-select-option>
-                            </b-form-select>
-                          <b-form-invalid-feedback>
-                            {{forms.address.errors.addressCurrentCountryId}}
-                          </b-form-invalid-feedback>
+                          <label>Region</label>
+                          <b-form-input
+                            v-model="forms.address.fields.currentRegion" 
+                            debounce="500"/>
                         </b-form-group>
                       </b-col>
-                      <b-col md="6">
+                      <b-col md="4">
+                        <b-form-group>
+                          <label class="required">Country</label>
+                          <b-form-select 
+                            v-model="forms.address.fields.currentCountryId" 
+                            :state="forms.address.states.addressCurrentCountryId">
+                            <template v-slot:first>
+                              <b-form-select-option :value='null' disabled>--Select Country --</b-form-select-option>
+                            </template>
+                            <b-form-select-option v-for='country in options.countries.items.values' :key='country.id' :value='country.id'>
+                              {{country.name}}
+                            </b-form-select-option>
+                          </b-form-select>
+                          <b-form-invalid-feedback>
+                              {{forms.address.errors.addressCurrentCountryId}}
+                            </b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="4">
                         <b-form-group>
                           <label class="required">Home Landline/Mobile No.</label>
                           <b-form-input
-                            v-model="forms.address.fields.currentHomeLandlineMobileNo"
-                            :state="forms.address.states.addressCurrentHomeLandlineMobileNo"
-                            debounce="500" />
+                            v-model="forms.address.fields.currentHomeLandlineMobileNo" 
+                            :state="forms.address.states.addressCurrentHomeLandlineMobileNo" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressCurrentHomeLandlineMobileNo}}
                           </b-form-invalid-feedback>
@@ -306,8 +350,8 @@
                           <b-form-textarea
                             rows="3"
                             v-model="forms.address.fields.currentCompleteAddress"
-                            :state="forms.address.states.addressCurrentCompleteAddress"
-                            debounce="500" />
+                            :state="forms.address.states.addressCurrentCompleteAddress" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressCurrentCompleteAddress}}
                           </b-form-invalid-feedback>
@@ -328,9 +372,9 @@
                         <b-form-group>
                           <label class="required">House No/Street</label>
                           <b-form-input
-                            v-model="forms.address.fields.permanentHouseNoStreet"
-                            :state="forms.address.states.addressPermanentHouseNoStreet"
-                            debounce="500" />
+                            v-model="forms.address.fields.permanentHouseNoStreet" 
+                            :state="forms.address.states.addressPermanentHouseNoStreet" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressPermanentHouseNoStreet}}
                           </b-form-invalid-feedback>
@@ -338,16 +382,30 @@
                       </b-col>
                       <b-col md="4">
                         <b-form-group>
+                          <label class="required">Barangay</label>
+                          <b-form-input
+                            v-model="forms.address.fields.permanentBarangay" 
+                            :state="forms.address.states.addressPermanentBarangay" 
+                            debounce="500"/>
+                          <b-form-invalid-feedback>
+                            {{forms.address.errors.addressPermanentBarangay}}
+                          </b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="4">
+                        <b-form-group>
                           <label class="required">City/Town</label>
                           <b-form-input
-                            v-model="forms.address.fields.permanentCityTown"
-                            :state="forms.address.states.addressPermanentCityTown"
-                            debounce="500" />
+                            v-model="forms.address.fields.permanentCityTown" 
+                            :state="forms.address.states.addressPermanentCityTown" 
+                            debounce="500"/>
                           <b-form-invalid-feedback>
                             {{forms.address.errors.addressPermanentCityTown}}
                           </b-form-invalid-feedback>
                         </b-form-group>
                       </b-col>
+                    </b-row>
+                    <b-row>
                       <b-col md="4">
                         <b-form-group>
                           <label class="required">Province</label>
@@ -360,11 +418,9 @@
                           </b-form-invalid-feedback>
                         </b-form-group>
                       </b-col>
-                    </b-row>
-                    <b-row>
                       <b-col md="4">
                         <b-form-group>
-                          <label class="required">Postal Code</label>
+                          <label class="required">Postal/Zip Code</label>
                           <b-form-input
                             v-model="forms.address.fields.permanentPostalCode"
                             :state="forms.address.states.addressPermanentPostalCode"
@@ -382,6 +438,8 @@
                             debounce="500" />
                         </b-form-group>
                       </b-col>
+                    </b-row>
+                    <b-row>
                       <b-col md="4">
                         <b-form-group>
                           <label>Region</label>
@@ -390,31 +448,29 @@
                             debounce="500" />
                         </b-form-group>
                       </b-col>
-                    </b-row>
-                    <b-row>
-                      <b-col md="6">
+                      <b-col md="4">
                         <b-form-group>
                           <label class="required">Country</label>
                           <b-form-select 
                             v-model="forms.address.fields.permanentCountryId"
-                            :state="forms.address.states.addressPermanentCountryId" >                  
+                            :state="forms.address.states.addressPermanentCountryId">
                             <template v-slot:first>
-                              <b-form-select-option :value='null' disabled>--Select Country --</b-form-select-option>
+                              <b-form-select-option :value='null' disabled>--Select Contry --</b-form-select-option>
                             </template>
                             <b-form-select-option v-for='country in options.countries.items.values' :key='country.id' :value='country.id'>
                               {{country.name}}
                             </b-form-select-option>
                           </b-form-select>
                           <b-form-invalid-feedback>
-                            {{forms.address.errors.addressPermanentCountryId}}
-                          </b-form-invalid-feedback>
+                              {{forms.address.errors.addressPermanentCountryId}}
+                            </b-form-invalid-feedback>
                         </b-form-group>
                       </b-col>
-                      <b-col md="6">
+                      <b-col md="4">
                         <b-form-group>
                           <label class="required">Home Landline/Mobile No.</label>
                           <b-form-input
-                            v-model="forms.address.fields.permanentHomeLandlineMobileNo"
+                            v-model="forms.address.fields.permanentHomeLandlineMobileNo" 
                             :state="forms.address.states.addressPermanentHomeLandlineMobileNo"
                             debounce="500" />
                           <b-form-invalid-feedback>
@@ -439,7 +495,18 @@
                       </b-col>
                     </b-row>
                   </b-tab>
-                  <b-tab title="Family">
+                  <b-tab >
+                    <template>
+                      <div slot="title">
+                        <span>{{ tabHeaders[2].header }}</span>
+                      </div>
+                    </template>
+                    <b-row class="mb-4">
+                      <b-col md=12>
+                        <h4>{{ tabHeaders[2].header }}</h4>
+                        <small>{{ tabHeaders[2].description }}</small>
+                      </b-col>
+                    </b-row>
                     <b-row>
                       <b-col md="6">
                         <b-form-group>
@@ -564,9 +631,20 @@
                       </b-col>
                     </b-row>
                   </b-tab>
-                  <b-tab title="Education">
+                  <b-tab >
+                    <template>
+                      <div slot="title">
+                        <span>{{ tabHeaders[3].header }}</span>
+                      </div>
+                    </template>
+                    <b-row class="mb-4">
+                      <b-col md=12>
+                        <h4>{{ tabHeaders[3].header }}</h4>
+                        <small>{{ tabHeaders[3].description }}</small>
+                      </b-col>
+                    </b-row>
                     <b-row>
-                      <b-col md="8">
+                      <b-col md="5">
                         <b-form-group>
                           <label>Last School Attended</label>
                           <b-form-input
@@ -574,12 +652,28 @@
                             debounce="500"/>
                         </b-form-group>
                       </b-col>
-                      <b-col md="4">
+                      <b-col md="2">
                         <b-form-group>
-                        <label>Level</label>
-                        <b-form-input
-                          v-model="forms.education.fields.year" 
-                          debounce="500"/>
+                          <label>From</label>
+                          <b-form-input
+                            v-model="forms.education.fields.lastSchoolYearFrom" 
+                            debounce="500"/>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="2">
+                        <b-form-group>
+                          <label>To</label>
+                          <b-form-input
+                            v-model="forms.education.fields.lastSchoolYearTo" 
+                            debounce="500"/>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="3">
+                        <b-form-group>
+                          <label>Level</label>
+                          <b-form-input
+                            v-model="forms.education.fields.lastLevel" 
+                            debounce="500"/>
                         </b-form-group>
                       </b-col>
                     </b-row>
@@ -588,36 +682,44 @@
                         <b-form-group>
                           <label>Last School Address</label>
                           <b-form-input
-                            v-model="forms.education.fields.lastSchoolAddress" 
-                            debounce="500"/>
+                            v-model="forms.education.fields.lastSchoolAddress"
+                            debounce="500" />
                         </b-form-group>
                       </b-col>
                     </b-row>
                     <b-row>
                       <b-col md="12">
                         <b-row>
-                          <b-col md="6">
+                          <b-col md="5">
                             <b-form-group>
-                            <label>Elementary Course Completed or Primary</label>
-                            <b-form-input
-                              v-model="forms.education.fields.elementaryCourse" 
-                              debounce="500"/>
+                              <label>Elementary or Primary</label>
+                              <b-form-input
+                                  v-model="forms.education.fields.elementaryCourse" 
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
-                          <b-col md="3">
+                          <b-col md="2">
                             <b-form-group>
-                              <label>Year</label>
+                              <label>From</label>
                               <b-form-input
-                                v-model="forms.education.fields.elementaryCourseYear" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.elementaryCourseYearFrom"
+                                  debounce="500" />
+                            </b-form-group>
+                          </b-col>
+                          <b-col md="2">
+                            <b-form-group>
+                              <label>To</label>
+                              <b-form-input
+                                  v-model="forms.education.fields.elementaryCourseYearTo"
+                                  debounce="500" />
                             </b-form-group>
                           </b-col>
                           <b-col md="3">
                             <b-form-group>
                               <label>Honor Received</label>
                               <b-form-input
-                                v-model="forms.education.fields.elementaryCourseHonors"
-                                debounce="500"/>
+                                  v-model="forms.education.fields.elementaryCourseHonors"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
                         </b-row>
@@ -626,28 +728,36 @@
                     <b-row>
                       <b-col md="12">
                         <b-row>
-                          <b-col md="6">
+                          <b-col md="5">
                             <b-form-group>
-                              <label>High School Course Completed or Secondary</label>
+                              <label>High School or Secondary</label>
                               <b-form-input
-                                v-model="forms.education.fields.highSchoolCourse" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.highSchoolCourse"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
-                          <b-col md="3">
+                          <b-col md="2">
                             <b-form-group>
-                              <label>Year</label>
+                              <label>From</label>
                               <b-form-input
-                                v-model="forms.education.fields.highSchoolCourseYear" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.highSchoolCourseYearFrom"
+                                  debounce="500"/>
+                            </b-form-group>
+                          </b-col>
+                          <b-col md="2">
+                            <b-form-group>
+                              <label>To</label>
+                              <b-form-input
+                                  v-model="forms.education.fields.highSchoolCourseYearTo"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
                           <b-col md="3">
                             <b-form-group>
                               <label>Honor Received</label>
                               <b-form-input
-                                v-model="forms.education.fields.highSchoolCourseHonors" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.highSchoolCourseHonors"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
                         </b-row>
@@ -656,28 +766,36 @@
                     <b-row>
                       <b-col md="12">
                         <b-row>
-                          <b-col md="6">
+                          <b-col md="5">
                             <b-form-group>
-                              <label style="font-size: 12px">Senior School Course Completed or Upper Secondary</label>
+                              <label>Senior School or Upper Secondary</label>
                               <b-form-input
-                                v-model="forms.education.fields.seniorSchoolCourse" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.seniorSchoolCourse"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
-                          <b-col md="3">
+                          <b-col md="2">
                             <b-form-group>
-                              <label>Year</label>
+                              <label>From</label>
                               <b-form-input
-                                v-model="forms.education.fields.seniorSchoolCourseYear" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.seniorSchoolCourseYearFrom"
+                                  debounce="500"/>
+                            </b-form-group>
+                          </b-col>
+                          <b-col md="2">
+                            <b-form-group>
+                              <label>To</label>
+                              <b-form-input
+                                  v-model="forms.education.fields.seniorSchoolCourseYearTo"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
                           <b-col md="3">
                             <b-form-group>
                               <label>Honor Received</label>
                               <b-form-input
-                                v-model="forms.education.fields.seniorSchoolCourseHonors" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.seniorSchoolCourseHonors"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
                         </b-row>
@@ -686,28 +804,36 @@
                     <b-row>
                       <b-col md="12">
                         <b-row>
-                          <b-col md="6">
+                          <b-col md="5">
                             <b-form-group>
                               <label >College Degree(if graduated) or Tertiary</label>
                               <b-form-input
-                                v-model="forms.education.fields.collegeDegree" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.collegeDegree"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
-                          <b-col md="3">
+                          <b-col md="2">
                             <b-form-group>
-                              <label>Year</label>
+                              <label>From</label>
                               <b-form-input
-                                v-model="forms.education.fields.collegeDegreeYear" 
-                                debounce="500"/>
-                              </b-form-group>
+                                  v-model="forms.education.fields.collegeDegreeYearFrom"
+                                  debounce="500"/>
+                            </b-form-group>
+                          </b-col>
+                          <b-col md="2">
+                            <b-form-group>
+                              <label>To</label>
+                              <b-form-input
+                                  v-model="forms.education.fields.collegeDegreeYearTo"
+                                  debounce="500"/>
+                            </b-form-group>
                           </b-col>
                           <b-col md="3">
                             <b-form-group>
                               <label>Honor Received</label>
                               <b-form-input
-                                v-model="forms.education.fields.collegeDegreeHonors" 
-                                debounce="500"/>
+                                  v-model="forms.education.fields.collegeDegreeHonors"
+                                  debounce="500"/>
                             </b-form-group>
                           </b-col>
                         </b-row>
@@ -716,39 +842,137 @@
                   </b-tab>
                 </b-tabs>
               </b-col>
-            </b-row>
-            
+            </b-row>    
           </b-card-body>
           <template v-slot:footer>
-            <b-row class="mt-3">
-              <b-col md=2 offset-md="8">
-                <b-button variant="outline-primary" block> Save </b-button>
-              </b-col>
-              <b-col md=2>
-                <b-button @click="showEntry=false" variant="outline-danger" block> Cancel </b-button>
-              </b-col>
-            </b-row>
+            <div class="w-100">
+              <b-button class="float-right ml-2"  @click="showStudentEntry=false" variant="outline-danger" > Cancel </b-button>
+              <b-button class="float-right"  variant="outline-primary"  @click="onStudentEntry">
+                <v-icon
+                  v-if="isSaving"
+                  name="sync"
+                  class="mr-2"
+                  spin />
+                  Save </b-button>
+            </div>
           </template>
         </b-card>
       </b-col>
     </b-row>
+    <b-modal 
+      @shown="$refs.username.focus()"
+			v-model="showModalUpdateUser"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+					User Account - Edit
+			</div> <!-- modal title -->
+      <!-- modal body -->
+			<b-row> 
+				<b-col md=12>
+          <b-form-group >
+            <label class="required">Email</label>
+            <b-form-input 
+              ref="username" 
+              v-model="forms.user.fields.username" 
+              :state="forms.user.states.userUsername"
+              debounce="500" />
+            <b-form-invalid-feedback>
+              {{forms.user.errors.userUsername}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group >
+            <label class="required">Password</label>
+            <b-form-input 
+              type="password"
+              v-model="forms.user.fields.password" 
+              :state="forms.user.states.userPassword" 
+              debounce="500" />
+            <b-form-invalid-feedback>
+              {{forms.user.errors.userPassword}}
+            </b-form-invalid-feedback>
+          </b-form-group>
+          <b-form-group >
+            <label class="required">Confirm Password</label>
+            <b-form-input 
+              type="password"
+              v-model="forms.user.fields.passwordConfirmation" 
+              debounce="500"/>
+          </b-form-group>
+				</b-col>
+			</b-row>
+      <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button 
+          variant="outline-danger" 
+          class="float-left btn-close" 
+          @click="showModalUpdateUser=false">
+          Close
+        </b-button>
+        <b-button
+          :disabled="isUserSaving"
+          variant="outline-primary" 
+          class="float-right btn-save" 
+          @click="onStudentEntry()">
+          <v-icon
+            v-if="isUserSaving"
+            name="sync" 
+            spin
+            class="mr-2" />
+          Save
+        </b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
+
+    <b-modal 
+      v-model="showModalConfirmation"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true" >
+      <div slot="modal-title">
+          Delete Student
+      </div>
+      Are you sure you want to delete this student ?
+      <div slot="modal-footer">
+        <b-button 
+          :disabled="isUserSaving"
+          variant="outline-primary" 
+          class="mr-2 btn-save" 
+          @click="onStudentDelete()">
+          <v-icon
+            v-if="isUserSaving"
+            name="sync" 
+            spin
+            class="mr-2" />
+          Yes
+        </b-button>
+        <b-button 
+          variant="outline-danger" 
+          class="btn-close"
+          @click="showModalConfirmation=false">
+          No
+        </b-button>            
+      </div>
+    </b-modal>
   </div>
 </template>
 <script>
 
 const studentFields = {
   id: null,
-  studentNo: null,
+  //studentNo: null,
+  // studentNo: null,
   firstName: null,
   middleName: null,
   lastName: null,
   mobileNo: null,
   birthDate: null,
   civilStatusId: null,
+  email: null,
 }
 
 const addressFields = {
   currentHouseNoStreet: null,
+  currentBarangay: null,
   currentCityTown: null,
   currentProvince: null,
   currentRegion: null,
@@ -758,6 +982,7 @@ const addressFields = {
   currentCompleteAddress: null,
   currentHomeLandlineMobileNo: null,
   permanentHouseNoStreet: null,
+  permanentBarangay: null,
   permanentCityTown: null,
   permanentProvince: null,
   permanentRegion: null,
@@ -770,6 +995,7 @@ const addressFields = {
 
 const addressErrorFields = {
   addressCurrentHouseNoStreet: null,
+  addressCurrentBarangay: null,
   addressCurrentCityTown: null,
   addressCurrentProvince: null,
   addressCurrentRegion: null,
@@ -779,6 +1005,7 @@ const addressErrorFields = {
   addressCurrentCompleteAddress: null,
   addressCurrentHomeLandlineMobileNo: null,
   addressPermanentHouseNoStreet: null,
+  addressPermanentBarangay: null,
   addressPermanentCityTown: null,
   addressPermanentProvince: null,
   addressPermanentRegion: null,
@@ -818,19 +1045,36 @@ const familyErrorFields = {
 const educationFields = {
   lastSchoolAttended: null,
   lastSchoolAddress: null,
-  year: null,
+  lastSchoolYearFrom: null,
+  lastSchoolYearTo: null,
+  lastLevel: null,
   elementaryCourse: null,
-  elementaryCourseYear: null,
+  elementaryCourseYearFrom: null,
+  elementaryCourseYearTo: null,
   elementaryCourseHonors: null,
   highSchoolCourse: null,
-  highSchoolCourseYear: null,
+  highSchoolCourseYearFrom: null,
+  highSchoolCourseYearTo: null,
   highSchoolCourseHonors: null,
   seniorSchoolCourse: null,
-  seniorSchoolCourseYear: null,
+  seniorSchoolCourseYearFrom: null,
+  seniorSchoolCourseYearTo: null,
   seniorSchoolCourseHonors: null,
   collegeDegree: null,
-  collegeDegreeYear: null,
+  collegeDegreeYearFrom: null,
+  collegeDegreeYearTo: null,
   collegeDegreeHonors: null,
+}
+
+const userFields = {
+  username: null,
+  password: null,
+  passwordConfirmation: null,
+}
+
+const userErrorFields = {
+  userUsername: null,
+  userPassword: null,
 }
 
 import { StudentApi, UserGroupApi } from "../../mixins/api"
@@ -838,6 +1082,7 @@ import { validate, reset, showNotification, clearFields } from '../../helpers/fo
 import { Countries, CivilStatuses } from "../../helpers/enum"
 import Tables from "../../helpers/tables"
 import PhotoViewer from '../components/PhotoViewer'
+import { copyValue } from '../../helpers/extractor'
 export default {
 	name: "Student",
   mixins: [StudentApi, Tables],
@@ -846,12 +1091,18 @@ export default {
   },
 	data() {
 		return {
-      showModalEntry: false,
-      showEntry: false,
+      showStudentEntry: false,
+      showModalUpdateUser: false,
+      showModalConfirmation: false,
+      isProfilePhotoBusy: false,
+      isSaving : false,
+      isUserSaving: false,
       studentPhotoUrl: null,
       Countries: Countries,
       CivilStatuses: CivilStatuses,
+      selectedPhoto: null,
       entryMode: "",
+      activeTabIndex: 0,
       forms: {
         student: {
           fields: { ...studentFields },
@@ -873,6 +1124,11 @@ export default {
           states: { ...educationFields },
           errors: { ...educationFields }
         },
+        user: {
+          fields: { ...userFields },
+          states: { ...userErrorFields },
+          errors: { ...userErrorFields }
+        }
       },
 			tables: {
 				students: {
@@ -906,6 +1162,12 @@ export default {
 					items: []
 				}
       },
+      tabHeaders: [
+          { header: 'Profile', description: 'Officially registering you is just few steps away. First, tell us a bit about yourself.' },
+          { header: 'Address', description: 'Let us know your address. Please include all required(*) fields.' },
+          { header: 'Family', description: 'Details about your family. Please include all required(*) fields.' },
+          { header: 'Education', description: 'Details about your previous educational background. Please include all required(*) fields.' }
+      ],
       paginations: {
 				student: {
 					from: 0,
@@ -933,125 +1195,204 @@ export default {
 	},
 	created() {
     this.loadStudents()
-   
 	},
 	methods: {
 		loadStudents() {
       const { students } = this.tables
-      const { student } = this.paginations
+      const { criteria } = this.filters.student
+      const { student, student: { perPage, page } } = this.paginations
 
       students.isBusy = true
 
-			let params = { paginate: false }
-      this.getStudentList(params).then(({ data }) =>{
-        students.items = data
-        console.log(students.items)
-        student.totalRows = data.length
-        this.recordDetails(student)
+			let params = { paginate: true, perPage, page, criteria }
+      this.getStudentList(params).then(({ data }) => {
+        students.items = data.data
+        student.from = data.meta.from
+        student.to = data.meta.to
+        student.totalRows = data.meta.total
         students.isBusy = false
       })
     },
-    onUserEntry() {
-      // const { user, personnel, personnel: { fields: { id } } } = this.forms
-      // const { users } = this.tables
-      // user.isProcessing = true
-      // reset(user)
-      // reset(personnel)
-      // if(this.entryMode == "Add"){
-      //   const data = { ...personnel.fields, user: user.fields }
-      //   this.addPersonnel(data)
-      //     .then(({ data }) => {
-      //       this.addRow(users, this.paginations.user, data)
-      //       user.isProcessing = false
-      //       showNotification(this, "success", "User created successfully.")
-      //       this.showModalEntry = false
-      //     })
-      //     .catch(error => {
-      //       const errors = error.response.data.errors
-      //       user.isProcessing = false
-      //       validate(user, errors)
-      //       validate(personnel, errors)
-      //     })
-      // }
-      // else if (this.entryMode == "Edit Personnel") {
-      //   this.updatePersonnel(personnel.fields, id)
-      //     .then(({ data }) => {
-      //       this.updateRow(users, data)
-      //       user.isProcessing = false
-      //       showNotification(this, "success", "User updated successfully.")
-      //       this.showModalUpdatePersonnel = false
-      //     })
-      //     .catch(error => {
-      //       const errors = error.response.data.errors
-      //       user.isProcessing = false
-      //       validate(personnel, errors)
-      //     })
-      // }
-      // else if (this.entryMode == "Edit User") {
-      //   const data = { user: user.fields }
-      //   this.updatePersonnel(data, id)
-      //     .then(({ data }) => {
-      //       this.updateRow(users, data)
-      //       user.isProcessing = false
-      //       showNotification(this, "success", "User updated successfully.")
-      //       this.showModalUpdateUser = false
-      //     })
-      //     .catch(error => {
-      //       const errors = error.response.data.errors
-      //       user.isProcessing = false
-      //       validate(user, errors)
-      //     })
-      // }
+    onStudentEntry() {
+      const { 
+        student: { fields: { id: studentId } },
+        student, 
+        address, 
+        family, 
+        education,
+        user } = this.forms
+        
+      const { students } = this.tables
+      
+      reset(student)
+      reset(address)
+      reset(family)
+      reset(education)
+      reset(user)
+
+      const data = {
+        ...student.fields,
+        address: { ...address.fields },
+        family: { ...family.fields },
+        education: { ...education.fields }
+      }
+      
+      if(this.entryMode == "Add"){
+        this.isSaving = true;
+
+        this.addStudent(data)
+          .then(({ data }) => {
+            let newStudent = data
+            if (this.selectedPhoto) {
+              const formData = new FormData();
+              formData.append('photo', this.selectedPhoto);
+              this.savePhoto(formData, newStudent.id).then(({ data }) => {
+                this.studentPhotoUrl = process.env.VUE_APP_PUBLIC_PHOTO_URL + data.hashName
+                newStudent.photo = data
+              })
+            }
+            
+            this.addRow(students, this.paginations.student, newStudent)
+
+            showNotification(this, 'success', 'Student has been added.')
+            this.showStudentEntry = false;
+            this.isSaving = false;
+        }).catch(error => {
+          console.log(error)
+          const errors = error.response.data.errors
+          console.log(error.response.data)
+          validate(student, errors)
+          validate(address, errors)
+          validate(family, errors)
+          validate(education, errors) 
+          this.showBulletedNotification(errors)
+          this.isSaving = false;
+          // validate(user, errors)
+          // validate(personnel, errors)
+        })
+
+      } else if (this.entryMode == "Edit Student") {
+        this.isSaving = true;
+        this.updateStudent(data, studentId)
+          .then(({ data }) => {
+            this.updateRow(students, data)
+            showNotification(this, 'success', 'Student has been updated.')
+            this.showStudentEntry = false;
+            this.isSaving = false;
+        }).catch(error => {
+          const errors = error.response.data.errors
+          
+          validate(student, errors)
+          validate(address, errors)
+          validate(family, errors)
+          validate(education, errors)
+          this.isSaving = false;
+          this.showBulletedNotification(errors)
+        })
+      } else if (this.entryMode == "Edit User") {
+        this.isUserSaving = true
+        student.fields.email = user.fields.username 
+        const data = { ...student.fields, user: user.fields }
+        
+        this.updateStudent(data, studentId)
+          .then(({ data }) => {
+            this.updateRow(students, data)
+            showNotification(this, "success", "Student's Account is updated successfully.")
+            this.showModalUpdateUser = false
+            this.isUserSaving = false
+          })
+          .catch(error => {
+            const errors = error.response.data.errors
+            validate(user, errors)
+            this.isUserSaving = false
+          })
+      }  
     },
-    onUserGroupDelete() {
-      // const { user, user: { fields: { id } } } = this.forms
-      // const { users } = this.tables
-      // user.isProcessing = true
-      // this.deletePersonnel(id)
-      //   .then(({ data }) => {
-      //     this.deleteRow(users, this.paginations.user, id)
-      //     user.isProcessing = false
-      //     showNotification(this, "success", "User deleted successfully.")
-      //     this.showModalConfirmation = false
-      //   })
+    setUpdateStudent(row) {
+      this.studentPhotoUrl = null
+      const { student, address, family, education } = this.forms
+      const { item } = row
+      this.activeTabIndex = 0
+
+      //clear fields value
+      clearFields(student.fields)
+      clearFields(address.fields)
+      clearFields(family.fields)
+      clearFields(education.fields)
+
+      //reset state
+      reset(student)
+      reset(address)
+      reset(family)
+      reset(education)
+
+      copyValue(item, student.fields)
+      copyValue(item.address, address.fields)
+      copyValue(item.family, family.fields)
+      copyValue(item.education, education.fields)
+
+      if (item.photo)
+      this.studentPhotoUrl = process.env.VUE_APP_PUBLIC_PHOTO_URL + item.photo.hashName
+
+      this.entryMode = "Edit Student"
+      this.showStudentEntry = true
     },
     setUpdateUser(row) {
-      // const { personnel, user, user: { fields } } = this.forms
-      // const { item } = row
-      // clearFields(fields)
-      // reset(user)
+     
+      const { student, user } = this.forms
+      const { item } = row
 
-      // personnel.fields.id = item.id
-      // fields.username = item.user.username
-      // fields.userGroupId = item.user.userGroupId
+      clearFields(user.fields)
+      reset(user)
 
-      // this.entryMode = "Edit User"
-      // this.showModalUpdateUser = true
-    },
-    setUpdatePersonnel(row) {
-      // const { personnel, personnel: { fields } } = this.forms
-      // const { item } = row
-      // clearFields(fields)
-      // reset(personnel)
-      // console.log(item)
-      // fields.id = item.id
-      // fields.firstName = item.firstName
-      // fields.middleName = item.middleName
-      // fields.lastName = item.lastName
-      // fields.birthDate = item.birthDate
+      copyValue(item, student.fields)
 
-      // this.entryMode = "Edit Personnel"
-      // this.showModalUpdatePersonnel = true
+      if (row.item.user)
+      user.fields.username = row.item.user.username
+
+      this.entryMode = "Edit User"
+      this.showModalUpdateUser = true
     },
     setCreate() {
-      // const { user, personnel } = this.forms
-      // reset(user)
-      // reset(personnel)
-      // clearFields(user.fields)
-      // clearFields(personnel.fields)
+
+      this.studentPhotoUrl = null
+      const { student, address, family, education } = this.forms
+   
       this.entryMode='Add'
-      //this.showModalEntry = true
+
       this.showEntry = true
+      this.activeTabIndex = 0
+
+      //reset state
+      reset(student)
+      reset(address)
+      reset(family)
+      reset(education)
+
+      //clear fields value
+      clearFields(student.fields)
+      clearFields(address.fields)
+      clearFields(family.fields)
+      clearFields(education.fields)
+      
+      // set default country
+      address.fields.currentCountryId = Countries.PHILIPPINES.id
+      address.fields.permanentCountryId = Countries.PHILIPPINES.id
+      
+      this.entryMode = 'Add'
+      this.showStudentEntry = true
+    },
+    onStudentDelete(){
+      const { student, user: { fields: { id } } } = this.forms
+      const { students } = this.tables
+      this.isUserSaving = true
+      this.deleteStudent(id)
+        .then(({ data }) => {
+          this.deleteRow(students, this.paginations.student, id)
+          this.isUserSaving = false
+          showNotification(this, "success", "User deleted successfully.")
+          this.showModalConfirmation = false
+        })
     },
     avatar(student){
       let src = ''
@@ -1060,6 +1401,84 @@ export default {
       }
       return src
     },
+    onSameAddress(isSame) {
+      const { address: { fields: address } } = this.forms
+      if (isSame) {
+        address.permanentHouseNoStreet = address.currentHouseNoStreet
+        address.permanentBarangay = address.currentBarangay
+        address.permanentCityTown = address.currentCityTown
+        address.permanentProvince = address.currentProvince
+        address.permanentRegion = address.currentRegion
+        address.permanentDistrict = address.currentDistrict
+        address.permanentPostalCode = address.currentPostalCode
+        address.permanentCountryId = address.currentCountryId
+        address.permanentCompleteAddress = address.currentCompleteAddress
+        address.permanentHomeLandlineMobileNo = address.currentHomeLandlineMobileNo
+      } else {
+        address.permanentHouseNoStreet = null
+        address.permanentCityTown = null
+        address.permanentProvince = null
+        address.permanentRegion = null
+        address.permanentDistrict = null
+        address.permanentPostalCode = null
+        address.permanentCountryId = Countries.PHILIPPINES.id
+        address.permanentCompleteAddress = null
+        address.permanentHomeLandlineMobileNo = null
+      }
+    },
+    onPhotoChange(file) {
+      this.studentPhotoUrl = null
+      this.isProfilePhotoBusy = true
+
+      if (this.entryMode == "Add") {
+        this.createBase64Image(file)
+        this.selectedPhoto = file
+      }
+      else {
+        const formData = new FormData();
+        const { id: studentId } = this.forms.student.fields
+        formData.append('photo', file);
+
+        this.savePhoto(formData, studentId).then(({ data }) =>{
+          this.studentPhotoUrl = process.env.VUE_APP_PUBLIC_PHOTO_URL + data.hashName
+          setTimeout(() => this.isProfilePhotoBusy = false, 3000)
+        })
+      }
+    },
+    onPhotoRemove() {
+      if (this.entryMode == "Add") {
+        this.studentPhotoUrl = ""
+      } else {
+        const { id: studentId } = this.forms.student.fields
+
+        this.deletePhoto(studentId).then(({ data }) =>{
+          this.studentPhotoUrl = ""
+        })
+      }
+
+      this.selectedPhoto = null
+    },
+    createBase64Image(fileObject) {
+      const reader = new FileReader()
+      
+      reader.onload = (e) => {
+        this.studentPhotoUrl = e.target.result
+      }
+      reader.readAsDataURL(fileObject)
+      setTimeout(() => this.isProfilePhotoBusy = false, 1000)
+    },
+    showBulletedNotification(errors) {
+      const h = this.$createElement
+      const errorList = []
+      Object.keys(errors).forEach((key) => {
+        errorList.push(h('li', errors[key][0]))
+      })
+      const vNodesMsg = h(
+        'ul',
+        errorList
+      )
+      showNotification(this, "danger", vNodesMsg, 4000)
+    }
 	}
 }
 </script>

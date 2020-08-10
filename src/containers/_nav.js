@@ -58,12 +58,19 @@ export const navs = () => {
         ]
       },
       {
+        
         _name: 'CSidebarNavDropdown',
         name: 'Registrar',
         route: '/subject',
         icon: 'cil-layers',
         items: [
       // Registrar
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Student',
+            to: '/student',
+            icon: 'cil-layers',
+          },
           {
             _name: 'CSidebarNavItem',
             name: 'School Category',
@@ -164,13 +171,7 @@ export const navs = () => {
         icon: 'cil-layers',
         _class: checkRights(0)
       },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Student',
-      //   to: '/student',
-      //   icon: 'cil-layers',
-      //   _class: checkRights(0)
-      // }
+      
     ]
   }]
 }
