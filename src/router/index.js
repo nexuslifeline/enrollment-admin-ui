@@ -30,6 +30,7 @@ const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
 const Student = () => import('@/views/pages/Student')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
+const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
 const SchoolYear = () => import('@/views/pages/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
@@ -119,6 +120,12 @@ function configRoutes () {
           path: 'curriculum',
           name: 'Curriculum',
           component: Curriculum,
+          meta: { requiresAuth: true, userType: 1 }
+        },
+        {
+          path: 'schedule',
+          name: 'Scheduling',
+          component: Schedule,
           meta: { requiresAuth: true, userType: 1 }
         },
         {

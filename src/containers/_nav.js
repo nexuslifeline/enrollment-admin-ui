@@ -120,6 +120,13 @@ export const navs = () => {
             icon: 'cil-layers',
             class: checkRights(1)
           },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Scheduling',
+            to: '/schedule',
+            icon: 'cil-layers',
+            class: checkRights(1)
+          },
         ]
       },
       // Finance
