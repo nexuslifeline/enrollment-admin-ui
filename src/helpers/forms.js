@@ -14,12 +14,12 @@ export const reset = (form) => {
   });
 }
 
-export const showNotification = (instance, variant, msg) => {
+export const showNotification = (instance, variant, msg, autoHideDelay=2000) => {
   instance.$bvToast.toast(msg, {
     title: "Notification",
     variant: variant,
     solid: true,
-    autoHideDelay: 2000,
+    autoHideDelay: autoHideDelay,
   })
 }
 

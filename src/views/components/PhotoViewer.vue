@@ -137,7 +137,7 @@ export default {
 
   .photo-viewer__browse-caption {
     font-weight: 500;
-    color: $dark-gray;
+    color: $dark-gray-200;
   }
 
   .photo-viewer__file {
