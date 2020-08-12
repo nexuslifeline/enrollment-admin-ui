@@ -68,7 +68,7 @@
                 v-for="instructor in options.instructors.items" 
                 :key="instructor.id" 
                 :value="instructor.id">
-                {{ instructor.name }}
+                {{ instructor.firstName + ' ' + instructor.lastName }}
               </b-form-select-option>
             </b-form-select>
           </template>
