@@ -642,7 +642,7 @@ export default {
       // copyValue(row.item, fields, Object.keys(newFields))
       copyValue(row.item, fields)
       reset(subject)
-      this.loadSubjectPrerequisite()
+      // this.loadSubjectPrerequisite()
 
       // row.item.prerequisites.forEach(p => {
       //   fields.prerequisites.push(p.pivot.prerequisiteSubjectId)
