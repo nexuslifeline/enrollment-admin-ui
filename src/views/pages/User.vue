@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="c-app">
     <b-row>
       <b-col md=12>
         <b-card>
@@ -559,7 +559,7 @@ export default {
           })
       }
       else if (this.entryMode == "Edit User") {
-        const data = { user: user.fields }
+        const data = { user: user.fields, id: personnel.fields.id }
         this.updatePersonnel(data, id)
           .then(({ data }) => {
             this.updateRow(users, data)
@@ -620,6 +620,7 @@ export default {
       reset(personnel)
       clearFields(user.fields)
       clearFields(personnel.fields)
+      user.userGroupId = null
       this.entryMode='Add'
       this.showModalEntry = true
     }

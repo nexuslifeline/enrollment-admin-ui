@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="c-app">
     <b-overlay :show="isLoaded" rounded="sm">
       <b-row>
         <b-col md=12>

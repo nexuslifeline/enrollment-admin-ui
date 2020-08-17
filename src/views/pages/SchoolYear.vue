@@ -1,6 +1,6 @@
 <template>
-  <div>
-      <b-row>
+  <div class="c-app">
+    <b-row>
       <b-col md=12>
         <b-card>
 					<!-- <h5 slot="header">

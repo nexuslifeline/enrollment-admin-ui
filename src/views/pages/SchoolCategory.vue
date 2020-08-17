@@ -1,6 +1,6 @@
 <template>
-  <div>
-      <b-row>
+  <div class="c-app">
+    <b-row>
       <b-col md=12>
         <b-card>
           <b-card-body>

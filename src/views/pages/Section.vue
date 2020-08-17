@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="c-app">
     <b-row v-show="!showEntry">
       <b-col md="12">
         <b-card>
