@@ -367,7 +367,7 @@ const paymentReceiptFileFields = {
 
 import { PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi } from "../../mixins/api"
 import { PaymentStatuses } from "../../helpers/enum"
-import { showNotification, formatNumber, clearFields, reset } from "../../helpers/forms"
+import { showNotification, formatNumber, clearFields, reset, validate } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 import FileUploader from "../components/FileUploader"
 import FileItem from "../components/FileItem"
@@ -732,7 +732,7 @@ export default {
         selectedFile.isBusy = false
       }).catch((error) => {
         const { errors } = error.response.data;
-        validate(paymentFile, errors);
+        validate(paymentReceiptFile, errors);
         paymentReceiptFile.isUpdating = false
         selectedFile.isBusy = false
       });
