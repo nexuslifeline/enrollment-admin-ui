@@ -11,8 +11,5 @@ export default {
     getSubjectsOfLevelList(levelId, params){
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/levels/${levelId}/subjects`, { params: params });
     },
-    updateSubjectsOfLevel(levelId, data) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/levels/${levelId}/subjects`, data);
-    },
   }
 }
