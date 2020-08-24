@@ -93,13 +93,13 @@ function configRoutes () {
           meta: { requiresAuth: true, userType: 1 }
         },
         {
-          path: 'studentadmission',
+          path: 'student-subject-enlisment',
           name: 'Student Subject Enlistment',
           component: StudentAdmission,
           meta: { requiresAuth: true, userType: 1 }
         },
         {
-          path: 'studentassessmentfee',
+          path: 'student-assessment-fee',
           name: 'Student Assessment Fee',
           component: StudentAssessmentFee,
           meta: { requiresAuth: true, userType: 2 }
@@ -111,7 +111,7 @@ function configRoutes () {
           meta: { requiresAuth: true, userType: 2 }
         },
         {
-          path: 'ratesheet',
+          path: 'rate-sheet',
           name: 'Rate Sheet',
           component: RateSheet,
           meta: { requiresAuth: true, userType: 2 }
@@ -153,13 +153,13 @@ function configRoutes () {
           meta: { requiresAuth: true, userType: 1 }
         },
         {
-          path: 'schoolfeecategory',
+          path: 'school-fee-category',
           name: 'School Fee Category',
           component: SchoolFeeCategory,
           meta: { requiresAuth: true, userType: 2 }
         },
         {
-          path: 'schoolfee',
+          path: 'school-fee',
           name: 'School Fee',
           component: SchoolFee,
           meta: { requiresAuth: true, userType: 2 }
@@ -171,7 +171,7 @@ function configRoutes () {
           meta: { requiresAuth: true, userType: 0 }
         },
         {
-          path: 'usergroup',
+          path: 'user-group',
           name: 'User Group',
           component: UserGroup,
           meta: { requiresAuth: true, userType: 0 }
@@ -183,7 +183,7 @@ function configRoutes () {
           meta: { requiresAuth: true, userType: 0 }
         },
         {
-          path: 'schoolcategory',
+          path: 'school-category',
           name: 'School Category',
           component: SchoolCategory,
           meta: { requiresAuth: true, userType: 0 }
@@ -195,7 +195,7 @@ function configRoutes () {
           meta: { requiresAuth: true, userType: 0 }
         },
         {
-          path: 'schoolyear',
+          path: 'school-year',
           name: 'School Year',
           component: SchoolYear,
           meta: { requiresAuth: true, userType: 0 }

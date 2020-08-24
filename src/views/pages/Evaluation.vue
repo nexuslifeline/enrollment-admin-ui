@@ -5,7 +5,7 @@
 				<b-card>
 					<b-card-body>
 						<b-row>
-							<b-col md=9>
+							<b-col md=12>
 								<SchoolCategoryTabs
                   :showAll="true" 
                   :schoolCategoryId="schoolCategoryId"
@@ -63,6 +63,9 @@
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 						>
+              <template v-slot:cell(attachments)="data">
+                <span>{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp; </span>  <v-icon name="paperclip"/> 
+              </template>
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
@@ -754,6 +757,13 @@ export default {
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: { width: "12%"}
+            },
+            {
+							key: "attachments",
+							label: "",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: { width: "8%"}
 						},
 						{
 							key: "action",
