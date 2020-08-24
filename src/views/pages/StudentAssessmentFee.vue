@@ -5,17 +5,15 @@
 				<b-card>
 					<b-card-body>
 						<b-row>
-							<b-col md=9>
-                <b-tabs pills>
-                  <SchoolCategoryTabs
-                    :showAll="true" 
-                    :schoolCategoryId="schoolCategoryId"
-                    @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
-                    @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
-                </b-tabs>
+							<b-col md=12>
+                <SchoolCategoryTabs
+                  :showAll="true" 
+                  :schoolCategoryId="schoolCategoryId"
+                  @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
+                  @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
 							</b-col>
-							<b-col md=3>
-							</b-col>
+							<!-- <b-col md=3>
+							</b-col> -->
 						</b-row>
 						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
@@ -194,11 +192,11 @@
                       :items="data.item.fees"
                       :busy="tables.studentFees.isBusy">
                       <template v-slot:cell(pivot.notes)="row">
-                        <b-form-input v-model="row.item.pivot.notes" />
+                        <b-form-input :disabled="data.item.application.applicationStatusId === applicationStatuses.APPROVED.id" v-model="row.item.pivot.notes" />
                       </template>
                       <template v-slot:cell(pivot.amount)="row">
                         <vue-autonumeric
-                          :disabled="row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1"
+                          :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || data.item.application.applicationStatusId === applicationStatuses.APPROVED.id"
                           v-model="row.item.pivot.amount"
                           class="form-control text-right" 
                           :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">

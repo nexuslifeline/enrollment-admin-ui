@@ -5,16 +5,16 @@
 				<b-card>
 					<b-card-body>
 						<b-row>
-							<b-col md=9>
+							<b-col md=12>
 								<SchoolCategoryTabs
                   :showAll="true" 
                   :schoolCategoryId="schoolCategoryId"
                   @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
                   @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
 							</b-col>
-							<b-col md=3>
+							<!-- <b-col md=3>
 								
-							</b-col>
+							</b-col> -->
 						</b-row>
 						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
@@ -138,12 +138,11 @@
                           <h5 class="pt-2">SUBJECTS</h5>
                         </b-col>
                       </b-row>
-                      <b-row class="mb-3">
+                      <!-- <b-row class="mb-3">
                         <b-col md=4>
                           <b-form-group 
                               label="Section"
                               label-cols-sm="3"
-															label-class="required"
                           >
                             <b-form-select
                               v-model="data.item.sectionId"
@@ -160,13 +159,41 @@
                             </b-form-select>
                           </b-form-group>
                         </b-col>
-                        <b-col md=2 offset-md="6" v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
+                        <b-col md=3 offset-md="5" v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
                           <b-button class="float-right" variant="outline-primary" block
                             @click="onAddSubject(data.item)">
-                            <v-icon name="plus-circle" /> ADD NEW SUBJECT
+                            <v-icon name="plus-circle" /> ADD SUBJECT
                           </b-button>
                         </b-col>
-                      </b-row>
+                      </b-row> -->
+											<div class="details__section-button-container">
+                        <div class="section__container">
+                          <label >Section</label>
+                          <b-form-select
+                            class="section-select"
+                            v-model="data.item.sectionId"
+                            >
+                            <template v-slot:first>
+                              <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
+                            </template>
+                            <b-form-select-option 
+                              v-for="section in filterSection(data)" 
+                              :key="section.id" 
+                              :value="section.id">
+                              {{ section.name }}
+                            </b-form-select-option>
+                          </b-form-select>
+                        </div>
+                          <!-- <b-button class="add-subject-button" variant="outline-primary"
+                            @click="onAddSubject(data.item)">
+                            <v-icon name="plus-circle" /> ADD SUBJECT
+                          </b-button> -->
+
+                        <button class="btn btn-outline-primary add-subject-button"
+                          @click="onAddSubject(data.item)">
+                          <v-icon name="plus-circle" /> ADD SUBJECT
+                        </button>
+                      </div>
 											<b-table
 												class="mb-4"
 												hover outlined small responsive show-empty
@@ -539,7 +566,7 @@ export default {
 						},
 						{
 							key: "status",
-							label: "Admission Status",
+							label: "Status",
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: { width: "12%"}
@@ -766,10 +793,10 @@ export default {
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
 				const errors = error.response.data.errors
-				if (errors['sectionId']) {
-					showNotification(this, "danger", 'Section is required.')
-					this.showModalApproval = false
-				}
+				// if (errors['sectionId']) {
+				// 	showNotification(this, "danger", 'Section is required.')
+				// 	this.showModalApproval = false
+				// }
         this.isProcessing = false;
       });
     },
@@ -997,6 +1024,8 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+	@import "../../assets/scss/shared.scss";
+
  .preview__modal-description {
     z-index: 5000;
     position: fixed;
@@ -1010,5 +1039,54 @@ export default {
     flex-direction: row;
     align-items: center;
     padding: 0 30px;
+  }
+	.details__section-button-container {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    @include for-size(phone-only) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .add-subject-button {
+    width: 175px;
+
+    @include for-size(phone-only) {
+      width: 100%;
+    }
+  }
+
+  .section__container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-right: 10px;
+    
+    label {
+      margin-right: 10px;
+    }
+
+   .section-select {
+      width: 200px;
+   }
+
+    @include for-size(phone-only) {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-right: 0;
+      margin-bottom: 10px;
+      width: 100%;
+
+      .section-select {
+        width: 100%;
+      }
+      
+    }
   }
 </style>
