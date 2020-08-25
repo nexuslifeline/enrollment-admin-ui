@@ -238,7 +238,36 @@
                               </div>
                             </b-col>
                             <b-col md=6 v-if="data.item.course">
-                              Course : <span class="font-weight-bold">{{ data.item.course.description }} {{ data.item.course.major ? ' - ' + data.item.course.major  : '' }}</span>
+                              <div class="d-flex flex-row">
+                                <div>Course : </div>
+                                <div v-if="!data.item.studentCourseEdit">
+                                  <span class="font-weight-bold">
+                                    {{ data.item.course.description }} {{ data.item.course.major ? ' - ' + data.item.course.major  : '' }}
+                                  </span>&nbsp;&nbsp;
+                                  <b-link 
+                                    v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
+                                    @click="data.item.studentCourseEdit = !data.item.studentCourseEdit">
+                                    [Change Course]
+                                  </b-link>
+                                </div>
+                                <div v-else class="w-75 ml-2">
+                                  <b-form-select
+                                    @change="onChangeCourse(data)" 
+                                    v-model="data.item.courseId" 
+                                    class="float-right">
+                                    <template v-slot:first>
+                                      <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                                    </template>
+                                    <b-form-select-option :value="null">None</b-form-select-option>
+                                    <b-form-select-option 
+                                      v-for="course in options.courses.items" 
+                                      :key="course.id" 
+                                      :value="course.id">
+                                      {{course.description}} {{course.major ? `(${course.major})` : ''}}
+                                    </b-form-select-option>
+                                  </b-form-select>
+                                </div>
+                              </div>
                             </b-col>
                           </b-row>
                           <b-row class="pb-1">
@@ -933,7 +962,10 @@ export default {
       const { 
         item,
         item: {
-          id: evaluationId
+          id: evaluationId,
+          curriculumId,
+          studentCurriculumId,
+          courseId
         }
       } = this.row
 
@@ -955,13 +987,14 @@ export default {
       })
 
       evaluation.evaluationStatusId = EvaluationStatuses.APPROVED.id
-      const curriculumId = item.curriculumId
-      const studentCurriculumId = item.studentCurriculumId
+      // const curriculumId = item.curriculumId
+      // const studentCurriculumId = item.studentCurriculumId
 
       const data = {
         ...evaluation,
         curriculumId,
         studentCurriculumId,
+        courseId,
         subjects
       }
 
@@ -1059,6 +1092,7 @@ export default {
         this.$set(item, 'isLoading', true)
         this.$set(item, 'curriculumEdit', false)
         this.$set(item, 'studentCurriculumEdit', false)
+        this.$set(item, 'studentCourseEdit', false)
         this.$set(item, 'curriculums', false)
 
         let params = { paginate: false, schoolCategoryId, levelId}
@@ -1073,6 +1107,7 @@ export default {
         .then(({ data }) => {
           this.$set(row.item, 'files', data)
           if (item.evaluationStatusId === EvaluationStatuses.SUBMITTED.id) {
+            // this.loadCurriculumList(params, row)
             this.getCurriculumList(params)
             .then(({ data }) => {
               item.curriculums = data
@@ -1105,6 +1140,50 @@ export default {
         })
 			}
 			row.toggleDetails()
+    },
+    onChangeCourse(row) {
+      const {
+        item,
+        item: {
+          schoolCategoryId,
+          courseId
+        } 
+      } = row
+
+      const params = { paginate: false, schoolCategoryId, courseId }
+
+      this.getCurriculumList(params)
+      .then(({ data }) => {
+        item.curriculums = data
+        if (data.length > 0) {
+          const activeCurriculum = data.find(c => c.active === 1)
+          if (activeCurriculum) {
+            item.curriculumId = activeCurriculum.id
+            if (item.studentCategoryId === StudentCategories.NEW.id) {
+              item.studentCurriculumId = activeCurriculum.id
+              item.studentCurriculum = activeCurriculum
+            }
+            item.curriculumMsg = false
+            this.loadCurriculum(item.curriculumId, row)
+          } else {
+            item.curriculum = null
+            item.studentCurriculum = null
+            item.studentCurriculumId = null
+            item.curriculumId = null
+            item.subjects = null
+            item.curriculumMsg = true
+            return
+          }
+        } else {
+          item.curriculum = null
+          item.studentCurriculum = null
+          item.studentCurriculumId = null
+          item.curriculumId = null
+          item.subjects = null
+          item.curriculumMsg = true
+          return
+        }
+      })
     },
     getName(item, child){
       if (item) {
