@@ -34,6 +34,11 @@ const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
 const SchoolYear = () => import('@/views/pages/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
+const AcademicRecords = () => import('@/views/pages/academic-records/AcademicRecords')
+const AcademicRecordEvaluation = () => import('@/views/pages/academic-records/Evaluation')
+const AcademicRecordSubjects = () => import('@/views/pages/academic-records/Subjects')
+const AcademicRecordAssessment = () => import('@/views/pages/academic-records/Assessment')
+const AcademicRecordRequirements = () => import('@/views/pages/academic-records/Requirements')
 
 Vue.use(Router)
 
@@ -180,7 +185,35 @@ function configRoutes () {
           path: 'student',
           name: 'Student',
           component: Student,
-          meta: { requiresAuth: true, userType: 0 }
+          meta: { requiresAuth: true, userType: 0 },
+          children: [
+            {
+              path: ':studentId/academic-records',
+              component: AcademicRecords,
+              children: [
+                {
+                  path: '/',
+                  redirect: 'evaluation'
+                },
+                {
+                  path: 'evaluation',
+                  component: AcademicRecordEvaluation
+                },
+                {
+                  path: 'subjects',
+                  component: AcademicRecordSubjects
+                },
+                {
+                  path: 'assessment',
+                  component: AcademicRecordAssessment
+                },
+                {
+                  path: 'requirements',
+                  component: AcademicRecordRequirements
+                }
+              ]
+            }
+          ]
         },
         {
           path: 'school-category',
