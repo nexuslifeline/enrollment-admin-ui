@@ -76,7 +76,7 @@
                       :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                       :src="avatar(data.item.student)" />										
 									</template>
-								  <span>{{ data.item.student.name }}</span><br>
+								  <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
 									<small>Address : {{ data.item.student.address ? 
                     data.item.student.address.currentCompleteAddress : "" }}

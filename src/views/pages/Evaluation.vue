@@ -76,7 +76,7 @@
                       :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                       :src="avatar(data.item.student)" />
 									</template>
-									<span>{{ data.item.student.name }}</span><br>
+									<span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
 									<small>Address : {{ data.item.student.address ? 
                     data.item.student.address.currentCompleteAddress : "" }}
@@ -577,47 +577,10 @@
 				</b-card>
       </b-col>
     </b-row>
-    <!-- Modal Preview -->
-    <b-modal 
-			v-model="showModalPreview"
-			size="xl"
-			header-bg-variant="success"
-			header-text-variant="light"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					Preview
-			</div> <!-- modal title -->
-			<b-row class="justify-content-md-center"> <!-- modal body -->
-				<b-col md=12>
-          <div v-if="file.src">
-            <center>
-              <b-img
-                fluid 
-                v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'" 
-                :src="file.src" />
-              <b-embed
-                v-else
-                type="iframe"
-                aspect="16by9"
-                allowfullscreen
-                :src="file.src"
-              ></b-embed>
-            </center>
-          </div>
-				</b-col>
-			</b-row> <!-- modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-right"
-          variant="outline-danger"
-          @click="showModalPreview=false">
-          Close
-        </b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
-    <!-- Modal Preview -->
-		<!-- Modal Approval -->
+    <PreviewFile
+      :showModalPreview="showModalPreview"
+      :file="file"
+      @close="showModalPreview = false" />
 		<b-modal 
 			v-model="showModalApproval"
 			centered
@@ -690,14 +653,6 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Reject -->
-    <!-- Modal Subject -->
-    <div v-if="showModalPreview" class="preview__modal-description">
-      <div class="mx-auto">
-        Filename : {{ file.name }}<br>
-        Notes : {{ file.notes }}
-      </div>
-    </div>
-    <!-- Modal Subject -->
 	</div> <!-- main container -->
 </template>
 <script>
@@ -707,6 +662,7 @@ import { showNotification, formatNumber, clearFields } from "../../helpers/forms
 import Tables from "../../helpers/tables"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import { copyValue } from '../../helpers/extractor'
+import PreviewFile from '../components/PreviewFile'
 
 const evaluationFields = {
   evaluationStatusId: null,
@@ -718,7 +674,8 @@ export default {
 	name: "Evaluation",
   mixins: [EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi, Tables],
   components: {
-    SchoolCategoryTabs
+    SchoolCategoryTabs,
+    PreviewFile
   },
 	data() {
 		return {
@@ -734,7 +691,8 @@ export default {
         type: null,
         src: null,
         name: null,
-        notes: null
+        notes: null,
+        isLoading: false
       },
       forms: {
         evaluation: {
@@ -1200,15 +1158,17 @@ export default {
       this.file.src = null
       this.file.name = name
       this.file.notes = notes
+      this.showModalPreview = true
+      this.file.isLoading = true
       this.getEvaluationFilePreview(evaluationId, id)
         .then(response => {
           this.file.type = response.headers.contentType
+          this.file.isLoading = false
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
           
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
-          this.showModalPreview = true
         })
     },
     loadCurriculum(id, row) {
