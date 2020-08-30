@@ -1292,7 +1292,7 @@ export default {
       } else if (this.entryMode == "Edit User") {
         this.isUserSaving = true
         student.fields.email = user.fields.username 
-        const data = { ...student.fields, user: user.fields }
+        const data = { id: student.fields.id, email: student.fields.email, user: user.fields }
         
         this.updateStudent(data, studentId)
           .then(({ data }) => {
@@ -1327,8 +1327,13 @@ export default {
       reset(education)
 
       copyValue(item, student.fields)
+      if (item.address)
       copyValue(item.address, address.fields)
+
+      if (item.family)
       copyValue(item.family, family.fields)
+
+      if (item.education)
       copyValue(item.education, education.fields)
 
       if (item.photo)
