@@ -192,11 +192,11 @@
                       :items="data.item.fees"
                       :busy="tables.studentFees.isBusy">
                       <template v-slot:cell(pivot.notes)="row">
-                        <b-form-input :disabled="data.item.application.applicationStatusId === applicationStatuses.APPROVED.id" v-model="row.item.pivot.notes" />
+                        <b-form-input :disabled="data.item.application ? data.item.application.applicationId : data.item.admission.applicationId === applicationStatuses.APPROVED.id" v-model="row.item.pivot.notes" />
                       </template>
                       <template v-slot:cell(pivot.amount)="row">
                         <vue-autonumeric
-                          :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || data.item.application.applicationStatusId === applicationStatuses.APPROVED.id"
+                          :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || data.item.application ? data.item.application.applicationId : data.item.admission.applicationId === applicationStatuses.APPROVED.id"
                           v-model="row.item.pivot.amount"
                           class="form-control text-right" 
                           :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
