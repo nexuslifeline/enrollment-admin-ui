@@ -1,18 +1,20 @@
 <template>
   <b-card style="min-height: 100%">
-    <b-row>
-      <b-col md=8>
-        <!-- <span class="entry-header">{{course}} - {{schoolYear}} {{ semester ? `/ ${semester}` : ''}}</span> -->
-        <!-- <span class="entry-header">{{details}}</span> -->
-        <span class="entry-header">Details here</span>
-      </b-col>
-      <b-col md=4>
-        <b-button variant="outline-primary" class="float-right"  @click="addSchedule()">
-          <v-icon name="plus-circle" /> ADD NEW ROW
-        </b-button>
-      </b-col>
-    </b-row>
-    <hr>
+    <div v-if="isEntry">
+      <b-row>
+        <b-col md=8>
+          <!-- <span class="entry-header">{{course}} - {{schoolYear}} {{ semester ? `/ ${semester}` : ''}}</span> -->
+          <!-- <span class="entry-header">{{details}}</span> -->
+          <!-- <span class="entry-header">Details here</span> -->
+        </b-col>
+        <b-col md=4>
+          <b-button variant="outline-primary" class="float-right"  @click="addSchedule()">
+            <v-icon name="plus-circle" /> ADD NEW ROW
+          </b-button>
+        </b-col>
+      </b-row>
+      <hr>
+    </div>
     <b-row>
       <b-col md=2>
         <b-tabs content-class="mt-3" pills vertical v-model="dayActiveIndex" >
@@ -34,19 +36,23 @@
         >
           <template v-slot:cell(startTime)="row">
             <b-form-input
+              :disabled="!isEntry"
               @blur="checkTime(true, row)"
               v-model="row.item.startTime"
               type="time" />
           </template>
           <template v-slot:cell(endTime)="row">
             <b-form-input
+              :disabled="!isEntry"
               @blur="checkTime(false, row)"
               v-model="row.item.endTime" 
               type="time" />
           </template>
-          <template v-slot:cell(subjectId)="{ item }">
-            <b-form-select 
-              v-model="item.subjectId" >
+          <template v-slot:cell(subjectId)="row">
+            <b-form-select
+              :disabled="!isEntry"
+              :state="scheduleStates ? scheduleStates[`subjectId${getTableIndex(row)}`] : null"
+              v-model="row.item.subjectId" >
               <template v-slot:first>
                 <b-form-select-option :value="null">-- Select Subject --</b-form-select-option>
               </template>
@@ -56,11 +62,21 @@
                 :value="subject.id">
                 {{ subject.name }}
               </b-form-select-option>
+              <b-form-select-option
+                v-if="row.item.subject"
+                :value="row.item.subject.id">
+                {{ row.item.subject.name }}
+              </b-form-select-option>
             </b-form-select>
+            <b-form-invalid-feedback>
+              Subject field is required.
+            </b-form-invalid-feedback>
           </template>
-          <template v-slot:cell(personnelId)="{ item }">
-            <b-form-select 
-              v-model="item.personnelId" >
+          <template v-slot:cell(personnelId)="row">
+            <b-form-select
+              :disabled="!isEntry"
+              :state="scheduleStates ? scheduleStates[`personnelId${getTableIndex(row)}`] : null"
+              v-model="row.item.personnelId" >
               <template v-slot:first>
                 <b-form-select-option :value="null">-- Select Instructor --</b-form-select-option>
               </template>
@@ -68,26 +84,37 @@
                 v-for="instructor in options.instructors.items" 
                 :key="instructor.id" 
                 :value="instructor.id">
-                {{ instructor.firstName + ' ' + instructor.lastName }}
+                {{ instructor.name }}
+              </b-form-select-option>
+              <b-form-select-option 
+                v-if="row.item.personnel"
+                :value="row.item.personnel.id">
+                {{ row.item.personnel.name }}
               </b-form-select-option>
             </b-form-select>
+            <b-form-invalid-feedback>
+              Instructor field is required.
+            </b-form-invalid-feedback>
           </template>
           <template v-slot:cell(isLab)="{ item }">
-            <b-form-checkbox 
+            <b-form-checkbox
+              :disabled="!isEntry"
               v-model="item.isLab"/>
           </template>
           <template v-slot:cell(remarks)="{ item }">
             <b-form-input 
+              :disabled="!isEntry"
               v-model="item.remarks"/>
           </template>
           <template v-slot:cell(action)="row">
             <b-button
+              v-if="isEntry"
               @click="removeSchedule(row)"
               size="sm"
               variant="danger">
               <v-icon 
                 name="trash" />
-            </b-button>
+              </b-button>
           </template>
         </b-table>
       </b-col>
@@ -103,9 +130,11 @@ import { showNotification } from '../../helpers/forms'
 export default {
   mixins: [ Tables, CurriculumApi, PersonnelApi ],
   props: {
+    isEntry: Boolean,
     isShown: Boolean,
     details: String,
     scheduleItems: Array,
+    scheduleStates: Object,
     subjects: Array
   },
   data() {
@@ -118,43 +147,43 @@ export default {
             {
 							key: "startTime",
 							label: "START TIME",
-							tdClass: "align-middle",
+							tdClass: "align-top",
 							thStyle: { width: "12%" },
             },
             {
 							key: "endTime",
 							label: "END TIME",
-							tdClass: "align-middle",
+							tdClass: "align-top",
 							thStyle: { width: "12%" },
             },
             {
 							key: "subjectId",
 							label: "SUBJECT",
-							tdClass: "align-middle",
+							tdClass: "align-top",
 							thStyle: { width: "20%" },
             },
             {
 							key: "personnelId",
 							label: "INSTRUCTOR",
-							tdClass: "align-middle",
+							tdClass: "align-top",
 							thStyle: { width: "20%" },
             },
             {
 							key: "isLab",
 							label: "IS LAB?",
-							tdClass: "align-middle text-center",
-							thStyle: { width: "5%" },
+							tdClass: "align-top text-center",
+							thStyle: { width: "5%", minWidth: "75px" },
             },
             {
 							key: "remarks",
 							label: "REMARKS",
-							tdClass: "align-middle",
+							tdClass: "align-top",
 							thStyle: { width: "auto" },
             },
             {
               key: "action",
               label: "",
-              tdClass: "align-middle",
+              tdClass: "align-top",
               thStyle: { width: "45px" }
             }
           ],
@@ -219,15 +248,7 @@ export default {
     },
     removeSchedule(row) {
       const { item } = row
-      const index = this.scheduleItems.findIndex(i => 
-        i.startTime === item.startTime &&
-        i.endTime === item.endTime &&
-        i.subjectId === item.subjectId &&
-        i.personnelId === item.personnelId &&
-        i.isLab === item.isLab &&
-        i.remarks === item.remarks &&
-        i.dayId === item.dayId
-      )
+      const index = this.getTableIndex(row)
       this.scheduleItems.splice(index, 1)
     },
     checkTime(isStart, row) {
@@ -274,18 +295,41 @@ export default {
       const hour = String(Number(newTime[0]) === condition[0] ? condition[1] : Number(newTime[0]) + Number(num))
       const minute = String(newTime[1])
       return `${hour.length === 1 ? `0${hour}` : hour}:${minute.length === 1 ? `0${minute}` : minute}`
+    },
+    getTableIndex(row) {
+      const { item } = row
+      const index = this.scheduleItems.findIndex(i => 
+        i.startTime === item.startTime &&
+        i.endTime === item.endTime &&
+        i.subjectId === item.subjectId &&
+        i.personnelId === item.personnelId &&
+        i.isLab === item.isLab &&
+        i.remarks === item.remarks &&
+        i.dayId === item.dayId
+      )
+      return index;
     }
   },
   computed: {
     filterScheduleItems() {
-      const filterScheduleItems = this.scheduleItems.filter(s => s.dayId === (this.dayActiveIndex + 1))
-      return filterScheduleItems
+      if (this.scheduleItems) {
+        const filterScheduleItems = this.scheduleItems.filter(s => s.dayId === (this.dayActiveIndex + 1))
+        return filterScheduleItems
+      } 
+      return []
     }
   },
   watch: {
     isShown(value) {
       if (value) {
         this.dayActiveIndex = 0
+      }
+    },
+    scheduleStates(value) {
+      if (value) {
+        const key = Object.keys(value)[0]
+        const index = key.substring(key.length - 1, key.length)
+        this.dayActiveIndex = this.scheduleItems[index].dayId - 1
       }
     }
   }
