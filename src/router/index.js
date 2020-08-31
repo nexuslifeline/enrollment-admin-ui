@@ -193,22 +193,26 @@ function configRoutes () {
               children: [
                 {
                   path: '/',
-                  redirect: 'evaluation'
+                  redirect: 'evaluations'
                 },
                 {
-                  path: 'evaluation',
+                  path: 'evaluations',
+                  name: 'Evaluations',
                   component: AcademicRecordEvaluation
                 },
                 {
                   path: 'subjects',
+                  name: 'Subjects',
                   component: AcademicRecordSubjects
                 },
                 {
                   path: 'assessment',
+                  name: 'Assessment',
                   component: AcademicRecordAssessment
                 },
                 {
                   path: 'requirements',
+                  name: 'Requirements',
                   component: AcademicRecordRequirements
                 }
               ]

@@ -15,8 +15,6 @@
           </router-link>
         </li>
       </ul>
-        <!--<router-link class="link" to="/my-documents/assesment-form" >Assesment Forms</router-link>
-        <router-link class="link" to="/my-documents/registration-form">Registration Forms</router-link>-->
     </div>
     <div class="right-pane">
       <router-view></router-view>

@@ -3,7 +3,7 @@ export default {
   items: [
     {
       label: 'Evaluation',
-      to: `/evaluation`
+      to: `/evaluations`
     },
     {
       label: 'Subjects',

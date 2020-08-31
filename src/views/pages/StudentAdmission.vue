@@ -22,7 +22,8 @@
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
 									<b-form-radio :value="null">Show All</b-form-radio>
 									<b-form-radio 
-										v-for="status in transcriptStatuses.values" 
+										v-for="status in transcriptStatuses.values"
+                    v-if="status.id != transcriptStatuses.ENROLLED.id"
 										:value="status.id" 
 										:key="status.id">
 										{{ status.name }}

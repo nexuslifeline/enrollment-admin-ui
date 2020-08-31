@@ -31,6 +31,12 @@ export default {
     },
     deletePhoto(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/students/${id}/photos`)
-    }
+    },
+    getEvaluationsOfStudent(studentId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/evaluations`, { params: params });
+    },
+    getTranscriptsOfStudent(studentId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/transcripts`, { params: params });
+    },
   }
 }
