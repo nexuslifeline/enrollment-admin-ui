@@ -86,6 +86,7 @@ export const ApplicationStatuses = new Enum({
 export const TranscriptStatuses = new Enum({
   DRAFT: { id: 1, name: 'Draft' },
   FINALIZED: { id: 2, name: 'Finalized' },
+  ENROLLED: { id: 3, name: 'Enrolled' }
 });
 
 export const StudentFeeStatuses = new Enum({
