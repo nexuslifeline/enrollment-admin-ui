@@ -191,6 +191,7 @@
                           </b-button> -->
 
                         <button class="btn btn-outline-primary add-subject-button"
+                          v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
                           @click="onAddSubject(data.item)">
                           <v-icon name="plus-circle" /> ADD SUBJECT
                         </button>
