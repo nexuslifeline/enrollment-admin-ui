@@ -15,7 +15,6 @@
                 </b-form-radio>
               </b-form-radio-group>
             </b-col>
-
             <b-col md="4">
               <b-form-input
                 v-model="filters.payment.criteria"
@@ -42,7 +41,7 @@
                     :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                     :src="avatar(data.item.student)" />
                 </template>
-                <span>{{ data.item.student.name }}</span><br>
+                <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                 <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
                 <small>Address : {{ data.item.student.address ? 
                   data.item.student.address.currentCompleteAddress : "" }}
@@ -147,44 +146,10 @@
       </b-col>
     </b-row>
     <!-- Modal Preview -->
-    <b-modal 
-			v-model="showModalPreview"
-			size="xl"
-			header-bg-variant="success"
-			header-text-variant="light"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					Preview
-			</div> <!-- modal title -->
-			<b-row class="justify-content-md-center"> <!-- modal body -->
-				<b-col md=12>
-          <div v-if="file.src">
-            <center>
-              <b-img
-                fluid 
-                v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'" 
-                :src="file.src" />
-              <b-embed
-                v-else
-                type="iframe"
-                aspect="16by9"
-                allowfullscreen
-                :src="file.src"
-              ></b-embed>
-            </center>
-          </div>
-				</b-col>
-			</b-row> <!-- modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-right"
-          variant="outline-danger"
-          @click="showModalPreview=false">
-          Close
-        </b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
+    <PreviewFile
+      :showModalPreview="showModalPreview"
+      :file="file"
+      @close="showModalPreview = false" />
     <!-- Modal Preview -->
 		<!-- Modal Approval Confirmation -->
 		<b-modal 
@@ -292,12 +257,6 @@
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
-    <div v-if="showModalPreview" class="preview__modal-description">
-      <div class="mx-auto">
-        Filename : {{ file.name }}<br>
-        Notes : {{ file.notes }}
-      </div>
-    </div>
 		<!-- Modal Reject -->
     <b-modal 
       v-model="showPaymentReceiptFileModal"
@@ -372,13 +331,15 @@ import Tables from "../../helpers/tables"
 import FileUploader from "../components/FileUploader"
 import FileItem from "../components/FileItem"
 import { copyValue } from '../../helpers/extractor'
+import PreviewFile from '../components/PreviewFile'
 
 export default {
 	name: "Payment",
   mixins: [PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi, Tables],
   components: {
     FileUploader,
-    FileItem
+    FileItem,
+    PreviewFile
   },
 	data() {
 		return {
@@ -395,7 +356,8 @@ export default {
         type: null,
         src: null,
         name: null,
-        notes: null
+        notes: null,
+        isLoading: false
       },
       forms: {
         payment: {
@@ -650,15 +612,17 @@ export default {
       this.file.src = null
       this.file.name = name
       this.file.notes = notes
+      this.showModalPreview = true
+      this.file.isLoading = true
       this.getPaymentFilePreview(paymentId, id)
         .then(response => {
           this.file.type = response.headers.contentType
+          this.file.isLoading = false
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
           
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
-          this.showModalPreview = true
         })
     },
     avatar(student){
@@ -758,21 +722,6 @@ export default {
 }
 </script>
 <style scoped lang="scss">
- .preview__modal-description {
-    z-index: 5000;
-    position: fixed;
-    height: 50px;
-    background-color: white;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0 30px;
-  }
-
   .file-uploader-container {
     width: 100%;
     height: 150px;

@@ -76,7 +76,7 @@
                       :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                       :src="avatar(data.item.student)" />										
 									</template>
-								  <span>{{ data.item.student.name }}</span><br>
+								  <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
 									<small>Address : {{ data.item.student.address ? 
                     data.item.student.address.currentCompleteAddress : "" }}
@@ -192,11 +192,17 @@
                       :items="data.item.fees"
                       :busy="tables.studentFees.isBusy">
                       <template v-slot:cell(pivot.notes)="row">
-                        <b-form-input :disabled="data.item.application.applicationStatusId === applicationStatuses.APPROVED.id" v-model="row.item.pivot.notes" />
+                        <b-form-input 
+                          v-model="row.item.pivot.notes" 
+                          :disabled="data.item.application ? 
+                            data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id : 
+                            data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id" />
                       </template>
                       <template v-slot:cell(pivot.amount)="row">
                         <vue-autonumeric
-                          :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || data.item.application.applicationStatusId === applicationStatuses.APPROVED.id"
+                          :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || (data.item.application ? 
+                            data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id : 
+                            data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id)"
                           v-model="row.item.pivot.amount"
                           class="form-control text-right" 
                           :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">

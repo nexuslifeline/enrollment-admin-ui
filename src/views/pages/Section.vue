@@ -5,20 +5,94 @@
         <b-card>
           <b-card-body>
             <!-- add button and search -->
+            <SchoolCategoryTabs
+              :showAll="true"
+              :schoolCategoryId="null"
+              @clickAll="filters.section.schoolCategoryId = null"
+              @click="filters.section.schoolCategoryId = $event"/>
+						<hr>
             <b-row class="mb-3">
               <b-col md="12">
                 <b-row>
-                  <b-col md="8">
+                  <b-col md="2">
                     <b-button variant="outline-primary" @click="setCreate()">
-                      <v-icon name="plus-circle" /> ADD NEW SECTION
+                      <v-icon name="plus-circle" /> ADD SECTION
                     </b-button>
                   </b-col>
-                  <b-col md="4">
+                  <b-col md="3">
+                    <b-form-select
+                      v-model="filters.section.courseId" 
+                      class="float-right">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                      </template>
+                      <b-form-select-option :value="null">None</b-form-select-option>
+                      <b-form-select-option 
+                        v-for="course in options.courses.fixItems" 
+                        :key="course.id" 
+                        :value="course.id">
+                        {{course.description}} {{course.major ? `(${course.major})` : ''}}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </b-col>
+                  <b-col md=5>
+                    <b-row>
+                      <b-col md="4">
+                        <b-form-select
+                          v-model="filters.section.semesterId" 
+                          class="float-right">
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
+                          </template>
+                          <b-form-select-option :value="null">None</b-form-select-option>
+                          <b-form-select-option 
+                            v-for="semester in options.semesters.values" 
+                            :key="semester.id" 
+                            :value="semester.id">
+                            {{semester.name}}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </b-col>
+                      <b-col md="4">
+                        <b-form-select
+                          v-model="filters.section.levelId" 
+                          class="float-right">
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
+                          </template>
+                          <b-form-select-option :value="null">None</b-form-select-option>
+                          <b-form-select-option 
+                            v-for="level in options.levels.fixItems" 
+                            :key="level.id" 
+                            :value="level.id">
+                            {{level.name}}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </b-col>
+                      <b-col md="4">
+                        <b-form-select
+                          v-model="filters.section.schoolYearId" 
+                          class="float-right">
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled>-- School Year --</b-form-select-option>
+                          </template>
+                          <b-form-select-option :value="null">None</b-form-select-option>
+                          <b-form-select-option 
+                            v-for="schoolYear in options.schoolYears.items" 
+                            :key="schoolYear.id" 
+                            :value="schoolYear.id">
+                            {{schoolYear.name}}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </b-col>
+                    </b-row>
+                  </b-col>
+                  <b-col md="2">
                     <b-form-input
                       v-model="filters.section.criteria"
                       type="text"
                       placeholder="Search"
-                    >
+                    />
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -35,7 +109,7 @@
                   show-empty
                   :fields="tables.sections.fields"
                   :busy="tables.sections.isBusy"
-                  :items="tables.sections.items"
+                  :items="filteredSection"
                   :current-page="paginations.section.page"
                   :per-page="paginations.section.perPage"
                   :filter="filters.section.criteria"
@@ -58,8 +132,14 @@
                       <template v-slot:button-content>
                         <v-icon name="ellipsis-v" />
                       </template>
-                      <b-dropdown-item @click="setUpdate(row)">
+                      <b-dropdown-item @click="loadSchedules(row)">
+                        {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
+                      </b-dropdown-item>
+                      <b-dropdown-item @click="setUpdate(row, 0)">
                         Edit
+                      </b-dropdown-item>
+                      <b-dropdown-item @click="setUpdate(row, 1)">
+                        Setup Schedule
                       </b-dropdown-item>
                       <b-dropdown-item
                         @click="
@@ -70,6 +150,18 @@
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
+                  </template>
+                  <template v-slot:row-details="data">
+                    <b-overlay :show="data.item.isLoading" rounded="sm">
+                      <b-card>
+                        <Schedule 
+                          :isEntry="false"
+                          class="mt-2"
+                          :isShown="true"
+                          :subjects="options.subjects.items"
+                          :scheduleItems="data.item.schedules"/>
+                      </b-card>
+                    </b-overlay>
                   </template>
                 </b-table>
                 <b-row>
@@ -107,7 +199,7 @@
               </span>
             </h5>
             <b-card-body>
-              <b-tabs>
+              <b-tabs v-model="entryTabIndex">
                 <b-tab title="Details">
                   <b-row class="mt-4">
                     <b-col md=6>
@@ -269,10 +361,12 @@
                 <b-tab title="Schedule">
                   <Schedule
                     class="mt-2"
+                    :isEntry="true"
                     :isShown="showEntry"
                     :details="scheduleDetails"
                     :subjects="options.subjects.items"
-                    :scheduleItems="forms.section.fields.schedules"/>
+                    :scheduleItems="forms.section.fields.schedules"
+                    :scheduleStates="forms.section.states.schedules"/>
                 </b-tab>
               </b-tabs>
 						</b-card-body>
@@ -401,24 +495,27 @@ const sectionFields = {
   levelId: null,
   courseId: null,
   semesterId: null,
-  schedules: []
+  schedules: null
 };
 
-import { SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CurriculumApi } from "../../mixins/api";
+import { SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, CurriculumApi } from "../../mixins/api";
 import { validate, reset, clearFields, showNotification, } from "../../helpers/forms";
 import { copyValue } from "../../helpers/extractor";
 import { SchoolCategories, Semesters } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 import SchoolYear from '../../mixins/api/SchoolYear';
 import Schedule from '../components/Schedule'
+import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 export default {
   name: "ClassSection",
-  mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, Tables],
+  mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, Tables],
   components: {
-    Schedule
+    Schedule,
+    SchoolCategoryTabs
   },
   data() {
     return {
+      entryTabIndex: 0,
       showModalEntry: false,
       showEntry: false,
       showModalConfirmation: false,
@@ -500,16 +597,23 @@ export default {
       filters: {
         section: {
           criteria: null,
+          schoolCategoryId: null,
+          levelId: null,
+          courseId: null,
+          schoolYearId: null,
+          semesterId: null
         },
       },
       options: {
         levels: {
           isLoading: false,
-          items: []
+          items: [],
+          fixItems: []
         },
         courses: {
           isLoading: false,
-          items: []
+          items: [],
+          fixItems: []
         },
         schoolYears: {
           items: []
@@ -526,6 +630,8 @@ export default {
   created() {
     this.loadSections();
     this.loadSchoolYears();
+    this.loadCourses();
+    this.loadLevels();
   },
   methods: {
     loadSections() {
@@ -597,11 +703,12 @@ export default {
               "success",
               "Section created successfully."
             );
-            this.showModalEntry = false;
+            this.showEntry = false;
           })
           .catch((error) => {
             const errors = error.response.data.errors;
             section.isProcessing = false;
+            this.validateSchedules(section, errors)
             validate(section, errors);
           });
       } else {
@@ -614,13 +721,40 @@ export default {
               "success",
               "Section updated successfully."
             );
-            this.showModalEntry = false;
+            this.showEntry = false;
           })
           .catch((error) => {
             const errors = error.response.data.errors;
             section.isProcessing = false;
+            this.validateSchedules(section, errors)
             validate(section, errors);
           });
+      }
+    },
+    validateSchedules(section, errors) {
+      // NOTE to be refactor
+      section.states.schedules = {}
+      const errorKeys = Object.keys(errors);
+        if (errorKeys && errorKeys.length > 0) {
+          this.entryTabIndex = errorKeys.includes('name') ||
+            errorKeys.includes('description') ||
+              errorKeys.includes('school_year_id') ||
+                errorKeys.includes('school_category_id') ||
+                  errorKeys.includes('level_id') ||
+                    errorKeys.includes('course_id') ||
+                      errorKeys.includes('semester_id')
+            ? 0
+            : 1;
+        }
+      const schedules = errorKeys.filter(e => e.includes('schedules'))
+      if(schedules) {
+        schedules.forEach(schedule => {
+          let index = schedule.substring(10, 11)
+          let key = schedule.substring(11).charAt(0).toLowerCase() + schedule.substring(12)
+          console.log(index)
+          console.log(key)
+          this.$set(section.states.schedules, `${key}${index}`, false)
+        })
       }
     },
     onSectionDelete() {
@@ -639,7 +773,8 @@ export default {
         this.showModalConfirmation = false;
       });
     },
-    setUpdate(row) {
+    setUpdate(row, tabIndex) {
+      this.entryTabIndex = tabIndex
       const {
         section,
         section: { fields },
@@ -665,6 +800,7 @@ export default {
       })
     },
     setCreate() {
+      this.entryTabIndex = 0
       const { section } = this.forms;
       reset(section);
       clearFields(section.fields);
@@ -719,7 +855,51 @@ export default {
         }
       }
       this.scheduleDetails = details
+    },
+    loadSchedules(row) {
+      this.$set(row.item, 'isLoading', true)
+      if (!row.detailsShowing) {
+        this.getSection(row.item.id)
+        .then(({ data }) => {
+          this.$set(row.item, 'schedules', data.schedules)
+          row.item.isLoading = false
+        })
+      }
+      row.toggleDetails()
+    },
+    loadCourses() {
+      const params = { paginate: false }
+      const { courses } = this.options
+      this.getCourseList(params)
+      .then(({ data }) => {
+        courses.fixItems = data
+      })
+    },
+    loadLevels() {
+      const params = { paginate: false }
+      const { levels } = this.options
+      this.getLevelList(params)
+      .then(({ data }) => {
+        levels.fixItems = data
+      })
     }
   },
+  computed: {
+    filteredSection() {
+      const { sections } = this.tables
+      const { section: filter } = this.filters
+      const { section: paginate } = this.paginations
+      const filteredSection = sections.items.filter(s => 
+        (filter.schoolCategoryId ? s.schoolCategoryId === filter.schoolCategoryId : true) &&
+        (filter.courseId ? s.courseId === filter.courseId : true) &&
+        (filter.levelId ? s.levelId === filter.levelId : true) &&
+        (filter.semesterId ? s.semesterId === filter.semesterId : true) &&
+        (filter.schoolYearId ? s.schoolYearId === filter.schoolYearId : true)
+      )
+      paginate.totalRows = filteredSection.length;
+      this.recordDetails(paginate);
+      return filteredSection
+    }
+  }
 };
 </script>
