@@ -7,13 +7,13 @@
 						<b-row>
 							<b-col md=12>
 								<SchoolCategoryTabs
-                  :showAll="true" 
+                  :showAll="true"
                   :schoolCategoryId="schoolCategoryId"
                   @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
                   @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
 							</b-col>
 							<!-- <b-col md=3>
-								
+
 							</b-col> -->
 						</b-row>
 						<hr>
@@ -21,9 +21,10 @@
 							<b-col md="6">
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
 									<b-form-radio :value="null">Show All</b-form-radio>
-									<b-form-radio 
-										v-for="status in transcriptStatuses.values" 
-										:value="status.id" 
+									<b-form-radio
+										v-for="status in transcriptStatuses.values"
+                    v-if="status.id != transcriptStatuses.ENROLLED.id"
+										:value="status.id"
 										:key="status.id">
 										{{ status.name }}
 									</b-form-radio>
@@ -31,19 +32,19 @@
 							</b-col>
 							<b-col md="3">
 								<b-form-select
-									v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id || 
-										filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id || 
-										filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id" 
-									@change="loadTranscript()" 
-									v-model="filters.student.courseId" 
+									v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
+										filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id ||
+										filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
+									@change="loadTranscript()"
+									v-model="filters.student.courseId"
 									class="float-right">
 									<template v-slot:first>
 										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
 									</template>
                   <b-form-select-option :value="null">None</b-form-select-option>
-									<b-form-select-option 
-										v-for="course in options.courses.items" 
-										:key="course.id" 
+									<b-form-select-option
+										v-for="course in options.courses.items"
+										:key="course.id"
 										:value="course.id">
 										{{course.description}} {{course.major ? `(${course.major})` : ''}}
 									</b-form-select-option>
@@ -54,12 +55,12 @@
 									v-model="filters.student.criteria"
                   debounce="500"
                   @update="loadTranscript()"
-									type="text" 
+									type="text"
 									placeholder="Search">
 								</b-form-input>
 							</b-col>
 						</b-row> <!-- row button and search input -->
-						<b-table 
+						<b-table
               details-td-class="table-secondary"
 							hover outlined small show-empty
 							:fields="tables.students.fields"
@@ -69,16 +70,16 @@
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
-										<b-avatar 
-                      rounded 
-                      blank 
-                      size="64" 
+										<b-avatar
+                      rounded
+                      blank
+                      size="64"
                       :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                       :src="avatar(data.item.student)" />
 									</template>
 									<span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-									<small>Address : {{ data.item.student.address ? 
+									<small>Address : {{ data.item.student.address ?
                     data.item.student.address.currentCompleteAddress : "" }}
                   </small>
 								</b-media>
@@ -89,22 +90,22 @@
                 <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
               </template>
 							<template v-slot:cell(education)="data">
-								<span>{{ getName(data.item, 'level') + " " 
-                  + getName(data.item, 'semester') + " " 
+								<span>{{ getName(data.item, 'level') + " "
+                  + getName(data.item, 'semester') + " "
                   + getName(data.item, 'studentType') }}</span><br>
                 <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
 							</template>
 							<template v-slot:cell(status)="data">
 								<b-badge
-									:variant="data.item.transcriptStatusId === transcriptStatuses.FINALIZED.id 
-										? 'primary' 
+									:variant="data.item.transcriptStatusId === transcriptStatuses.FINALIZED.id
+										? 'primary'
 										: 'warning'">
 									{{ transcriptStatuses.getEnum(data.item.transcriptStatusId).name }}
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<v-icon 
-									:name="row.detailsShowing ? 'caret-down' : 'caret-left'" 
+								<v-icon
+									:name="row.detailsShowing ? 'caret-down' : 'caret-left'"
 									@click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
@@ -140,7 +141,7 @@
                       </b-row>
                       <!-- <b-row class="mb-3">
                         <b-col md=4>
-                          <b-form-group 
+                          <b-form-group
                               label="Section"
                               label-cols-sm="3"
                           >
@@ -150,9 +151,9 @@
                               <template v-slot:first>
                                 <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
                               </template>
-                              <b-form-select-option 
-                                v-for="section in filterSection(data)" 
-                                :key="section.id" 
+                              <b-form-select-option
+                                v-for="section in filterSection(data)"
+                                :key="section.id"
                                 :value="section.id">
                                 {{ section.name }}
                               </b-form-select-option>
@@ -176,9 +177,9 @@
                             <template v-slot:first>
                               <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
                             </template>
-                            <b-form-select-option 
-                              v-for="section in filterSection(data)" 
-                              :key="section.id" 
+                            <b-form-select-option
+                              v-for="section in filterSection(data)"
+                              :key="section.id"
                               :value="section.id">
                               {{ section.name }}
                             </b-form-select-option>
@@ -201,9 +202,9 @@
 												:items="data.item.subjects"
 												:busy="tables.subjects.isBusy">
 												<template v-slot:cell(action)="row">
-													<b-button 
+													<b-button
                             v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
-														@click="removeSubject(data.item.subjects, row)" 
+														@click="removeSubject(data.item.subjects, row)"
 														size="sm" variant="danger">
 														<v-icon name="trash" />
 													</b-button>
@@ -219,16 +220,16 @@
 												:items="data.item.files"
 												:busy="tables.files.isBusy">
 												<template v-slot:cell(action)="row">
-													<b-button 
-														@click="previewFile(row)" 
+													<b-button
+														@click="previewFile(row)"
 														size="sm" variant="secondary">
-														<v-icon 
+														<v-icon
                               name="search"/>
 													</b-button>
 												</template>
 											</b-table>
 										</div>
-										
+
 										<!-- <template v-slot:footer>
 											<b-row>
 												<b-col md=10>
@@ -243,12 +244,12 @@
 									<b-button
                     v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
                     @click="setDisapproval(data)"
-                    class="float-right my-2 mr-2" 
+                    class="float-right my-2 mr-2"
                     variant="outline-danger">Reject</b-button>
 									<b-button
                     v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
                     @click="setApproval(data)"
-                    class="float-right m-2" 
+                    class="float-right m-2"
                     variant="outline-primary">Approve</b-button>
 								</b-overlay>
 							</template>
@@ -273,7 +274,7 @@
       </b-col>
     </b-row>
     <!-- Modal Preview -->
-    <b-modal 
+    <b-modal
 			v-model="showModalPreview"
 			size="xl"
 			header-bg-variant="success"
@@ -288,8 +289,8 @@
           <div v-if="file.src">
             <center>
               <b-img
-                fluid 
-                v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'" 
+                fluid
+                v-if="file.type.substr(0, file.type.indexOf('/')) == 'image'"
                 :src="file.src" />
               <b-embed
                 v-else
@@ -303,7 +304,7 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
+				<b-button
           class="float-right"
           variant="outline-danger"
           @click="showModalPreview=false">
@@ -313,7 +314,7 @@
 		</b-modal>
     <!-- Modal Preview -->
 		<!-- Modal Approval -->
-		<b-modal 
+		<b-modal
 			v-model="showModalApproval"
 			centered
 			header-bg-variant="success"
@@ -326,20 +327,20 @@
 			<b-row> <!-- modal body -->
 				<b-col md=12>
 					<label>Notes</label>
-					<b-textarea 
+					<b-textarea
             v-model="forms.applicationAdmission.fields.approvalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
+				<b-button
+          class="float-left"
           @click="showModalApproval=false">
           Cancel
         </b-button>
-				<b-button 
+				<b-button
           @click="onApproval()"
-          class="float-right" 
+          class="float-right"
           variant="outline-primary">
           <v-icon
             v-if="isProcessing"
@@ -352,8 +353,8 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Approval -->
-		<!-- Modal Reject --> 
-		<b-modal 
+		<!-- Modal Reject -->
+		<b-modal
 			v-model="showModalRejection"
 			centered
 			header-bg-variant="danger"
@@ -372,12 +373,12 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
+				<b-button
+          class="float-left"
           @click="showModalRejection=false">
           Cancel
         </b-button>
-				<b-button 
+				<b-button
           @click="onDisapproval()"
           class="float-right" variant="outline-primary">
 					Confirm
@@ -386,7 +387,7 @@
 		</b-modal>
 		<!-- Modal Reject -->
     <!-- Modal Subject -->
-    <b-modal 
+    <b-modal
 			v-model="showModalSubjects"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true"
@@ -407,8 +408,8 @@
                 </template>
                 <b-form-select-option :value="null">None</b-form-select-option>
                 <b-form-select-option
-                  v-for="department in options.departments.items" 
-                  :key="department.id" 
+                  v-for="department in options.departments.items"
+                  :key="department.id"
                   :value="department.id">
                   {{department.name}}
                 </b-form-select-option>
@@ -417,7 +418,7 @@
             <b-col offset-md="4" md="4">
               <b-form-input
                 v-model="filters.subject.criteria"
-                type="text" 
+                type="text"
                 placeholder="Search">
               </b-form-input>
             </b-col>
@@ -432,8 +433,8 @@
             :per-page="paginations.subject.perPage"
             @filtered="onFiltered($event, paginations.subject)">
 						<template v-slot:cell(action)="row">
-							<b-button 
-                @click="addSubject(row)" 
+							<b-button
+                @click="addSubject(row)"
                 size="sm" variant="success">
                 <v-icon name="plus" />
               </b-button>
@@ -457,8 +458,8 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-        class="float-right" 
+				<b-button
+        class="float-right"
         variant="outline-danger"
         @click="showModalSubjects=false">
         Close
@@ -549,14 +550,14 @@ export default {
 									item.student.middleName = ""
 								}
 								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-							} 
+							}
 						},
 						{
 							key: "contact",
 							label: "Contact Info",
 							tdClass: "align-middle",
 							thStyle: { width: "30%" },
-							
+
 						},
 						{
 							key: "education",
@@ -739,16 +740,16 @@ export default {
         this.row = row.item
         this.showModalApproval = true
       }
-      
+
     },
     onApproval() {
-      const { 
+      const {
         id: transcriptId,
         applicationId,
         admissionId
       } = this.row
 
-      const { 
+      const {
         applicationAdmission: { fields: application },
         applicationAdmission: { fields: admission },
         transcript: { fields: transcript },
@@ -762,12 +763,11 @@ export default {
 
       const index = applicationId ? 0 : 1
 
-      let subjects = []
-
-      this.row.subjects.forEach(subject => {
-				subjects.push(subject.id)
+      let subjects = this.row.subjects.map(subject => {
+        const { id: subjectId, pivot: { sectionId } } = subject
+				return { subjectId, sectionId }
       })
-      
+
       studentFee.schoolYearId = this.row.schoolYearId,
       studentFee.semesterId = this.row.semesterId,
       studentFee.levelId = this.row.levelId,
@@ -805,26 +805,26 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
-      const { 
+      const {
         id: transcriptId,
         applicationId,
         admissionId
       } = this.row
 
-      const { 
+      const {
         applicationAdmission: { fields: application },
         applicationAdmission: { fields: admission },
         transcript: { fields: transcript }
       } = this.forms
 
-      const data = applicationId 
-      ? { application: { 
+      const data = applicationId
+      ? { application: {
             ...application,
             applicationStatusId: ApplicationStatuses.REJECTED.id,
             applicationStepId: this.row.application.applicationStepId - 1
-          } 
-        } 
-        : { admission: { 
+          }
+        }
+        : { admission: {
             ...admission,
             applicationStatusId: ApplicationStatuses.REJECTED.id,
             admissionStepId: this.row.admission.admissionStepId - 1
@@ -848,12 +848,12 @@ export default {
       students.isBusy = true
       const { transcriptStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
 			const applicationStatusId = ApplicationStatuses.SUBMITTED.id
-			let params = { 
-				paginate: true, 
-				perPage, page, 
-				transcriptStatusId, 
-				schoolCategoryId, 
-				courseId, 
+			let params = {
+				paginate: true,
+				perPage, page,
+				transcriptStatusId,
+				schoolCategoryId,
+				courseId,
         applicationStatusId,
         criteria }
 			this.getTranscriptList(params)
@@ -885,20 +885,20 @@ export default {
 		},
 	  loadDetails(row){
 			if (!row.detailsShowing) {
-				const { 
-					id: transcriptId, 
+				const {
+					id: transcriptId,
 					admissionId
 				} = row.item
 
         const params = { paginate: false }
-        
+
 				this.isLoading = true
 				this.getSubjectsOfTranscript(transcriptId, params)
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
 						this.isLoading = false
         })
-        
+
 				if (admissionId) {
 					this.isLoading = true
 					this.getAdmissionFileList(admissionId, params)
@@ -930,7 +930,7 @@ export default {
           this.file.type = response.headers.contentType
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
-          
+
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
           this.showModalPreview = true
@@ -947,7 +947,7 @@ export default {
 
       subjects.isBusy = true
       let params = { paginate: false, schoolCategoryId }
-      
+
 			this.getSubjectList(params)
 				.then(({ data }) => {
           subjects.items = data
@@ -977,7 +977,9 @@ export default {
         showNotification(this, 'danger', item.name + ' is already added.')
         return
       }
-			this.studentSubjects.push(row.item)
+      this.$set(item, 'pivot', {})
+      this.$set(item.pivot, 'sectionId', null)
+			this.studentSubjects.push(item)
 		},
 		removeSubject(subjects, row){
 			subjects.splice(row.index, 1)
@@ -1013,10 +1015,10 @@ export default {
     },
     filterSection(data) {
       const sect=
-         this.options.sections.items.filter(s => 
-          s.schoolYearId === data.item.schoolYearId 
-              && s.levelId === data.item.levelId 
-                  && s.courseId === data.item.courseId 
+         this.options.sections.items.filter(s =>
+          s.schoolYearId === data.item.schoolYearId
+              && s.levelId === data.item.levelId
+                  && s.courseId === data.item.courseId
                     && s.semesterId === data.item.semesterId )
       return sect
     }
@@ -1067,7 +1069,7 @@ export default {
     align-items: center;
     flex: 1;
     margin-right: 10px;
-    
+
     label {
       margin-right: 10px;
     }
@@ -1086,7 +1088,7 @@ export default {
       .section-select {
         width: 100%;
       }
-      
+
     }
   }
 </style>
