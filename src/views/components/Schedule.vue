@@ -18,13 +18,13 @@
     <b-row>
       <b-col md=2>
         <b-tabs content-class="mt-3" pills vertical v-model="dayActiveIndex" >
-          <b-tab title="MONDAY" active/> 
-          <b-tab title="TUESDAY" /> 
-          <b-tab title="WEDNESDAY" /> 
-          <b-tab title="THURSDAY" /> 
-          <b-tab title="FRIDAY" /> 
-          <b-tab title="SATURDAY" /> 
-          <b-tab title="SUNDAY" /> 
+          <b-tab title="MONDAY" active/>
+          <b-tab title="TUESDAY" />
+          <b-tab title="WEDNESDAY" />
+          <b-tab title="THURSDAY" />
+          <b-tab title="FRIDAY" />
+          <b-tab title="SATURDAY" />
+          <b-tab title="SUNDAY" />
         </b-tabs>
       </b-col>
       <b-col md=10>
@@ -45,7 +45,7 @@
             <b-form-input
               :disabled="!isEntry"
               @blur="checkTime(false, row)"
-              v-model="row.item.endTime" 
+              v-model="row.item.endTime"
               type="time" />
           </template>
           <template v-slot:cell(subjectId)="row">
@@ -56,14 +56,14 @@
               <template v-slot:first>
                 <b-form-select-option :value="null">-- Select Subject --</b-form-select-option>
               </template>
-              <b-form-select-option 
-                v-for="subject in subjects" 
-                :key="subject.id" 
+              <b-form-select-option
+                v-for="subject in subjects"
+                :key="subject.id"
                 :value="subject.id">
                 {{ subject.name }}
               </b-form-select-option>
               <b-form-select-option
-                v-if="row.item.subject"
+                v-if="row.item.subject && !isEntry"
                 :value="row.item.subject.id">
                 {{ row.item.subject.name }}
               </b-form-select-option>
@@ -80,14 +80,14 @@
               <template v-slot:first>
                 <b-form-select-option :value="null">-- Select Instructor --</b-form-select-option>
               </template>
-              <b-form-select-option 
-                v-for="instructor in options.instructors.items" 
-                :key="instructor.id" 
+              <b-form-select-option
+                v-for="instructor in options.instructors.items"
+                :key="instructor.id"
                 :value="instructor.id">
                 {{ instructor.name }}
               </b-form-select-option>
-              <b-form-select-option 
-                v-if="row.item.personnel"
+              <b-form-select-option
+                v-if="row.item.personnel && !isEntry"
                 :value="row.item.personnel.id">
                 {{ row.item.personnel.name }}
               </b-form-select-option>
@@ -102,7 +102,7 @@
               v-model="item.isLab"/>
           </template>
           <template v-slot:cell(remarks)="{ item }">
-            <b-form-input 
+            <b-form-input
               :disabled="!isEntry"
               v-model="item.remarks"/>
           </template>
@@ -112,7 +112,7 @@
               @click="removeSchedule(row)"
               size="sm"
               variant="danger">
-              <v-icon 
+              <v-icon
                 name="trash" />
               </b-button>
           </template>
@@ -198,10 +198,10 @@ export default {
       options: {
         instructors:{
           items: []
-        }, 
+        },
         subjects: {
           items: []
-        } 
+        }
       }
     }
   },
@@ -223,7 +223,7 @@ export default {
       let newEndTime = "08:00"
       if (filteredScheduleItems.length > 0) {
         const index = filteredScheduleItems.length - 1
-        const { 
+        const {
           startTime,
           endTime,
           subjectId,
@@ -273,7 +273,7 @@ export default {
           item.endTime = this.computeTimeByHour(item.startTime, 1)
           showNotification(this, 'danger', 'End time must be later than the start time.')
           return
-        } else { 
+        } else {
           const rows = scheduleItems.length - (row.index + 1)
           if (rows) {
             for (var i = 0; i < rows; i++) {
@@ -298,7 +298,7 @@ export default {
     },
     getTableIndex(row) {
       const { item } = row
-      const index = this.scheduleItems.findIndex(i => 
+      const index = this.scheduleItems.findIndex(i =>
         i.startTime === item.startTime &&
         i.endTime === item.endTime &&
         i.subjectId === item.subjectId &&
@@ -315,7 +315,7 @@ export default {
       if (this.scheduleItems) {
         const filterScheduleItems = this.scheduleItems.filter(s => s.dayId === (this.dayActiveIndex + 1))
         return filterScheduleItems
-      } 
+      }
       return []
     }
   },

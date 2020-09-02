@@ -21,15 +21,15 @@
                   </b-col>
                   <b-col md="3">
                     <b-form-select
-                      v-model="filters.section.courseId" 
+                      v-model="filters.section.courseId"
                       class="float-right">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
                       </template>
                       <b-form-select-option :value="null">None</b-form-select-option>
-                      <b-form-select-option 
-                        v-for="course in options.courses.fixItems" 
-                        :key="course.id" 
+                      <b-form-select-option
+                        v-for="course in options.courses.fixItems"
+                        :key="course.id"
                         :value="course.id">
                         {{course.description}} {{course.major ? `(${course.major})` : ''}}
                       </b-form-select-option>
@@ -39,15 +39,15 @@
                     <b-row>
                       <b-col md="4">
                         <b-form-select
-                          v-model="filters.section.semesterId" 
+                          v-model="filters.section.semesterId"
                           class="float-right">
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
                           </template>
                           <b-form-select-option :value="null">None</b-form-select-option>
-                          <b-form-select-option 
-                            v-for="semester in options.semesters.values" 
-                            :key="semester.id" 
+                          <b-form-select-option
+                            v-for="semester in options.semesters.values"
+                            :key="semester.id"
                             :value="semester.id">
                             {{semester.name}}
                           </b-form-select-option>
@@ -55,15 +55,15 @@
                       </b-col>
                       <b-col md="4">
                         <b-form-select
-                          v-model="filters.section.levelId" 
+                          v-model="filters.section.levelId"
                           class="float-right">
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
                           </template>
                           <b-form-select-option :value="null">None</b-form-select-option>
-                          <b-form-select-option 
-                            v-for="level in options.levels.fixItems" 
-                            :key="level.id" 
+                          <b-form-select-option
+                            v-for="level in options.levels.fixItems"
+                            :key="level.id"
                             :value="level.id">
                             {{level.name}}
                           </b-form-select-option>
@@ -71,15 +71,15 @@
                       </b-col>
                       <b-col md="4">
                         <b-form-select
-                          v-model="filters.section.schoolYearId" 
+                          v-model="filters.section.schoolYearId"
                           class="float-right">
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- School Year --</b-form-select-option>
                           </template>
                           <b-form-select-option :value="null">None</b-form-select-option>
-                          <b-form-select-option 
-                            v-for="schoolYear in options.schoolYears.items" 
-                            :key="schoolYear.id" 
+                          <b-form-select-option
+                            v-for="schoolYear in options.schoolYears.items"
+                            :key="schoolYear.id"
                             :value="schoolYear.id">
                             {{schoolYear.name}}
                           </b-form-select-option>
@@ -93,7 +93,6 @@
                       type="text"
                       placeholder="Search"
                     />
-                    </b-form-input>
                   </b-col>
                 </b-row>
               </b-col>
@@ -154,7 +153,7 @@
                   <template v-slot:row-details="data">
                     <b-overlay :show="data.item.isLoading" rounded="sm">
                       <b-card>
-                        <Schedule 
+                        <Schedule
                           :isEntry="false"
                           class="mt-2"
                           :isShown="true"
@@ -236,9 +235,9 @@
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- School Year --</b-form-select-option>
                           </template>
-                          <b-form-select-option 
-                            v-for="schoolYear in options.schoolYears.items" 
-                            :key="schoolYear.id" 
+                          <b-form-select-option
+                            v-for="schoolYear in options.schoolYears.items"
+                            :key="schoolYear.id"
                             :value="schoolYear.id">
                             {{schoolYear.name}}
                           </b-form-select-option>
@@ -251,7 +250,7 @@
                     <b-col md=6>
                       <b-form-group >
                         <label class="required">School Category</label>
-                        <b-form-select 
+                        <b-form-select
                           v-model="forms.section.fields.schoolCategoryId"
                           :state="forms.section.states.schoolCategoryId"
                           @change="loadLevelsOfSchoolCategoryList()"
@@ -259,9 +258,9 @@
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
                           </template>
-                          <b-form-select-option 
-                            v-for="schoolCategory in options.schoolCategories.values" 
-                            :key="schoolCategory.id" 
+                          <b-form-select-option
+                            v-for="schoolCategory in options.schoolCategories.values"
+                            :key="schoolCategory.id"
                             :value="schoolCategory.id">
                             {{ schoolCategory.name }}
                           </b-form-select-option>
@@ -278,7 +277,7 @@
                             name="spinner"
                             spin />
                         </label>
-                        <b-form-select 
+                        <b-form-select
                           v-model="forms.section.fields.levelId"
                           :state="forms.section.states.levelId"
                           @change="loadCoursesOfLevelList(), loadSubjectsOfCurriculum()"
@@ -286,9 +285,9 @@
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
                           </template>
-                          <b-form-select-option 
-                            v-for="level in options.levels.items" 
-                            :key="level.id" 
+                          <b-form-select-option
+                            v-for="level in options.levels.items"
+                            :key="level.id"
                             :value="level.id">
                             {{level.name}}
                           </b-form-select-option>
@@ -299,28 +298,28 @@
                       </b-form-group>
                       <b-form-group >
                         <label>
-                          Course 
+                          Course
                           <v-icon
                             v-if="options.courses.isLoading"
                             name="spinner"
                             spin />
                         </label>
-                        <b-form-select 
+                        <b-form-select
                           v-model="forms.section.fields.courseId"
                           :state="forms.section.states.courseId"
                           :disabled="
-                              forms.section.fields.schoolCategoryId === null || 
-                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRE_SCHOOL.id || 
-                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRIMARY_SCHOOL.id || 
+                              forms.section.fields.schoolCategoryId === null ||
+                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRE_SCHOOL.id ||
+                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRIMARY_SCHOOL.id ||
                               forms.section.fields.schoolCategoryId === options.schoolCategories.JUNIOR_HIGH_SCHOOL.id"
                           @change="loadSubjectsOfCurriculum()"
                           >
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
                           </template>
-                          <b-form-select-option 
-                            v-for="course in options.courses.items" 
-                            :key="course.id" 
+                          <b-form-select-option
+                            v-for="course in options.courses.items"
+                            :key="course.id"
                             :value="course.id">
                             {{course.description}} {{course.major ? `(${course.major})` : ''}}
                           </b-form-select-option>
@@ -331,22 +330,22 @@
                       </b-form-group>
                       <b-form-group >
                         <label>Semester</label>
-                        <b-form-select 
+                        <b-form-select
                           v-model="forms.section.fields.semesterId"
                           :state="forms.section.states.semesterId"
                           :disabled="
-                              forms.section.fields.schoolCategoryId === null || 
-                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRE_SCHOOL.id || 
-                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRIMARY_SCHOOL.id || 
+                              forms.section.fields.schoolCategoryId === null ||
+                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRE_SCHOOL.id ||
+                              forms.section.fields.schoolCategoryId === options.schoolCategories.PRIMARY_SCHOOL.id ||
                               forms.section.fields.schoolCategoryId === options.schoolCategories.JUNIOR_HIGH_SCHOOL.id"
                           @change="loadSubjectsOfCurriculum()"
                           >
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
                           </template>
-                          <b-form-select-option 
-                            v-for="semester in options.semesters.values" 
-                            :key="semester.id" 
+                          <b-form-select-option
+                            v-for="semester in options.semesters.values"
+                            :key="semester.id"
                             :value="semester.id">
                             {{ semester.name }}
                           </b-form-select-option>
@@ -371,18 +370,18 @@
               </b-tabs>
 						</b-card-body>
             <template v-slot:footer>
-							<b-button 
-								class="float-right btn-save ml-2" 
-								@click="showEntry = false" 
+							<b-button
+								class="float-right btn-save ml-2"
+								@click="showEntry = false"
 								variant="outline-danger">
 								Close
 							</b-button>
-							<b-button 
+							<b-button
 								:disabled="forms.section.isProcessing"
-								class="float-right btn-save" 
-								@click="onSectionEntry()" 
+								class="float-right btn-save"
+								@click="onSectionEntry()"
 								variant="outline-primary">
-								<v-icon 
+								<v-icon
 									v-if="forms.section.isProcessing"
 									name="sync"
 									spin
@@ -408,12 +407,12 @@
       <!-- modal body -->
       <!-- <b-row>
         <b-col md="12">
-          
+
         </b-col>
       </b-row>
       <b-row>
         <b-col md="12">
-          
+
 
 
         </b-col>
@@ -686,15 +685,27 @@ export default {
     onSectionEntry() {
       const {
         section,
-        section: { fields },
+        section: { fields: { schedules, ...fields }, },
       } = this.forms;
       const { sections } = this.tables;
 
+      const newSchedules = schedules.map(s => {
+        const{ personnel, subject, ...schedule } = s
+        return schedule
+      })
+
+      // console.log(newSchedules)
+      // return
+
+      const data = {
+        ...fields,
+        schedules: newSchedules
+      }
 
       section.isProcessing = true;
       reset(section);
       if (this.entryMode == "Add") {
-        this.addSection(fields)
+        this.addSection(data)
           .then(({ data }) => {
             this.addRow(sections, this.paginations.section, data);
             section.isProcessing = false;
@@ -712,7 +723,7 @@ export default {
             validate(section, errors);
           });
       } else {
-        this.updateSection(fields, fields.id)
+        this.updateSection(data, fields.id)
           .then(({ data }) => {
             this.updateRow(sections, data);
             section.isProcessing = false;
@@ -751,8 +762,6 @@ export default {
         schedules.forEach(schedule => {
           let index = schedule.substring(10, 11)
           let key = schedule.substring(11).charAt(0).toLowerCase() + schedule.substring(12)
-          console.log(index)
-          console.log(key)
           this.$set(section.states.schedules, `${key}${index}`, false)
         })
       }
@@ -814,7 +823,7 @@ export default {
       this.showEntry = true
     },
     loadSubjectsOfCurriculum() {
-      const { fields, fields: { levelId, courseId, semesterId } } = this.forms.section 
+      const { fields, fields: { levelId, courseId, semesterId } } = this.forms.section
       const { subjects } = this.options
       const params = {
         paginate: false,
@@ -827,7 +836,7 @@ export default {
           return
         }
       }
-      
+
       this.getSubjectsOfLevelList(levelId, params)
       .then(({ data }) => {
         subjects.items = data
@@ -850,7 +859,7 @@ export default {
             details = `${fields.name} - ${level.name}/${course.description} ${course.major ? `(${course.major})` : ''} - ${schoolYear.name}/${semester.name}`
           }
         }
-        else { 
+        else {
           details = `${fields.name} - ${level.name}/${schoolYear.name}`
         }
       }
@@ -889,7 +898,7 @@ export default {
       const { sections } = this.tables
       const { section: filter } = this.filters
       const { section: paginate } = this.paginations
-      const filteredSection = sections.items.filter(s => 
+      const filteredSection = sections.items.filter(s =>
         (filter.schoolCategoryId ? s.schoolCategoryId === filter.schoolCategoryId : true) &&
         (filter.courseId ? s.courseId === filter.courseId : true) &&
         (filter.levelId ? s.levelId === filter.levelId : true) &&
