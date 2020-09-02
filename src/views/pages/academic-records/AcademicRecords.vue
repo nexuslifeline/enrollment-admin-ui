@@ -77,7 +77,7 @@ export default {
   }
 
   .left-pane {
-    min-width: 230px;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     padding: 20px;
