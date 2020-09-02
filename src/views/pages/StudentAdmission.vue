@@ -67,6 +67,15 @@
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 						>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
@@ -210,6 +219,15 @@
 														<v-icon name="trash" />
 													</b-button>
 												</template>
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
 											</b-table>
 										</div>
 										<div v-if="data.item.admissionId">
@@ -228,6 +246,15 @@
                               name="search"/>
 													</b-button>
 												</template>
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
 											</b-table>
 										</div>
 
@@ -440,6 +467,15 @@
                 <v-icon name="plus" />
               </b-button>
 						</template>
+            <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
 					</b-table>
           <b-row>
             <b-col md=6>
