@@ -51,20 +51,29 @@
 									v-model="filters.student.criteria"
                   debounce="500"
                   @update="loadEvaluation()"
-									type="text" 
+									type="text"
 									placeholder="Search">
 								</b-form-input>
 							</b-col>
 						</b-row> <!-- row button and search input -->
-						<b-table 
+						<b-table
               details-td-class="table-secondary"
 							hover outlined small show-empty responsive
 							:fields="tables.students.fields"
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 						>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
               <template v-slot:cell(attachments)="data">
-                <span>{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp; </span>  <v-icon name="paperclip"/> 
+                <span>{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp; </span>  <v-icon name="paperclip"/>
               </template>
 							<template v-slot:cell(name)="data">
 								<b-media>
@@ -97,23 +106,23 @@
 							</template>
               <template v-slot:cell(studentCategory.name)="{ item: { studentCategory, studentCategoryId } }">
 								<b-badge
-                  :variant="studentCategoryId === studentCategories.NEW.id 
-										? 'success' 
+                  :variant="studentCategoryId === studentCategories.NEW.id
+										? 'success'
 										: studentCategoryId === studentCategories.OLD.id ? 'primary' : 'warning'">
 									{{ studentCategory.name }}
 								</b-badge>
 							</template>
 							<template v-slot:cell(status)="data">
 								<b-badge
-									:variant="data.item.evaluationStatusId === evaluationStatuses.APPROVED.id 
-										? 'success' 
+									:variant="data.item.evaluationStatusId === evaluationStatuses.APPROVED.id
+										? 'success'
 										: data.item.evaluationStatusId === evaluationStatuses.REJECTED.id ? 'danger' : 'warning'">
 									{{ evaluationStatuses.getEnum(data.item.evaluationStatusId).name }}
 								</b-badge>
 							</template>
 							<template v-slot:cell(action)="row">
-								<v-icon 
-									:name="row.detailsShowing ? 'caret-down' : 'caret-left'" 
+								<v-icon
+									:name="row.detailsShowing ? 'caret-down' : 'caret-left'"
 									@click="loadDetails(row)" />
 							</template>
 							<template v-slot:row-details="data">
@@ -134,6 +143,15 @@
                               <v-icon 
                                 name="search"/>
                             </b-button>
+                          </template>
+                          <template v-slot:table-busy>
+                            <div class="text-center my-2">
+                              <v-icon
+                                name="spinner"
+                                spin
+                                class="mr-2" />
+                              <strong>Loading...</strong>
+                            </div>
                           </template>
                         </b-table>
                       </div>
@@ -372,8 +390,8 @@
                                 </template>
                                 <template v-slot:table-busy>
                                   <div class="text-center my-2">
-                                    <v-icon 
-                                      name="spinner" 
+                                    <v-icon
+                                      name="spinner"
                                       spin
                                       class="mr-2" />
                                     <strong>Loading...</strong>
@@ -383,7 +401,7 @@
                                   <vue-autonumeric
                                     :disabled="data.item.evaluationStatusId !== evaluationStatuses.SUBMITTED.id || !row.item.pivot.isTaken"
                                     v-model="row.item.pivot.grade"
-                                    class="form-control text-right" 
+                                    class="form-control text-right"
                                     :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
                                   </vue-autonumeric>
                                 </template>
@@ -427,11 +445,11 @@
                               </b-table>
                             </b-col>
                           </b-row>
-                          <b-row v-else> 
+                          <b-row v-else>
                             <b-col md=12>
-                              <b-list-group>				
-                                <b-list-group-item										
-                                  v-for="level in data.item.levels" 
+                              <b-list-group>
+                                <b-list-group-item
+                                  v-for="level in data.item.levels"
                                   :key="level.id">
                                   <div v-b-toggle="'level' + level.id" class="d-flex justify-content-between align-items-center">
                                     <h5>{{ level.name }}</h5>
@@ -465,8 +483,8 @@
                                             :busy="tables.subjects.isBusy">
                                             <template v-slot:table-busy>
                                               <div class="text-center my-2">
-                                                <v-icon 
-                                                  name="spinner" 
+                                                <v-icon
+                                                  name="spinner"
                                                   spin
                                                   class="mr-2" />
                                                 <strong>Loading...</strong>
@@ -476,7 +494,7 @@
                                               <vue-autonumeric
                                                 :disabled="data.item.evaluationStatusId !== evaluationStatuses.SUBMITTED.id || !row.item.pivot.isTaken"
                                                 v-model="row.item.pivot.grade"
-                                                class="form-control text-right" 
+                                                class="form-control text-right"
                                                 :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
                                               </vue-autonumeric>
                                             </template>
@@ -548,12 +566,12 @@
 									<b-button
                     v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
                     @click="setDisapproval(data)"
-                    class="float-right my-2 mr-2" 
+                    class="float-right my-2 mr-2"
                     variant="outline-danger">Reject</b-button>
 									<b-button
                     v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
                     @click="setApproval(data)"
-                    class="float-right m-2" 
+                    class="float-right m-2"
                     variant="outline-primary">Approve</b-button>
 								</b-overlay>
 							</template>
@@ -581,7 +599,7 @@
       :showModalPreview="showModalPreview"
       :file="file"
       @close="showModalPreview = false" />
-		<b-modal 
+		<b-modal
 			v-model="showModalApproval"
 			centered
 			header-bg-variant="success"
@@ -594,20 +612,20 @@
 			<b-row> <!-- modal body -->
 				<b-col md=12>
 					<label>Notes</label>
-					<b-textarea 
+					<b-textarea
             v-model="forms.evaluation.fields.approvalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
+				<b-button
+          class="float-left"
           @click="showModalApproval=false">
           Cancel
         </b-button>
-				<b-button 
+				<b-button
           @click="onApproval()"
-          class="float-right" 
+          class="float-right"
           variant="outline-primary">
           <v-icon
             v-if="isProcessing"
@@ -620,8 +638,8 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Approval -->
-		<!-- Modal Reject --> 
-		<b-modal 
+		<!-- Modal Reject -->
+		<b-modal
 			v-model="showModalRejection"
 			centered
 			header-bg-variant="danger"
@@ -640,12 +658,12 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
+				<b-button
+          class="float-left"
           @click="showModalRejection=false">
           Cancel
         </b-button>
-				<b-button 
+				<b-button
           @click="onDisapproval()"
           class="float-right" variant="outline-primary">
 					Confirm
