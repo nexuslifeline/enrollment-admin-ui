@@ -1,6 +1,6 @@
 <template>
   <div class="c-app">
-    <TheSidebar/>
+    <!-- <TheSidebar/> -->
     <CWrapper>
       <TheHeader/>
       <div class="c-body">
@@ -19,7 +19,7 @@
 
 <script>
 import TheSidebar from './TheSidebar'
-import TheHeader from './TheHeader'
+import TheHeader from './Header'
 import TheFooter from './TheFooter'
 
 export default {

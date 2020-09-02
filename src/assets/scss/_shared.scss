@@ -1,18 +1,47 @@
 $blue: #0080FF;
-$white: #FFFFFF;
+$white: #fff;
+$white-shadow: #eff7ff;
+$light-blue: #c4e0fb;
+$light-blue-100: #ddebfe;
+$light-blue-shadow: #8cc0f0;
 $gray: #b8b8b8;
-$light-gray: #fcfcfc;
-$light-gray-10: #ebebeb;
+$black: #000000;
+
+$light-blue: #A1CFFD;
+$light-blue-10: #D4EAFF;
+
+$green: #00cc45;
+$dark-blue: #193278;
+$red: red;
+$maroon: #AB1B1E;
+
 $dark-gray: #7c7c7c;
 $dark-gray-10: #9c9c9c;
+
+$dark-gray-100: #9c9c9c;
 $dark-gray-200: #7c7c7c;
-$light-blue: #A1CFFD;
-$green: #00cc45;
-$darkblue: #0654A2;
-$red: red;
+$dark-gray-300: #606060;
+$dark-gray-500: #333333;
+$dark-gray-600: #242424;
+
+$light-gray: #fcfcfc;
+$light-gray-10: #d8dbe0;
+$light-gray-50: #f7f7f7;
+$light-gray-100: #f3f3f4;
+$light-gray-200: #e4e3e3;
+
+$light-blue-gray: #d2e5f8;
+$light-gray-blue: #e3effb;
+
+$maroon-100: #fff9f9;
+
+$side-bar-width: 50px;
+$header-height: 50px;
+$input-background-color: $light-gray-100;
 
 $brand-primary: $blue;
-$brand-border-color: $light-gray-10;
+$brand-border-color: $light-gray-100;
+
 
 
 @mixin for-size($size, $extra:0) {
