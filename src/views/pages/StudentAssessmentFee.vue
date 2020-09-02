@@ -678,7 +678,7 @@ export default {
           amount: fee.pivot.amount, 
           notes: fee.pivot.notes 
         })
-        totalAmount += fee.pivot.amount
+        totalAmount += Number(fee.pivot.amount)
       })
 
       const data = {
