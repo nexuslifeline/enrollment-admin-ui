@@ -98,7 +98,7 @@
                   <b-col md=6>
                     Showing {{ paginations.student.from }} to {{ paginations.student.to }} of {{ paginations.student.totalRows }} records.
                     </b-col>
-                    <b-col md=4>
+                    <!--<b-col md=4>
                       <b-form-input
                         v-model="filters.student.criteria"
                         type="text" 
@@ -106,7 +106,7 @@
                         debounce="500"
                         @update="loadStudents()">
                       </b-form-input>
-                    </b-col>
+                    </b-col>-->
                   </b-row>
               </b-col>
             </b-row>
