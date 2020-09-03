@@ -626,7 +626,8 @@
 				<b-button
           @click="onApproval()"
           class="float-right"
-          variant="outline-primary">
+          variant="outline-primary"
+          :disabled="isProcessing">
           <v-icon
             v-if="isProcessing"
             name="sync"
@@ -665,8 +666,16 @@
         </b-button>
 				<b-button
           @click="onDisapproval()"
-          class="float-right" variant="outline-primary">
-					Confirm
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
+          Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
@@ -935,6 +944,7 @@ export default {
       this.showModalApproval = true
     },
     onApproval() {
+      this.isProcessing = true;
       const {
         item,
         item: {
@@ -974,7 +984,6 @@ export default {
         subjects
       }
 
-      this.isProcessing = true;
       this.updateEvaluation(data, evaluationId)
       .then(({ data }) => {
         clearFields(evaluation)
@@ -993,6 +1002,7 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
+      this.isProcessing = true;
       const {
         item,
         item: {
@@ -1010,7 +1020,6 @@ export default {
         ...evaluation
       }
 
-      this.isProcessing = true;
       this.updateEvaluation(data, evaluationId)
       .then(({ data }) => {
         clearFields(evaluation)
