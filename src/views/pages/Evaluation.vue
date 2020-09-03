@@ -63,6 +63,15 @@
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 						>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
               <template v-slot:cell(attachments)="data">
                 <span>{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp; </span>  <v-icon name="paperclip"/>
               </template>
@@ -134,6 +143,15 @@
                               <v-icon
                                 name="search"/>
                             </b-button>
+                          </template>
+                          <template v-slot:table-busy>
+                            <div class="text-center my-2">
+                              <v-icon
+                                name="spinner"
+                                spin
+                                class="mr-2" />
+                              <strong>Loading...</strong>
+                            </div>
                           </template>
                         </b-table>
                       </div>
