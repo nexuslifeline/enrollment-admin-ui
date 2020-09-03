@@ -626,7 +626,8 @@
 				<b-button
           @click="onApproval()"
           class="float-right"
-          variant="outline-primary">
+          variant="outline-primary"
+          :disabled="isProcessing">
           <v-icon
             v-if="isProcessing"
             name="sync"
@@ -665,8 +666,16 @@
         </b-button>
 				<b-button
           @click="onDisapproval()"
-          class="float-right" variant="outline-primary">
-					Confirm
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
+          Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
@@ -935,7 +944,8 @@ export default {
       this.showModalApproval = true
     },
     onApproval() {
-      const { 
+      this.isProcessing = true;
+      const {
         item,
         item: {
           id: evaluationId,
@@ -945,7 +955,7 @@ export default {
         }
       } = this.row
 
-      const { 
+      const {
         evaluation: { fields: evaluation },
       } = this.forms
 
@@ -974,7 +984,6 @@ export default {
         subjects
       }
 
-      this.isProcessing = true;
       this.updateEvaluation(data, evaluationId)
       .then(({ data }) => {
         clearFields(evaluation)
@@ -993,14 +1002,15 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
-      const { 
+      this.isProcessing = true;
+      const {
         item,
         item: {
           id: evaluationId
         }
       } = this.row
 
-      const { 
+      const {
         evaluation: { fields: evaluation },
       } = this.forms
 
@@ -1010,7 +1020,6 @@ export default {
         ...evaluation
       }
 
-      this.isProcessing = true;
       this.updateEvaluation(data, evaluationId)
       .then(({ data }) => {
         clearFields(evaluation)
@@ -1029,10 +1038,10 @@ export default {
       students.isBusy = true
       const { evaluationStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
 			const applicationStatusId = EvaluationStatuses.SUBMITTED.id
-			let params = { 
-				paginate: true, 
-				perPage, page, 
-        evaluationStatusId, 
+			let params = {
+				paginate: true,
+				perPage, page,
+        evaluationStatusId,
         schoolCategoryId,
         courseId,
         criteria }

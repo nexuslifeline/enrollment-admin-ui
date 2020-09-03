@@ -369,7 +369,8 @@
 				<b-button
           @click="onApproval()"
           class="float-right"
-          variant="outline-primary">
+          variant="outline-primary"
+          :disabled="isProcessing">
           <v-icon
             v-if="isProcessing"
             name="sync"
@@ -408,7 +409,15 @@
         </b-button>
 				<b-button
           @click="onDisapproval()"
-          class="float-right" variant="outline-primary">
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
 					Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
@@ -842,6 +851,7 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
+      this.isProcessing = true;
       const {
         id: transcriptId,
         applicationId,
@@ -868,7 +878,6 @@ export default {
           }
         }
 
-      this.isProcessing = true;
       this.updateTranscript(data, transcriptId).then(({ data }) => {
         this.loadTranscript()
         this.isProcessing = false

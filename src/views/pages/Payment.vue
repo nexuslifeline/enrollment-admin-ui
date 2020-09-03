@@ -7,7 +7,7 @@
             <b-col md="8">
               <b-form-radio-group @input="loadPaymentList()" v-model="filters.payment.paymentStatusId">
                 <b-form-radio :value="null">Show All</b-form-radio>
-                <b-form-radio 
+                <b-form-radio
                   v-for="status in paymentStatuses.values"
                   :value="status.id"
                   :key="status.id">
@@ -20,17 +20,26 @@
                 v-model="filters.payment.criteria"
                 debounce="500"
                 @update="loadPaymentList()"
-                type="text" 
+                type="text"
                 placeholder="Search">
               </b-form-input>
             </b-col>
           </b-row> <!-- row button and search input -->
-          <b-table 
+          <b-table
             details-td-class="table-secondary"
             hover outlined small show-empty
             :fields="tables.payments.fields"
             :items="tables.payments.items"
             :busy="tables.payments.isBusy">
+             <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon
+                  name="spinner"
+                  spin
+                  class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
             <template v-slot:cell(name)="data">
               <b-media>
                 <template v-slot:aside>
@@ -43,7 +52,7 @@
                 </template>
                 <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                 <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-                <small>Address : {{ data.item.student.address ? 
+                <small>Address : {{ data.item.student.address ?
                   data.item.student.address.currentCompleteAddress : "" }}
                 </small>
               </b-media>
@@ -59,7 +68,7 @@
             <template v-slot:cell(paymentStatusId)="data">
               <b-badge
                 :variant="data.item.paymentStatusId === paymentStatuses.APPROVED.id
-                  ? 'primary' 
+                  ? 'primary'
                   : data.item.paymentStatusId === paymentStatuses.SUBMITTED.id ? 'warning' : 'danger'">
                 {{ paymentStatuses.getEnum(data.item.paymentStatusId).name }}
               </b-badge>
@@ -89,6 +98,15 @@
                           :fields="tables.billingItems.fields"
                           :items="data.item.billing.billingItems"
                           :busy="tables.billingItems.isBusy">
+                           <template v-slot:table-busy>
+                            <div class="text-center my-2">
+                              <v-icon
+                                name="spinner"
+                                spin
+                                class="mr-2" />
+                              <strong>Loading...</strong>
+                            </div>
+                          </template>
                         </b-table>
                       </div>
                       <div v-if="data.item.files">
@@ -107,17 +125,26 @@
                                 name="search" />
                             </b-button>
                           </template>
+                          <template v-slot:table-busy>
+                            <div class="text-center my-2">
+                              <v-icon
+                                name="spinner"
+                                spin
+                                class="mr-2" />
+                              <strong>Loading...</strong>
+                            </div>
+                          </template>
                         </b-table>
                       </div>
                       <b-row v-if="data.item.paymentStatusId === paymentStatuses.SUBMITTED.id">
                         <b-col md=12>
                           <b-button
                             @click="setDisapproval(data)"
-                            class="float-right my-2" 
+                            class="float-right my-2"
                             variant="outline-danger">Reject</b-button>
                           <b-button
                             @click="setApproval(data)"
-                            class="float-right my-2 mr-2" 
+                            class="float-right my-2 mr-2"
                             variant="outline-primary">Approve</b-button>
                         </b-col>
                       </b-row>
@@ -152,7 +179,7 @@
       @close="showModalPreview = false" />
     <!-- Modal Preview -->
 		<!-- Modal Approval Confirmation -->
-		<b-modal 
+		<b-modal
 			v-model="showModalApproval"
 			centered
 			header-bg-variant="success"
@@ -173,7 +200,7 @@
         <b-col md=12>
           <div class="file-uploader-container">
             <FileUploader
-              @onFileChange="onPaymentReceiptFileUpload" 
+              @onFileChange="onPaymentReceiptFileUpload"
               @onFileDrop="onPaymentReceiptFileUpload"
             />
           </div>
@@ -199,21 +226,22 @@
       <b-row>
 				<b-col md=12>
 					<label>Notes</label>
-					<b-textarea 
+					<b-textarea
             v-model="forms.payment.fields.approvalNotes"
 						rows=7 />
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
+				<b-button
+          class="float-left"
           @click="showModalApproval=false">
           Cancel
         </b-button>
-				<b-button 
+				<b-button
           @click="onApproval()"
-          class="float-right" 
-          variant="outline-primary">
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
           <v-icon
             v-if="isProcessing"
             name="sync"
@@ -225,8 +253,8 @@
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Approval Confirmation -->
-    <!-- Modal Reject --> 
-		<b-modal 
+    <!-- Modal Reject -->
+		<b-modal
 			v-model="showModalRejection"
 			centered
 			header-bg-variant="danger"
@@ -245,20 +273,28 @@
 				</b-col>
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          class="float-left" 
+				<b-button
+          class="float-left"
           @click="showModalRejection=false">
           Cancel
         </b-button>
-				<b-button 
+				<b-button
           @click="onDisapproval()"
-          class="float-right" variant="outline-primary">
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
 					Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
 		<!-- Modal Reject -->
-    <b-modal 
+    <b-modal
       v-model="showPaymentReceiptFileModal"
       centered
       header-bg-variant="success"
@@ -272,7 +308,7 @@
       <b-row> <!-- modal body -->
         <b-col md=12>
           <label>Notes</label>
-          <b-textarea 
+          <b-textarea
             v-model="forms.paymentReceiptFile.fields.notes"
             :state="forms.paymentReceiptFile.states.notes"
             rows=7
@@ -283,8 +319,8 @@
         </b-col>
       </b-row> <!-- modal body -->
       <div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-        <b-button 
-          class="float-left" 
+        <b-button
+          class="float-left"
           @click="onDeletePaymentReceiptFile(selectedPaymentReceiptFileIndex)"
           variant="outline-danger">
           <v-icon
@@ -295,9 +331,9 @@
           />
           Delete
         </b-button>
-        <b-button 
+        <b-button
           @click="onUpdatePaymentReceiptFile()"
-          class="float-right" 
+          class="float-right"
           variant="outline-primary">
           <v-icon
             v-if="forms.paymentReceiptFile.isUpdating"
@@ -308,7 +344,7 @@
           Update
         </b-button>
       </div> <!-- modal footer buttons -->
-    </b-modal>  
+    </b-modal>
 	</div> <!-- main container -->
 </template>
 <script>
@@ -393,7 +429,6 @@ export default {
 							label: "Contact Info",
 							tdClass: "align-middle",
 							thStyle: { width: "15%" },
-							
 						},
             {
 							key: "datePaid",
@@ -513,13 +548,13 @@ export default {
       const { payment, payment: { perPage, page } } = this.paginations
       const { paymentStatusId, criteria } = this.filters.payment
       payments.isBusy = true
-			let params = { 
-				paginate: true, 
-        perPage, 
-        page, 
+			let params = {
+				paginate: true,
+        perPage,
+        page,
         paymentStatusId,
         criteria }
-      
+
       this.getPaymentList(params)
         .then(({ data }) => {
           payments.items = data.data
@@ -540,13 +575,13 @@ export default {
       })
     },
     onApproval() {
+      this.isProcessing = true
       const { id } = this.row
       const { approvalNotes } = this.forms.payment.fields
       const data = {
         approvalNotes,
         paymentStatusId: PaymentStatuses.APPROVED.id
       }
-      this.isProcessing = true
       this.updatePayment(data, id)
         .then(({ data }) => {
           this.row.paymentStatusId = PaymentStatuses.APPROVED.id
@@ -564,6 +599,7 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
+      this.isProcessing = true
       const { id } = this.row
       const { disapprovalNotes } = this.forms.payment.fields
       const data = {
@@ -571,7 +607,6 @@ export default {
         paymentStatusId: PaymentStatuses.REJECTED.id
       }
 
-      this.isProcessing = true
       this.updatePayment(data, id)
         .then(({ data }) => {
           this.row.paymentStatusId = PaymentStatuses.REJECTED.id
@@ -620,7 +655,7 @@ export default {
           this.file.isLoading = false
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
-          
+
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
         })
@@ -640,11 +675,11 @@ export default {
       formData.append('studentId', this.row.student.id);
 
       this.paymentReceiptFiles.push(
-        { 
-          id: null, 
-          name: null, 
-          notes: null, 
-          isBusy: true 
+        {
+          id: null,
+          name: null,
+          notes: null,
+          isBusy: true
         }
       )
       const paymentReceiptFile = this.paymentReceiptFiles[this.paymentReceiptFiles.length - 1]

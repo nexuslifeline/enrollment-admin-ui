@@ -9,7 +9,7 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button variant="outline-primary" 
+                    <b-button variant="outline-primary"
                       @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD NEW DEPARTMENT
                     </b-button>
@@ -17,7 +17,7 @@
                   <b-col md=4>
                     <b-form-input
                       v-model="filters.department.criteria"
-                      type="text" 
+                      type="text"
                       placeholder="Search" >
                     </b-form-input>
                   </b-col>
@@ -40,8 +40,8 @@
                   <!-- :filter="filters.department.criteria> -->
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
-                      <v-icon 
-                        name="spinner" 
+                      <v-icon
+                        name="spinner"
                         spin
                         class="mr-2" />
                       <strong>Loading...</strong>
@@ -52,12 +52,14 @@
                       <template v-slot:button-content>
                         <v-icon name="ellipsis-v" />
                       </template>
-                      <b-dropdown-item 
-                        @click="setUpdate(row)" >
+                      <b-dropdown-item
+                        @click="setUpdate(row)"
+                        :disabled="showModalEntry">
                         Edit
                       </b-dropdown-item>
-                      <b-dropdown-item 
-                        @click="forms.department.fields.id = row.item.id, showModalConfirmation = true">
+                      <b-dropdown-item
+                        @click="forms.department.fields.id = row.item.id, showModalConfirmation = true"
+                        :disabled="showModalConfirmation">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -85,7 +87,7 @@
       </b-col>
     </b-row>
     <!-- Modal Entry -->
-    <b-modal 
+    <b-modal
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
@@ -93,49 +95,50 @@
         Department - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
-			<b-row> 
-        <b-col md=12>
-          <b-form-group >
-            <label class="required">Name</label>
-            <b-form-input 
-              ref="name" 
-              v-model="forms.department.fields.name"
-              :state="forms.department.states.name" />
-            <b-form-invalid-feedback>
-              {{forms.department.errors.name}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-			</b-row>
-      <b-row>
-        <b-col md=12>
-           <b-form-group >
-              <label class="required">Description</label>
-              <b-form-textarea 
-                ref="description" 
-                v-model="forms.department.fields.description" 
-                :state="forms.department.states.description"/>
+      <b-overlay :show="forms.department.isLoading" rounded="sm">
+        <b-row>
+          <b-col md=12>
+            <b-form-group >
+              <label class="required">Name</label>
+              <b-form-input
+                ref="name"
+                v-model="forms.department.fields.name"
+                :state="forms.department.states.name" />
               <b-form-invalid-feedback>
-                {{forms.department.errors.description}}
+                {{forms.department.errors.name}}
               </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-row>
-     
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md=12>
+            <b-form-group >
+                <label class="required">Description</label>
+                <b-form-textarea
+                  ref="description"
+                  v-model="forms.department.fields.description"
+                  :state="forms.department.states.description"/>
+                <b-form-invalid-feedback>
+                  {{forms.department.errors.description}}
+                </b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-overlay>
       <!-- end modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          variant="outline-danger" 
-          class="float-left btn-close" 
+				<b-button
+          variant="outline-danger"
+          class="float-left btn-close"
           @click="showModalEntry=false">
           Close
         </b-button>
-        <b-button 
+        <b-button
           :disabled="forms.department.isProcessing"
-          variant="outline-primary" 
-          class="float-right btn-save" 
+          variant="outline-primary"
+          class="float-right btn-save"
           @click="onDepartmentEntry()">
-          <v-icon 
+          <v-icon
             v-if="forms.department.isProcessing"
             name="sync"
             spin
@@ -147,7 +150,7 @@
     <!-- End Modal Entry -->
 
     <!-- Modal Confirmation -->
-    <b-modal 
+    <b-modal
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
@@ -158,10 +161,10 @@
       <div slot="modal-footer">
         <b-button
           :disabled="forms.department.isProcessing"
-          variant="outline-primary" 
-          class="mr-2 btn-save" 
+          variant="outline-primary"
+          class="mr-2 btn-save"
           @click="onDepartmentDelete()">
-          <v-icon 
+          <v-icon
             v-if="forms.department.isProcessing"
             name="sync"
             spin
@@ -202,6 +205,7 @@ export default {
       forms: {
         department: {
           isProcessing: false,
+          isLoading: false,
           fields: { ...departmentFields },
           states: { ...departmentFields },
           errors: { ...departmentFields }
@@ -315,17 +319,21 @@ export default {
     },
     setUpdate(row){
       const { department, department: { fields } } = this.forms
+      this.showModalEntry = true
+      department.isLoading = true
       copyValue(row.item, fields)
       reset(department)
       this.entryMode = "Edit"
-      this.showModalEntry = true
+      department.isLoading = false
     },
     setCreate(){
       const { department } = this.forms
+      this.showModalEntry = true
+      department.isLoading = true
       reset(department)
       clearFields(department.fields)
       this.entryMode='Add'
-      this.showModalEntry = true
+      department.isLoading = false
     },
 	}
 }
