@@ -6,7 +6,7 @@
   }
 
   .header__menus-container {
-    background-color: $dark-gray-500;
+    background-color: $dark-gray-600;
     height: 45px;
     width: 100%;
     padding: 0 60px;
@@ -25,13 +25,37 @@
     display: flex;
     flex-direction: row;
     color: $white;
-    font-size: 13px;
+    font-size: 14px;
     height: 100%;
     align-items: center;
   }
 
   .header__menu-item {
-    margin-right: 50px;
+    margin-right: 60px;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: $gray;
+
+    &.active {
+      color: $white;
+
+      &:after {
+        content: ' ';
+        position: absolute;
+        z-index: 2;
+        left: calc(50% - 20px);
+        top: calc(45px - 10px);
+
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 18px 20px 18px;
+        border-color: transparent transparent $brand-primary transparent;
+      }
+    }
   }
 
   .header__account-details {
@@ -55,7 +79,7 @@
   .header__sub-menu-item {
     margin-right: 40px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     height: 100%;
     display: flex;
     align-items: center;
@@ -102,19 +126,25 @@
     color: $white;
   }
 
+  .header__menu-link {
+    color: inherit;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
 </style>
 <template>
   <div class="header">
     <div class="header__menus-container">
       <ul class="header__menus">
-        <li class="header__menu-item">
-          <a>Home</a>
-        </li>
-        <li class="header__menu-item">
-          <a>For Approval</a>
-        </li>
-        <li class="header__menu-item">
-          <a>Registrar</a>
+        <li v-for="(nav, idx) in $options.navItems"
+          :key="idx"
+          class="header__menu-item"
+          :class="{ active: $route.path.includes(nav.to) }">
+          <a :href="`#${nav.to}`" class="header__menu-link">
+            {{nav.label}}
+          </a>
         </li>
       </ul>
     </div>
@@ -129,14 +159,13 @@
     </div>
     <div class="header__sub-menus-container">
       <ul class="header__sub-menus">
-        <li class="header__sub-menu-item">
-          <a>Evaluation</a>
-        </li>
-        <li class="header__sub-menu-item active">
-          <a>Subjects</a>
-        </li>
-        <li class="header__sub-menu-item">
-          <a>Student Fees</a>
+        <li v-for="(subNav, idx) in $options.navItems[activeIndex].children"
+          :key="idx"
+          class="header__sub-menu-item"
+          :class="{ active: $route.path === subNav.to }">
+          <a :href="`#${subNav.to}`" class="header__menu-link">
+            {{subNav.label}}
+          </a>
         </li>
       </ul>
     </div>
@@ -144,12 +173,15 @@
 </template>
 
 <script>
-import TheHeaderDropdownAccnt from './TheHeaderDropdownAccnt'
+import navItems from './navs';
 
 export default {
   name: 'TheHeader',
-  components: {
-    TheHeaderDropdownAccnt
+  navItems,
+  computed: {
+    activeIndex() {
+      return this.$options.navItems.findIndex(v => this.$route.path.includes(v.to));
+    }
   }
 }
 </script>
