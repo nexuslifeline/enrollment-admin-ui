@@ -73,14 +73,18 @@
                         <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item
+                        :to="`${row.item.id}/academic-records`" >
+                        Update Academic Records
+                      </b-dropdown-item>
+                      <b-dropdown-item
                         @click="setUpdateStudent(row)"
                         :disabled="showEntry">
-                        Edit Student Info
+                        Edit Student Record
                       </b-dropdown-item>
                       <b-dropdown-item
                         @click="setUpdateUser(row)"
                         :disabled="showModalUpdateUser" >
-                        Edit Account Info
+                        Edit Account
                       </b-dropdown-item>
                       <b-dropdown-item
                         @click="forms.user.fields.id = row.item.id, showModalConfirmation = true"
