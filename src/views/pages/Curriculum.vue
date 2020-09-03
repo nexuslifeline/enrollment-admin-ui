@@ -115,7 +115,7 @@
                               
                               <div 
                                 v-for="level in data.item.levels"
-                                :key="level.id + '-' + level.semesterId ? level.semesterId : ''">
+                                :key="`${level.id} - ${(level.semesterId ? level.semesterId : '')}`">
                                 <hr>
                                 <h6>{{level.name}} {{level.semesterId ? `- ${options.semesters.getEnum(level.semesterId).name}` : ''}} </h6>
                                 <b-table
