@@ -78,8 +78,8 @@
                       </b-dropdown-item>
                       <b-dropdown-item
                         @click="setUpdateStudent(row)"
-                        :disabled="showEntry">
-                        Edit Student Record
+                        :disabled="showStudentEntry">
+                        Edit Student Info
                       </b-dropdown-item>
                       <b-dropdown-item
                         @click="setUpdateUser(row)"
@@ -1154,12 +1154,12 @@ export default {
 							label: "Name",
 							tdClass: "align-middle",
 							thStyle: { width: "50%"},
-							formatter: (value, key, item) => {
-								if(!item.middleName) {
-									item.middleName = ""
-								}
-								item.name = item.firstName + " " + item.middleName + " " + item.lastName
-							}
+							// formatter: (value, key, item) => {
+							// 	if(!item.middleName) {
+							// 		item.middleName = ""
+							// 	}
+							// 	item.name = item.firstName + " " + item.middleName + " " + item.lastName
+							// }
 						},
 						{
 							key: "contact",
@@ -1272,9 +1272,7 @@ export default {
             this.showStudentEntry = false;
             this.isProcessing = false;
         }).catch(error => {
-          console.log(error)
           const errors = error.response.data.errors
-          console.log(error.response.data)
           validate(student, errors)
           validate(address, errors)
           validate(family, errors)
@@ -1382,7 +1380,7 @@ export default {
    
       this.entryMode='Add'
 
-      this.showEntry = true
+      this.showStudentEntry = true
       this.activeTabIndex = 0
 
       //reset state
@@ -1396,11 +1394,11 @@ export default {
       clearFields(address.fields)
       clearFields(family.fields)
       clearFields(education.fields)
-      
+
       // set default country
       address.fields.currentCountryId = Countries.PHILIPPINES.id
       address.fields.permanentCountryId = Countries.PHILIPPINES.id
-      
+
       this.entryMode = 'Add'
       this.showStudentEntry = true
     },

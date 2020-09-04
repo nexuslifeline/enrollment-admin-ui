@@ -738,19 +738,18 @@ export default {
 							label: "Name",
 							tdClass: "align-middle",
 							thStyle: { width: "auto"},
-							formatter: (value, key, item) => {
-								if(!item.student.middleName){
-									item.student.middleName = ""
-								}
-								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-							}
+							// formatter: (value, key, item) => {
+							// 	if(!item.student.middleName){
+							// 		item.student.middleName = ""
+							// 	}
+							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
+							// } 
 						},
 						{
 							key: "contact",
 							label: "Contact Info",
 							tdClass: "align-middle",
 							thStyle: { width: "20%" },
-
 						},
 						{
 							key: "education",
@@ -936,6 +935,7 @@ export default {
 	},
 	methods: {
     setApproval(row) {
+      this.forms.evaluation.approvalNotes = null
       if (row.item.curriculumMsg) {
         showNotification(this, 'danger', 'Please set a curriculum before approving.')
         return
@@ -998,6 +998,7 @@ export default {
       });
     },
     setDisapproval(row) {
+      this.forms.evaluation.disapprovalNotes = null
       this.row = row
       this.showModalRejection = true
     },
@@ -1086,7 +1087,6 @@ export default {
           schoolCategoryId === SchoolCategories.COLLEGE.id) {
           params = { paginate: false, schoolCategoryId, courseId }
         }
-
         item.isLoading = true
         this.getEvaluationFileList(id, { paginate: false })
         .then(({ data }) => {
@@ -1121,7 +1121,6 @@ export default {
           } else {
             this.loadSubjectsOfEvaluation(id, row)
           }
-
         })
 			}
 			row.toggleDetails()
@@ -1193,7 +1192,6 @@ export default {
           this.file.isLoading = false
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
-
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
         })

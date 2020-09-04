@@ -7,13 +7,13 @@
             <b-card-body>
               <b-row>
                 <b-col md=12>
-                  <b-tabs pills>						
-										<b-tab 
-											v-for="schoolCategory in options.schoolCategories.values" 
-											:key="schoolCategory.id" 
+                  <b-tabs pills>
+										<b-tab
+											v-for="schoolCategory in options.schoolCategories.values"
+											:key="schoolCategory.id"
 											:disabled="userGroupId ? false : schoolCategoryId !== schoolCategory.id"
 											:active="schoolCategoryId === schoolCategory.id"
-											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)" 
+											@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
 											:title="schoolCategory.name"/>
                   </b-tabs>
                 </b-col>
@@ -28,30 +28,30 @@
                 <b-col md=6>
                   <b-row v-show="options.courses.items.length	> 0">
                     <b-col md=4>
-                      <b-form-select 
-                        v-model="forms.rateSheet.fields.courseId" 
+                      <b-form-select
+                        v-model="forms.rateSheet.fields.courseId"
                         @change="loadFeesOfLevel()">
                         <template v-slot:first>
                           <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
                         </template>
-                        <b-form-select-option 
-                          v-for="course in options.courses.items" 
-                          :key="course.id" 
+                        <b-form-select-option
+                          v-for="course in options.courses.items"
+                          :key="course.id"
                           :value="course.id">
                           {{course.description}} {{course.major ? `(${course.major})` : ''}}
                         </b-form-select-option>
                       </b-form-select>
                     </b-col>
                     <b-col md=4>
-                      <b-form-select 
-                        v-model="forms.rateSheet.fields.semesterId" 
+                      <b-form-select
+                        v-model="forms.rateSheet.fields.semesterId"
                         @change="loadFeesOfLevel()">
                         <template v-slot:first>
                           <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
                         </template>
-                        <b-form-select-option 
-                          v-for="semester in options.semesters.values" 
-                          :key="semester.id" 
+                        <b-form-select-option
+                          v-for="semester in options.semesters.values"
+                          :key="semester.id"
                           :value="semester.id">
                           {{ semester.name }}
                         </b-form-select-option>
@@ -60,17 +60,17 @@
                   </b-row>
                 </b-col>
                 <b-col md=4>
-                  <b-button 
-                    class="float-right" 
+                  <b-button
+                    class="float-right"
                     variant="outline-primary"
-                    @click="showModalFees=true"
-                  ><v-icon name="plus-circle" /> ADD NEW ITEM</b-button>
+                    @click="showModalFees=true">
+                    <v-icon name="plus-circle" /> ADD NEW ITEM</b-button>
                 </b-col>
               </b-row>
               <b-row>
                 <b-col md=2>
                   <b-tabs pills vertical v-model="levelIndex">
-                    <b-tab v-for="level in options.levels.items" :key="level.id" 
+                    <b-tab v-for="level in options.levels.items" :key="level.id"
                       @click="loadCoursesOfLevelList(level.id)"
                       :title="level.name"/>
                   </b-tabs>
@@ -83,8 +83,8 @@
                     :busy="tables.rateSheetFees.isBusy">
                     <template v-slot:table-busy>
                       <div class="text-center my-2">
-                        <v-icon 
-                          name="spinner" 
+                        <v-icon
+                          name="spinner"
                           spin
                           class="mr-2" />
                         <strong>Loading...</strong>
@@ -109,7 +109,7 @@
                       <vue-autonumeric
                         :disabled="forms.rateSheet.fields.isComputedByUnits === 1 && row.item.id === fees.TUITION_FEE.id"
                         v-model="row.item.pivot.amount"
-                        class="form-control text-right" 
+                        class="form-control text-right"
                         :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
                       </vue-autonumeric>
                     </template>
@@ -123,14 +123,6 @@
                   <hr>
                   <b-row>
                     <b-col md=4>
-                      <!-- <b-row>
-                        <b-col md=7>
-                          <h6 class="font-weight-bold pt-1">ENTRANCE FEE : </h6>
-                        </b-col>
-                        <b-col md=5>
-                          <b-form-input v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input>
-                        </b-col>
-                      </b-row> -->
                       <b-form-group
                         label="INITIAL FEE TOTAL"
                         label-for="enrollmentFee"
@@ -157,18 +149,18 @@
                     </b-col>
                   </b-row>
                 </b-col>
-              </b-row>						
+              </b-row>
             </b-card-body>
             <template v-slot:footer>
-              <b-button 
+              <b-button
                 :disabled="forms.rateSheet.isProcessing"
-                class="float-right btn-save" 
+                class="float-right btn-save"
                 variant="outline-primary"
                 @click="createUpdateRateSheet()">
-                <v-icon 
-                  v-if="forms.rateSheet.isProcessing" 
-                  name="sync" 
-                  spin 
+                <v-icon
+                  v-if="forms.rateSheet.isProcessing"
+                  name="sync"
+                  spin
                   class="mr-2" />
                 Save
               </b-button>
@@ -178,7 +170,7 @@
       </b-row>
     </b-overlay>
     <!-- MODAL FEES -->
-		<b-modal 
+		<b-modal
 			v-model="showModalFees"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true"
@@ -192,8 +184,9 @@
             <b-col offset-md="8" md="4">
               <b-form-input
                 v-model="filters.fee.criteria"
-                type="text" 
-                placeholder="Search">
+                type="text"
+                placeholder="Search"
+                debounce="500">
               </b-form-input>
             </b-col>
           </b-row>
@@ -209,6 +202,15 @@
 						<template v-slot:cell(action)="row">
 							<b-button @click="addFee(row)" size="sm" variant="success"><v-icon name="plus" /></b-button>
 						</template>
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon
+                  name="spinner"
+                  spin
+                  class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
 					</b-table>
           <b-row>
             <b-col md=6>
@@ -229,7 +231,7 @@
 			</b-row> <!-- modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
 				<b-button
-          class="float-right" 
+          class="float-right"
           variant="outline-danger"
           @click="showModalFees=false">
           Close
@@ -249,8 +251,8 @@ export default {
 	data() {
 		return {
       isLoaded: false,
-      showModalFees: false, 
-      fees: Fees,     
+      showModalFees: false,
+      fees: Fees,
       forms: {
         rateSheet: {
           isProcessing: false,
