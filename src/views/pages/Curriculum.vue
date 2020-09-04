@@ -421,19 +421,19 @@
                                             </b-td>
                                             <b-td class="text-center">
                                               <span class="text-danger">
-                                                {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                                {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
                                                   totalUnits(filterSubjects(level.id, semester.id), 'labs') }}
                                               </span>
                                             </b-td>
                                             <b-td class="text-center">
                                               <span class="text-danger">
-                                                {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                                {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
                                                   totalUnits(filterSubjects(level.id, semester.id), 'units') }}
                                               </span>
                                             </b-td>
                                             <b-td class="text-center">
                                               <span class="text-danger">
-                                                {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : 
+                                                {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
                                                   totalUnits(filterSubjects(level.id, semester.id), 'totalUnits') }}
                                               </span>
                                             </b-td>

@@ -418,11 +418,11 @@ export default {
 							label: "Student",
 							tdClass: "align-middle",
               thStyle: { width: "20%"},
-              formatter: (value, key, item) => {
-                item.student.middleName = item.student.middleName ? item.student.middleName : ''
-                item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
-                return item.student.name
-              }
+              // formatter: (value, key, item) => {
+              //   item.student.middleName = item.student.middleName ? item.student.middleName : ''
+              //   item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
+              //   return item.student.name
+              // }
             },
             {
 							key: "contact",
