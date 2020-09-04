@@ -60,12 +60,14 @@
                       <template v-slot:button-content>
                         <v-icon name="ellipsis-v" />
                       </template>
-                      <b-dropdown-item 
-                        @click="setUpdate(row)" >
+                      <b-dropdown-item
+                        @click="setUpdate(row)"
+                        :disabled="showModalEntry" >
                         Edit
                       </b-dropdown-item>
-                      <b-dropdown-item 
-                        @click="forms.schoolYear.fields.id = row.item.id, showModalConfirmation = true">
+                      <b-dropdown-item
+                        @click="forms.schoolYear.fields.id = row.item.id, showModalConfirmation = true"
+                        :disabled="showModalConfirmation">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -93,79 +95,80 @@
       </b-col>
     </b-row>
     <!-- Modal Entry -->
-    <b-modal 
+    <b-modal
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					School Year - {{ entryMode }}
-			</div> <!-- modal title -->
-      <!-- modal body -->
-      <b-form-group >
-        <label class="required">Name</label>
-        <b-form-input 
-          ref="name" 
-          v-model="forms.schoolYear.fields.name"
-          :state="forms.schoolYear.states.name" />
-        <b-form-invalid-feedback>
-          {{forms.schoolYear.errors.name}}
-        </b-form-invalid-feedback>
-      </b-form-group>
+      <div slot="modal-title"> <!-- modal title -->
+            School Year - {{ entryMode }}
+        </div> <!-- modal title -->
+      <b-overlay :show="forms.schoolYear.isLoading" rounded="sm">
+        <!-- modal body -->
         <b-form-group >
-          <label class="required">Description</label>
-          <b-form-textarea 
-            ref="description" 
-            v-model="forms.schoolYear.fields.description" 
-            :state="forms.schoolYear.states.description"/>
+          <label class="required">Name</label>
+          <b-form-input
+            ref="name"
+            v-model="forms.schoolYear.fields.name"
+            :state="forms.schoolYear.states.name" />
           <b-form-invalid-feedback>
-            {{forms.schoolYear.errors.description}}
+            {{forms.schoolYear.errors.name}}
           </b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group >
-        <label class="required">Start Date</label>
-        <b-form-input type="date" 
-          v-model="forms.schoolYear.fields.startDate" 
-          :state="forms.schoolYear.states.startDate"/>
-        <b-form-invalid-feedback>
-          {{ forms.schoolYear.errors.startDate }}
-        </b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group>
-        <b-form-checkbox
-          class="pl-5"
-          v-model="forms.schoolYear.fields.isActive"
-          :value=1
-          :unchecked-value=0>
-          <b>Active</b>
-        </b-form-checkbox>
-      </b-form-group>
-     
-      <!-- end modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          variant="outline-danger" 
-          class="float-left btn-close" 
-          @click="showModalEntry=false">
-          Close
-        </b-button>
-        <b-button 
-          :disabled="forms.schoolYear.isProcessing"
-          variant="outline-primary" 
-          class="float-right btn-save" 
-          @click="onSchoolYearEntry()">
-          <v-icon 
-            v-if="forms.schoolYear.isProcessing"
-            name="sync"
-            spin
-            class="mr-2" />
-          Save
-        </b-button>
-			</div> <!-- modal footer buttons -->
+        </b-form-group>
+          <b-form-group >
+            <label class="required">Description</label>
+            <b-form-textarea
+              ref="description"
+              v-model="forms.schoolYear.fields.description"
+              :state="forms.schoolYear.states.description"/>
+            <b-form-invalid-feedback>
+              {{forms.schoolYear.errors.description}}
+            </b-form-invalid-feedback>
+        </b-form-group>
+        <b-form-group >
+          <label class="required">Start Date</label>
+          <b-form-input type="date"
+            v-model="forms.schoolYear.fields.startDate"
+            :state="forms.schoolYear.states.startDate"/>
+          <b-form-invalid-feedback>
+            {{ forms.schoolYear.errors.startDate }}
+          </b-form-invalid-feedback>
+        </b-form-group>
+        <b-form-group>
+          <b-form-checkbox
+            class="pl-5"
+            v-model="forms.schoolYear.fields.isActive"
+            :value=1
+            :unchecked-value=0>
+            <b>Active</b>
+          </b-form-checkbox>
+        </b-form-group>
+        <!-- end modal body -->
+      </b-overlay>
+      <div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry=false">
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.schoolYear.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onSchoolYearEntry()">
+            <v-icon
+              v-if="forms.schoolYear.isProcessing"
+              name="sync"
+              spin
+              class="mr-2" />
+            Save
+          </b-button>
+        </div> <!-- modal footer buttons -->
 		</b-modal>
     <!-- End Modal Entry -->
 
     <!-- Modal Confirmation -->
-    <b-modal 
+    <b-modal
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
@@ -176,22 +179,22 @@
       <div slot="modal-footer">
         <b-button
           :disabled="forms.schoolYear.isProcessing"
-          variant="outline-primary" 
-          class="mr-2 btn-save" 
+          variant="outline-primary"
+          class="mr-2 btn-save"
           @click="onSchoolYearDelete()">
-          <v-icon 
+          <v-icon
             v-if="forms.schoolYear.isProcessing"
             name="sync"
             spin
             class="mr-2" />
           Yes
         </b-button>
-        <b-button 
+        <b-button
           variant="outline-danger"
           class="btn-close"
           @click="showModalConfirmation=false">
           No
-        </b-button>            
+        </b-button>
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
@@ -222,6 +225,7 @@ export default {
       forms: {
         schoolYear: {
           isProcessing: false,
+          isLoading: false,
           fields: {...schoolYearFields},
           states: {...schoolYearFields},
           errors: {...schoolYearFields}
@@ -351,11 +355,14 @@ export default {
     },
     setCreate() {
       const { schoolYear } = this.forms
+      this.showModalEntry = true
+      schoolYear.isLoading = true
+
       clearFields(schoolYear.fields)
       reset(schoolYear)
       schoolYear.fields.isActive = 1
       this.entryMode = "Add"
-      this.showModalEntry = true
+      schoolYear.isLoading = false
     },
     setUpdate(row) {
       const { schoolYear, schoolYear: { fields } } = this.forms

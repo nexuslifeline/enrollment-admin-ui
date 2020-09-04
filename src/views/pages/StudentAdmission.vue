@@ -67,6 +67,15 @@
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 						>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
@@ -210,6 +219,15 @@
 														<v-icon name="trash" />
 													</b-button>
 												</template>
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
 											</b-table>
 										</div>
 										<div v-if="data.item.admissionId">
@@ -228,6 +246,15 @@
                               name="search"/>
 													</b-button>
 												</template>
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
 											</b-table>
 										</div>
 
@@ -342,7 +369,8 @@
 				<b-button
           @click="onApproval()"
           class="float-right"
-          variant="outline-primary">
+          variant="outline-primary"
+          :disabled="isProcessing">
           <v-icon
             v-if="isProcessing"
             name="sync"
@@ -381,7 +409,15 @@
         </b-button>
 				<b-button
           @click="onDisapproval()"
-          class="float-right" variant="outline-primary">
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
 					Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
@@ -440,6 +476,15 @@
                 <v-icon name="plus" />
               </b-button>
 						</template>
+            <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
 					</b-table>
           <b-row>
             <b-col md=6>
@@ -806,6 +851,7 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
+      this.isProcessing = true;
       const {
         id: transcriptId,
         applicationId,
@@ -832,7 +878,6 @@ export default {
           }
         }
 
-      this.isProcessing = true;
       this.updateTranscript(data, transcriptId).then(({ data }) => {
         this.loadTranscript()
         this.isProcessing = false

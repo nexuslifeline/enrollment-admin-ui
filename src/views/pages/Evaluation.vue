@@ -63,6 +63,15 @@
 							:items="tables.students.items"
 							:busy="tables.students.isBusy"
 						>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
               <template v-slot:cell(attachments)="data">
                 <span>{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp; </span>  <v-icon name="paperclip"/>
               </template>
@@ -134,6 +143,15 @@
                               <v-icon
                                 name="search"/>
                             </b-button>
+                          </template>
+                          <template v-slot:table-busy>
+                            <div class="text-center my-2">
+                              <v-icon
+                                name="spinner"
+                                spin
+                                class="mr-2" />
+                              <strong>Loading...</strong>
+                            </div>
                           </template>
                         </b-table>
                       </div>
@@ -608,7 +626,8 @@
 				<b-button
           @click="onApproval()"
           class="float-right"
-          variant="outline-primary">
+          variant="outline-primary"
+          :disabled="isProcessing">
           <v-icon
             v-if="isProcessing"
             name="sync"
@@ -647,8 +666,16 @@
         </b-button>
 				<b-button
           @click="onDisapproval()"
-          class="float-right" variant="outline-primary">
-					Confirm
+          class="float-right"
+          variant="outline-primary"
+          :disabled="isProcessing">
+          <v-icon
+            v-if="isProcessing"
+            name="sync"
+            class="mr-2"
+            spin
+          />
+          Confirm
 				</b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
@@ -917,6 +944,7 @@ export default {
       this.showModalApproval = true
     },
     onApproval() {
+      this.isProcessing = true;
       const {
         item,
         item: {
@@ -956,7 +984,6 @@ export default {
         subjects
       }
 
-      this.isProcessing = true;
       this.updateEvaluation(data, evaluationId)
       .then(({ data }) => {
         clearFields(evaluation)
@@ -975,6 +1002,7 @@ export default {
       this.showModalRejection = true
     },
     onDisapproval() {
+      this.isProcessing = true;
       const {
         item,
         item: {
@@ -992,7 +1020,6 @@ export default {
         ...evaluation
       }
 
-      this.isProcessing = true;
       this.updateEvaluation(data, evaluationId)
       .then(({ data }) => {
         clearFields(evaluation)

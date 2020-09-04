@@ -184,9 +184,14 @@ function configRoutes () {
         {
           path: 'student',
           name: 'Student',
-          component: Student,
-          meta: { requiresAuth: true, userType: 0 },
+          component: { render(c) { return c('router-view') } },
           children: [
+            {
+              path: '/',
+              name: 'Student',
+              component: Student,
+              meta: { requiresAuth: true, userType: 0 }
+            },
             {
               path: ':studentId/academic-records',
               component: AcademicRecords,
