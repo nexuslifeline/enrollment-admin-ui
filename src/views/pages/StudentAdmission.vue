@@ -148,34 +148,6 @@
                           <h5 class="pt-2">SUBJECTS</h5>
                         </b-col>
                       </b-row>
-                      <!-- <b-row class="mb-3">
-                        <b-col md=4>
-                          <b-form-group
-                              label="Section"
-                              label-cols-sm="3"
-                          >
-                            <b-form-select
-                              v-model="data.item.sectionId"
-                              >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
-                              </template>
-                              <b-form-select-option
-                                v-for="section in filterSection(data)"
-                                :key="section.id"
-                                :value="section.id">
-                                {{ section.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                          </b-form-group>
-                        </b-col>
-                        <b-col md=3 offset-md="5" v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
-                          <b-button class="float-right" variant="outline-primary" block
-                            @click="onAddSubject(data.item)">
-                            <v-icon name="plus-circle" /> ADD SUBJECT
-                          </b-button>
-                        </b-col>
-                      </b-row> -->
 											<div class="details__section-button-container">
                         <div class="section__container">
                           <label >Section</label>
@@ -228,6 +200,29 @@
                             <strong>Loading...</strong>
                           </div>
                         </template>
+                        <template v-slot:custom-foot>
+                        <b-tr class="font-weight-bold">
+                          <b-td colspan=2 class="text-right">
+                            <span class="text-danger">Total Units </span>
+                          </b-td>
+                          <b-td class="text-center">
+                            <span class="text-danger">
+                                {{ totalUnits(data.item.subjects, 'units') }}
+                            </span>
+                          </b-td>
+                          <b-td class="text-center">
+                            <span class="text-danger">
+                                {{ totalUnits(data.item.subjects, 'labs') }}
+                            </span>
+                          </b-td>
+                          <b-td class="text-center">
+                            <span class="text-danger">
+                                {{ totalUnits(data.item.subjects, 'totalUnits') }}
+                            </span>
+                          </b-td>
+                          <b-td></b-td>
+                        </b-tr>
+                      </template>
 											</b-table>
 										</div>
 										<div v-if="data.item.admissionId">
@@ -257,17 +252,6 @@
                         </template>
 											</b-table>
 										</div>
-
-										<!-- <template v-slot:footer>
-											<b-row>
-												<b-col md=10>
-													<h5 class="float-right font-weight-bold">TUITION FEE</h5>
-												</b-col>
-												<b-col md=2>
-													<h5 class="float-right pr-2 font-weight-bold">P1,400.00</h5>
-												</b-col>
-											</b-row>
-										</template> -->
 									</b-card>
 									<b-button
                     v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
@@ -591,12 +575,12 @@ export default {
 							label: "Name",
 							tdClass: "align-middle",
 							thStyle: { width: "30%"},
-							formatter: (value, key, item) => {
-								if(!item.student.middleName){
-									item.student.middleName = ""
-								}
-								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-							}
+							// formatter: (value, key, item) => {
+							// 	if(!item.student.middleName){
+							// 		item.student.middleName = ""
+							// 	}
+							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
+							// }
 						},
 						{
 							key: "contact",
@@ -773,6 +757,7 @@ export default {
 	},
 	methods: {
     setApproval(row) {
+      this.forms.applicationAdmission.fields.approvalNotes =  null
       if (!row.item.subjects) {
         const { id: transcriptId } = row.item
         const params = { paginate: false }
@@ -847,6 +832,7 @@ export default {
       });
     },
     setDisapproval(row) {
+      this.forms.applicationAdmission.fields.disapprovalNotes =  null
       this.row = row.item
       this.showModalRejection = true
     },
@@ -1068,7 +1054,18 @@ export default {
                     && s.semesterId === data.item.semesterId )
       return sect
     }
-	},
+  },
+  computed: {
+    totalUnits() {
+      return (subjects, field) => {
+        let units = 0
+        subjects.forEach(s => {
+          units += Number(s[field])
+        })
+        return units
+      }
+    },
+  }
 }
 </script>
 <style scoped lang="scss">

@@ -468,12 +468,12 @@ export default {
 							label: "Name",
 							tdClass: "align-middle",
 							thStyle: { width: "30%"},
-							formatter: (value, key, item) => {
-								if(!item.student.middleName){
-									item.student.middleName = ""
-								}
-								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-							}
+							// formatter: (value, key, item) => {
+							// 	if(!item.student.middleName){
+							// 		item.student.middleName = ""
+							// 	}
+							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
+							// }
             },
             {
 							key: "contact",
@@ -708,10 +708,10 @@ export default {
       let totalAmount = 0
 
       item.fees.forEach(fee => {
-				fees.push({ 
-          schoolFeeId: fee.id, 
-          amount: fee.pivot.amount, 
-          notes: fee.pivot.notes 
+				fees.push({
+          schoolFeeId: fee.id,
+          amount: fee.pivot.amount,
+          notes: fee.pivot.notes
         })
         totalAmount += Number(fee.pivot.amount)
       })

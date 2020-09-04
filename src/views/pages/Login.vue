@@ -13,7 +13,8 @@
             <b-form-input
               v-model="forms.auth.fields.username"
               placeholder="Username"
-              :state="forms.auth.states.username"/>
+              :state="forms.auth.states.username"
+              @keyup.enter="authLogin()"/>
             <b-form-invalid-feedback>
               {{forms.auth.errors.username}}
             </b-form-invalid-feedback>
@@ -23,7 +24,8 @@
               v-model="forms.auth.fields.password"
               type="password"
               placeholder="Password"
-              :state="forms.auth.states.password"/>
+              :state="forms.auth.states.password"
+              @keyup.enter="authLogin()"/>
               <b-form-invalid-feedback>
                 {{forms.auth.errors.password}}
               </b-form-invalid-feedback>
@@ -46,7 +48,7 @@
         <div class="rigth-pane__intro-container">
           <h1 class="rigth-pane__title">STC Admin App</h1>
           <p class="rigth-pane__description">
-            STC Admin App helps discover, organize and track academic records of student 
+            STC Admin App helps discover, organize and track academic records of student
             and some accounting stuff, so nothing falls off the radar.
           </p>
         </div>

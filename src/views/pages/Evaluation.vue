@@ -78,16 +78,16 @@
 							<template v-slot:cell(name)="data">
 								<b-media>
 									<template v-slot:aside>
-										<b-avatar 
-                      rounded 
-                      blank 
-                      size="64" 
+										<b-avatar
+                      rounded
+                      blank
+                      size="64"
                       :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                       :src="avatar(data.item.student)" />
 									</template>
 									<span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                   <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-									<small>Address : {{ data.item.student.address ? 
+									<small>Address : {{ data.item.student.address ?
                     data.item.student.address.currentCompleteAddress : "" }}
                   </small>
 								</b-media>
@@ -137,10 +137,10 @@
                           :items="data.item.files"
                           :busy="tables.files.isBusy">
                           <template v-slot:cell(action)="row">
-                            <b-button 
-                              @click="previewFile(row)" 
+                            <b-button
+                              @click="previewFile(row)"
                               size="sm" variant="secondary">
-                              <v-icon 
+                              <v-icon
                                 name="search"/>
                             </b-button>
                           </template>
@@ -738,19 +738,18 @@ export default {
 							label: "Name",
 							tdClass: "align-middle",
 							thStyle: { width: "auto"},
-							formatter: (value, key, item) => {
-								if(!item.student.middleName){
-									item.student.middleName = ""
-								}
-								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-							} 
+							// formatter: (value, key, item) => {
+							// 	if(!item.student.middleName){
+							// 		item.student.middleName = ""
+							// 	}
+							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
+							// } 
 						},
 						{
 							key: "contact",
 							label: "Contact Info",
 							tdClass: "align-middle",
 							thStyle: { width: "20%" },
-							
 						},
 						{
 							key: "education",
@@ -936,6 +935,7 @@ export default {
 	},
 	methods: {
     setApproval(row) {
+      this.forms.evaluation.approvalNotes = null
       if (row.item.curriculumMsg) {
         showNotification(this, 'danger', 'Please set a curriculum before approving.')
         return
@@ -962,7 +962,7 @@ export default {
       let subjects = []
 
       item.subjects.forEach(subject => {
-        subjects.push({ 
+        subjects.push({
           subjectId: subject.id,
           levelId: subject.pivot.levelId,
           semesterId: subject.pivot.semesterId,
@@ -998,6 +998,7 @@ export default {
       });
     },
     setDisapproval(row) {
+      this.forms.evaluation.disapprovalNotes = null
       this.row = row
       this.showModalRejection = true
     },
@@ -1066,8 +1067,8 @@ export default {
 			if (!row.detailsShowing) {
 				const {
           item,
-          item: {  
-            id, 
+          item: {
+            id,
             schoolCategoryId,
             levelId,
             courseId
@@ -1082,11 +1083,10 @@ export default {
 
         let params = { paginate: false, schoolCategoryId, levelId}
 
-        if (schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id || 
+        if (schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
           schoolCategoryId === SchoolCategories.COLLEGE.id) {
           params = { paginate: false, schoolCategoryId, courseId }
         }
-        
         item.isLoading = true
         this.getEvaluationFileList(id, { paginate: false })
         .then(({ data }) => {
@@ -1121,7 +1121,6 @@ export default {
           } else {
             this.loadSubjectsOfEvaluation(id, row)
           }
-          
         })
 			}
 			row.toggleDetails()
@@ -1132,7 +1131,7 @@ export default {
         item: {
           schoolCategoryId,
           courseId
-        } 
+        }
       } = row
 
       const params = { paginate: false, schoolCategoryId, courseId }
@@ -1193,7 +1192,6 @@ export default {
           this.file.isLoading = false
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
-          
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
         })
@@ -1213,12 +1211,10 @@ export default {
           row.item.isLoading = false
         }
         subjects.isBusy = false
-        
       });
     },
     loadStudentCurriculum(id, row) {
       const { item, item : { curriculum, curriculums } } = row
-      
       const studentCurr = curriculums.find(i => i.id === id)
       item.curriculumId = id
       item.studentCurriculum = studentCurr

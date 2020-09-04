@@ -9,7 +9,7 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button variant="outline-primary" 
+                    <b-button variant="outline-primary"
                       @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE CATEGORY
                     </b-button>
@@ -17,8 +17,9 @@
                   <b-col md=4>
                     <b-form-input
                       v-model="filters.schoolFeeCategory.criteria"
-                      type="text" 
-                      placeholder="Search" >
+                      type="text"
+                      placeholder="Search"
+                      debounce="500">
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -40,8 +41,8 @@
                   <!-- :filter="filters.schoolFeeCategory.criteria> -->
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
-                      <v-icon 
-                        name="spinner" 
+                      <v-icon
+                        name="spinner"
                         spin
                         class="mr-2" />
                       <strong>Loading...</strong>
@@ -52,12 +53,14 @@
                       <template v-slot:button-content>
                         <v-icon name="ellipsis-v" />
                       </template>
-                      <b-dropdown-item 
-                        @click="setUpdate(row)" >
+                      <b-dropdown-item
+                        @click="setUpdate(row)"
+                        :disabled="showModalEntry">
                         Edit
                       </b-dropdown-item>
-                      <b-dropdown-item 
-                        @click="forms.schoolFeeCategory.fields.id = row.item.id, showModalConfirmation = true">
+                      <b-dropdown-item
+                        @click="forms.schoolFeeCategory.fields.id = row.item.id, showModalConfirmation = true"
+                        :disabled="showModalConfirmation">
                         Delete
                       </b-dropdown-item>
                     </b-dropdown>
@@ -85,7 +88,7 @@
       </b-col>
     </b-row>
     <!-- Modal Entry -->
-    <b-modal 
+    <b-modal
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
@@ -93,49 +96,50 @@
 					School Fee Category - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
-			<b-row> 
-        <b-col md=12>
-          <b-form-group >
-            <label class="required">Name</label>
-            <b-form-input 
-              ref="name" 
-              v-model="forms.schoolFeeCategory.fields.name"
-              :state="forms.schoolFeeCategory.states.name" />
-            <b-form-invalid-feedback>
-              {{forms.schoolFeeCategory.errors.name}}
-            </b-form-invalid-feedback>
-          </b-form-group>
-				</b-col>
-			</b-row>
-      <b-row>
-        <b-col md=12>
-           <b-form-group >
-              <label class="required">Description</label>
-              <b-form-textarea 
-                ref="description" 
-                v-model="forms.schoolFeeCategory.fields.description" 
-                :state="forms.schoolFeeCategory.states.description"/>
+      <b-overlay :show="forms.schoolFeeCategory.isLoading" rounded="sm">
+        <b-row>
+          <b-col md=12>
+            <b-form-group >
+              <label class="required">Name</label>
+              <b-form-input
+                ref="name"
+                v-model="forms.schoolFeeCategory.fields.name"
+                :state="forms.schoolFeeCategory.states.name" />
               <b-form-invalid-feedback>
-                {{forms.schoolFeeCategory.errors.description}}
+                {{forms.schoolFeeCategory.errors.name}}
               </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-row>
-     
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md=12>
+            <b-form-group >
+                <label class="required">Description</label>
+                <b-form-textarea
+                  ref="description"
+                  v-model="forms.schoolFeeCategory.fields.description"
+                  :state="forms.schoolFeeCategory.states.description"/>
+                <b-form-invalid-feedback>
+                  {{forms.schoolFeeCategory.errors.description}}
+                </b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-overlay>
       <!-- end modal body -->
 			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button 
-          variant="outline-danger" 
-          class="float-left btn-close" 
+				<b-button
+          variant="outline-danger"
+          class="float-left btn-close"
           @click="showModalEntry=false">
           Close
         </b-button>
-        <b-button 
+        <b-button
           :disabled="forms.schoolFeeCategory.isProcessing"
-          variant="outline-primary" 
-          class="float-right btn-save" 
+          variant="outline-primary"
+          class="float-right btn-save"
           @click="onSchoolFeeEntry()">
-          <v-icon 
+          <v-icon
             v-if="forms.schoolFeeCategory.isProcessing"
             name="sync"
             spin
@@ -147,7 +151,7 @@
     <!-- End Modal Entry -->
 
     <!-- Modal Confirmation -->
-    <b-modal 
+    <b-modal
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true" >
@@ -158,22 +162,22 @@
       <div slot="modal-footer">
         <b-button
           :disabled="forms.schoolFeeCategory.isProcessing"
-          variant="outline-primary" 
-          class="mr-2 btn-save" 
+          variant="outline-primary"
+          class="mr-2 btn-save"
           @click="onSchoolFeeDelete()">
-          <v-icon 
+          <v-icon
             v-if="forms.schoolFeeCategory.isProcessing"
             name="sync"
             spin
             class="mr-2" />
           Yes
         </b-button>
-        <b-button 
+        <b-button
           variant="outline-danger"
           class="btn-close"
           @click="showModalConfirmation=false">
           No
-        </b-button>            
+        </b-button>
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
@@ -202,6 +206,7 @@ export default {
       forms: {
         schoolFeeCategory: {
           isProcessing: false,
+          isLoading: false,
           fields: { ...schoolFeeCategoryFields },
           states: { ...schoolFeeCategoryFields },
           errors: { ...schoolFeeCategoryFields }
@@ -314,18 +319,22 @@ export default {
         })
     },
     setUpdate(row){
+      this.showModalEntry = true
       const { schoolFeeCategory, schoolFeeCategory: { fields } } = this.forms
+      schoolFeeCategory.isLoading = true
       copyValue(row.item, fields)
       reset(schoolFeeCategory)
       this.entryMode = "Edit"
-      this.showModalEntry = true
+      schoolFeeCategory.isLoading = false
     },
     setCreate(){
+      this.showModalEntry = true
       const { schoolFeeCategory } = this.forms
+      schoolFeeCategory.isLoading = true
       reset(schoolFeeCategory)
       clearFields(schoolFeeCategory.fields)
       this.entryMode='Add'
-      this.showModalEntry = true
+      schoolFeeCategory.isLoading = false
     },
 	}
 }

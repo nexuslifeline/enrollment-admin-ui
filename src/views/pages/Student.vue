@@ -1150,12 +1150,12 @@ export default {
 							label: "Name",
 							tdClass: "align-middle",
 							thStyle: { width: "50%"},
-							formatter: (value, key, item) => {
-								if(!item.middleName) {
-									item.middleName = ""
-								}
-								item.name = item.firstName + " " + item.middleName + " " + item.lastName
-							}
+							// formatter: (value, key, item) => {
+							// 	if(!item.middleName) {
+							// 		item.middleName = ""
+							// 	}
+							// 	item.name = item.firstName + " " + item.middleName + " " + item.lastName
+							// }
 						},
 						{
 							key: "contact",
@@ -1391,11 +1391,11 @@ export default {
       clearFields(address.fields)
       clearFields(family.fields)
       clearFields(education.fields)
-      
+
       // set default country
       address.fields.currentCountryId = Countries.PHILIPPINES.id
       address.fields.permanentCountryId = Countries.PHILIPPINES.id
-      
+
       this.entryMode = 'Add'
       this.showStudentEntry = true
     },
