@@ -1,15 +1,16 @@
 <template>
   <div class="c-app">
-    <b-row>
-      <b-col md=12 v-show="!showStudentEntry">
-        <b-card>
-          <b-card-body>
-            <!-- add button and search -->
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Student Management</h4>
+      </div>
+      <div v-show="!showStudentEntry">
+                    <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button variant="outline-primary"
+                    <b-button variant="primary"
                       @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD NEW STUDENT
                     </b-button>
@@ -111,9 +112,9 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
+      </div>
+    </div>
+    <b-row>
       <b-col md=12 v-show="showStudentEntry">
         <b-overlay :show="isLoading" rounded="sm">
           <b-card>

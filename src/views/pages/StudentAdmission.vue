@@ -1,22 +1,18 @@
 <template>
 	<div class="c-app">
-    <b-row>
-      <b-col md=12>
-				<b-card>
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Subjects Enlistment</h4>
+      </div>
+      <SchoolCategoryTabs
+        :showAll="true"
+        :schoolCategoryId="schoolCategoryId"
+        @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
+        @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()"
+      />
+      <div>
+        <b-card>
 					<b-card-body>
-						<b-row>
-							<b-col md=12>
-								<SchoolCategoryTabs
-                  :showAll="true"
-                  :schoolCategoryId="schoolCategoryId"
-                  @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
-                  @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()" />
-							</b-col>
-							<!-- <b-col md=3>
-
-							</b-col> -->
-						</b-row>
-						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
 							<b-col md="6">
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
@@ -283,8 +279,8 @@
 						</b-row>
 					</b-card-body>
 				</b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
     <!-- Modal Preview -->
     <b-modal
 			v-model="showModalPreview"

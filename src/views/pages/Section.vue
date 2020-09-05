@@ -1,21 +1,21 @@
 <template>
   <div class="c-app">
-    <b-row v-show="!showEntry">
-      <b-col md="12">
-        <b-card>
-          <b-card-body>
-            <!-- add button and search -->
-            <SchoolCategoryTabs
-              :showAll="true"
-              :schoolCategoryId="null"
-              @clickAll="filters.section.schoolCategoryId = null"
-              @click="filters.section.schoolCategoryId = $event"/>
-						<hr>
-            <b-row class="mb-3">
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Section and Schedule Management</h4>
+      </div>
+      <SchoolCategoryTabs
+        :showAll="true"
+        :schoolCategoryId="null"
+        @clickAll="filters.section.schoolCategoryId = null"
+        @click="filters.section.schoolCategoryId = $event"
+      />
+      <div v-show="!showEntry">
+                    <b-row class="mb-3">
               <b-col md="12">
                 <b-row>
                   <b-col md="2">
-                    <b-button variant="outline-primary" @click="setCreate()">
+                    <b-button variant="primary" @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD SECTION
                     </b-button>
                   </b-col>
@@ -186,10 +186,9 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
+
     <div v-show="showEntry">
       <b-overlay :show="forms.section.isLoading" rounded="sm">
         <b-row>

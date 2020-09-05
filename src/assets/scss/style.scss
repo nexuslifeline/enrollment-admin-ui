@@ -46,3 +46,49 @@ legend.required:before {
       text-align: center;
   }
 }
+
+.c-app {
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+}
+
+.page-content__title-container {
+  border-bottom: 1px solid $brand-border-color;
+  padding: 5px 0;
+  margin-bottom: 15px;
+}
+
+.page-content__title {
+  font-size: 20px;
+}
+
+.c-tab-pills {
+  margin-bottom: 30px;
+
+  .nav-link {
+    padding: 1px 15px;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    border-radius: 10px;
+  }
+
+}
+
+.c-tab-pills-vertical {
+  .nav-link {
+    border-radius: 0;
+    color: $dark-gray-200;
+
+    &.active {
+      background-color: $white;
+      color: $brand-primary;
+      font-weight: 500;
+      border-bottom: 3px solid $brand-primary;
+    }
+  }
+
+}

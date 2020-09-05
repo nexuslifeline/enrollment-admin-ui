@@ -1,15 +1,11 @@
 <template>
   <div class="c-app">
-    <b-row>
-      <b-col md=12>
-        <b-card>
-					<!-- <h5 slot="header">
-						<span >
-						Semester
-						<small class="font-italic">- List of all semesters.</small></span>
-					</h5> -->
-          <b-card-body>
-            <!-- add button and search -->
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Semester Management</h4>
+      </div>
+      <div>
+                    <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
@@ -28,7 +24,7 @@
             <b-row >
               <b-col md=12>
                 <b-table
-									small hover outlined show-empty
+									hover outlined show-empty
 									:fields="tables.semesters.fields"
                   :busy="tables.semesters.isBusy"
                   :items.sync="tables.semesters.items"
@@ -63,10 +59,8 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
   </div>
 </template>
 

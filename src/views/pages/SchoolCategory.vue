@@ -1,10 +1,11 @@
 <template>
   <div class="c-app">
-    <b-row>
-      <b-col md=12>
-        <b-card>
-          <b-card-body>
-            <!-- add button and search -->
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">School Category Management</h4>
+      </div>
+      <div>
+                    <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
@@ -23,7 +24,7 @@
             <b-row >
               <b-col md=12>
                 <b-table
-									small hover outlined show-empty
+									hover outlined show-empty
 									:fields="tables.schoolCategories.fields"
                   :busy="tables.schoolCategories.isBusy"
                   :items.sync="tables.schoolCategories.items"
@@ -58,10 +59,8 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
   </div>
 </template>
 

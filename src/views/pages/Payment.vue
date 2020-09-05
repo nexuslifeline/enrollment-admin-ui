@@ -1,8 +1,11 @@
 <template>
 	<div class="c-app">
-    <b-row>
-      <b-col md=12>
-				<b-card>
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Payment Transactions</h4>
+      </div>
+      <div>
+        <b-card>
           <b-row class="mb-2"> <!-- row button and search input -->
             <b-col md="8">
               <b-form-radio-group @input="loadPaymentList()" v-model="filters.payment.paymentStatusId">
@@ -170,8 +173,8 @@
             </b-col>
           </b-row>
 				</b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
     <!-- Modal Preview -->
     <PreviewFile
       :showModalPreview="showModalPreview"

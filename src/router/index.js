@@ -86,162 +86,189 @@ function configRoutes () {
       component: TheContainer,
       children: [
         {
+          path: 'approval',
+          name: 'Approval',
+          redirect: { name: 'Evaluation' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'evaluation',
+              name: 'Evaluation',
+              component: Evaluation,
+              meta: { requiresAuth: true, userType: 1 }
+            },
+            {
+              path: 'student-subject-enlisment',
+              name: 'Student Subject Enlistment',
+              component: StudentAdmission,
+              meta: { requiresAuth: true, userType: 1 }
+            },
+            {
+              path: 'student-assessment-fee',
+              name: 'Student Assessment Fee',
+              component: StudentAssessmentFee,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'payment',
+              name: 'Payment',
+              component: Payment,
+              meta: { requiresAuth: true, userType: 2 }
+            }
+          ]
+        },
+        {
+          path: 'registrar',
+          name: 'Registrar',
+          redirect: { name: 'Curriculum' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'curriculum',
+              name: 'Curriculum',
+              component: Curriculum,
+              meta: { requiresAuth: true, userType: 1 }
+            },
+            {
+              path: 'schedule',
+              name: 'Scheduling',
+              component: Schedule,
+              meta: { requiresAuth: true, userType: 1 }
+            },
+            {
+              path: 'section',
+              name: 'Section',
+              component: Section,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'subject',
+              name: 'Subject',
+              component: Subject,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'course',
+              name: 'Course',
+              component: Course,
+              meta: { requiresAuth: true, userType: 1 }
+            }
+          ]
+        },
+        {
+          path: 'finance',
+          name: 'Finance',
+          redirect: { name: 'Rate Sheet' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'rate-sheet',
+              name: 'Rate Sheet',
+              component: RateSheet,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'school-fee-category',
+              name: 'School Fee Category',
+              component: SchoolFeeCategory,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'school-fee',
+              name: 'School Fee',
+              component: SchoolFee,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+          ]
+        },
+        {
+          path: 'maintenance',
+          name: 'Maintenance',
+          redirect: { name: 'Department' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'department',
+              name: 'Department',
+              component: Department,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'school-category',
+              name: 'School Category',
+              component: SchoolCategory,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'semester',
+              name: 'Semester',
+              component: Semester,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'school-year',
+              name: 'School Year',
+              component: SchoolYear,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'user-group',
+              name: 'User Group',
+              component: UserGroup,
+              meta: { requiresAuth: true, userType: 0 }
+            }
+          ]
+        },
+        {
+          path: 'master-files',
+          name: 'Masterfiles',
+          redirect: { name: 'Student' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'user',
+              name: 'User',
+              component: User,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'student',
+              name: 'Student',
+              component: Student,
+              meta: { requiresAuth: true, userType: 0 }
+            }
+          ]
+        },
+        {
           path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard,
           meta: { requiresAuth: true }
         },
-        {
-          path: 'evaluation',
-          name: 'Evaluation & Admission',
-          component: Evaluation,
-          meta: { requiresAuth: true, userType: 1 }
-        },
-        {
-          path: 'student-subject-enlisment',
-          name: 'Student Subject Enlistment',
-          component: StudentAdmission,
-          meta: { requiresAuth: true, userType: 1 }
-        },
-        {
-          path: 'student-assessment-fee',
-          name: 'Student Assessment Fee',
-          component: StudentAssessmentFee,
-          meta: { requiresAuth: true, userType: 2 }
-        },
-        {
-          path: 'payment',
-          name: 'Payment',
-          component: Payment,
-          meta: { requiresAuth: true, userType: 2 }
-        },
-        {
-          path: 'rate-sheet',
-          name: 'Rate Sheet',
-          component: RateSheet,
-          meta: { requiresAuth: true, userType: 2 }
-        },
-        {
-          path: 'curriculum',
-          name: 'Curriculum',
-          component: Curriculum,
-          meta: { requiresAuth: true, userType: 1 }
-        },
-        {
-          path: 'schedule',
-          name: 'Scheduling',
-          component: Schedule,
-          meta: { requiresAuth: true, userType: 1 }
-        },
-        {
-          path: 'section',
-          name: 'Section',
-          component: Section,
-          meta: { requiresAuth: true }
-        },
-        {
-          path: 'department',
-          name: 'Department',
-          component: Department,
-          meta: { requiresAuth: true }
-        },
-        {
-          path: 'subject',
-          name: 'Subject',
-          component: Subject,
-          meta: { requiresAuth: true }
-        },
-        {
-          path: 'course',
-          name: 'Course',
-          component: Course,
-          meta: { requiresAuth: true, userType: 1 }
-        },
-        {
-          path: 'school-fee-category',
-          name: 'School Fee Category',
-          component: SchoolFeeCategory,
-          meta: { requiresAuth: true, userType: 2 }
-        },
-        {
-          path: 'school-fee',
-          name: 'School Fee',
-          component: SchoolFee,
-          meta: { requiresAuth: true, userType: 2 }
-        },
-        {
-          path: 'user',
-          name: 'User',
-          component: User,
-          meta: { requiresAuth: true, userType: 0 }
-        },
-        {
-          path: 'user-group',
-          name: 'User Group',
-          component: UserGroup,
-          meta: { requiresAuth: true, userType: 0 }
-        },
-        {
-          path: 'student',
-          name: 'Student',
-          component: { render(c) { return c('router-view') } },
-          children: [
-            {
-              path: '/',
-              name: 'Student',
-              component: Student,
-              meta: { requiresAuth: true, userType: 0 }
-            },
-            {
-              path: ':studentId/academic-records',
-              component: AcademicRecords,
-              children: [
-                {
-                  path: '/',
-                  redirect: 'evaluations'
-                },
-                {
-                  path: 'evaluations',
-                  name: 'Evaluations',
-                  component: AcademicRecordEvaluation
-                },
-                {
-                  path: 'subjects',
-                  name: 'Subjects',
-                  component: AcademicRecordSubjects
-                },
-                {
-                  path: 'assessment',
-                  name: 'Assessment',
-                  component: AcademicRecordAssessment
-                },
-                {
-                  path: 'requirements',
-                  name: 'Requirements',
-                  component: AcademicRecordRequirements
-                }
-              ]
-            }
-          ]
-        },
-        {
-          path: 'school-category',
-          name: 'School Category',
-          component: SchoolCategory,
-          meta: { requiresAuth: true, userType: 0 }
-        },
-        {
-          path: 'semester',
-          name: 'Semester',
-          component: Semester,
-          meta: { requiresAuth: true, userType: 0 }
-        },
-        {
-          path: 'school-year',
-          name: 'School Year',
-          component: SchoolYear,
-          meta: { requiresAuth: true, userType: 0 }
-        }
+        // {
+        //   path: 'evaluation',
+        //   name: 'Evaluation & Admission',
+        //   component: Evaluation,
+        //   meta: { requiresAuth: true, userType: 1 }
+        // },
+        // {
+        //   path: 'student-subject-enlisment',
+        //   name: 'Student Subject Enlistment',
+        //   component: StudentAdmission,
+        //   meta: { requiresAuth: true, userType: 1 }
+        // },
+        // {
+        //   path: 'student-assessment-fee',
+        //   name: 'Student Assessment Fee',
+        //   component: StudentAssessmentFee,
+        //   meta: { requiresAuth: true, userType: 2 }
+        // },
+        // {
+        //   path: 'payment',
+        //   name: 'Payment',
+        //   component: Payment,
+        //   meta: { requiresAuth: true, userType: 2 }
+        // },
       ]
     },
     {

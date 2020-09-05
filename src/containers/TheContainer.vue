@@ -1,31 +1,34 @@
 <template>
   <div class="c-app">
-    <TheSidebar/>
+    <!-- <TheSidebar/> -->
     <CWrapper>
       <TheHeader/>
-      <div class="c-body">
-        <main class="c-main">
-          <CContainer fluid>
-            <transition name="fade">
-              <router-view></router-view>
-            </transition>
-          </CContainer>
-        </main>
-        <TheFooter/>
+      <div class="main-content">
+        <LeftPane />
+        <div class="c-body">
+          <main class="c-main">
+            <CContainer fluid>
+              <transition name="fade">
+                <router-view></router-view>
+              </transition>
+            </CContainer>
+          </main>
+          <TheFooter/>
+        </div>
       </div>
     </CWrapper>
   </div>
 </template>
 
 <script>
-import TheSidebar from './TheSidebar'
-import TheHeader from './TheHeader'
+import LeftPane from './ContentLeftPane'
+import TheHeader from './Header'
 import TheFooter from './TheFooter'
 
 export default {
   name: 'TheContainer',
   components: {
-    TheSidebar,
+    LeftPane,
     TheHeader,
     TheFooter
   }
@@ -40,5 +43,11 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.main-content {
+  display: flex;
+  padding: 0;
+  margin: 0;
 }
 </style>
