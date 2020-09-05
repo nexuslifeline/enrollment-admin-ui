@@ -1,15 +1,16 @@
 <template>
 	<div class="c-app">
-		<div v-show="!showEntry">
-			<b-row>
-				<b-col md=12>
-					<b-card>
-						<b-card-body>
-							<b-row class="mb-3">
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Curriculum Management</h4>
+      </div>
+      <div>
+        <div v-show="!showEntry">
+			    <b-row class="mb-3">
 								<b-col md=12>
 									<b-row>
 										<b-col md=6 class="bottom-space">
-											<b-button variant="outline-primary"
+											<b-button variant="primary"
 												@click="setCreate()">
 												<v-icon name="plus-circle" /> ADD NEW CURRICULUM
 											</b-button>
@@ -178,12 +179,10 @@
 										</b-row>
 								</b-col>
 							</b-row>
-							<!-- end table -->
-						</b-card-body>
-					</b-card>
-				</b-col>
-			</b-row>
-		</div>
+		    </div>
+      </div>
+    </div>
+
 		<div v-show="showEntry">
       <div>
         <b-overlay  blur="blur" :show="forms.curriculum.isLoading" rounded="sm">

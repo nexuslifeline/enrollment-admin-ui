@@ -141,7 +141,7 @@
         <li v-for="(nav, idx) in $options.navItems"
           :key="idx"
           class="header__menu-item"
-          :class="{ active: $route.path.includes(nav.to) }">
+          :class="{ active: $route.path.startsWith(nav.to) }">
           <a :href="`#${nav.to}`" class="header__menu-link">
             {{nav.label}}
           </a>
@@ -155,6 +155,29 @@
       <div class="header__account-profile-details">
         <p class="header__account-name">Paul Christian Rueda</p>
         <p class="header__account-group">System Administrator</p>
+      </div>
+      <div class="header__account-actions">
+        <button @click="showDropdown = !showDropdown" type="button" class="account-action__settings">
+          <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
+          <v-icon name="caret-down" class="account-action__icon" scale=".85" />
+          <div v-show="showDropdown" class="account-action__dropdown">
+            <ul class="account-action__dropdown-items">
+              <li class="account-action__dropdown-item">
+                <a href="#"
+                  class="account-action__dropdown-item-link">
+                  My Profile
+                </a>
+              </li>
+              <li class="account-action__dropdown-item">
+                <a href="#"
+                  @click.prevent="logout"
+                  class="account-action__dropdown-item-link">
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </button>
       </div>
     </div>
     <div class="header__sub-menus-container">
@@ -178,10 +201,89 @@ import navItems from './navs';
 export default {
   name: 'TheHeader',
   navItems,
+  data() {
+    return {
+      showDropdown: false
+    }
+  },
   computed: {
     activeIndex() {
       return this.$options.navItems.findIndex(v => this.$route.path.includes(v.to));
     }
+  },
+  methods: {
+    logout() { // Note! needs to be refactored
+      if(localStorage.adminAccessToken) {
+        localStorage.clear();
+        this.$http.post('api/v1/logout', [], {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('adminAccessToken')
+            }
+          }).then(response => {
+            //localStorage.removeItem('adminAccessToken')
+            this.$store.commit('logoutUser')
+            this.$router.push({ name: 'Login' })
+          }).catch(err => {
+              console.log(err)
+              this.$router.push({ name: 'Login' })
+          });
+      }
+    }
   }
 }
 </script>
+<style lang="scss" scoped>
+  @import "../assets/scss/shared.scss";
+
+  .header__account-actions {
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .account-action__settings {
+    outline: 0;
+    border: 1px solid $gray;
+    background: none;
+    padding: 5px 7px;
+    border-radius: 3px;
+    position: relative;
+  }
+
+  .account-action__icon {
+    color: $white;
+  }
+
+  .account-action__dropdown {
+    position: absolute;
+    background-color: $white;
+    border: 1px solid $brand-border-color;
+    top: 35px;
+    right: 0;
+    min-width: 180px;
+    border-radius: 3px;
+  }
+
+  .account-action__dropdown-items {
+    list-style: none;
+    width: 100%;
+    padding: 8px 0;
+    margin: 0;
+  }
+
+  .account-action__dropdown-item {
+    padding: 5px 20px;
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid $brand-border-color;
+
+    &:last-child {
+      border: 0;
+    }
+  }
+
+  .account-action__dropdown-item-link {
+    color: $dark-gray-600;
+  }
+</style>

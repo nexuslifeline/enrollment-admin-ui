@@ -1,27 +1,16 @@
-<style lang="scss" scoped>
-  @import "../../assets/scss/shared.scss";
-
-  .bottom-space {
-    margin-bottom: 0px;
-    @include for-size(phone-only) {
-      margin-bottom: 15px;
-    }
-
-  }
-</style>
-
 <template>
   <div class="c-app">
-    <b-row>
-      <b-col md=12>
-        <b-card>
-          <b-card-body>
-            <!-- add button and search -->
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Course Management</h4>
+      </div>
+      <div>
+                    <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button class="bottom-space" variant="outline-primary"
+                    <b-button class="bottom-space" variant="primary"
                       @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD NEW COURSE
                     </b-button>
@@ -93,10 +82,8 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -397,3 +384,14 @@ export default {
 	}
 }
 </script>
+<style lang="scss" scoped>
+  @import "../../assets/scss/shared.scss";
+
+  .bottom-space {
+    margin-bottom: 0px;
+    @include for-size(phone-only) {
+      margin-bottom: 15px;
+    }
+
+  }
+</style>

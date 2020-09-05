@@ -1,12 +1,12 @@
 <template>
-  <b-tabs pills>
-    <b-tab 
+  <b-tabs class="c-tab-pills" pills>
+    <b-tab
       v-if="showAll"
       @click="$emit('clickAll')"
       active
       :disabled="schoolCategoryId !== null"
-      title="All" />
-    <b-tab v-for="schoolCategory in schoolCategories.values" 
+      title="All Category" />
+    <b-tab v-for="schoolCategory in schoolCategories.values"
       :key="schoolCategory.id"
       :title="schoolCategory.name"
       :active="schoolCategoryId === schoolCategory.id"

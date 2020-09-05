@@ -27,6 +27,8 @@ import 'vue-awesome/icons/paper-plane'
 import 'vue-awesome/icons/map-marker-alt'
 import 'vue-awesome/icons/calendar-alt'
 import 'vue-awesome/icons/address-card'
+import 'vue-awesome/icons/cogs'
+import 'vue-awesome/icons/caret-down'
 import Icon from 'vue-awesome/components/Icon'
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'

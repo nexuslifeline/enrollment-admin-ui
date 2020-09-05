@@ -1,15 +1,11 @@
 <template>
   <div class="c-app">
-    <b-row>
-      <b-col md=12>
-        <b-card>
-					<!-- <h5 slot="header">
-						<span >
-						School Year
-						<small class="font-italic">- List of all school year.</small></span>
-					</h5> -->
-          <b-card-body>
-            <!-- add button and search -->
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">School Year Management</h4>
+      </div>
+      <div>
+                    <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
@@ -90,10 +86,8 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"

@@ -71,7 +71,7 @@ export default [
         to: '/finance/rate-sheet'
       },
       {
-        label: 'School Fee Category',
+        label: 'Fee Category',
         to: '/finance/school-fee-category'
       },
       {
@@ -89,7 +89,7 @@ export default [
         to: '/master-files/student'
       },
       {
-        label: 'User',
+        label: 'Personnel',
         to: '/master-files/user'
       }
     ]

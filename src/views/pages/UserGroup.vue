@@ -1,15 +1,16 @@
 <template>
   <div class="c-app">
-    <b-row>
-      <b-col md=12>
-        <b-card>
-          <b-card-body>
-            <!-- add button and search -->
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">User Group Management</h4>
+      </div>
+      <div>
+                    <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button variant="outline-primary"
+                    <b-button variant="primary"
                       @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD NEW USER GROUP
                     </b-button>
@@ -30,7 +31,7 @@
             <b-row >
               <b-col md=12>
                 <b-table
-									small hover outlined show-empty
+									hover outlined show-empty
 									:fields="tables.userGroups.fields"
                   :busy="tables.userGroups.isBusy"
                   :items="tables.userGroups.items"
@@ -82,10 +83,8 @@
               </b-col>
             </b-row>
             <!-- end table -->
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
     <!-- Modal Entry -->
     <b-modal
       @shown="$refs.code.focus()"

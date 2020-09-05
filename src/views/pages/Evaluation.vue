@@ -1,19 +1,18 @@
 <template>
 	<div class="c-app">
-    <b-row>
-      <b-col md=12>
-				<b-card>
+    <div>
+      <div class="page-content__title-container">
+        <h4 class="page-content__title">Evaluation & Admission Records</h4>
+      </div>
+      <SchoolCategoryTabs
+        :showAll="true"
+        :schoolCategoryId="schoolCategoryId"
+        @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadEvaluation()"
+        @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadEvaluation()" 
+      />
+      <div>
+        <b-card>
 					<b-card-body>
-						<b-row>
-							<b-col md=12>
-								<SchoolCategoryTabs
-                  :showAll="true" 
-                  :schoolCategoryId="schoolCategoryId"
-                  @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadEvaluation()"
-                  @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadEvaluation()" />
-							</b-col>
-						</b-row>
-						<hr>
 						<b-row class="mb-2"> <!-- row button and search input -->
 							<b-col md="6">
 								<b-form-radio-group @input="loadEvaluation()" v-model="filters.student.evaluationStatusId">
@@ -593,8 +592,8 @@
 						</b-row>
 					</b-card-body>
 				</b-card>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
     <PreviewFile
       :showModalPreview="showModalPreview"
       :file="file"
@@ -1324,6 +1323,8 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+  @import "../../assets/scss/shared.scss";
+
   .preview__modal-description {
     z-index: 5000;
     position: fixed;
@@ -1348,4 +1349,5 @@ export default {
   .evaluation__form-details-second {
     width: 30%;
   }
+
 </style>
