@@ -238,7 +238,7 @@ function configRoutes () {
               children: [
                 {
                   path: '/',
-                  name: 'student',
+                  name: 'Student List',
                   component: Student,
                   meta: { requiresAuth: true, userType: 0 }
                 },
