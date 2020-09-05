@@ -281,7 +281,7 @@ export default {
     padding: 0 10px;
 
     &.active {
-      border-top: 3px solid $black;
+      border-top: 3px solid $dark-blue;
     }
   }
 

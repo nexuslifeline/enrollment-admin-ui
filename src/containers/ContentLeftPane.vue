@@ -17,7 +17,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
-    color: $dark-gray-200;
+    color: $dark-gray-300;
   }
 </style>
 <template>
