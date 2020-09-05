@@ -208,7 +208,7 @@ export default {
   }
 
   .header__sub-menus-container {
-    height: 35px;
+    height: 40px;
     width: 100%;
     padding: 0 230px;
   }
