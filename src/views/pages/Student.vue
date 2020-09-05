@@ -74,7 +74,7 @@
                         <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item
-                        :to="`/student/${row.item.id}/academic-records`" >
+                        :to="`/master-files/student/${row.item.id}/academic-records`" >
                         Update Academic Records
                       </b-dropdown-item>
                       <b-dropdown-item
