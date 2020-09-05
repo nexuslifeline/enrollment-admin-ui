@@ -40,11 +40,11 @@ export default {
     colorFactory() {
       const colors = [
         { bg: '#fcfcfc', font: '#7c7c7c' },
-        { bg: '#0080FF', font: '#FFFFFF' },
+        { bg: '#FFA33A', font: '#FFFFFF' },
         { bg: '#00cc45', font: '#FFFFFF' },
         { bg: '#7908CF', font: '#FFFFFF' },
         { bg: '#DE193F', font: '#FFFFFF' },
-        { bg: '#FFA33A', font: '#FFFFFF' },
+        { bg: '#0080FF', font: '#FFFFFF' },
         { bg: '#aa4ced', font: '#FFFFFF' },
         { bg: '#ed4cca', font: '#FFFFFF' },
         { bg: '#4cede2', font: '#FFFFFF' }

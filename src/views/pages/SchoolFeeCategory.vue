@@ -10,7 +10,7 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=8>
-                    <b-button variant="outline-primary"
+                    <b-button variant="primary"
                       @click="setCreate()">
                       <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE CATEGORY
                     </b-button>

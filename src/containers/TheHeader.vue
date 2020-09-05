@@ -27,12 +27,12 @@
     <CToggler
       in-header
       class="ml-3 d-lg-none"
-      @click="$store.commit('toggleSidebarMobile')"
+      @click="$store.commit('TOGGLE_SIDEBAR_MOBILE')"
     />
     <CToggler
       in-header
       class="ml-3 d-md-down-none"
-      @click="$store.commit('toggleSidebarDesktop')"
+      @click="$store.commit('TOGGLE_SIDEBAR_DESKTOP')"
     />
     <CHeaderBrand class="mx-auto d-lg-none" to="/">
       <div class="logo__stc-brand">

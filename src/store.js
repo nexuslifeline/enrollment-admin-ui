@@ -10,24 +10,24 @@ const state = {
 }
 
 const mutations = {
-  toggleSidebarDesktop (state) {
+  TOGGLE_SIDEBAR_DESKTOP (state) {
     const sidebarOpened = [true, 'responsive'].includes(state.sidebarShow)
     state.sidebarShow = sidebarOpened ? false : 'responsive'
   },
-  toggleSidebarMobile (state) {
+  TOGGLE_SIDEBAR_MOBILE (state) {
     const sidebarClosed = [false, 'responsive'].includes(state.sidebarShow)
     state.sidebarShow = sidebarClosed ? true : 'responsive'
   },
   set (state, [variable, value]) {
     state[variable] = value
   },
-  loginUser (state) {
+  LOGIN_USER (state) {
     state.isLoggedIn = true
   },
-  logoutUser (state) {
+  LOGOUT_USER (state) {
     state.isLoggedIn = false
   },
-  user (state, user_data) {
+  SET_USER (state, user_data) {
     state.user = user_data
   },
 }

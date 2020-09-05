@@ -83,7 +83,7 @@ export default {
             }
           }).then(response => {
             //localStorage.removeItem('adminAccessToken')
-            this.$store.commit('logoutUser')
+            this.$store.commit('LOGOUT_USER')
             this.$router.push({ name: 'Login' })
           }).catch(err => {
               console.log(err)
