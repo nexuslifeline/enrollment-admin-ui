@@ -98,17 +98,17 @@
                 <b-row>
                   <b-col md=6>
                     Showing {{ paginations.student.from }} to {{ paginations.student.to }} of {{ paginations.student.totalRows }} records.
-                    </b-col>
-                    <!--<b-col md=4>
-                      <b-form-input
-                        v-model="filters.student.criteria"
-                        type="text" 
-                        placeholder="Search"
-                        debounce="500"
-                        @update="loadStudents()">
-                      </b-form-input>
-                    </b-col>-->
-                  </b-row>
+                  </b-col>
+                  <b-col md=6>
+                    <b-pagination
+                      v-model="paginations.student.page"
+                      :total-rows="paginations.student.totalRows"
+                      :per-page="paginations.student.perPage"
+                      size="sm"
+                      align="end"
+                      @input="loadStudents()" />
+                  </b-col>
+                </b-row>
               </b-col>
             </b-row>
             <!-- end table -->

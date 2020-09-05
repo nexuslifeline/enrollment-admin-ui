@@ -38,5 +38,8 @@ export default {
     getTranscriptsOfStudent(studentId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/transcripts`, { params: params });
     },
+    getStudentFeesOfStudent(studentId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/student-fees`, { params: params });
+    },
   }
 }

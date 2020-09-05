@@ -11,41 +11,49 @@
         <b-table
           details-td-class="table-secondary"
           hover outlined small show-empty
-          :fields="tables.transcripts.fields"
-          :items="tables.transcripts.items"
-          :busy="tables.transcripts.isBusy">
-          <template v-slot:cell(name)="{item: { student } }">
+          :fields="tables.studentFees.fields"
+          :items="tables.studentFees.items"
+          :busy="tables.studentFees.isBusy">
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon
+                name="spinner"
+                spin
+                class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="data">
             <b-media>
               <template v-slot:aside>
                 <b-avatar
                   rounded
                   blank
                   size="64"
-                  :text="student.firstName.charAt(0) + '' + student.lastName.charAt(0)"
-                  :src="avatar(student)" />
+                  :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                  :src="avatar(data.item.student)" />
               </template>
-              <span>{{ student.name }}</span><br>
-              <small>Student no.: {{ student.studentNo ? student.studentNo : 'Awaiting Confirmation' }}</small><br>
-              <small>Address : {{ student.address ?
-                student.address.currentCompleteAddress : "" }}
+              <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
+              <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+              <small>Address : {{ data.item.student.address ?
+                data.item.student.address.currentCompleteAddress : "" }}
               </small>
             </b-media>
           </template>
-          <template v-slot:cell(contact)="{item: student}">
+          <template v-slot:cell(contact)="{item: { student }}">
             Email : {{ student.email }} <br>
             <small>Phone : {{ student.phoneNo }}</small> <br>
             <small>Mobile : {{ student.mobileNo }}</small> <br>
           </template>
           <template v-slot:cell(education)="{ item }">
             <span>{{ getName(item, 'level') + " "
-              + getName(item, 'semester') + " "
-              + getName(item, 'studentType') }}</span><br>
+              + getName(item, 'semester') }}</span><br>
             <small v-if="item.course">{{item.course.description}} {{item.course.major ? `(${item.course.major})` : ''}}</small>
           </template>
           <template v-slot:cell(status)>
             <b-badge
               variant='primary'>
-              Finalized
+              Approved
             </b-badge>
           </template>
           <template v-slot:cell(action)="row">
@@ -54,222 +62,291 @@
               @click="loadDetails(row)" />
           </template>
           <template v-slot:row-details="data">
-            <b-overlay :show="isLoading" rounded="sm">
-              <b-card>
-                <b-row>
-                  <b-col md="3">
-                    <b-form-group>
-                      <label>Level</label>
-                      <b-form-select
-                        @change="checkSchoolCategory(data)"
-                        v-model="data.item.levelId">
-                        <template v-slot:first>
-                          <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
-                        </template>
-                        <b-form-select-option
-                          v-for="level in options.levels.items"
-                          :key="level.id"
-                          :value="level.id">
-                          {{ level.name }}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </b-form-group>
+            <b-card>
+              <b-row>
+                <b-col md="3">
+                  <b-form-group>
+                    <label>Level</label>
+                    <b-form-select
+                      @change="checkSchoolCategory(data)"
+                      v-model="data.item.levelId">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
+                      </template>
+                      <b-form-select-option
+                        v-for="level in options.levels.items"
+                        :key="level.id"
+                        :value="level.id">
+                        {{ level.name }}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </b-form-group>
+                </b-col>
+                <b-col md="3">
+                  <b-form-group>
+                    <label>Status</label>
+                    <b-form-select
+                      disabled
+                      v-model="data.item.studentFeeStatusId">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Status --</b-form-select-option>
+                      </template>
+                      <b-form-select-option
+                        v-for="status in studentFeeStatuses.values"
+                        :key="status.id"
+                        :value="status.id">
+                        {{ status.name }}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </b-form-group>
+                </b-col>
+                <b-col md="3">
+                  <b-form-group>
+                    <label>School Year</label>
+                    <b-form-input
+                      v-model="data.item.schoolYear.name"
+                      readonly />
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <b-row v-if="data.item.courseId">
+                <b-col md="5">
+                  <b-form-group>
+                    <label>Course</label>
+                    <b-form-select
+                      v-model="data.item.courseId">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                      </template>
+                      <b-form-select-option
+                        v-for="course in options.courses.items"
+                        :key="course.id"
+                        :value="course.id">
+                        {{`${course.description} ${(course.major ? course.major : '')}`}}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </b-form-group>
+                </b-col>
+                <b-col md="2">
+                  <b-form-group>
+                    <label>Semester</label>
+                    <b-form-select
+                      v-model="data.item.semesterId">
+                      <b-form-select-option
+                        v-for="semester in semesters.values"
+                        :key="semester.id"
+                        :value="semester.id">
+                        {{semester.name}}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <hr>
+              <b-card v-if="data.item.studentFeeItems">
+                <b-row class="mb-3">
+                  <b-col md=4>
+                    <h5 class="pt-2">STUDENT FEES</h5>
                   </b-col>
-                  <!-- <b-col md="3">
-                    <b-form-group>
-                      <label>Assessment Status</label>
-                      <b-form-select
-                        v-model="data.item.applicationStatusId">
-                        <template v-slot:first>
-                          <b-form-select-option :value="null" disabled>-- Status --</b-form-select-option>
-                        </template>
-                        <b-form-select-option
-                          v-for="status in transcriptStatuses.values"
-                          :key="status.id"
-                          :value="status.id">
-                          {{ status.name }}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </b-form-group>
-                  </b-col> -->
-                  <b-col md="3">
-                    <b-form-group>
-                      <label>School Year</label>
-                      <b-form-input
-                        v-model="data.item.schoolYear.name"
-                        readonly />
-                    </b-form-group>
+                  <b-col md=4 class="text-center">
+                  </b-col>
+                  <b-col md=4>
+                    <b-button
+                      @click="onAddFees(data.item.studentFeeItems)"
+                      variant="outline-primary"
+                      class="float-right">
+                      <v-icon name="plus-circle" /> New Item
+                    </b-button>
                   </b-col>
                 </b-row>
-                <b-row v-if="data.item.courseId">
-                  <b-col md="5">
-                    <b-form-group>
-                      <label>Course</label>
-                      <b-form-select
-                        v-model="data.item.courseId">
-                        <template v-slot:first>
-                          <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
-                        </template>
-                        <b-form-select-option
-                          v-for="course in options.courses.items"
-                          :key="course.id"
-                          :value="course.id">
-                          {{`${course.description} ${(course.major ? course.major : '')}`}}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="2">
-                    <b-form-group>
-                      <label>Semester</label>
-                      <b-form-select
-                        v-model="data.item.semesterId">
-                        <b-form-select-option
-                          v-for="semester in semesters.values"
-                          :key="semester.id"
-                          :value="semester.id">
-                          {{semester.name}}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-                <hr>
-                <b-card v-if="data.item.fees">
-                    <b-row class="mb-3">
-                      <b-col md=4>
-                        <h5 class="pt-2">STUDENT FEES</h5>
-                      </b-col>
-                      <b-col md=4 class="text-center">
-                        <!-- <span v-if="data.item.msg" class="text-danger font-weight-bold">{{ data.item.msg }}</span> -->
-                      </b-col>
-                      <b-col md=4>
-                        <b-button
-                          @click="onAddFees(data.item.fees)"
-                          variant="outline-primary"
-                          class="float-right">
-                          <v-icon name="plus-circle" /> New Item
-                        </b-button>
-                      </b-col>
-                    </b-row>
-                    <b-table
-                      hover outlined small responsive show-empty
-                      :fields="tables.studentFees.fields"
-                      :items="data.item.fees"
-                      :busy="tables.studentFees.isBusy">
-                      <template v-slot:cell(pivot.notes)="row">
-                        <b-form-input
-                          v-model="row.item.pivot.notes" />
-                      </template>
-                      <template v-slot:cell(pivot.amount)="row">
-                        <vue-autonumeric
-                          :disabled="row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1"
-                          v-model="row.item.pivot.amount"
-                          class="form-control text-right"
-                          :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
-                        </vue-autonumeric>
-                      </template>
-                      <template v-slot:cell(action)="row">
-                        <b-button
-                          v-if="row.item.id !== fees.TUITION_FEE.id"
-                          @click="removeFee(data.item.fees, row)"
-                          size="sm" variant="danger">
-                          <v-icon name="trash" />
-                        </b-button>
-                      </template>
-                    </b-table>
-                    <template v-slot:footer>
-                      <b-row>
-                        <b-col md=4>
-                          <b-form-group
-                            label="INITIAL FEE TOTAL :"
-                            label-for="enrollmentFee"
-                            label-class="font-weight-bold"
-                            label-cols="4">
-                            <vue-autonumeric
-                              class="form-control text-right"
-                              v-model="data.item.enrollmentFee"
-                              :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
-                            </vue-autonumeric>
-                          </b-form-group>
-                        </b-col>
-                        <b-col md=4>
-                          <b-form-group
-                            label="PREVIOUS BALANCE :"
-                            label-for="enrollmentFee"
-                            label-class="font-weight-bold"
-                            label-cols="4">
-                            <vue-autonumeric
-                              class="form-control text-right"
-                              v-model="data.item.previousBalance"
-                              :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
-                            </vue-autonumeric>
-                          </b-form-group>
-                        </b-col>
-                        <b-col md=2>
-                          <h5 class="float-right font-weight-bold">Total</h5>
-                        </b-col>
-                        <b-col md=2>
-                          <h5 class="float-right font-weight-bold">{{ feesTotalAmount(data.item.fees) }}</h5>
-                        </b-col>
-                      </b-row>
-                    </template>
-                  </b-card>
+                <b-table
+                  hover outlined small responsive show-empty
+                  :fields="tables.studentFeeItems.fields"
+                  :items="data.item.studentFeeItems"
+                  :busy="tables.studentFees.isBusy">
+                  <template v-slot:cell(pivot.notes)="row">
+                    <b-form-input
+                      v-model="row.item.pivot.notes" />
+                  </template>
+                  <template v-slot:cell(pivot.amount)="row">
+                    <vue-autonumeric
+                      :disabled="row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1"
+                      v-model="row.item.pivot.amount"
+                      class="form-control text-right"
+                      :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
+                    </vue-autonumeric>
+                  </template>
+                  <template v-slot:cell(action)="row">
+                    <b-button
+                      v-if="row.item.id !== fees.TUITION_FEE.id"
+                      @click="removeFee(data.item.studentFeeItems, row)"
+                      size="sm" variant="danger">
+                      <v-icon name="trash" />
+                    </b-button>
+                  </template>
+                </b-table>
                 <template v-slot:footer>
-                  <b-button
-                    @click="loadDetails(data)"
-                    class="float-right my-2 mr-2"
-                    variant="outline-danger">Cancel</b-button>
-                  <b-button
-                    :disabled="isProcessing"
-                    @click="onUpdateSubjects(data.item)"
-                    class="float-right m-2"
-                    variant="outline-primary">
-                    <v-icon
-                      v-if="isProcessing"
-                      name="sync"
-                      spin />
-                    Update
-                  </b-button>
+                  <b-row>
+                    <b-col md=4>
+                      <b-form-group
+                        label="INITIAL FEE TOTAL :"
+                        label-for="enrollmentFee"
+                        label-class="font-weight-bold"
+                        label-cols="6">
+                        <vue-autonumeric
+                          class="form-control text-right"
+                          v-model="data.item.enrollmentFee"
+                          :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
+                        </vue-autonumeric>
+                      </b-form-group>
+                    </b-col>
+                    <!-- <b-col md=4>
+                      <b-form-group
+                        label="PREVIOUS BALANCE :"
+                        label-for="enrollmentFee"
+                        label-class="font-weight-bold"
+                        label-cols="4">
+                        <vue-autonumeric
+                          class="form-control text-right"
+                          v-model="data.item.previousBalance"
+                          :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
+                        </vue-autonumeric>
+                      </b-form-group>
+                    </b-col> -->
+                    <b-col offset-md=4 md=2>
+                      <h5 class="float-right font-weight-bold">Total</h5>
+                    </b-col>
+                    <b-col md=2>
+                      <h5 class="float-right font-weight-bold">{{ feesTotalAmount(data.item, data.item.studentFeeItems) }}</h5>
+                    </b-col>
+                  </b-row>
                 </template>
               </b-card>
-            </b-overlay>
+              <template v-slot:footer>
+                <b-button
+                  @click="loadDetails(data)"
+                  class="float-right my-2 mr-2"
+                  variant="outline-danger">Cancel</b-button>
+                <b-button
+                  :disabled="isProcessing"
+                  @click="onUpdateStudentFees(data.item)"
+                  class="float-right m-2"
+                  variant="outline-primary">
+                  <v-icon
+                    v-if="isProcessing"
+                    name="sync"
+                    spin />
+                  Update
+                </b-button>
+              </template>
+            </b-card>
           </template>
         </b-table>
       </b-card-body>
     </b-card>
+    <b-modal
+			v-model="showModalFees"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true"
+			size="xl">
+			<div slot="modal-title">
+					School Fees
+			</div>
+			<b-row>
+				<b-col md=12>
+          <b-row class="mb-2">
+            <b-col offset-md="8" md="4">
+              <b-form-input
+                v-model="filters.fee.criteria"
+                type="text"
+                placeholder="Search">
+              </b-form-input>
+            </b-col>
+          </b-row>
+					<b-table
+						small hover outlined show-empty
+						:items.sync="tables.fees.items"
+						:fields="tables.fees.fields"
+            :filter="filters.fee.criteria"
+						:busy="tables.fees.isBusy2"
+            :current-page="paginations.fee.page"
+            :per-page="paginations.fee.perPage"
+            @filtered="onFiltered($event, paginations.fee)">
+						<template v-slot:cell(action)="row">
+							<b-button
+                @click="addFee(row)"
+                size="sm" variant="success">
+                <v-icon name="plus" />
+              </b-button>
+						</template>
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon
+                  name="spinner"
+                  spin
+                  class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
+					</b-table>
+          <b-row>
+            <b-col md=6>
+              Showing {{paginations.fee.from}} to {{paginations.fee.to}} of {{paginations.fee.totalRows}} records.
+            </b-col>
+            <b-col md=6>
+              <b-pagination
+                v-model="paginations.fee.page"
+                :total-rows="paginations.fee.totalRows"
+                :per-page="paginations.fee.perPage"
+                size="sm"
+                align="end"
+                @input="recordDetails(paginations.fee)"
+              />
+            </b-col>
+          </b-row>
+				</b-col>
+			</b-row> <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button
+          class="float-right"
+          variant="outline-danger"
+          @click="showModalFees=false">
+          Close
+        </b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
   </div>
 </template>
 <script>
-import { StudentApi, TranscriptApi, LevelApi, CourseApi } from '../../../mixins/api'
-import { StudentCategories, TranscriptStatuses, Semesters, SchoolCategories, Fees } from '../../../helpers/enum'
+import { StudentApi, LevelApi, CourseApi, SchoolFeeApi, StudentFeeApi } from '../../../mixins/api'
+import { StudentCategories, Semesters, SchoolCategories, Fees, StudentFeeStatuses } from '../../../helpers/enum'
 import EvaluationEntry from './EvaluationEntry'
 import tables from '../../../helpers/tables'
 import { showNotification, formatNumber } from '../../../helpers/forms'
 export default {
-  mixins: [ StudentApi, TranscriptApi, LevelApi, CourseApi, tables ],
+  mixins: [ StudentApi, LevelApi, CourseApi, SchoolFeeApi, StudentFeeApi, tables ],
   components: {
     EvaluationEntry
   },
   created() {
     this.studentId = this.$route.params.studentId
-    this.loadStudentTranscriptList()
+    this.loadStudentFeesList()
     this.loadCourseList()
     this.loadLevelList()
+    this.loadFees()
   },
   data() {
     return {
       fees: Fees,
       isProcessing: false,
       studentCategories: StudentCategories,
-      transcriptStatuses: TranscriptStatuses,
+      studentFeeStatuses: StudentFeeStatuses,
       semesters: Semesters,
-      showModalSubjects: false,
-      studentSubjects: [],
+      studentFees: [],
+      showModalFees: false,
       tables: {
-        transcripts: {
+        studentFees: {
 					isBusy: false,
-					filterIncludedFields: ["firstName", "lastName"],
 					fields: [
 						{
 							key: "name",
@@ -292,7 +369,7 @@ export default {
 						},
 						{
 							key: "status",
-							label: "Assessment Status",
+							label: "Status",
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: { width: "12%"}
@@ -306,7 +383,7 @@ export default {
 					],
 					items: []
         },
-        studentFees: {
+        studentFeeItems: {
 					isBusy: false,
 					fields: [
 						{
@@ -371,6 +448,20 @@ export default {
           items: []
         }
       },
+      filters: {
+        fee: {
+          criteria: null
+        }
+      },
+      paginations: {
+        fee: {
+					from: 0,
+					to: 0,
+					totalRows: 0,
+					page: 1,
+					perPage: 10,
+				},
+      }
     }
   },
   methods: {
@@ -390,15 +481,28 @@ export default {
         courses.items = data
       })
     },
-    loadStudentTranscriptList() {
-      const transcriptStatusId = TranscriptStatuses.FINALIZED.id
-      const params = { paginate: false, transcriptStatusId }
-      const { transcripts } = this.tables
-      transcripts.isBusy = true
-      this.getTranscriptsOfStudent(this.studentId, params)
+    loadStudentFeesList() {
+      const studentFeeStatusId = StudentFeeStatuses.APPROVED.id
+      const params = { paginate: false, studentFeeStatusId }
+      const { studentFees } = this.tables
+      studentFees.isBusy = true
+      this.getStudentFeesOfStudent(this.studentId, params)
       .then(({ data }) => {
-        transcripts.isBusy = false
-        transcripts.items = data
+        studentFees.items = data
+        studentFees.isBusy = false
+      })
+    },
+    loadFees(){
+      const { fees } = this.tables
+      const { fee } = this.paginations
+      const params = { paginate: false }
+      fees.isBusy = true
+      this.getSchoolFeeList(params)
+        .then(({ data }) => {
+          fees.items = data
+          fee.totalRows = data.length
+          this.recordDetails(fee)
+          fees.isBusy = false
       })
     },
     avatar(student){
@@ -417,24 +521,7 @@ export default {
       }
       return ''
     },
-    loadDetails(row){
-			if (!row.detailsShowing) {
-				const {
-					id: transcriptId,
-					admissionId
-				} = row.item
-        const params = { paginate: false }
-
-				this.isLoading = true
-				this.getStudentFeeOfTranscript(transcriptId)
-        .then(({ data }) => {
-          this.$set(row.item, 'enrollmentFee', data.enrollmentFee)
-          this.$set(row.item, 'previousBalance', data.billings[0].previousBalance )
-          this.$set(row.item, 'fees', data.studentFeeItems)
-          this.$set(row.item, 'isComputedByUnits', data.isComputedByUnits)
-          this.isLoading = false
-        })
-			}
+    loadDetails(row) {
 			row.toggleDetails()
     },
     checkSchoolCategory(row) {
@@ -454,15 +541,75 @@ export default {
         item.courseId = null
         item.semesterId = null
       }
+    },
+    onAddFees(fees) {
+      this.studentFees = fees
+      this.showModalFees = true
+    },
+		addFee(row) {
+      const { item } = row
+      const result = this.studentFees.find(fee => fee.id === item.id)
+
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.')
+        return
+      }
+
+      this.studentFees.push({
+        id: row.item.id,
+        name : row.item.name,
+        isIntegrated: row.item.isIntegrated,
+        description: row.item.description,
+        pivot:{ schoolFeeId: row.item.id, amount: 0.00, notes: "" }
+      })
+    },
+		removeFee(fees, row){
+			fees.splice(row.index, 1);
+    },
+    onUpdateStudentFees(row) {
+      const {
+        id: studentFeeId,
+        levelId,
+        studentFeeStatusId,
+        courseId,
+        semesterId,
+        studentFeeItems: rawFees
+      } = row
+
+      let studentFeeItems = rawFees.map(fee => {
+        const { id: schoolFeeId, pivot: { amount, notes } } = fee
+        // row.totalAmount += amount
+				return { schoolFeeId, amount, notes }
+      })
+
+      const data = {
+        levelId,
+        studentFeeStatusId,
+        courseId,
+        semesterId,
+        studentFeeItems
+      }
+
+      this.isProcessing = true;
+      this.updateStudentFee(data, studentFeeId)
+      .then(({ data }) => {
+        this.isProcessing = false
+        this.loadStudentFeesList()
+        showNotification(this, "success", "Updated Successfully.")
+      }).catch((error) => {
+				const errors = error.response.data.errors
+        this.isProcessing = false;
+      });
     }
   },
   computed: {
     feesTotalAmount() {
-      return fees => {
+      return (item, fees) => {
         let amount = 0
         fees.forEach(fee => {
           amount += Number(fee.pivot.amount)
         })
+        item.totalAmount = amount
         return formatNumber(amount)
       }
     },

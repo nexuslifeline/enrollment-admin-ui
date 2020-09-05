@@ -14,20 +14,20 @@
           :fields="tables.transcripts.fields"
           :items="tables.transcripts.items"
           :busy="tables.transcripts.isBusy">
-          <template v-slot:cell(name)="{item: { student } }">
+          <template v-slot:cell(name)="row">
             <b-media>
               <template v-slot:aside>
                 <b-avatar
                   rounded
                   blank
                   size="64"
-                  :text="student.firstName.charAt(0) + '' + student.lastName.charAt(0)"
-                  :src="avatar(student)" />
+                  :text="row.item.student.firstName.charAt(0) + '' + row.item.student.lastName.charAt(0)"
+                  :src="avatar(row.item.student)" />
               </template>
-              <span>{{ student.name }}</span><br>
-              <small>Student no.: {{ student.studentNo ? student.studentNo : 'Awaiting Confirmation' }}</small><br>
-              <small>Address : {{ student.address ?
-                student.address.currentCompleteAddress : "" }}
+              <span><b-link @click="loadDetails(row)">{{ row.item.student.name }}</b-link></span><br>
+              <small>Student no.: {{ row.item.student.studentNo ? row.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+              <small>Address : {{ row.item.student.address ?
+                row.item.student.address.currentCompleteAddress : "" }}
               </small>
             </b-media>
           </template>

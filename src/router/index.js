@@ -73,13 +73,12 @@ router.beforeEach((to, from, next) => {
       next({name: from.name})
       return
   }
-  
 next()
 })
 
 function configRoutes () {
   return [
-    {
+  {
       path: '/',
       redirect: '/dashboard',
       name: 'Home',
@@ -242,6 +241,40 @@ function configRoutes () {
                   component: Student,
                   meta: { requiresAuth: true, userType: 0 }
                 },
+                {
+                  path: ':studentId/academic-records',
+                  component: AcademicRecords,
+                  children: [
+                    {
+                      path: '/',
+                      redirect: 'evaluations',
+                    },
+                    {
+                      path: 'evaluations',
+                      name: 'Evaluations',
+                      component: AcademicRecordEvaluation,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'subjects',
+                      name: 'Subjects',
+                      component: AcademicRecordSubjects,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'assessment',
+                      name: 'Assessment',
+                      component: AcademicRecordAssessment,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'requirements',
+                      name: 'Requirements',
+                      component: AcademicRecordRequirements,
+                      meta: { requiresAuth: true }
+                    },
+                  ]
+                }
                 // add academic records route here
               ]
             }

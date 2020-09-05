@@ -78,7 +78,7 @@ export const ApplicationStatuses = new Enum({
   DRAFT: { id: 2, name: 'Draft' },
   REJECTED: { id: 3, name: 'Reject' },
   SUBMITTED: { id: 4, name: 'Submitted' },
-  APPROVED_ASSESMENT: { id: 5, name: 'Approved Assesment' },
+  APPROVED_ASSESSMENT: { id: 5, name: 'Approved Assesment' },
   PAYMENT_SUBMITTED: { id: 6, name: 'Payment Submitted' },
   COMPLETED: { id: 7, name: 'Completed' },
 });

@@ -21,4 +21,5 @@ export { default as CurriculumApi } from './Curriculum';
 export { default as SchoolFeeCategoryApi } from './SchoolFeeCategory';
 export { default as EvaluationApi } from './Evaluation';
 export { default as EvaluationFileApi } from './EvaluationFile';
-export { default as PaymentReceiptFileApi } from './PaymentReceiptFile'
+export { default as PaymentReceiptFileApi } from './PaymentReceiptFile';
+export { default as StudentFeeApi } from './StudentFee';
