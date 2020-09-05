@@ -28,14 +28,14 @@
           name="envelope"
           class="mr-2"
           scale="1"
-        /> chrisrueda14@yahoo.com
+        /> {{user.username}}
       </p>
       <p class="left-panel__text">
         <v-icon
           name="address-card"
           class="mr-2"
           scale="1"
-        /> System Administrator
+        /> {{userGroup}}
       </p>
     </div>
     <div class="left-panel__section mt-3">
@@ -44,14 +44,14 @@
           name="map-marker-alt"
           class="mr-2"
           scale="1"
-        /> San Jose, San Simon, Pampanga, Ph
+        /> {{userAddress}}
       </p>
-      <p class="left-panel__text">
+      <p v-if="!!(user.userable.mobileNo || user.userable.phone_no)" class="left-panel__text">
         <v-icon
           name="paper-plane"
           class="mr-2"
           scale="1"
-        /> 09357467601
+        /> {{user.userable.mobileNo || user.userable.phone_no}}
       </p>
       <p class="left-panel__text">
         <v-icon
@@ -67,16 +67,18 @@
 <script>
 export default {
   name: 'Sidebar',
-  data(){
-    return {
-
-    }
-  },
-  created(){
-
-  },
   computed: {
-
+    user() {
+      return this.$store.state.user;
+    },
+    userAddress() {
+      return this.user.userable && this.user.userable.address || 'Surigao, Philippines';
+    },
+    userGroup() {
+      const userGroup = this.user && this.user.userGroup;
+      const name = userGroup && userGroup.name || 'System Administrator';
+      return name;
+    }
   }
 }
 </script>

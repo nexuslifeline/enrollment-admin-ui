@@ -87,16 +87,16 @@ export default {
       reset(auth)
       this.login({ username, password })
         .then(({ data }) => {
-          this.$store.commit('loginUser')
-          localStorage.setItem('adminAccessToken', data.accessToken)
-          this.getAuthenticatedUser()
-            .then(({ data }) => {
-              auth.isProcessing = false;
-              localStorage.setItem('userGroupId', data.userGroupId)
-              this.$router.push({ name: 'Dashboard'})
-            })
+          localStorage.setItem('adminAccessToken', data.accessToken);
+          this.$store.commit('LOGIN_USER');
+          this.$router.push({ name: 'Dashboard' });
+          // this.getAuthenticatedUser()
+          //   .then(({ data }) => {
+          //     auth.isProcessing = false;
+          //     localStorage.setItem('userGroupId', data.userGroupId)
+          //     this.$router.push({ name: 'Dashboard'})
+          //   })
         }).catch((error) => {
-          console.log(error)
           auth.isProcessing = false;
           const { errors } = error.response.data;
           validate(auth, errors);

@@ -217,7 +217,7 @@ function configRoutes () {
         {
           path: 'master-files',
           name: 'Masterfiles',
-          redirect: { name: 'Student' },
+          redirect: { name: 'Student List' },
           component: { render(c) { return c('router-view') } },
           children: [
             {
