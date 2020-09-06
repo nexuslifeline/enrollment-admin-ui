@@ -5,6 +5,10 @@
     width: 270px;
     height: 100%;
     padding: 55px 20px 20px 40px;
+
+    @include for-size(tablet-landscape-down) {
+      display: none;
+    }
   }
 
   .left-panel__section {

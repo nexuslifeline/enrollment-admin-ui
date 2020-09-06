@@ -6,7 +6,7 @@
       class="profile-maker__initials"
       :style="{
         'color': colorFactory.font,
-        'font-size': `${fontSize}px`,
+        'font-size': fontSize ? `${fontSize}px` : '',
         'font-weight': fontWeight
       }">
       {{initials}}
@@ -28,8 +28,7 @@ export default {
       type: [Number]
     },
     fontSize: {
-      type: [Number],
-      default: 50
+      type: [Number]
     },
     fontWeight: {
       type: [Number],
@@ -67,5 +66,6 @@ export default {
 
   .profile-maker__initials {
     font-weight: 700;
+    font-size: inherit;
   }
 </style>
