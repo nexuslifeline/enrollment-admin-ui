@@ -5,8 +5,7 @@
         <h4 class="page-content__title">Payment Transactions</h4>
       </div>
       <div>
-        <b-card>
-          <b-row class="mb-2"> <!-- row button and search input -->
+        <b-row class="mb-2"> <!-- row button and search input -->
             <b-col md="8">
               <b-form-radio-group @input="loadPaymentList()" v-model="filters.payment.paymentStatusId">
                 <b-form-radio :value="null">Show All</b-form-radio>
@@ -172,7 +171,6 @@
               />
             </b-col>
           </b-row>
-				</b-card>
       </div>
     </div>
     <!-- Modal Preview -->
