@@ -1,3 +1,6 @@
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const bundleAnalyzer = new BundleAnalyzerPlugin();
+
 module.exports = {
   lintOnSave: false,
   runtimeCompiler: true,
@@ -11,7 +14,10 @@ module.exports = {
     output: {
       filename: 'js/[name].[hash:8].js',
       chunkFilename: 'js/[name].[hash:8].js'
-    }
+    },
+    plugins: [
+      //bundleAnalyzer  // for analyzing build
+    ]
   },
   outputDir: process.env.NODE_ENV === 'production'
     ? 'release-stc-admin/'

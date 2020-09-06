@@ -96,3 +96,46 @@ legend.required:before {
   }
 
 }
+
+.btn {
+  &.btn-primary {
+    color: $white !important;
+  }
+}
+
+.c-wrapper:not(.c-wrapper-fluid) {
+  height: 100vh;
+}
+
+.c-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c-wrapper {
+  will-change: auto;
+  -webkit-transition: margin-left 0.25s, margin-right 0.25s, width 0.25s, -webkit-transform 0.25s, -webkit-box-flex 0.25s;
+  transition: margin-left 0.25s, margin-right 0.25s, width 0.25s, -webkit-transform 0.25s, -webkit-box-flex 0.25s;
+  transition: transform 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, flex 0.25s;
+  transition: transform 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, flex 0.25s, -webkit-transform 0.25s, -webkit-box-flex 0.25s, -ms-flex 0.25s;
+}
+
+@media (min-width: 768px){
+  .c-main > .container-fluid {
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+}
+
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}

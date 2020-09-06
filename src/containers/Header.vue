@@ -201,16 +201,17 @@ export default {
   }
 
   .header__menus-container {
-    background-color: $dark-gray-600;
+    background-color: $dark-gray-500;
     height: 45px;
     width: 100%;
     padding: 0 60px;
   }
 
   .header__sub-menus-container {
-    height: 40px;
+    height: 33px;
     width: 100%;
     padding: 0 230px;
+    background-color: $brand-primary;
   }
 
   .header__menus {
@@ -272,16 +273,22 @@ export default {
   }
 
   .header__sub-menu-item {
-    margin-right: 40px;
-    font-weight: 600;
+    margin-right: 20px;
     font-size: 14px;
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 10px;
+    padding: 0 18px;
+    color: $white;
 
     &.active {
-      border-top: 3px solid $dark-blue;
+      font-weight: 600;
+      color: $dark-gray-500;
+      background-color: $white;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      //border-radius-top-left: 3px;
+      //border-top: 3px solid $dark-blue;
     }
   }
 
