@@ -11,9 +11,7 @@
         @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()"
       />
       <div>
-        <b-card>
-					<b-card-body>
-						<b-row class="mb-2"> <!-- row button and search input -->
+        						<b-row class="mb-2"> <!-- row button and search input -->
 							<b-col md="6">
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
 									<b-form-radio :value="null">Show All</b-form-radio>
@@ -61,8 +59,7 @@
 							hover outlined small show-empty
 							:fields="tables.students.fields"
 							:items="tables.students.items"
-							:busy="tables.students.isBusy"
-						>
+							:busy="tables.students.isBusy">
               <template v-slot:table-busy>
                 <div class="text-center my-2">
                   <v-icon
@@ -277,8 +274,6 @@
 								/>
 							</b-col>
 						</b-row>
-					</b-card-body>
-				</b-card>
       </div>
     </div>
     <!-- Modal Preview -->
