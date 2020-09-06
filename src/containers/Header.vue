@@ -23,7 +23,6 @@
           class="header__account-photo"
           :initials="user.userable.name.charAt(0)"
           :colorIndex="user.id % 8"
-          :fontSize="70"
         />
       </div>
       <div class="header__account-profile-details">
@@ -149,6 +148,10 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+
+     @include for-size(tablet-portrait-down) {
+       padding: 10px;
+     }
   }
 
   .account-action__settings {
@@ -205,6 +208,10 @@ export default {
     height: 45px;
     width: 100%;
     padding: 0 60px;
+
+    @include for-size(tablet-landscape-down) {
+      padding: 0 20px;
+    }
   }
 
   .header__sub-menus-container {
@@ -212,6 +219,10 @@ export default {
     width: 100%;
     padding: 0 230px;
     background-color: $brand-primary;
+
+    @include for-size(tablet-portrait-down) {
+      padding: 0 20px;
+    }
   }
 
   .header__menus {
@@ -252,6 +263,10 @@ export default {
         border-color: transparent transparent $brand-primary transparent;
       }
     }
+
+    @include for-size(tablet-landscape-down) {
+      margin-right: 30px;
+    }
   }
 
   .header__account-details {
@@ -270,6 +285,10 @@ export default {
     height: 100%;
     align-items: center;
     padding: 0 20px;
+
+    @include for-size(tablet-portrait-down) {
+      padding: 0;
+    }
   }
 
   .header__sub-menu-item {
@@ -290,10 +309,29 @@ export default {
       //border-radius-top-left: 3px;
       //border-top: 3px solid $dark-blue;
     }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    @include for-size(tablet-portrait-down) {
+      margin-right: 15px;
+      padding: 0 12px;
+    }
   }
 
   .header__account-photo-container {
     width: 230px;
+
+    @include for-size(tablet-portrait-down) {
+      padding: 15px;
+      width: auto;
+      display: flex;
+      flex: 0;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
   }
 
   .header__account-profile-details {
@@ -302,6 +340,11 @@ export default {
     flex-direction: column;
     justify-content: flex-end;
     padding: 20px 30px;
+
+    @include for-size(tablet-portrait-down) {
+      padding: 10px;
+      justify-content: center;
+    }
   }
 
   .header__account-photo {
@@ -313,6 +356,14 @@ export default {
     left: 60px;
     top: 40%;
     border: 5px solid $white;
+    font-size: 70px;
+
+    @include for-size(tablet-portrait-down) {
+      font-size: 30px;
+      position: static;
+      height: 70px;
+      width: 70px;
+    }
   }
 
   .header__account-name {
@@ -320,6 +371,10 @@ export default {
     font-weight: 600;
     color: $white;
     margin: 0;
+
+    @include for-size(tablet-portrait-down) {
+      font-size: 20px;
+    }
   }
 
   .header__account-group {
