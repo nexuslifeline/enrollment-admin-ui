@@ -44,10 +44,10 @@ export default [
         label: 'Curriculum',
         to: '/registrar/curriculum'
       },
-      {
-        label: 'Schedule',
-        to: '/registrar/schedule'
-      },
+      // {
+      //   label: 'Schedule',
+      //   to: '/registrar/schedule'
+      // },
       {
         label: 'Section',
         to: '/registrar/section'
@@ -86,7 +86,7 @@ export default [
     children: [
       {
         label: 'Student',
-        to: '/master-files/student'
+        to: '/master-files/student/' // added trailing slash here to satisfy the tab active check
       },
       {
         label: 'Personnel',

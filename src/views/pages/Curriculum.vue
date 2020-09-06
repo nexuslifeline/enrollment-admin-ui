@@ -65,7 +65,7 @@
 												</template>
                         <b-dropdown-item
                           @click="setViewDetails(row)"
-                          :disabled="detailsShowing"
+                          :disabled="row.detailsShowing"
 													>
 													{{row.detailsShowing ? 'Hide' : 'View'}} Details
 												</b-dropdown-item>
@@ -1153,8 +1153,6 @@ export default {
         })
     },
 		onCurriculumEntry(){
-      curriculum.isProcessing = true
-
 			const {
 				curriculum,
 				curriculum: {
@@ -1163,7 +1161,7 @@ export default {
 						...fields }
 					}
         } = this.forms
-
+      curriculum.isProcessing = true
       const { curriculums } = this.tables
       let data = {
         subjects : [],

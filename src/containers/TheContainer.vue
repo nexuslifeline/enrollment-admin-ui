@@ -2,22 +2,22 @@
   <div class="c-app">
     <!-- <TheSidebar/> -->
     <b-overlay :show="isLoading" class="full-overlay-container">
-      <CWrapper v-if="!isLoading">
+      <div v-if="!isLoading" class="c-wrapper">
         <TheHeader/>
         <div class="main-content">
           <LeftPane />
           <div class="c-body">
             <main class="c-main">
-              <CContainer fluid>
+              <div class="container-fluid">
                 <transition name="fade">
                   <router-view></router-view>
                 </transition>
-              </CContainer>
+              </div>
             </main>
             <!-- <TheFooter/> -->
           </div>
         </div>
-      </CWrapper>
+      </div>
     </b-overlay>
   </div>
 </template>
@@ -78,6 +78,5 @@ export default {
 
 .full-overlay-container {
   height: 100vh;
-  width: 100vw;
 }
 </style>
