@@ -79,9 +79,9 @@ import 'vue-awesome/icons/address-card'
 import 'vue-awesome/icons/cogs'
 import 'vue-awesome/icons/caret-down'
 import Icon from 'vue-awesome/components/Icon'
-import vSelect from 'vue-select'
+// import vSelect from 'vue-select'
 
-Vue.component('v-select', vSelect);
+// Vue.component('v-select', vSelect);
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 // const axiosConfig = {
