@@ -107,7 +107,7 @@ export default [
         to: '/maintenance/semester'
       },
       {
-        label: 'Year',
+        label: 'School Year',
         to: '/maintenance/school-year'
       },
       {

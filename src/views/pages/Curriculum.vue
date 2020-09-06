@@ -64,9 +64,7 @@
 													<v-icon name="ellipsis-v" />
 												</template>
                         <b-dropdown-item
-                          @click="setViewDetails(row)"
-                          :disabled="row.detailsShowing"
-													>
+                          @click="setViewDetails(row)">
 													{{row.detailsShowing ? 'Hide' : 'View'}} Details
 												</b-dropdown-item>
 												<b-dropdown-item

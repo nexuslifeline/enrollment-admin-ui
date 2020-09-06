@@ -11,9 +11,7 @@
         @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()"
       />
       <div>
-        <b-card>
-					<b-card-body>
-						<b-row class="mb-2"> <!-- row button and search input -->
+        						<b-row class="mb-2"> <!-- row button and search input -->
 							<b-col md="6">
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.applicationStatusId">
 									<b-form-radio :value="null">Show All</b-form-radio>
@@ -318,8 +316,6 @@
 								/>
 							</b-col>
 						</b-row>
-					</b-card-body>
-				</b-card>
       </div>
     </div>
     <!-- MODAL FEES -->
