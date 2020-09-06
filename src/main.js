@@ -38,7 +38,7 @@ import { ImagePlugin } from 'bootstrap-vue'
 import { InputGroupPlugin } from 'bootstrap-vue'
 //import { JumbotronPlugin } from 'bootstrap-vue'
 import { LayoutPlugin } from 'bootstrap-vue'
-//import { LinkPlugin } from 'bootstrap-vue'
+import { LinkPlugin } from 'bootstrap-vue'
 import { ListGroupPlugin } from 'bootstrap-vue'
 import { MediaPlugin } from 'bootstrap-vue'
 import { ModalPlugin } from 'bootstrap-vue'
@@ -79,6 +79,9 @@ import 'vue-awesome/icons/address-card'
 import 'vue-awesome/icons/cogs'
 import 'vue-awesome/icons/caret-down'
 import Icon from 'vue-awesome/components/Icon'
+import vSelect from 'vue-select'
+
+Vue.component('v-select', vSelect);
 
 //axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 // const axiosConfig = {
@@ -128,7 +131,7 @@ Vue.use(ImagePlugin)
 Vue.use(InputGroupPlugin)
 //Vue.use(JumbotronPlugin)
 Vue.use(LayoutPlugin)
-//Vue.use(LinkPlugin)
+Vue.use(LinkPlugin)
 Vue.use(ListGroupPlugin)
 Vue.use(MediaPlugin)
 Vue.use(ModalPlugin)
