@@ -1,23 +1,25 @@
 <template>
-  <div class="main-container">
-    <div class="left-pane">
-      <p class="sub-nav__title">{{$options.subNav.title}}</p>
-      <ul class="sub-nav">
-        <li
-          v-for="(item, idx) in $options.subNav.items"
-          :key="idx"
-          class="sub-nav__item"
-          :class="{ active: $route.path.includes(item.to)}">
-          <router-link
-            class="sub-nav__link"
-            :to="`/master-files/student/${$route.params.studentId}/academic-records${item.to}`">
-            {{item.label}}
-          </router-link>
-        </li>
-      </ul>
-    </div>
-    <div class="right-pane">
-      <router-view></router-view>
+  <div class="c-app">
+    <div class="main-container">
+      <div class="left-pane">
+        <p class="sub-nav__title">{{$options.subNav.title}}</p>
+        <ul class="sub-nav">
+          <li
+            v-for="(item, idx) in $options.subNav.items"
+            :key="idx"
+            class="sub-nav__item"
+            :class="{ active: $route.path.includes(item.to)}">
+            <router-link
+              class="sub-nav__link"
+              :to="`/master-files/student/${$route.params.studentId}/academic-records${item.to}`">
+              {{item.label}}
+            </router-link>
+          </li>
+        </ul>
+      </div>
+      <div class="right-pane">
+        <router-view></router-view>
+      </div>
     </div>
   </div>
 </template>
