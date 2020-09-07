@@ -34,6 +34,7 @@ const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
 const SchoolYear = () => import('@/views/pages/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
+const DemoPage = () => import('@/views/pages/DemoPage')
 
 Vue.use(Router)
 
@@ -282,6 +283,11 @@ function configRoutes () {
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/demo',
+      name: 'Login',
+      component: DemoPage
     },
     {
       path: '*',
