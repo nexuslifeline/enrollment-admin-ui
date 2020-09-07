@@ -4,179 +4,200 @@
       <div class="page-content__title-container">
         <h4 class="page-content__title">Curriculum Management</h4>
       </div>
+      <SchoolCategoryTabs
+        :showAll="true"
+        :schoolCategoryId="schoolCategoryId"
+        @clickAll="filters.curriculum.schoolCategoryId = null, loadCurriculums()"
+        @click="filters.curriculum.schoolCategoryId = $event, loadCurriculums()"
+      />
       <div>
         <div v-show="!showEntry">
 			    <b-row class="mb-3">
-								<b-col md=12>
-									<b-row>
-										<b-col md=6 class="bottom-space">
-											<b-button variant="primary"
-												@click="setCreate()">
-												<v-icon name="plus-circle" /> ADD NEW CURRICULUM
-											</b-button>
-										</b-col>
-										<b-col md=3>
-										</b-col>
-										<b-col md=3>
-											<b-form-input
-												v-model="filters.curriculum.criteria"
-												type="text"
-												placeholder="Search">
-											</b-form-input>
-										</b-col>
-									</b-row>
-								</b-col>
-							</b-row>
-							<!-- end add button and search -->
-							<!-- table -->
-							<b-row >
-								<b-col md=12>
-									<b-table
-										small hover outlined show-empty
-                    :responsive="tables.curriculums.items.length > 3"
-										:fields="tables.curriculums.fields"
-										:busy="tables.curriculums.isBusy"
-										:items.sync="tables.curriculums.items"
-										:current-page="paginations.curriculum.page"
-										:per-page="paginations.curriculum.perPage"
-										:filter="filters.curriculum.criteria"
-										@filtered="onFiltered($event, paginations.curriculum)">
-										<template v-slot:table-busy>
-											<div class="text-center my-2">
-												<v-icon
-													name="spinner"
-													spin
-													class="mr-2" />
-												<strong>Loading...</strong>
-											</div>
-										</template>
-                    <template v-slot:cell(active)="row">
-                      <b-badge
-                        :variant="row.item.active
-                          ? 'success'
-                          : 'warning'">
-                        {{ row.item.active ? "NEW" : "OLD" }}
-                      </b-badge>
+            <b-col md=12>
+              <b-row>
+                <b-col md=6 class="bottom-space">
+                  <b-button variant="primary"
+                    @click="setCreate()">
+                    <v-icon name="plus-circle" /> ADD NEW CURRICULUM
+                  </b-button>
+                </b-col>
+                <b-col md=3>
+                  <b-form-select
+                    @change="loadCurriculums()"
+                    v-model="filters.curriculum.levelId"
+                    class="float-right">
+                    <template v-slot:first>
+                      <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
                     </template>
-										<template v-slot:cell(action)="row">
-											<b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
-												<template v-slot:button-content>
-													<v-icon name="ellipsis-v" />
-												</template>
-                        <b-dropdown-item
-                          @click="setViewDetails(row)">
-													{{row.detailsShowing ? 'Hide' : 'View'}} Details
-												</b-dropdown-item>
-												<b-dropdown-item
-                          @click="setUpdate(row.item.id)"
-                          :disabled="showEntry"
-													>
-													Edit
-												</b-dropdown-item>
-												<b-dropdown-item
-                          @click="forms.curriculum.fields.id = row.item.id, showModalConfirmation = true"
-                          :disabled="showModalConfirmation">
-													Delete
-												</b-dropdown-item>
-											</b-dropdown>
-										</template>
-                    <template v-slot:row-details="data">
-                      <b-overlay :show="data.item.isBusy" rounded="sm">
-                        <b-card>
-                          <b-row>
-                            <b-col md=4>
-                              <h6>Curriculum Name : {{data.item.name}}</h6>
-                              <h6 v-if="data.item.course">{{ `Course : ${data.item.course.name}`}}</h6>
-                              <h6 v-if="data.item.level">{{`Level : ${data.item.level.name}` }}</h6>
-                            </b-col>
-                            <b-col md=4>
-                              <h6>Description : {{data.item.description}}</h6>
-                              <h6 v-if="data.item.course">Major : {{data.item.course.major}}</h6>
-                              <h6>Effectivity Year : {{data.item.effectiveYear}}</h6>
-                            </b-col>
-                            <b-col md=4>
-                              <h6>Notes : {{ data.item.notes }}</h6>
-                            </b-col>
-                          </b-row>
-                          <b-row v-if="data.item.subjects && data.item.levels">
-                            <b-col md=12>
-                              
-                              <div 
-                                v-for="level in data.item.levels"
-                                :key="`${level.id} - ${(level.semesterId ? level.semesterId : '')}`">
-                                <hr>
-                                <h6>{{level.name}} {{level.semesterId ? `- ${options.semesters.getEnum(level.semesterId).name}` : ''}} </h6>
-                                <b-table
-                                  class="table-preview"
-                                  responsive small hover outlined show-empty
-                                  :items="filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)"
-                                  :fields="tables.previewSubjects.fields"
-                                  :busy="data.item.isBusy">
-                                  <template v-slot:table-busy>
-                                    <div class="text-center my-2">
-                                      <v-icon 
-                                        name="spinner" 
-                                        spin
-                                        class="mr-2" />
-                                      <strong>Loading...</strong>
-                                    </div>
-                                  </template>
-                                  <template v-slot:cell(labs)="row">
-                                    {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
-                                  </template>
-                                  <template v-slot:cell(units)="row">
-                                    {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
-                                  </template>
-                                  <template v-slot:custom-foot>
-                                    <b-tr class="font-weight-bold">
-                                      <b-td colspan=2 class="text-right">
-                                        <span class="text-danger">Total Units </span>
-                                      </b-td>
-                                      <b-td class="text-center">
-                                        <span class="text-danger">
-                                          {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'labs') }}
-                                        </span>
-                                      </b-td>
-                                      <b-td class="text-center">
-                                        <span class="text-danger">
-                                          {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'units') }}
-                                        </span>
-                                      </b-td>
-                                      <b-td class="text-center">
-                                        <span class="text-danger">
-                                          {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                              totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'totalUnits') }}
-                                        </span>
-                                      </b-td>
-                                      <b-td></b-td>
-                                    </b-tr>
-                                  </template>
-                                </b-table>
-                              </div>
-                            </b-col>
-                          </b-row>
-                        </b-card>
-                      </b-overlay>
+                    <b-form-select-option :value="null">None</b-form-select-option>
+                    <b-form-select-option
+                      v-for="level in options.levels.fixItems"
+                      :key="level.id"
+                      :value="level.id">
+                      {{level.name}}
+                    </b-form-select-option>
+                  </b-form-select>
+                </b-col>
+                <b-col md=3>
+                  <b-form-input
+                    v-model="filters.curriculum.criteria"
+                    type="text"
+                    placeholder="Search">
+                  </b-form-input>
+                </b-col>
+              </b-row>
+            </b-col>
+          </b-row>
+          <!-- end add button and search -->
+          <!-- table -->
+          <b-row >
+            <b-col md=12>
+              <b-table
+                small hover outlined show-empty
+                :responsive="tables.curriculums.items.length > 3"
+                :fields="tables.curriculums.fields"
+                :busy="tables.curriculums.isBusy"
+                :items.sync="tables.curriculums.items"
+                :current-page="paginations.curriculum.page"
+                :per-page="paginations.curriculum.perPage"
+                :filter="filters.curriculum.criteria"
+                @filtered="onFiltered($event, paginations.curriculum)">
+                <template v-slot:table-busy>
+                  <div class="text-center my-2">
+                    <v-icon
+                      name="spinner"
+                      spin
+                      class="mr-2" />
+                    <strong>Loading...</strong>
+                  </div>
+                </template>
+                <template v-slot:cell(active)="row">
+                  <b-badge
+                    :variant="row.item.active
+                      ? 'success'
+                      : 'warning'">
+                    {{ row.item.active ? "NEW" : "OLD" }}
+                  </b-badge>
+                </template>
+                <template v-slot:cell(action)="row">
+                  <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+                    <template v-slot:button-content>
+                      <v-icon name="ellipsis-v" />
                     </template>
-									</b-table>
-									<b-row>
-										<b-col md=6>
-											Showing {{ paginations.curriculum.from }} to {{ paginations.curriculum.to }} of {{ paginations.curriculum.totalRows }} records.
-                    </b-col>
-										<b-col md=6>
-											<b-pagination
-												v-model="paginations.curriculum.page"
-												:total-rows="paginations.curriculum.totalRows"
-												:per-page="paginations.curriculum.perPage"
-												size="sm"
-												align="end"
-												@input="recordDetails(paginations.curriculum)" />
-											</b-col>
-										</b-row>
-								</b-col>
-							</b-row>
+                    <b-dropdown-item
+                      @click="setViewDetails(row)">
+                      {{row.detailsShowing ? 'Hide' : 'View'}} Details
+                    </b-dropdown-item>
+                    <b-dropdown-item
+                      @click="setUpdate(row.item.id)"
+                      :disabled="showEntry"
+                      >
+                      Edit
+                    </b-dropdown-item>
+                    <b-dropdown-item
+                      @click="forms.curriculum.fields.id = row.item.id, showModalConfirmation = true"
+                      :disabled="showModalConfirmation">
+                      Delete
+                    </b-dropdown-item>
+                  </b-dropdown>
+                </template>
+                <template v-slot:row-details="data">
+                  <b-overlay :show="data.item.isBusy" rounded="sm">
+                    <b-card>
+                      <b-row>
+                        <b-col md=4>
+                          <h6>Curriculum Name : {{data.item.name}}</h6>
+                          <h6 v-if="data.item.course">{{ `Course : ${data.item.course.name}`}}</h6>
+                          <h6 v-if="data.item.level">{{`Level : ${data.item.level.name}` }}</h6>
+                        </b-col>
+                        <b-col md=4>
+                          <h6>Description : {{data.item.description}}</h6>
+                          <h6 v-if="data.item.course">Major : {{data.item.course.major}}</h6>
+                          <h6>Effectivity Year : {{data.item.effectiveYear}}</h6>
+                        </b-col>
+                        <b-col md=4>
+                          <h6>Notes : {{ data.item.notes }}</h6>
+                        </b-col>
+                      </b-row>
+                      <b-row v-if="data.item.subjects && data.item.levels">
+                        <b-col md=12>
+
+                          <div
+                            v-for="level in data.item.levels"
+                            :key="`${level.id} - ${(level.semesterId ? level.semesterId : '')}`">
+                            <hr>
+                            <h6>{{level.name}} {{level.semesterId ? `- ${options.semesters.getEnum(level.semesterId).name}` : ''}} </h6>
+                            <b-table
+                              class="table-preview"
+                              responsive small hover outlined show-empty
+                              :items="filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null)"
+                              :fields="tables.previewSubjects.fields"
+                              :busy="data.item.isBusy">
+                              <template v-slot:table-busy>
+                                <div class="text-center my-2">
+                                  <v-icon
+                                    name="spinner"
+                                    spin
+                                    class="mr-2" />
+                                  <strong>Loading...</strong>
+                                </div>
+                              </template>
+                              <template v-slot:cell(labs)="row">
+                                {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                              </template>
+                              <template v-slot:cell(units)="row">
+                                {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
+                              </template>
+                              <template v-slot:custom-foot>
+                                <b-tr class="font-weight-bold">
+                                  <b-td colspan=2 class="text-right">
+                                    <span class="text-danger">Total Units </span>
+                                  </b-td>
+                                  <b-td class="text-center">
+                                    <span class="text-danger">
+                                      {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                          totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'labs') }}
+                                    </span>
+                                  </b-td>
+                                  <b-td class="text-center">
+                                    <span class="text-danger">
+                                      {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                          totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'units') }}
+                                    </span>
+                                  </b-td>
+                                  <b-td class="text-center">
+                                    <span class="text-danger">
+                                      {{ data.item.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                          totalUnits(filterPreviewSubjects(data.item.subjects, level.id, level.semesterId ? level.semesterId : null), 'totalUnits') }}
+                                    </span>
+                                  </b-td>
+                                  <b-td></b-td>
+                                </b-tr>
+                              </template>
+                            </b-table>
+                          </div>
+                        </b-col>
+                      </b-row>
+                    </b-card>
+                  </b-overlay>
+                </template>
+              </b-table>
+              <b-row>
+                <b-col md=6>
+                  Showing {{ paginations.curriculum.from }} to {{ paginations.curriculum.to }} of {{ paginations.curriculum.totalRows }} records.
+                </b-col>
+                <b-col md=6>
+                  <b-pagination
+                    v-model="paginations.curriculum.page"
+                    :total-rows="paginations.curriculum.totalRows"
+                    :per-page="paginations.curriculum.perPage"
+                    size="sm"
+                    align="end"
+                    @input="recordDetails(paginations.curriculum)" />
+                  </b-col>
+                </b-row>
+            </b-col>
+          </b-row>
 		    </div>
       </div>
     </div>
@@ -265,7 +286,7 @@
                                 spin />
                             </label>
                             <b-form-select
-                              :disabled="((!checkSchoolCategory() && !checkSchoolCategory(true)) || forms.curriculum.fields.schoolCategoryId == null) 
+                              :disabled="((!checkSchoolCategory() && !checkSchoolCategory(true)) || forms.curriculum.fields.schoolCategoryId == null)
                                 || options.courses.isLoading"
                               @change="loadLevelsOfCourse()"
                               v-model="forms.curriculum.fields.courseId"
@@ -397,7 +418,7 @@
                                           {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                                         </template>
                                         <template v-slot:cell(prerequisites)="row">
-                                          <Select2
+                                          <!-- <Select2
                                             class="w-100"
                                             multiple
                                             v-model="row.item.prerequisites"
@@ -409,7 +430,13 @@
                                               :value="subject.id">
                                               {{subject.name}}
                                             </option>
-                                          </Select2>
+                                          </Select2> -->
+                                          <v-select
+                                            v-model="row.item.prerequisites"
+                                            :reduce="item => item.id"
+                                            multiple
+                                            label="name"
+                                            :options="tables.subjects.items" />
                                         </template>
                                         <template v-slot:custom-foot>
                                           <b-tr class="font-weight-bold">
@@ -482,7 +509,7 @@
                                         {{ forms.curriculum.fields.schoolCategoryId === options.schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                                       </template>
                                       <template v-slot:cell(prerequisites)="row">
-                                        <Select2
+                                        <!-- <Select2
                                           class="w-100"
                                           multiple
                                           v-model="row.item.prerequisites"
@@ -494,7 +521,13 @@
                                             :value="subject.id">
                                             {{subject.name}}
                                           </option>
-                                        </Select2>
+                                        </Select2> -->
+                                        <v-select
+                                          v-model="row.item.prerequisites"
+                                          :reduce="item => item.id"
+                                          multiple
+                                          label="name"
+                                          :options="tables.subjects.items" />
                                       </template>
                                       <template v-slot:custom-foot>
                                         <b-tr class="font-weight-bold">
@@ -684,7 +717,7 @@ import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
 import { showNotification, validate, clearFields, reset } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
-import Select2 from '../components/Select2'
+import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 
 const curriculumFields = {
   id: null,
@@ -703,7 +736,7 @@ export default {
 	name: "Curriculum",
 	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi,
     SubjectApi, DepartmentApi, CurriculumApi, Tables ],
-  components: { Select2 },
+  components: { SchoolCategoryTabs },
 	data() {
 		return {
       showModalSubjects: false,
@@ -986,14 +1019,17 @@ export default {
           departmentId: null
 				},
 				curriculum: {
-					criteria: null
+          criteria: null,
+          schoolCategoryId: null,
+          levelId: null
 				}
       },
 			options: {
 				schoolCategories: SchoolCategories,
 				levels: {
           isLoading: false,
-					items: []
+          items: [],
+          fixItems: []
 				},
 				courses: {
           isLoading: false,
@@ -1012,7 +1048,7 @@ export default {
 		}
 	},
 	created(){
-    this.loadCurriculums()
+    this.loadLevelList()
     this.checkRights()
     // this.loadDepartments()
 	},
@@ -1020,17 +1056,26 @@ export default {
     loadCurriculums() {
       const { curriculums } = this.tables
       const { curriculum } = this.paginations
-
+      const { schoolCategoryId, levelId } = this.filters.curriculum
       curriculums.isBusy = true
 
-			let params = { paginate: false }
+			let params = { paginate: false, schoolCategoryId, levelId}
       this.getCurriculumList(params)
-        .then(({ data }) => {
-          curriculums.items = data
-          curriculum.totalRows = data.length
-          this.recordDetails(curriculum)
-          curriculums.isBusy = false
-        })
+      .then(({ data }) => {
+        curriculums.items = data
+        curriculum.totalRows = data.length
+        this.recordDetails(curriculum)
+        curriculums.isBusy = false
+      })
+    },
+    loadLevelList() {
+      const { levels } = this.options
+
+			let params = { paginate: false }
+      this.getLevelList(params)
+      .then(({ data }) => {
+        levels.fixItems = data
+      })
     },
 		loadLevelsOfSchoolCategoryList(getSelectedLevel = false) {
 			this.loadSubjects()
@@ -1313,17 +1358,13 @@ export default {
 		checkRights(){
 			const userGroupId = localStorage.getItem('userGroupId')
 			const userGroup = UserGroups.getEnum(Number(userGroupId))
-			let result = false
-			if (userGroup) {
-				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
-				this.schoolCategoryId = userGroup.schoolCategoryId
-			}
+      let result = false
 
-			if (UserGroups.SUPER_USER.id == userGroup.id) {
-        this.schoolCategoryId = SchoolCategories.getEnum(1).id
-        this.userGroupId = UserGroups.SUPER_USER.id
-			}
-      // this.loadLevelsOfSchoolCategoryList()
+			if (userGroup) {
+				this.filters.curriculum.schoolCategoryId = userGroup.schoolCategoryId
+				this.schoolCategoryId = userGroup.schoolCategoryId
+      }
+      this.loadCurriculums()
     },
     loadDepartments(){
       let params = { paginate: false }

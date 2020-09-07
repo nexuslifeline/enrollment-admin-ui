@@ -388,12 +388,12 @@ import { SubjectApi, DepartmentApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification, formatNumber } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import { UserGroups, SchoolCategories } from '../../helpers/enum'
-import Select2 from '../components/Select2'
+// import Select2 from '../components/Select2'
 import Tables from '../../helpers/tables'
 export default {
 	name: "Subject",
   mixins: [ SubjectApi, DepartmentApi, Tables ],
-  components: { Select2 },
+  // components: { Select2 },
 	data() {
 		return {
       showModalEntry: false,

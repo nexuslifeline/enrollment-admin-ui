@@ -11,181 +11,181 @@
         @click="filters.section.schoolCategoryId = $event"
       />
       <div v-show="!showEntry">
-                    <b-row class="mb-3">
-              <b-col md="12">
+        <b-row class="mb-3">
+          <b-col md="12">
+            <b-row>
+              <b-col md="2">
+                <b-button variant="primary" @click="setCreate()">
+                  <v-icon name="plus-circle" /> ADD SECTION
+                </b-button>
+              </b-col>
+              <b-col md="3">
+                <b-form-select
+                  v-model="filters.section.courseId"
+                  class="float-right">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                  </template>
+                  <b-form-select-option :value="null">None</b-form-select-option>
+                  <b-form-select-option
+                    v-for="course in options.courses.fixItems"
+                    :key="course.id"
+                    :value="course.id">
+                    {{course.description}} {{course.major ? `(${course.major})` : ''}}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-col>
+              <b-col md=5>
                 <b-row>
-                  <b-col md="2">
-                    <b-button variant="primary" @click="setCreate()">
-                      <v-icon name="plus-circle" /> ADD SECTION
-                    </b-button>
-                  </b-col>
-                  <b-col md="3">
+                  <b-col md="4">
                     <b-form-select
-                      v-model="filters.section.courseId"
+                      v-model="filters.section.semesterId"
                       class="float-right">
                       <template v-slot:first>
-                        <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                        <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
                       </template>
                       <b-form-select-option :value="null">None</b-form-select-option>
                       <b-form-select-option
-                        v-for="course in options.courses.fixItems"
-                        :key="course.id"
-                        :value="course.id">
-                        {{course.description}} {{course.major ? `(${course.major})` : ''}}
+                        v-for="semester in options.semesters.values"
+                        :key="semester.id"
+                        :value="semester.id">
+                        {{semester.name}}
                       </b-form-select-option>
                     </b-form-select>
                   </b-col>
-                  <b-col md=5>
-                    <b-row>
-                      <b-col md="4">
-                        <b-form-select
-                          v-model="filters.section.semesterId"
-                          class="float-right">
-                          <template v-slot:first>
-                            <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
-                          </template>
-                          <b-form-select-option :value="null">None</b-form-select-option>
-                          <b-form-select-option
-                            v-for="semester in options.semesters.values"
-                            :key="semester.id"
-                            :value="semester.id">
-                            {{semester.name}}
-                          </b-form-select-option>
-                        </b-form-select>
-                      </b-col>
-                      <b-col md="4">
-                        <b-form-select
-                          v-model="filters.section.levelId"
-                          class="float-right">
-                          <template v-slot:first>
-                            <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
-                          </template>
-                          <b-form-select-option :value="null">None</b-form-select-option>
-                          <b-form-select-option
-                            v-for="level in options.levels.fixItems"
-                            :key="level.id"
-                            :value="level.id">
-                            {{level.name}}
-                          </b-form-select-option>
-                        </b-form-select>
-                      </b-col>
-                      <b-col md="4">
-                        <b-form-select
-                          v-model="filters.section.schoolYearId"
-                          class="float-right">
-                          <template v-slot:first>
-                            <b-form-select-option :value="null" disabled>-- School Year --</b-form-select-option>
-                          </template>
-                          <b-form-select-option :value="null">None</b-form-select-option>
-                          <b-form-select-option
-                            v-for="schoolYear in options.schoolYears.items"
-                            :key="schoolYear.id"
-                            :value="schoolYear.id">
-                            {{schoolYear.name}}
-                          </b-form-select-option>
-                        </b-form-select>
-                      </b-col>
-                    </b-row>
-                  </b-col>
-                  <b-col md="2">
-                    <b-form-input
-                      v-model="filters.section.criteria"
-                      type="text"
-                      placeholder="Search"
-                    />
-                  </b-col>
-                </b-row>
-              </b-col>
-            </b-row>
-            <!-- end add button and search -->
-            <!-- table -->
-            <b-row>
-              <b-col md="12">
-                <b-table
-                  small
-                  hover
-                  outlined
-                  show-empty
-                  :fields="tables.sections.fields"
-                  :busy="tables.sections.isBusy"
-                  :items="filteredSection"
-                  :current-page="paginations.section.page"
-                  :per-page="paginations.section.perPage"
-                  :filter="filters.section.criteria"
-                  @filtered="onFiltered($event, paginations.section)"
-                >
-                  <!-- :filter="filters.section.criteria> -->
-                  <template v-slot:table-busy>
-                    <div class="text-center my-2">
-                      <v-icon name="spinner" spin class="mr-2" />
-                      <strong>Loading...</strong>
-                    </div>
-                  </template>
-                  <template v-slot:cell(action)="row">
-                    <b-dropdown
-                      right
-                      variant="link"
-                      toggle-class="text-decoration-none"
-                      no-caret
-                    >
-                      <template v-slot:button-content>
-                        <v-icon name="ellipsis-v" />
+                  <b-col md="4">
+                    <b-form-select
+                      v-model="filters.section.levelId"
+                      class="float-right">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
                       </template>
-                      <b-dropdown-item @click="loadSchedules(row)">
-                        {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
-                      </b-dropdown-item>
-                      <b-dropdown-item @click="setUpdate(row, 0)"
-                        :disabled="showEntry" >
-                        Edit
-                      </b-dropdown-item>
-                      <b-dropdown-item @click="setUpdate(row, 1)"
-                        :disabled="showEntry">
-                        Setup Schedule
-                      </b-dropdown-item>
-                      <b-dropdown-item
-                        @click="
-                          (forms.section.fields.id = row.item.id),
-                            (showModalConfirmation = true)
-                        "
-                        :disabled="showModalConfirmation"
-                      >
-                        Delete
-                      </b-dropdown-item>
-                    </b-dropdown>
-                  </template>
-                  <template v-slot:row-details="data">
-                    <b-overlay :show="data.item.isLoading" rounded="sm">
-                      <b-card>
-                        <Schedule
-                          :isEntry="false"
-                          class="mt-2"
-                          :isShown="true"
-                          :subjects="options.subjects.items"
-                          :scheduleItems="data.item.schedules"/>
-                      </b-card>
-                    </b-overlay>
-                  </template>
-                </b-table>
-                <b-row>
-                  <b-col md="6">
-                    Showing {{ paginations.section.from }} to
-                    {{ paginations.section.to }} of
-                    {{ paginations.section.totalRows }} records.
+                      <b-form-select-option :value="null">None</b-form-select-option>
+                      <b-form-select-option
+                        v-for="level in options.levels.fixItems"
+                        :key="level.id"
+                        :value="level.id">
+                        {{level.name}}
+                      </b-form-select-option>
+                    </b-form-select>
                   </b-col>
-                  <b-col md="6">
-                    <b-pagination
-                      v-model="paginations.section.page"
-                      :total-rows="paginations.section.totalRows"
-                      :per-page="paginations.section.perPage"
-                      size="sm"
-                      align="end"
-                      @input="recordDetails(paginations.section)"
-                    />
+                  <b-col md="4">
+                    <b-form-select
+                      v-model="filters.section.schoolYearId"
+                      class="float-right">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- School Year --</b-form-select-option>
+                      </template>
+                      <b-form-select-option :value="null">None</b-form-select-option>
+                      <b-form-select-option
+                        v-for="schoolYear in options.schoolYears.items"
+                        :key="schoolYear.id"
+                        :value="schoolYear.id">
+                        {{schoolYear.name}}
+                      </b-form-select-option>
+                    </b-form-select>
                   </b-col>
                 </b-row>
               </b-col>
+              <b-col md="2">
+                <b-form-input
+                  v-model="filters.section.criteria"
+                  type="text"
+                  placeholder="Search"
+                />
+              </b-col>
             </b-row>
-            <!-- end table -->
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row>
+          <b-col md="12">
+            <b-table
+              small
+              hover
+              outlined
+              show-empty
+              :fields="tables.sections.fields"
+              :busy="tables.sections.isBusy"
+              :items="filteredSection"
+              :current-page="paginations.section.page"
+              :per-page="paginations.section.perPage"
+              :filter="filters.section.criteria"
+              @filtered="onFiltered($event, paginations.section)"
+            >
+              <!-- :filter="filters.section.criteria> -->
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon name="spinner" spin class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret
+                >
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item @click="loadSchedules(row)">
+                    {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="setUpdate(row, 0)"
+                    :disabled="showEntry" >
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="setUpdate(row, 1)"
+                    :disabled="showEntry">
+                    Setup Schedule
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    @click="
+                      (forms.section.fields.id = row.item.id),
+                        (showModalConfirmation = true)
+                    "
+                    :disabled="showModalConfirmation"
+                  >
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+              <template v-slot:row-details="data">
+                <b-overlay :show="data.item.isLoading" rounded="sm">
+                  <b-card>
+                    <Schedule
+                      :isEntry="false"
+                      class="mt-2"
+                      :isShown="true"
+                      :subjects="options.subjects.items"
+                      :scheduleItems="data.item.schedules"/>
+                  </b-card>
+                </b-overlay>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md="6">
+                Showing {{ paginations.section.from }} to
+                {{ paginations.section.to }} of
+                {{ paginations.section.totalRows }} records.
+              </b-col>
+              <b-col md="6">
+                <b-pagination
+                  v-model="paginations.section.page"
+                  :total-rows="paginations.section.totalRows"
+                  :per-page="paginations.section.perPage"
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.section)"
+                />
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
     </div>
 

@@ -7,7 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
-
+import vSelect from 'vue-select'
 import { AlertPlugin } from 'bootstrap-vue';
 import { AvatarPlugin } from 'bootstrap-vue';
 import { BadgePlugin } from 'bootstrap-vue';
@@ -90,6 +90,8 @@ import Icon from 'vue-awesome/components/Icon'
 // }
 Vue.config.performance = true
 Vue.component('v-icon', Icon)
+Vue.component('v-select', vSelect)
+
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
 //Vue.use(IconsPlugin)
