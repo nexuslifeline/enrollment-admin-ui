@@ -10,23 +10,23 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=6 class="bottom-space">
-                    <b-button variant="primary" 
+                    <b-button variant="primary"
                       @click="onCreate()">
                       <v-icon name="plus-circle" /> ADD NEW SUBJECT
                     </b-button>
                   </b-col>
                   <b-col md=3>
                     <b-form-select
-                      @input="filterBySchoolCategory()" 
-                      v-model="filters.subject.schoolCategoryId" 
+                      @input="filterBySchoolCategory()"
+                      v-model="filters.subject.schoolCategoryId"
                       class="float-right">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
                       </template>
                       <b-form-select-option :value="null">None</b-form-select-option>
-                      <b-form-select-option 
-                        v-for="category in options.schoolCategories.values" 
-                        :key="category.id" 
+                      <b-form-select-option
+                        v-for="category in options.schoolCategories.values"
+                        :key="category.id"
                         :value="category.id">
                         {{category.name}}
                       </b-form-select-option>
@@ -35,8 +35,9 @@
                   <b-col md=3>
                     <b-form-input
                       v-model="filters.subject.criteria"
-                      type="text" 
-                      placeholder="Search">
+                      type="text"
+                      placeholder="Search"
+                      debounce="500">
                     </b-form-input>
                   </b-col>
                 </b-row>
@@ -50,7 +51,7 @@
 									small hover outlined show-empty responsive
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
-                  :items="tables.subjects.filteredItems" 
+                  :items="tables.subjects.filteredItems"
                   :current-page="paginations.subject.page"
                   :per-page="paginations.subject.perPage"
                   :filter="filters.subject.criteria"
@@ -130,9 +131,9 @@
               <b-col md=12>
                 <b-form-group>
                   <label class="required">Description</label>
-                  <b-form-textarea 
-                    ref="description" 
-                    v-model="forms.subject.fields.description" 
+                  <b-form-textarea
+                    ref="description"
+                    v-model="forms.subject.fields.description"
                     :state="forms.subject.states.description" />
                   <b-form-invalid-feedback>
                     {{forms.subject.errors.description}}
@@ -140,7 +141,7 @@
                 </b-form-group>
               </b-col>
             </b-row>
-            <b-row> 
+            <b-row>
               <b-col md=12>
                 <b-form-group >
                   <label class="required">School Category</label>
@@ -151,9 +152,9 @@
                     <template v-slot:first>
                       <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
                     </template>
-                    <b-form-select-option 
-                      v-for="schoolCategory in options.schoolCategories.values" 
-                      :key="schoolCategory.id" 
+                    <b-form-select-option
+                      v-for="schoolCategory in options.schoolCategories.values"
+                      :key="schoolCategory.id"
                       :value="schoolCategory.id">
                       {{schoolCategory.name}}
                     </b-form-select-option>
@@ -168,15 +169,15 @@
               <b-col md=12>
                 <b-form-group >
                   <label class="required">Department</label>
-                  <b-form-select 
+                  <b-form-select
                     v-model="forms.subject.fields.departmentId"
                     :state="forms.subject.states.departmentId">
                     <template v-slot:first>
                       <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
                     </template>
-                    <b-form-select-option 
-                      v-for="department in options.departments.items" 
-                      :key="department.id" 
+                    <b-form-select-option
+                      v-for="department in options.departments.items"
+                      :key="department.id"
                       :value="department.id">
                       {{department.name}}
                     </b-form-select-option>
@@ -190,11 +191,11 @@
             <!-- <b-row>
               <b-col md=12>
                 <b-form-group >
-                  <label>Prerequisites 
+                  <label>Prerequisites
                     <v-icon
                       v-if="isLoading"
                       class="ml-2"
-                      name="spinner" 
+                      name="spinner"
                       spin/>
                   </label>
                   <Select2
@@ -202,9 +203,9 @@
                     :disabled="isLoading"
                     v-model="forms.subject.fields.prerequisites"
                     :allowClear="false">
-                    <option 
+                    <option
                       v-for="subject in options.subjects.items"
-                      :key="subject.id" 
+                      :key="subject.id"
                       :value="subject.id">
                       {{subject.name}}
                     </option>
@@ -221,10 +222,10 @@
                     :disabled="checkRights(1)"
                     v-model='forms.subject.fields.units'
                     :class="'form-control text-right'"
-                    :options="[{ 
+                    :options="[{
                       decimalPlaces: 0,
-                      minimumValue: 0, 
-                      modifyValueOnWheel: false, 
+                      minimumValue: 0,
+                      modifyValueOnWheel: false,
                       emptyInputBehavior: 0 }]">
                   </vue-autonumeric>
                 </b-form-group>
@@ -237,9 +238,9 @@
                     :disabled="checkRights(2)"
                     v-model='forms.subject.fields.amountPerUnit'
                     :class="'form-control text-right'"
-                    :options="[{ 
-                      minimumValue: 0, 
-                      modifyValueOnWheel: false, 
+                    :options="[{
+                      minimumValue: 0,
+                      modifyValueOnWheel: false,
                       emptyInputBehavior: 0 }]">
                   </vue-autonumeric>
                 </b-form-group>
@@ -254,10 +255,10 @@
                     :disabled="checkRights(1)"
                     v-model='forms.subject.fields.labs'
                     :class="'form-control text-right'"
-                    :options="[{ 
+                    :options="[{
                       decimalPlaces: 0,
-                      minimumValue: 0, 
-                      modifyValueOnWheel: false, 
+                      minimumValue: 0,
+                      modifyValueOnWheel: false,
                       emptyInputBehavior: 0 }]">
                   </vue-autonumeric>
                 </b-form-group>
@@ -270,9 +271,9 @@
                     :disabled="checkRights(2)"
                     v-model='forms.subject.fields.amountPerLab'
                     :class="'form-control text-right'"
-                    :options="[{ 
-                      minimumValue: 0, 
-                      modifyValueOnWheel: false, 
+                    :options="[{
+                      minimumValue: 0,
+                      modifyValueOnWheel: false,
                       emptyInputBehavior: 0 }]">
                   </vue-autonumeric>
                 </b-form-group>
@@ -286,10 +287,10 @@
                     ref="totalUnits"
                     v-model='forms.subject.fields.totalUnits'
                     :class="'form-control text-right'"
-                    :options="[{ 
+                    :options="[{
                       decimalPlaces: 0,
-                      minimumValue: 0, 
-                      modifyValueOnWheel: false, 
+                      minimumValue: 0,
+                      modifyValueOnWheel: false,
                       emptyInputBehavior: 0 }]">
                   </vue-autonumeric>
                 </b-form-group>
@@ -301,9 +302,9 @@
                     ref="totalAmount"
                     v-model='forms.subject.fields.totalAmount'
                     :class="'form-control text-right'"
-                    :options="[{ 
-                      minimumValue: 0, 
-                      modifyValueOnWheel: false, 
+                    :options="[{
+                      minimumValue: 0,
+                      modifyValueOnWheel: false,
                       emptyInputBehavior: 0 }]">
                   </vue-autonumeric>
                 </b-form-group>
@@ -652,11 +653,11 @@ export default {
           result = false
         }
       }
-      
+
       if (UserGroups.SUPER_USER.id == userGroup.id) {
 				result = false
       }
-      
+
 			return result
     },
     loadSubjectPrerequisite(){
@@ -690,10 +691,10 @@ export default {
 
   .bottom-space {
     margin-bottom: 0px;
-    
+
     @include for-size(phone-only) {
       margin-bottom: 15px;
     }
 
   }
-</style> 
+</style>

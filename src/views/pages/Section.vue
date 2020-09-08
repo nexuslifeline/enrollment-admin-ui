@@ -7,8 +7,8 @@
       <SchoolCategoryTabs
         :showAll="true"
         :schoolCategoryId="null"
-        @clickAll="filters.section.schoolCategoryId = null"
-        @click="filters.section.schoolCategoryId = $event"
+        @clickAll="filters.section.schoolCategoryId = null, filterSection()"
+        @click="filters.section.schoolCategoryId = $event, filterSection()"
       />
       <div v-show="!showEntry">
         <b-row class="mb-3">
@@ -21,6 +21,7 @@
               </b-col>
               <b-col md="3">
                 <b-form-select
+                  @input="filterSection()"
                   v-model="filters.section.courseId"
                   class="float-right">
                   <template v-slot:first>
@@ -39,6 +40,7 @@
                 <b-row>
                   <b-col md="4">
                     <b-form-select
+                      @input="filterSection()"
                       v-model="filters.section.semesterId"
                       class="float-right">
                       <template v-slot:first>
@@ -55,6 +57,7 @@
                   </b-col>
                   <b-col md="4">
                     <b-form-select
+                      @input="filterSection()"
                       v-model="filters.section.levelId"
                       class="float-right">
                       <template v-slot:first>
@@ -71,6 +74,7 @@
                   </b-col>
                   <b-col md="4">
                     <b-form-select
+                      @input="filterSection()"
                       v-model="filters.section.schoolYearId"
                       class="float-right">
                       <template v-slot:first>
@@ -92,6 +96,7 @@
                   v-model="filters.section.criteria"
                   type="text"
                   placeholder="Search"
+                  debounce="500"
                 />
               </b-col>
             </b-row>
@@ -108,13 +113,12 @@
               show-empty
               :fields="tables.sections.fields"
               :busy="tables.sections.isBusy"
-              :items="filteredSection"
+              :items="tables.sections.filteredItems"
               :current-page="paginations.section.page"
               :per-page="paginations.section.perPage"
               :filter="filters.section.criteria"
               @filtered="onFiltered($event, paginations.section)"
             >
-              <!-- :filter="filters.section.criteria> -->
               <template v-slot:table-busy>
                 <div class="text-center my-2">
                   <v-icon name="spinner" spin class="mr-2" />
@@ -587,6 +591,7 @@ export default {
             },
           ],
           items: [],
+          filteredItems: []
         },
       },
       paginations: {
@@ -646,6 +651,7 @@ export default {
       let params = { paginate: false };
       this.getSectionList(params).then(({ data }) => {
         sections.items = data;
+        sections.filteredItems = data;
         section.totalRows = data.length;
         this.recordDetails(section);
         sections.isBusy = false;
@@ -849,8 +855,6 @@ export default {
       .then(({ data }) => {
         subjects.items = data
       })
-
-      // this.loadSectionDetails()
     },
     loadSectionDetails() {
       let details = ''
@@ -899,24 +903,21 @@ export default {
       .then(({ data }) => {
         levels.fixItems = data
       })
-    }
-  },
-  computed: {
-    filteredSection() {
+    },
+    filterSection() {
       const { sections } = this.tables
       const { section: filter } = this.filters
       const { section: paginate } = this.paginations
-      const filteredSection = sections.items.filter(s =>
+      sections.filteredItems = sections.items.filter(s =>
         (filter.schoolCategoryId ? s.schoolCategoryId === filter.schoolCategoryId : true) &&
         (filter.courseId ? s.courseId === filter.courseId : true) &&
         (filter.levelId ? s.levelId === filter.levelId : true) &&
         (filter.semesterId ? s.semesterId === filter.semesterId : true) &&
         (filter.schoolYearId ? s.schoolYearId === filter.schoolYearId : true)
       )
-      paginate.totalRows = filteredSection.length;
+      paginate.totalRows = sections.filteredItems.length;
       this.recordDetails(paginate);
-      return filteredSection
     }
-  }
+  },
 };
 </script>
