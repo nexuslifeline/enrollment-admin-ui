@@ -54,9 +54,7 @@
                 </template>
                 <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
                 <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-                <small>Address : {{ data.item.student.address ?
-                  data.item.student.address.currentCompleteAddress : "" }}
-                </small>
+                <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
               </b-media>
             </template>
             <template v-slot:cell(contact)="data">

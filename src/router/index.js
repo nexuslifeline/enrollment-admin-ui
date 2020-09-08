@@ -14,7 +14,8 @@ const Dashboard = () => import('@/views/Dashboard')
 const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
-
+const MyProfile = () => import('@/views/pages/MyProfile')
+const MyActivity = () => import('@/views/pages/MyActivity')
 const Evaluation = () => import('@/views/pages/Evaluation')
 const StudentAdmission = () => import('@/views/pages/StudentAdmission')
 const StudentAssessmentFee = () => import('@/views/pages/StudentAssessmentFee')
@@ -69,7 +70,7 @@ router.beforeEach((to, from, next) => {
       next({name: from.name})
       return
   }
-  
+
 next()
 })
 
@@ -246,6 +247,18 @@ function configRoutes () {
           path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: 'profile',
+          name: 'MyProfile',
+          component: MyProfile,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: 'activity',
+          name: 'MyActivity',
+          component: MyActivity,
           meta: { requiresAuth: true }
         },
         // {
