@@ -11,5 +11,8 @@ export default {
     updateEvaluation(data, id) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/evaluations/` + id, data)
     },
+    getEvaluation(id) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/evaluations/${id}`);
+    },
   }
 }

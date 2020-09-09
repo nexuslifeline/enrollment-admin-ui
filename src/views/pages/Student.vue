@@ -73,6 +73,10 @@
                         <v-icon name="ellipsis-v" />
                       </template>
                       <b-dropdown-item
+                        :to="`/master-files/student/${row.item.id}/academic-records`" >
+                        Update Academic Records
+                      </b-dropdown-item>
+                      <b-dropdown-item
                         @click="setUpdateStudent(row)"
                         :disabled="showStudentEntry">
                         Edit Student Info
@@ -80,7 +84,7 @@
                       <b-dropdown-item
                         @click="setUpdateUser(row)"
                         :disabled="showModalUpdateUser" >
-                        Edit Account Info
+                        Edit Account
                       </b-dropdown-item>
                       <b-dropdown-item
                         @click="forms.user.fields.id = row.item.id, showModalConfirmation = true"
@@ -93,7 +97,7 @@
                 <b-row>
                   <b-col md=6>
                     Showing {{ paginations.student.from }} to {{ paginations.student.to }} of {{ paginations.student.totalRows }} records.
-                    </b-col>
+                  </b-col>
                   <b-col md=6>
                     <b-pagination
                       v-model="paginations.student.page"
@@ -102,8 +106,8 @@
                       size="sm"
                       align="end"
                       @input="loadStudents()" />
-                    </b-col>
-                  </b-row>
+                  </b-col>
+                </b-row>
               </b-col>
             </b-row>
             <!-- end table -->
@@ -1204,6 +1208,7 @@ export default {
 		}
 	},
 	created() {
+    console.log(this.$route)
     this.loadStudents()
 	},
 	methods: {

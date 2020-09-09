@@ -36,6 +36,11 @@ const Semester = () => import('@/views/pages/Semester')
 const SchoolYear = () => import('@/views/pages/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
 const DemoPage = () => import('@/views/pages/DemoPage')
+const AcademicRecords = () => import('@/views/pages/academic-records/AcademicRecords')
+const AcademicRecordEvaluation = () => import('@/views/pages/academic-records/Evaluation')
+const AcademicRecordSubjects = () => import('@/views/pages/academic-records/Subjects')
+const AcademicRecordAssessment = () => import('@/views/pages/academic-records/Assessment')
+const AcademicRecordRequirements = () => import('@/views/pages/academic-records/Requirements')
 
 Vue.use(Router)
 
@@ -76,7 +81,7 @@ next()
 
 function configRoutes () {
   return [
-    {
+  {
       path: '/',
       redirect: '/dashboard',
       name: 'Home',
@@ -239,6 +244,41 @@ function configRoutes () {
                   component: Student,
                   meta: { requiresAuth: true, userType: 0 }
                 },
+                {
+                  path: ':studentId/academic-records',
+                  component: AcademicRecords,
+                  children: [
+                    {
+                      path: '/',
+                      redirect: 'evaluations',
+                    },
+                    {
+                      path: 'evaluations',
+                      name: 'Evaluations',
+                      component: AcademicRecordEvaluation,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'subjects',
+                      name: 'Subjects',
+                      component: AcademicRecordSubjects,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'assessment',
+                      name: 'Assessment',
+                      component: AcademicRecordAssessment,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'requirements',
+                      name: 'Requirements',
+                      component: AcademicRecordRequirements,
+                      meta: { requiresAuth: true }
+                    },
+                  ]
+                }
+                // add academic records route here
               ]
             }
           ]
