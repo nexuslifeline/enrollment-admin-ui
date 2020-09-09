@@ -1293,7 +1293,6 @@ export default {
             this.isProcessing = false;
         }).catch(error => {
           const errors = error.response.data.errors
-          
           validate(student, errors)
           validate(address, errors)
           validate(family, errors)
@@ -1377,7 +1376,6 @@ export default {
 
       this.studentPhotoUrl = null
       const { student, address, family, education } = this.forms
-   
       this.entryMode='Add'
 
       this.showStudentEntry = true
@@ -1480,7 +1478,7 @@ export default {
     },
     createBase64Image(fileObject) {
       const reader = new FileReader()
-      
+
       reader.onload = (e) => {
         this.studentPhotoUrl = e.target.result
       }

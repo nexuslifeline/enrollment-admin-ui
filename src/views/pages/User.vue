@@ -5,7 +5,7 @@
         <h4 class="page-content__title">Personnel Management</h4>
       </div>
       <div>
-                    <!-- add button and search -->
+          <!-- add button and search -->
             <b-row class="mb-3">
               <b-col md=12>
                 <b-row>
@@ -39,6 +39,18 @@
                   :per-page="paginations.user.perPage"
                   :filter="filters.user.criteria"
                   @filtered="onFiltered($event, paginations.user)">
+                  <template v-slot:cell(photo)="data">
+                    <b-media>
+                      <template v-slot:aside>
+                        <b-avatar
+                          rounded
+                          blank
+                          size="64"
+                          :text="data.item.firstName.charAt(0) + '' + data.item.lastName.charAt(0)"
+                          :src="avatar(data.item)" />
+                      </template>
+                    </b-media>
+                  </template>
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
                       <v-icon
@@ -94,94 +106,152 @@
       @shown="$refs.username.focus()"
 			v-model="showModalEntry"
 			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
+			:noCloseOnBackdrop="true"
+      size="xl">
 			<div slot="modal-title"> <!-- modal title -->
 					User - Add
 			</div> <!-- modal title -->
       <!-- modal body -->
       <b-overlay :show="forms.personnel.isLoading" rounded="sm">
         <b-row>
-          <b-col md=6>
-            <b-form-group >
-              <label class="required">Email</label>
-              <b-form-input
-                ref="username"
-                v-model="forms.user.fields.username"
-                :state="forms.user.states.userUsername" />
-              <b-form-invalid-feedback>
-                {{forms.user.errors.userUsername}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group >
-              <label class="required">Password</label>
-              <b-form-input
-                type="password"
-                v-model="forms.user.fields.password"
-                :state="forms.user.states.userPassword" />
-              <b-form-invalid-feedback>
-                {{forms.user.errors.userPassword}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group >
-              <label class="required">Confirm Password</label>
-              <b-form-input
-                type="password"
-                v-model="forms.user.fields.passwordConfirmation" />
-            </b-form-group>
-            <b-form-group>
-              <label class="required">User Group</label>
-              <b-form-select
-                v-model="forms.user.fields.userGroupId"
-                :state="forms.user.states.userUserGroupId" >
-                <template v-slot:first>
-                  <b-form-select-option :value='null' disabled>-- Select User Group --</b-form-select-option>
-                </template>
-                <b-form-select-option v-for='userGroup in options.userGroups.items' :key='userGroup.id' :value='userGroup.id'>
-                  {{userGroup.name}}
-                </b-form-select-option>
-              </b-form-select>
-              <b-form-invalid-feedback>
-                {{forms.user.errors.userUserGroupId}}
-              </b-form-invalid-feedback>
-            </b-form-group>
+          <b-col md=3>
+            <label class="header-details">PROFILE PHOTO</label>
+            <div class="profile-photo-container">
+              <div class="profile-photo">
+                <PhotoViewer
+                  @onPhotoChange="onPhotoChange"
+                  @onPhotoRemove="onPhotoRemove"
+                  :isBusy="isProfilePhotoBusy"
+                  :imageUrl="personnelPhotoUrl"
+                />
+              </div>
+            </div>
           </b-col>
-          <b-col md=6>
-            <b-form-group >
-              <label class="required">Firstname</label>
-              <b-form-input
-                v-model="forms.personnel.fields.firstName"
-                :state="forms.personnel.states.firstName" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.firstName}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group >
-              <label>Middlename</label>
-              <b-form-input
-                v-model="forms.personnel.fields.middleName"
-                :state="forms.personnel.states.middleName" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.middleName}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group >
-              <label class="required">Lastname</label>
-              <b-form-input
-                v-model="forms.personnel.fields.lastName"
-                :state="forms.personnel.states.lastName" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.lastName}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label class="required">Birthdate</label>
-              <b-form-input type="date"
-                v-model="forms.personnel.fields.birthDate"
-                :state="forms.personnel.states.birthDate" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.birthDate}}
-              </b-form-invalid-feedback>
-            </b-form-group>
+          <b-col md=9>
+            <b-row>
+              <b-col md=12>
+                <label class="header-details">ACCOUNT DETAILS</label>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Email</label>
+                  <b-form-input
+                    ref="username"
+                    v-model="forms.user.fields.username"
+                    :state="forms.user.states.userUsername" />
+                  <b-form-invalid-feedback>
+                    {{forms.user.errors.userUsername}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Password</label>
+                  <b-form-input
+                    type="password"
+                    v-model="forms.user.fields.password"
+                    :state="forms.user.states.userPassword" />
+                  <b-form-invalid-feedback>
+                    {{forms.user.errors.userPassword}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Confirm Password</label>
+                  <b-form-input
+                    type="password"
+                    v-model="forms.user.fields.passwordConfirmation" />
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                <b-form-group>
+                  <label class="required">User Group</label>
+                  <b-form-select
+                    v-model="forms.user.fields.userGroupId"
+                    :state="forms.user.states.userUserGroupId" >
+                    <template v-slot:first>
+                      <b-form-select-option :value='null' disabled>-- Select User Group --</b-form-select-option>
+                    </template>
+                    <b-form-select-option v-for='userGroup in options.userGroups.items' :key='userGroup.id' :value='userGroup.id'>
+                      {{userGroup.name}}
+                    </b-form-select-option>
+                  </b-form-select>
+                  <b-form-invalid-feedback>
+                    {{forms.user.errors.userUserGroupId}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=12>
+                <label class="header-details">PERSONAL DETAILS</label>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Firstname</label>
+                  <b-form-input
+                    ref="firstName"
+                    v-model="forms.personnel.fields.firstName"
+                    :state="forms.personnel.states.firstName" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.firstName}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group >
+                  <label>Middlename</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.middleName"
+                    :state="forms.personnel.states.middleName" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.middleName}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Lastname</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.lastName"
+                    :state="forms.personnel.states.lastName" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.lastName}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                 <b-form-group>
+                  <label class="required">Birthdate</label>
+                  <b-form-input type="date"
+                    v-model="forms.personnel.fields.birthDate"
+                    :state="forms.personnel.states.birthDate" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.birthDate}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=12>
+                <b-form-group>
+                  <label class="required">Complete Address</label>
+                  <b-textarea
+                    v-model="forms.personnel.fields.completeAddress"
+                    rows=3 />
+                </b-form-group>
+              </b-col>
+            </b-row>
           </b-col>
         </b-row>
       </b-overlay>
@@ -210,54 +280,95 @@
     <!-- End Modal Entry -->
     <!-- Modal Entry Edit Personnel info -->
     <b-modal
-      @shown="$refs.firstname.focus()"
+      @shown="$refs.firstName.focus()"
 			v-model="showModalUpdatePersonnel"
 			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
+			:noCloseOnBackdrop="true"
+      size=lg>
 			<div slot="modal-title"> <!-- modal title -->
 					User - Edit
 			</div> <!-- modal title -->
       <!-- modal body -->
       <b-overlay :show="forms.personnel.isLoading" rounded="sm">
         <b-row>
-          <b-col md=12>
-            <b-form-group >
-              <label class="required">Firstname</label>
-              <b-form-input
-                ref="firstname"
-                v-model="forms.personnel.fields.firstName"
-                :state="forms.personnel.states.firstName" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.firstName}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group >
-              <label>Middlename</label>
-              <b-form-input
-                v-model="forms.personnel.fields.middleName"
-                :state="forms.personnel.states.middleName" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.middleName}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group >
-              <label class="required">Lastname</label>
-              <b-form-input
-                v-model="forms.personnel.fields.lastName"
-                :state="forms.personnel.states.lastName" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.lastName}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label class="required">Birthdate</label>
-              <b-form-input type="date"
-                v-model="forms.personnel.fields.birthDate"
-                :state="forms.personnel.states.birthDate" />
-              <b-form-invalid-feedback>
-                {{forms.personnel.errors.birthDate}}
-              </b-form-invalid-feedback>
-            </b-form-group>
+           <b-col md=3>
+            <label class="header-details">PROFILE PHOTO</label>
+            <div class="profile-photo-container">
+              <div class="profile-photo">
+                <PhotoViewer
+                  @onPhotoChange="onPhotoChange"
+                  @onPhotoRemove="onPhotoRemove"
+                  :isBusy="isProfilePhotoBusy"
+                  :imageUrl="personnelPhotoUrl"
+                />
+              </div>
+            </div>
+          </b-col>
+          <b-col md=9>
+            <b-row>
+              <b-col md=12>
+                <label class="header-details">PERSONAL DETAILS</label>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Firstname</label>
+                  <b-form-input
+                    ref="firstName"
+                    v-model="forms.personnel.fields.firstName"
+                    :state="forms.personnel.states.firstName" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.firstName}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group >
+                  <label>Middlename</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.middleName"
+                    :state="forms.personnel.states.middleName" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.middleName}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group >
+                  <label class="required">Lastname</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.lastName"
+                    :state="forms.personnel.states.lastName" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.lastName}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                 <b-form-group>
+                  <label class="required">Birthdate</label>
+                  <b-form-input type="date"
+                    v-model="forms.personnel.fields.birthDate"
+                    :state="forms.personnel.states.birthDate" />
+                  <b-form-invalid-feedback>
+                    {{forms.personnel.errors.birthDate}}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=12>
+                <b-form-group>
+                  <label class="required">Complete Address</label>
+                  <b-textarea
+                    v-model="forms.personnel.fields.completeAddress"
+                    rows=3 />
+                </b-form-group>
+              </b-col>
+            </b-row>
           </b-col>
         </b-row>
       </b-overlay>
@@ -418,22 +529,30 @@ const personnelFields = {
   firstName: null,
   middleName: null,
   lastName: null,
-  birthDate: null
+  birthDate: null,
+  completeAddress: null
 }
 
 import { PersonnelApi, UserGroupApi } from "../../mixins/api"
 import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
+import PhotoViewer from '../components/PhotoViewer'
 import Tables from '../../helpers/tables'
 import Personnel from '../../mixins/api/Personnel'
 export default {
 	name: "Personnel",
-	mixins: [ PersonnelApi, UserGroupApi, Tables ],
+  mixins: [ PersonnelApi, UserGroupApi, Tables ],
+  components: {
+    PhotoViewer,
+  },
 	data() {
 		return {
       showModalEntry: false,
       showModalUpdatePersonnel: false,
       showModalUpdateUser: false,
       showModalConfirmation: false,
+      isProfilePhotoBusy: false,
+      selectedPhoto: null,
+      personnelPhotoUrl: null,
       entryMode: "",
       forms: {
         personnel: {
@@ -455,6 +574,12 @@ export default {
 				users: {
           isBusy: false,
 					fields: [
+            {
+							key: "photo",
+							label: "",
+							tdClass: "align-middle",
+							thStyle: {width: "64px"}
+						},
             {
 							key: "user.username",
 							label: "Email",
@@ -539,10 +664,21 @@ export default {
       reset(user)
       reset(personnel)
       if(this.entryMode == "Add"){
-        const data = { ...personnel.fields, user: user.fields }
-        this.addPersonnel(data)
+        const payload = { ...personnel.fields, user: user.fields }
+        this.addPersonnel(payload)
           .then(({ data }) => {
-            this.addRow(users, this.paginations.user, data)
+
+            let newPersonnel = data
+            if (this.selectedPhoto) {
+              const formData = new FormData();
+              formData.append('photo', this.selectedPhoto);
+              this.savePhoto(formData, newPersonnel.id).then(({ data }) => {
+                this.personnelPhotoUrl = process.env.VUE_APP_PUBLIC_PHOTO_URL + data.hashName
+                newPersonnel.photo = data
+              })
+            }
+
+            this.addRow(users, this.paginations.user, newPersonnel)
             user.isProcessing = false
             showNotification(this, "success", "User created successfully.")
             this.showModalEntry = false
@@ -553,6 +689,7 @@ export default {
             validate(user, errors)
             validate(personnel, errors)
           })
+
       }
       else if (this.entryMode == "Edit Personnel") {
         this.updatePersonnel(personnel.fields, id)
@@ -613,6 +750,7 @@ export default {
 
     },
     setUpdatePersonnel(row){
+      this.personnelPhotoUrl = null
       const { personnel, personnel: { fields } } = this.forms
       const { item } = row
       this.showModalUpdatePersonnel = true
@@ -624,10 +762,16 @@ export default {
       fields.middleName = item.middleName
       fields.lastName = item.lastName
       fields.birthDate = item.birthDate
+      fields.completeAddress = item.completeAddress
+
+       if (item.photo)
+      this.personnelPhotoUrl = process.env.VUE_APP_PUBLIC_PHOTO_URL + item.photo.hashName
+
       this.entryMode = "Edit Personnel"
       personnel.isLoading = false
     },
     setCreate(){
+      this.personnelPhotoUrl = null
       const { user, personnel } = this.forms
       this.showModalEntry = true
       personnel.isLoading = true
@@ -638,7 +782,79 @@ export default {
       user.userGroupId = null
       this.entryMode='Add'
       personnel.isLoading = false
-    }
+    },
+    onPhotoChange(file) {
+      this.personnelPhotoUrl = null
+      this.isProfilePhotoBusy = true
+
+      if (this.entryMode == "Add") {
+        this.createBase64Image(file)
+        this.selectedPhoto = file
+      }
+      else if(this.entryMode == "Edit Personnel") {
+        const formData = new FormData();
+        const { id: personnelId } = this.forms.personnel.fields
+        formData.append('photo', file);
+
+        this.savePhoto(formData, personnelId).then(({ data }) =>{
+          this.personnelPhotoUrl = process.env.VUE_APP_PUBLIC_PHOTO_URL + data.hashName
+          setTimeout(() => this.isProfilePhotoBusy = false, 2000)
+        })
+      }
+    },
+    onPhotoRemove() {
+      if (this.entryMode == "Add") {
+        this.personnelPhotoUrl = ""
+      }
+      else if(this.entryMode == "Edit Personnel") {
+        const { id: studentId } = this.forms.student.fields
+
+        this.deletePhoto(studentId).then(({ data }) =>{
+          this.personnelPhotoUrl = ""
+        })
+      }
+      this.selectedPhoto = null
+    },
+    createBase64Image(fileObject) {
+      const reader = new FileReader()
+
+      reader.onload = (e) => {
+        this.personnelPhotoUrl = e.target.result
+      }
+      reader.readAsDataURL(fileObject)
+      setTimeout(() => this.isProfilePhotoBusy = false, 1000)
+    },
+    avatar(personnel){
+      let src = ''
+      if (personnel.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + personnel.photo.hashName
+      }
+      return src
+    },
 	}
 }
 </script>
+<style lang="scss" scoped>
+
+ @import "../../assets/scss/shared.scss";
+  .header-details {
+    font-weight: 600;
+    font-size: 14pt;
+    display: block;
+    border-bottom: solid 1px lightgray;
+  }
+
+  .profile-photo {
+    height: 200px;
+    width: 200px;
+  }
+
+  .profile-photo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+</style>
