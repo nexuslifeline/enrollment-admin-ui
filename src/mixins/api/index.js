@@ -23,3 +23,4 @@ export { default as EvaluationApi } from './Evaluation';
 export { default as EvaluationFileApi } from './EvaluationFile';
 export { default as PaymentReceiptFileApi } from './PaymentReceiptFile';
 export { default as StudentFeeApi } from './StudentFee';
+export { default as PermissionGroupApi } from './PermissionGroup';
