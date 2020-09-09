@@ -83,7 +83,7 @@ function configRoutes () {
   return [
   {
       path: '/',
-      redirect: '/dashboard',
+      redirect: { name: 'Dashboard' },
       name: 'Home',
       component: TheContainer,
       children: [
@@ -287,19 +287,22 @@ function configRoutes () {
           path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard,
-          meta: { requiresAuth: true }
-        },
-        {
-          path: 'profile',
-          name: 'MyProfile',
-          component: MyProfile,
-          meta: { requiresAuth: true }
-        },
-        {
-          path: 'activity',
-          name: 'MyActivity',
-          component: MyActivity,
-          meta: { requiresAuth: true }
+          redirect: { name: 'MyProfile' },
+          meta: { requiresAuth: true },
+          children: [
+            {
+              path: 'profile',
+              name: 'MyProfile',
+              component: MyProfile,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'activity',
+              name: 'MyActivity',
+              component: MyActivity,
+              meta: { requiresAuth: true }
+            }
+          ]
         },
         // {
         //   path: 'evaluation',

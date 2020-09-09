@@ -5,11 +5,11 @@ export default [
     children: [
       {
         label: 'Profile',
-        to: '/profile'
+        to: '/dashboard/profile'
       },
       {
         label: 'Activity',
-        to: '/activity'
+        to: '/dashboard/activity'
       },
     ]
   },

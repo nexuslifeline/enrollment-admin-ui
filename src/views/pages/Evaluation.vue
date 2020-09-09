@@ -82,16 +82,22 @@
                   :src="avatar(data.item.student)" />
               </template>
               <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
-              <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-              <small>Address : {{ data.item.student.address ?
-                data.item.student.address.currentCompleteAddress : "" }}
-              </small>
+              <div>
+                <span>Student No:</span>
+                {{ data.item.student.studentNo ? data.item.student.studentNo : ' Awaiting Confirmation' }}
+              </div>
+              <div>
+                <span>{{data.item.student.email}}</span>
+                <span v-if="!!data.item.student.phoneNo || !!data.item.student.mobileNo"> (</span>
+                <span>{{data.item.student.phoneNo}}</span>
+                <span v-if="!!data.item.student.phoneNo && !!data.item.student.mobileNo"> | </span>
+                <span>{{data.item.student.mobileNo}}</span>
+                <span v-if="!!data.item.student.phoneNo || !!data.item.student.mobileNo">)</span>
+              </div>
+              <div>
+                {{data.item.student.currentAddress || data.item.student.address.currentCompleteAddress}}
+              </div>
             </b-media>
-          </template>
-          <template v-slot:cell(contact)="data">
-            Email : {{ data.item.student.email }} <br>
-            <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
-            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
           </template>
           <template v-slot:cell(education)="data">
             <span>
@@ -752,12 +758,6 @@ export default {
 							// 	}
 							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							// }
-						},
-						{
-							key: "contact",
-							label: "Contact",
-							tdClass: "align-middle",
-							thStyle: { width: "20%" },
 						},
 						{
 							key: "education",

@@ -34,12 +34,7 @@ export default {
     height: auto;
     width: 100%;
     padding: 40px;
-    font-size: 20pt;
-    text-align: center;
-
-    .team-text {
-      text-align: end;
-    }
+    font-size: 18px;
   }
 
 </style>

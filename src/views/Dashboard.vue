@@ -1,8 +1,6 @@
 <template>
   <div>
-    <center>
-      <h3>Coming Soon</h3>
-    </center>
+    <router-view></router-view>
   </div>
 </template>
 
