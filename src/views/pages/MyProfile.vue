@@ -1,8 +1,9 @@
 <template>
   <div class="my-profile__main-container">
     <div class="my-profile__announcement-container">
-      <p>Thank you for being patient. We are still doing some work on this feature. </p>
-      <p class="team-text">- Nexus Team</p>
+      <div>Thank you for being patient. We are still doing some work on this feature.</div>
+      <div>We will release an update as soon as we can.</div>
+      <p class="mt-4">- Nexus Team</p>
     </div>
   </div>
 </template>
