@@ -16,6 +16,9 @@ export default {
     },
     deleteSection(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/sections/${id}`);
-    }
+    },
+    getSectionScheduledSubjectsWithStatus(params, sectionId){
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/sections/${sectionId}/my-scheduled-subjects`, { params: params });
+    },
   }
 }

@@ -17,5 +17,8 @@ export default {
     deleteSubject(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/subjects/` + id)
     },
+    getSectionsOfSubject(params, subjectId){
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/subjects/${subjectId}/sections`, { params: params });
+    },
   }
 }

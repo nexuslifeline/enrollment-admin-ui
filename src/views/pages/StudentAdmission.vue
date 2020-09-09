@@ -11,267 +11,279 @@
         @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()"
       />
       <div>
-        						<b-row class="mb-2"> <!-- row button and search input -->
-							<b-col md="6">
-								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
-									<b-form-radio :value="null">Show All</b-form-radio>
-									<b-form-radio
-										v-for="status in transcriptStatuses.values"
-                    v-if="status.id != transcriptStatuses.ENROLLED.id"
-										:value="status.id"
-										:key="status.id">
-										{{ status.name }}
-									</b-form-radio>
-								</b-form-radio-group>
-							</b-col>
-							<b-col md="3">
-								<b-form-select
-									v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-										filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id ||
-										filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
-									@change="loadTranscript()"
-									v-model="filters.student.courseId"
-									class="float-right">
-									<template v-slot:first>
-										<b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
-									</template>
-                  <b-form-select-option :value="null">None</b-form-select-option>
-									<b-form-select-option
-										v-for="course in options.courses.items"
-										:key="course.id"
-										:value="course.id">
-										{{course.description}} {{course.major ? `(${course.major})` : ''}}
-									</b-form-select-option>
-								</b-form-select>
-							</b-col>
-							<b-col md="3">
-								<b-form-input
-									v-model="filters.student.criteria"
-                  debounce="500"
-                  @update="loadTranscript()"
-									type="text"
-									placeholder="Search">
-								</b-form-input>
-							</b-col>
-						</b-row> <!-- row button and search input -->
-						<b-table
-              details-td-class="table-secondary"
-							hover outlined small show-empty
-							:fields="tables.students.fields"
-							:items="tables.students.items"
-							:busy="tables.students.isBusy">
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon
-                    name="spinner"
-                    spin
-                    class="mr-2" />
-                  <strong>Loading...</strong>
+      <b-row class="mb-2"> <!-- row button and search input -->
+        <b-col md="6">
+          <b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
+            <b-form-radio :value="null">Show All</b-form-radio>
+            <b-form-radio
+              v-for="status in transcriptStatuses.values"
+              v-if="status.id != transcriptStatuses.ENROLLED.id"
+              :value="status.id"
+              :key="status.id">
+              {{ status.name }}
+            </b-form-radio>
+          </b-form-radio-group>
+        </b-col>
+        <b-col md="3">
+          <b-form-select
+            v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
+              filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id ||
+              filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
+            @change="loadTranscript()"
+            v-model="filters.student.courseId"
+            class="float-right">
+            <template v-slot:first>
+              <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+            </template>
+            <b-form-select-option :value="null">None</b-form-select-option>
+            <b-form-select-option
+              v-for="course in options.courses.items"
+              :key="course.id"
+              :value="course.id">
+              {{course.description}} {{course.major ? `(${course.major})` : ''}}
+            </b-form-select-option>
+          </b-form-select>
+        </b-col>
+        <b-col md="3">
+          <b-form-input
+            v-model="filters.student.criteria"
+            debounce="500"
+            @update="loadTranscript()"
+            type="text"
+            placeholder="Search">
+          </b-form-input>
+        </b-col>
+      </b-row> <!-- row button and search input -->
+      <b-table
+        details-td-class="table-secondary"
+        hover outlined small show-empty
+        :fields="tables.students.fields"
+        :items="tables.students.items"
+        :busy="tables.students.isBusy">
+        <template v-slot:table-busy>
+          <div class="text-center my-2">
+            <v-icon
+              name="spinner"
+              spin
+              class="mr-2" />
+            <strong>Loading...</strong>
+          </div>
+        </template>
+        <template v-slot:cell(name)="data">
+          <b-media>
+            <template v-slot:aside>
+              <b-avatar
+                rounded
+                blank
+                size="64"
+                :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                :src="avatar(data.item.student)" />
+            </template>
+            <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
+            <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+            <small>Address : {{ data.item.student.address ?
+              data.item.student.address.currentCompleteAddress : "" }}
+            </small>
+          </b-media>
+        </template>
+        <template v-slot:cell(contact)="data">
+          Email : {{ data.item.student.email }} <br>
+          <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+          <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+        </template>
+        <template v-slot:cell(education)="data">
+          <span>{{ getName(data.item, 'level') + " "
+            + getName(data.item, 'semester') + " "
+            + getName(data.item, 'studentType') }}</span><br>
+          <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
+        </template>
+        <template v-slot:cell(status)="data">
+          <b-badge
+            :variant="data.item.transcriptStatusId === transcriptStatuses.FINALIZED.id
+              ? 'primary'
+              : 'warning'">
+            {{ transcriptStatuses.getEnum(data.item.transcriptStatusId).name }}
+          </b-badge>
+        </template>
+        <template v-slot:cell(action)="row">
+          <v-icon
+            :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
+            @click="loadDetails(row)" />
+        </template>
+        <template v-slot:row-details="data">
+          <b-overlay :show="isLoading" rounded="sm">
+            <b-row class="m-2">
+              <b-col md="3">
+                <h6>Level</h6>
+                <h6>{{ getName(data.item, 'level') }}</h6>
+              </b-col>
+              <b-col md="4">
+                <div v-if="getName(data.item, 'course') != ''">
+                  <h6>Course</h6>
+                  <h6>{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</h6>
                 </div>
-              </template>
-							<template v-slot:cell(name)="data">
-								<b-media>
-									<template v-slot:aside>
-										<b-avatar
-                      rounded
-                      blank
-                      size="64"
-                      :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
-                      :src="avatar(data.item.student)" />
-									</template>
-									<span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
-                  <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-									<small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
-								</b-media>
-							</template>
-              <template v-slot:cell(contact)="data">
-                Email : {{ data.item.student.email }} <br>
-                <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
-                <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
-              </template>
-							<template v-slot:cell(education)="data">
-								<span>{{ getName(data.item, 'level') + " "
-                  + getName(data.item, 'semester') + " "
-                  + getName(data.item, 'studentType') }}</span><br>
-                <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
-							</template>
-							<template v-slot:cell(status)="data">
-								<b-badge
-									:variant="data.item.transcriptStatusId === transcriptStatuses.FINALIZED.id
-										? 'primary'
-										: 'warning'">
-									{{ transcriptStatuses.getEnum(data.item.transcriptStatusId).name }}
-								</b-badge>
-							</template>
-							<template v-slot:cell(action)="row">
-								<v-icon
-									:name="row.detailsShowing ? 'caret-down' : 'caret-left'"
-									@click="loadDetails(row)" />
-							</template>
-							<template v-slot:row-details="data">
-								<b-overlay :show="isLoading" rounded="sm">
-									<b-row class="m-2">
-										<b-col md="3">
-											<h6>Level</h6>
-											<h6>{{ getName(data.item, 'level') }}</h6>
-										</b-col>
-										<b-col md="4">
-											<div v-if="getName(data.item, 'course') != ''">
-												<h6>Course</h6>
-												<h6>{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</h6>
-											</div>
-										</b-col>
-										<b-col md="2">
-											<div v-show="getName(data.item, 'course') != ''">
-												<h6>Semester</h6>
-												<h6>{{ getName(data.item, 'semester') }}</h6>
-											</div>
-										</b-col>
-										<b-col md="3">
-											<h6>School Year</h6>
-											<h6>{{ getName(data.item, 'schoolYear') }}</h6>
-										</b-col>
-									</b-row>
-									<b-card>
-										<div v-if="data.item.subjects">
-											<b-row class="mb-3">
-                        <b-col md=12>
-                          <h5 class="pt-2">SUBJECTS</h5>
-                        </b-col>
-                      </b-row>
-											<div class="details__section-button-container">
-                        <div class="section__container">
-                          <label >Section</label>
-                          <b-form-select
-                            class="section-select"
-                            v-model="data.item.sectionId"
-                            >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
-                            </template>
-                            <b-form-select-option
-                              v-for="section in filterSection(data)"
-                              :key="section.id"
-                              :value="section.id">
-                              {{ section.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                        </div>
-                          <!-- <b-button class="add-subject-button" variant="outline-primary"
-                            @click="onAddSubject(data.item)">
-                            <v-icon name="plus-circle" /> ADD SUBJECT
-                          </b-button> -->
-
-                        <button class="btn btn-outline-primary add-subject-button"
-                          v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
-                          @click="onAddSubject(data.item)">
-                          <v-icon name="plus-circle" /> ADD SUBJECT
-                        </button>
-                      </div>
-											<b-table
-												class="mb-4"
-												hover outlined small responsive show-empty
-												:fields="tables.subjects.fields"
-												:items="data.item.subjects"
-												:busy="tables.subjects.isBusy">
-												<template v-slot:cell(action)="row">
-													<b-button
-                            v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
-														@click="removeSubject(data.item.subjects, row)"
-														size="sm" variant="danger">
-														<v-icon name="trash" />
-													</b-button>
-												</template>
-                        <template v-slot:table-busy>
-                          <div class="text-center my-2">
-                            <v-icon
-                              name="spinner"
-                              spin
-                              class="mr-2" />
-                            <strong>Loading...</strong>
-                          </div>
-                        </template>
-                        <template v-slot:custom-foot>
-                        <b-tr class="font-weight-bold">
-                          <b-td colspan=2 class="text-right">
-                            <span class="text-danger">Total Units </span>
-                          </b-td>
-                          <b-td class="text-center">
-                            <span class="text-danger">
-                                {{ totalUnits(data.item.subjects, 'units') }}
-                            </span>
-                          </b-td>
-                          <b-td class="text-center">
-                            <span class="text-danger">
-                                {{ totalUnits(data.item.subjects, 'labs') }}
-                            </span>
-                          </b-td>
-                          <b-td class="text-center">
-                            <span class="text-danger">
-                                {{ totalUnits(data.item.subjects, 'totalUnits') }}
-                            </span>
-                          </b-td>
-                          <b-td></b-td>
-                        </b-tr>
+              </b-col>
+              <b-col md="2">
+                <div v-show="getName(data.item, 'course') != ''">
+                  <h6>Semester</h6>
+                  <h6>{{ getName(data.item, 'semester') }}</h6>
+                </div>
+              </b-col>
+              <b-col md="3">
+                <h6>School Year</h6>
+                <h6>{{ getName(data.item, 'schoolYear') }}</h6>
+              </b-col>
+            </b-row>
+            <b-card>
+              <div v-if="data.item.subjects">
+                <b-row class="mb-3">
+                  <b-col md=12>
+                    <h5 class="pt-2">SUBJECTS</h5>
+                  </b-col>
+                </b-row>
+                <div class="details__section-button-container">
+                  <div class="section__container">
+                    <label >Section</label>
+                    <b-form-select
+                      class="section-select"
+                      v-model="data.item.sectionId"
+                      @change="prePopulateStudentSubjects(data)"
+                      :disabled="data.item.transcriptStatusId !== transcriptStatuses.DRAFT.id"
+                      >
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
                       </template>
-											</b-table>
-										</div>
-										<div v-if="data.item.admissionId">
-											<h5>Files</h5>
-											<b-table
-												v-if="data.item.files"
-												hover outlined small responsive show-empty
-												:fields="tables.files.fields"
-												:items="data.item.files"
-												:busy="tables.files.isBusy">
-												<template v-slot:cell(action)="row">
-													<b-button
-														@click="previewFile(row)"
-														size="sm" variant="secondary">
-														<v-icon
-                              name="search"/>
-													</b-button>
-												</template>
-                        <template v-slot:table-busy>
-                          <div class="text-center my-2">
-                            <v-icon
-                              name="spinner"
-                              spin
-                              class="mr-2" />
-                            <strong>Loading...</strong>
-                          </div>
-                        </template>
-											</b-table>
-										</div>
-									</b-card>
-									<b-button
+                      <b-form-select-option
+                        v-for="section in filterSection(data)"
+                        :key="section.id"
+                        :value="section.id">
+                        {{ section.name }}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </div>
+                    <!-- <b-button class="add-subject-button" variant="outline-primary"
+                      @click="onAddSubject(data.item)">
+                      <v-icon name="plus-circle" /> ADD SUBJECT
+                    </b-button> -->
+
+                  <button class="btn btn-outline-primary add-subject-button"
                     v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
-                    @click="setDisapproval(data)"
-                    class="float-right my-2 mr-2"
-                    variant="outline-danger">Reject</b-button>
-									<b-button
-                    v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
-                    @click="setApproval(data)"
-                    class="float-right m-2"
-                    variant="outline-primary">Approve</b-button>
-								</b-overlay>
-							</template>
-						</b-table>
-						<b-row>
-							<b-col md=6>
-								Showing {{paginations.student.from}} to {{paginations.student.to}} of {{paginations.student.totalRows}} records.
-							</b-col>
-							<b-col md=6>
-								<b-pagination
-									v-model="paginations.student.page"
-									:total-rows="paginations.student.totalRows"
-									:per-page="paginations.student.perPage"
-									size="sm"
-									align="end"
-									@input="loadTranscript()"
-								/>
-							</b-col>
-						</b-row>
+                    @click="onAddSubject(data.item)">
+                    <v-icon name="plus-circle" /> ADD SUBJECT
+                  </button>
+                </div>
+                <b-table
+                  class="mb-4"
+                  hover outlined small responsive show-empty
+                  :fields="tables.subjects.fields"
+                  :items="data.item.subjects"
+                  :busy="tables.subjects.isBusy">
+                  <template v-slot:cell(action)="row">
+                    <b-button
+                      v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                      @click="removeSubject(data.item.subjects, row)"
+                      size="sm" variant="danger">
+                      <v-icon name="trash" />
+                    </b-button>
+                  </template>
+                  <template v-slot:cell(section)="row">
+                    <span>{{ row.item.section ? row.item.section.name : '' }}</span>
+                    <span v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
+                      <a class="float-right" href="#" @click.prevent="onShowModalSection(row.item, data)">[Change]</a>
+                      <br>
+                      <a class="float-right" href="#" @click.prevent="onSectionSubjectClear(row)">[Clear]</a>
+                    </span>
+                  </template>
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon
+                        name="spinner"
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
+                  <template v-slot:custom-foot>
+                  <b-tr class="font-weight-bold">
+                    <b-td colspan=2 class="text-right">
+                      <span class="text-danger">Total Units </span>
+                    </b-td>
+                    <b-td class="text-center">
+                      <span class="text-danger">
+                          {{ totalUnits(data.item.subjects, 'units') }}
+                      </span>
+                    </b-td>
+                    <b-td class="text-center">
+                      <span class="text-danger">
+                          {{ totalUnits(data.item.subjects, 'labs') }}
+                      </span>
+                    </b-td>
+                    <b-td class="text-center">
+                      <span class="text-danger">
+                          {{ totalUnits(data.item.subjects, 'totalUnits') }}
+                      </span>
+                    </b-td>
+                    <b-td></b-td>
+                  </b-tr>
+                </template>
+                </b-table>
+              </div>
+              <!-- <div v-if="data.item.admissionId">
+                <h5>Files</h5>
+                <b-table
+                  v-if="data.item.files"
+                  hover outlined small responsive show-empty
+                  :fields="tables.files.fields"
+                  :items="data.item.files"
+                  :busy="tables.files.isBusy">
+                  <template v-slot:cell(action)="row">
+                    <b-button
+                      @click="previewFile(row)"
+                      size="sm" variant="secondary">
+                      <v-icon
+                        name="search"/>
+                    </b-button>
+                  </template>
+                  <template v-slot:table-busy>
+                    <div class="text-center my-2">
+                      <v-icon
+                        name="spinner"
+                        spin
+                        class="mr-2" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
+                </b-table>
+              </div> -->
+            </b-card>
+            <b-button
+              v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+              @click="setDisapproval(data)"
+              class="float-right my-2 mr-2"
+              variant="outline-danger">Reject</b-button>
+            <b-button
+              v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+              @click="setApproval(data)"
+              class="float-right m-2"
+              variant="outline-primary">Approve</b-button>
+          </b-overlay>
+        </template>
+      </b-table>
+      <b-row>
+        <b-col md=6>
+          Showing {{paginations.student.from}} to {{paginations.student.to}} of {{paginations.student.totalRows}} records.
+        </b-col>
+        <b-col md=6>
+          <b-pagination
+            v-model="paginations.student.page"
+            :total-rows="paginations.student.totalRows"
+            :per-page="paginations.student.perPage"
+            size="sm"
+            align="end"
+            @input="loadTranscript()"
+          />
+        </b-col>
+      </b-row>
       </div>
     </div>
     <!-- Modal Preview -->
@@ -436,12 +448,16 @@
 					<b-table
 						small hover outlined show-empty
 						:items.sync="tables.subjects.items"
-						:fields="tables.subjects.fields"
+						:fields="tables.subjects.fields2"
             :filter="filters.subject.criteria"
 						:busy="tables.subjects.isBusy"
             :current-page="paginations.subject.page"
             :per-page="paginations.subject.perPage"
             @filtered="onFiltered($event, paginations.subject)">
+            <!-- <template v-slot:cell(section)>
+						  <b-tr class="d-none">
+						  </b-tr>
+						</template> -->
 						<template v-slot:cell(action)="row">
 							<b-button
                 @click="addSubject(row)"
@@ -485,6 +501,79 @@
       </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
+    <b-modal
+      v-model="showModalSection"
+			size="xl"
+			header-bg-variant="success"
+			header-text-variant="light"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+      <div slot="modal-title"> <!-- modal title -->
+					Select Section
+			</div> <!-- modal title -->
+			<b-row class="justify-content-md-center"> <!-- modal body -->
+				<b-col md=12>
+          <b-table
+            class="c-app__table"
+            small hover outlined show-empty
+            :items.sync="tables.sectionsOfSubjects.items"
+            :fields="tables.sectionsOfSubjects.fields"
+            :busy="tables.sectionsOfSubjects.isBusy"
+            :current-page="paginations.sectionsOfSubject.page"
+            :per-page="paginations.sectionsOfSubject.perPage"
+           >
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon
+                name="spinner"
+                spin
+                class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+           <template v-slot:cell(schedule)="row">
+             <span>
+               {{ row.item.schedules[0].personnel.name }}
+             </span>
+             <br>
+             <span v-for="schedule in row.item.schedules" :key="schedule.id" class="item">
+              <small>{{ `${days.getEnum(schedule.dayId).abbrev} - Time: ${schedule.startTime} - ${schedule.endTime}`  }}</small>
+             </span>
+           </template>
+           <template v-slot:cell(action) = "row">
+              <b-button
+                @click="onChangeSection(row)"
+                variant="success">
+                <v-icon name="check" />
+              </b-button>
+            </template>
+          </b-table>
+          <b-row>
+              <b-col md=6>
+                Showing {{paginations.sectionsOfSubject.from}} to {{paginations.sectionsOfSubject.to}} of {{paginations.sectionsOfSubject.totalRows}} records.
+              </b-col>
+              <b-col md=6>
+                <b-pagination
+                  v-model="paginations.sectionsOfSubject.page"
+                  :total-rows="paginations.sectionsOfSubject.totalRows"
+                  :per-page="paginations.sectionsOfSubject.perPage"
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.sectionsOfSubject)"
+                />
+              </b-col>
+            </b-row>
+				</b-col>
+			</b-row> <!-- modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button
+          class="float-right"
+          variant="outline-danger"
+          @click="showModalSection=false">
+          Close
+        </b-button>
+			</div> <!-- modal footer buttons -->
+    </b-modal>
     <div v-if="showModalPreview" class="preview__modal-description">
       <div class="mx-auto">
         Filename : {{ file.name }}<br>
@@ -496,7 +585,7 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
-import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, Days, UserGroups } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
@@ -532,8 +621,10 @@ export default {
 			showModalApproval: false,
       showModalRejection: false,
       showModalSubjects: false,
+      showModalSection: false,
 			isLoading: false,
-			transcriptStatuses: TranscriptStatuses,
+      transcriptStatuses: TranscriptStatuses,
+      days: Days,
       file: {
         type: null,
         src: null,
@@ -655,7 +746,55 @@ export default {
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
               thStyle: {width: "12%"}
+            },
+            {
+              key: "section",
+              label: "Section",
+              tdClass: "align-middle",
+              thClass: "align-middle",
+              thStyle: {width: "20%"}
+            },
+						{
+							key: "action",
+							label: "",
+							tdClass: "align-middle text-center",
+							thStyle: {width: "5%"}
+						}
+          ],
+          fields2: [
+						{
+							key: "name",
+							label: "Subject Code",
+							tdClass: "align-middle",
+							thStyle: {width: "12%"}
 						},
+						{
+							key: "description",
+							label: "Description",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
+						},
+						{
+							key: "units",
+							label: "Lec Units",
+							tdClass: "align-middle text-center",
+							thClass: "text-right text-center",
+							thStyle: {width: "8%"}
+            },
+						{
+							key: "labs",
+							label: "Lab Units",
+							tdClass: "align-middle text-center",
+							thClass: "text-right",
+							thStyle: {width: "8%"}
+            },
+            {
+							key: "totalUnits",
+							label: "Total Units",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+              thStyle: {width: "12%"}
+            },
 						{
 							key: "action",
 							label: "",
@@ -689,7 +828,108 @@ export default {
             }
           ],
 					items: []
-				},
+        },
+        sectionsOfSubjects: {
+          isBusy: false,
+          fields: [
+            {
+              key: "name",
+              label: "SECTION",
+              tdClass: "align-middle ",
+              thClass: "align-middle",
+              thStyle: { width: "15%" }
+            },
+            {
+              key: "level.name",
+              label: "LEVEL",
+               tdClass: "align-middle ",
+              thClass: "align-middle",
+              thStyle: { width: "15%" }
+            },
+            {
+              key: "course.name",
+              label: "COURSE",
+              tdClass: "align-middle ",
+              thClass: "align-middle",
+              thStyle: { width: "15%" }
+            },
+            {
+              key: "semester.name",
+              label: "SEMESTER",
+              tdClass: "align-middle ",
+              thClass: "align-middle",
+              thStyle: {width: "15%"}
+            },
+            {
+              key: "schedule",
+              label: "SCHEDULE",
+              tdClass: "align-middle",
+              thClass: "align-middle",
+              thStyle: {width: "AUTO"}
+            },
+            {
+              key: "action",
+              label: "",
+              tdClass: "align-middle text-center",
+              thStyle: {width: "5%"}
+            }
+          ],
+          items: []
+        },
+        scheduledSubjects: {
+          isBusy: false,
+          fields: [
+            {
+              key: "isAllowed",
+              label: "Allowed",
+              thClass: "align-middle",
+              tdClass: "align-middle text-center",
+              thStyle: { width: "25px" }
+            },
+            {
+              key: "subject",
+              label: "SUBJECT",
+              tdClass: "align-middle ",
+              thClass: "align-middle",
+              thStyle: { width: "20%" }
+            },
+            {
+              key: "schedule",
+              label: "SCHEDULE",
+              tdClass: "align-middle",
+              thClass: "align-middle",
+              thStyle: { width: "auto", minWidth: "500px"}
+            },
+            {
+              key: "units",
+              label: "Lec Units",
+              tdClass: "align-middle text-right",
+              thClass: "align-middle text-right",
+              thStyle: {width: "8%"}
+            },
+            {
+              key: "labs",
+              label: "Lab Units",
+              tdClass: "align-middle text-right",
+              thClass: "align-middle text-right",
+              thStyle: {width: "8%"}
+            },
+            {
+              key: "totalUnits",
+              label: "TOTAL UNITS",
+              tdClass: "align-middle text-right",
+              thClass: "text-right",
+              thStyle: {width: "8%"}
+            },
+            {
+              key: "action",
+              label: "",
+              tdClass: "align-middle text-center",
+              thStyle: {width: "5%"}
+            }
+          ],
+          items: []
+        }
 			},
 			paginations: {
 				student: {
@@ -705,7 +945,21 @@ export default {
 					totalRows: 0,
 					page: 1,
 					perPage: 10,
-				}
+        },
+        scheduledSubject: {
+          from: 0,
+          to: 0,
+          totalRows: 0,
+          page: 1,
+          perPage: 10,
+        },
+        sectionsOfSubject: {
+          from: 0,
+          to: 0,
+          totalRows: 0,
+          page: 1,
+          perPage: 10,
+        }
 			},
 			filters: {
 				student: {
@@ -717,6 +971,17 @@ export default {
         subject: {
           criteria: null,
           departmentId: null
+        },
+        scheduledSubject: {
+          criteria: null,
+          levelId: null,
+          courseId: null,
+          semesterId: null,
+          sectionId: null,
+          schoolCategory: null
+        },
+        sectionsOfSubject: {
+          criteria: null,
         }
 			},
 			options: {
@@ -735,7 +1000,8 @@ export default {
       showDepartment: false,
 			schoolCategoryId: null,
       studentSubjects: [],
-      row: []
+      row: [],
+      selectedLevelSubject: null
 		}
 	},
 	created(){
@@ -753,6 +1019,7 @@ export default {
         this.getSubjectsOfTranscript(transcriptId, params)
 					.then(({ data }) => {
             this.$set(row.item, 'subjects', data)
+            this.$set(row.item, 'isBusy', false)
             this.row = row.item
             this.showModalApproval = true
 				})
@@ -920,14 +1187,14 @@ export default {
 						this.isLoading = false
         })
 
-				if (admissionId) {
-					this.isLoading = true
-					this.getAdmissionFileList(admissionId, params)
-						.then(({ data }) => {
-							this.$set(row.item, 'files', data)
-							this.isLoading = false
-					})
-        }
+				// if (admissionId) {
+				// 	this.isLoading = true
+				// 	this.getAdmissionFileList(admissionId, params)
+				// 		.then(({ data }) => {
+				// 			this.$set(row.item, 'files', data)
+				// 			this.isLoading = false
+				// 	})
+        // }
 			}
 			row.toggleDetails()
     },
@@ -1042,7 +1309,65 @@ export default {
                   && s.courseId === data.item.courseId
                     && s.semesterId === data.item.semesterId )
       return sect
-    }
+    },
+    onShowModalSection(subject, data) {
+      this.showModalSection = true
+      const { sectionsOfSubjects } = this.tables
+      const { sectionsOfSubject } = this.paginations
+      const { id: subjectId } = subject
+      const { schoolYearId } = data.item
+
+      this.selectedLevelSubject = null
+      this.selectedLevelSubject = subject
+
+      const params = { paginate: false, subjectId, schoolYearId }
+      sectionsOfSubjects.isBusy = true
+
+      this.getSectionsOfSubject(params, subjectId)
+      .then(({ data }) => {
+        sectionsOfSubjects.items = data
+        sectionsOfSubject.totalRows = data.length
+        this.recordDetails(sectionsOfSubject)
+        sectionsOfSubjects.isBusy = false
+      }).catch((error) => {
+        sectionsOfSubjects.isBusy = false
+      })
+    },
+    onSectionSubjectClear(row) {
+      this.$set(row.item.pivot, 'sectionId', null)
+      this.$set(row.item, 'section', null)
+    },
+    onChangeSection(row) {
+      // const { subjects } = this.tables
+      this.$set(this.selectedLevelSubject.pivot, 'sectionId', row.item.id)
+      this.$set(this.selectedLevelSubject, 'section', { id: row.item.id, name: row.item.name })
+      this.showModalSection = false
+    },
+    prePopulateStudentSubjects(row) {
+      const { item, item: { curriculumId, sectionId } } = row
+      const params = { paginate: false, curriculumId }
+      const { subjects } = this.tables
+      subjects.isBusy = true
+
+      if (!sectionId) {
+        subjects.subjects = []
+        item.isBusy = false
+        return
+      }
+
+      this.getSectionScheduledSubjectsWithStatus(params, sectionId)
+      .then(({ data }) => {
+        const allowedSubjects = data.filter(s => s.isAllowed === true)
+        item.subjects = allowedSubjects
+        const section = this.options.sections.items.find(s => s.id === sectionId )
+        item.subjects.forEach(item => {
+          this.$set(item, 'pivot', {})
+          this.$set(item.pivot, 'sectionId', section ? section.id : null)
+          this.$set(item, 'section', section ? section : null)
+        });
+        subjects.isBusy = false
+      })
+    },
   },
   computed: {
     totalUnits() {
