@@ -17,5 +17,11 @@ export default {
     deletePersonnel(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/` + id)
     },
+    savePhoto(data, id){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${id}/photos`, data)
+    },
+    deletePhoto(id){
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${id}/photos`)
+    }
   }
 }
