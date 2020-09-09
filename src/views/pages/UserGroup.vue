@@ -5,84 +5,89 @@
         <h4 class="page-content__title">User Group Management</h4>
       </div>
       <div>
-                    <!-- add button and search -->
-            <b-row class="mb-3">
-              <b-col md=12>
-                <b-row>
-                  <b-col md=8>
-                    <b-button variant="primary"
-                      @click="setCreate()">
-                      <v-icon name="plus-circle" /> ADD NEW USER GROUP
-                    </b-button>
-                  </b-col>
-                  <b-col md=4>
-                    <b-form-input
-                      v-model="filters.userGroup.criteria"
-                      type="text"
-                      placeholder="Search"
-                      debounce="500">
-                    </b-form-input>
-                  </b-col>
-                </b-row>
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=8>
+                <b-button variant="primary"
+                  @click="setCreate()">
+                  <v-icon name="plus-circle" /> ADD NEW USER GROUP
+                </b-button>
+              </b-col>
+              <b-col md=4>
+                <b-form-input
+                  v-model="filters.userGroup.criteria"
+                  type="text"
+                  placeholder="Search"
+                  debounce="500">
+                </b-form-input>
               </b-col>
             </b-row>
-            <!-- end add button and search -->
-            <!-- table -->
-            <b-row >
-              <b-col md=12>
-                <b-table
-									hover outlined show-empty
-									:fields="tables.userGroups.fields"
-                  :busy="tables.userGroups.isBusy"
-                  :items="tables.userGroups.items"
-                  :current-page="paginations.userGroup.page"
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              hover outlined show-empty
+              :fields="tables.userGroups.fields"
+              :busy="tables.userGroups.isBusy"
+              :items="tables.userGroups.items"
+              :current-page="paginations.userGroup.page"
+              :per-page="paginations.userGroup.perPage"
+              :filter="filters.userGroup.criteria"
+              @filtered="onFiltered($event, paginations.userGroup)">
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item
+                    :to="`/maintenance/user-group/${row.item.id}/`"
+                    :disabled="showModalEntry">
+                    Setup Permission
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    @click="setUpdate(row)"
+                    :disabled="showModalEntry">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true"
+                    :disabled="showModalConfirmation">
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.userGroup.from }} to {{ paginations.userGroup.to }} of {{ paginations.userGroup.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  v-model="paginations.userGroup.page"
+                  :total-rows="paginations.userGroup.totalRows"
                   :per-page="paginations.userGroup.perPage"
-                  :filter="filters.userGroup.criteria"
-                  @filtered="onFiltered($event, paginations.userGroup)">
-                  <template v-slot:table-busy>
-                    <div class="text-center my-2">
-                      <v-icon
-                        name="spinner"
-                        spin
-                        class="mr-2" />
-                      <strong>Loading...</strong>
-                    </div>
-                  </template>
-                  <template v-slot:cell(action)="row">
-                    <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
-                      <template v-slot:button-content>
-                        <v-icon name="ellipsis-v" />
-                      </template>
-                      <b-dropdown-item
-                        @click="setUpdate(row)"
-                        :disabled="showModalEntry">
-                        Edit
-                      </b-dropdown-item>
-                      <b-dropdown-item
-                        @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true"
-                        :disabled="showModalConfirmation">
-                        Delete
-                      </b-dropdown-item>
-                    </b-dropdown>
-                  </template>
-								</b-table>
-                <b-row>
-                  <b-col md=6>
-                    Showing {{ paginations.userGroup.from }} to {{ paginations.userGroup.to }} of {{ paginations.userGroup.totalRows }} records.
-                    </b-col>
-                  <b-col md=6>
-                    <b-pagination
-                      v-model="paginations.userGroup.page"
-                      :total-rows="paginations.userGroup.totalRows"
-                      :per-page="paginations.userGroup.perPage"
-                      size="sm"
-                      align="end"
-                      @input="recordDetails(paginations.userGroup)" />
-                    </b-col>
-                  </b-row>
-              </b-col>
-            </b-row>
-            <!-- end table -->
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.userGroup)" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
     </div>
     <!-- Modal Entry -->
@@ -92,7 +97,7 @@
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title"> <!-- modal title -->
-					User Group - {{ entryMode }}
+        User Group - {{ entryMode }}
 			</div> <!-- modal title -->
       <!-- modal body -->
       <b-overlay :show="forms.userGroup.isLoading" rounded="sm">

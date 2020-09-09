@@ -41,6 +41,9 @@ const AcademicRecordEvaluation = () => import('@/views/pages/academic-records/Ev
 const AcademicRecordSubjects = () => import('@/views/pages/academic-records/Subjects')
 const AcademicRecordAssessment = () => import('@/views/pages/academic-records/Assessment')
 const AcademicRecordRequirements = () => import('@/views/pages/academic-records/Requirements')
+const UserGroupPermissions = () => import('@/views/pages/user-group-permissions/UserGroupPermissions')
+const Permissions = () => import('@/views/pages/user-group-permissions/Permissions')
+const SchoolCategories = () => import('@/views/pages/user-group-permissions/SchoolCategories')
 
 Vue.use(Router)
 
@@ -216,8 +219,37 @@ function configRoutes () {
             {
               path: 'user-group',
               name: 'User Group',
-              component: UserGroup,
-              meta: { requiresAuth: true, userType: 0 }
+              component: { render(c) { return c('router-view') } },
+              children: [
+                {
+                  path: '/',
+                  name: 'User Group List',
+                  component: UserGroup,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+                {
+                  path: ':userGroupId/',
+                  component: UserGroupPermissions,
+                  children: [
+                    {
+                      path: '/',
+                      redirect: 'permissions',
+                    },
+                    {
+                      path: 'permissions',
+                      name: 'Permissions',
+                      component: Permissions,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'school-categories',
+                      name: 'SchoolCategories',
+                      component: SchoolCategories,
+                      meta: { requiresAuth: true }
+                    },
+                  ]
+                }
+              ]
             }
           ]
         },
