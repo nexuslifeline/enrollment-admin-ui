@@ -177,14 +177,35 @@ h5, .h5 {
   border-radius: 0.25rem !important;
 }
 
+
+.badge {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background-color: $light-blue-20;
+  border: 1px solid $brand-primary;
+  color: $brand-primary;
+}
+
+.badge-success {
+  background-color: $light-green;
+  border: 1px solid $green;
+  color: $green;
+}
+
+.badge-warning {
+  background-color: $light-yellow;
+  border: 1px solid $yellow;
+  color: $yellow;
+}
+
 .badge-secondary {
   color: $bluish-gray;
   background-color: #ced2d8;
 }
 
-.badge {
-  color: $white;
-}
 
 .btn {
   display: inline-block;
@@ -402,4 +423,18 @@ legend.required:before {
   padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
+}
+
+.btn-invisible {
+  border: 0;
+  background: none;
+  outline: 0;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:active {
+    outline: 0;
+  }
 }

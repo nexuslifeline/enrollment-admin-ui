@@ -78,6 +78,8 @@ import 'vue-awesome/icons/calendar-alt'
 import 'vue-awesome/icons/address-card'
 import 'vue-awesome/icons/cogs'
 import 'vue-awesome/icons/caret-down'
+import 'vue-awesome/icons/chevron-down'
+import 'vue-awesome/icons/chevron-left'
 import Icon from 'vue-awesome/components/Icon'
 // import vSelect from 'vue-select'
 
