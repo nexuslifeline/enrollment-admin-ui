@@ -218,7 +218,7 @@ function configRoutes () {
             },
             {
               path: 'user-group',
-              name: 'User Group',
+              // name: 'User Group',
               component: { render(c) { return c('router-view') } },
               children: [
                 {
@@ -267,7 +267,7 @@ function configRoutes () {
             },
             {
               path: 'student',
-              name: 'Student',
+              // name: 'Student',
               component: { render(c) { return c('router-view') } },
               children: [
                 {
