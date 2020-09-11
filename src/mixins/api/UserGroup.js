@@ -17,5 +17,17 @@ export default {
     deleteUserGroup(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/user-groups/` + id)
     },
+    getPermissionsOfUserGroup(userGroupId, params){
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/user-groups/${userGroupId}/permissions`, { params: params })
+    },
+    storePermissionsOfUserGroup(userGroupId, data){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/user-groups/${userGroupId}/permissions`, data)
+    },
+    getSchoolCategoriesOfUserGroup(userGroupId, params){
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/user-groups/${userGroupId}/school-categories`, { params: params })
+    },
+    storeSchoolCategoriesOfUserGroup(userGroupId, data){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/user-groups/${userGroupId}/school-categories`, data)
+    },
   }
 }
