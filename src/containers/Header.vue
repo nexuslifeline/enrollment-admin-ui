@@ -13,63 +13,66 @@
       </ul>
     </div>
     <div class="header__account-details">
-      <div class="header__account-photo-container">
-        <img
-          v-if="!!userPhoto"
-          class="header__account-photo" :src="userPhoto"
-        />
-        <ProfileMaker
-          v-else
-          class="header__account-photo"
-          :initials="user.userable.name.charAt(0)"
-          :colorIndex="user.id % 8"
-        />
+      <WaveBackground />
+      <div class="header__account-details-row">
+        <div class="header__account-photo-container">
+          <img
+            v-if="!!userPhoto"
+            class="header__account-photo" :src="userPhoto"
+          />
+          <ProfileMaker
+            v-else
+            class="header__account-photo"
+            :initials="user.userable.name.charAt(0)"
+            :colorIndex="user.id % 8"
+          />
+        </div>
+        <div class="header__account-profile-details">
+          <p class="header__account-name">{{user.userable.name}}</p>
+          <p class="header__account-group">{{userGroup}}</p>
+        </div>
+        <div class="header__account-actions">
+          <button @click.stop="showDropdown = !showDropdown" type="button" class="account-action__settings">
+            <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
+            <v-icon name="caret-down" class="account-action__icon" scale=".85" />
+            <div v-show="showDropdown" class="account-action__dropdown">
+              <ul class="account-action__dropdown-items">
+                <li class="account-action__dropdown-item">
+                  <a href="#"
+                    class="account-action__dropdown-item-link">
+                    My Profile
+                  </a>
+                </li>
+                <li class="account-action__dropdown-item">
+                  <a href="#"
+                    @click.prevent.stop="logout"
+                    class="account-action__dropdown-item-link">
+                    Logout
+                    <v-icon
+                      v-if="isLoading"
+                      name="spinner"
+                      spin
+                      class="ml-2"
+                    />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </button>
+        </div>
       </div>
-      <div class="header__account-profile-details">
-        <p class="header__account-name">{{user.userable.name}}</p>
-        <p class="header__account-group">{{userGroup}}</p>
+      <div class="header__sub-menus-container">
+        <ul class="header__sub-menus">
+          <li v-for="(subNav, idx) in $options.navItems[activeIndex].children"
+            :key="idx"
+            class="header__sub-menu-item"
+            :class="{ active: $route.path === subNav.to }">
+            <a :href="`#${subNav.to}`" class="header__menu-link">
+              {{subNav.label}}
+            </a>
+          </li>
+        </ul>
       </div>
-      <div class="header__account-actions">
-        <button @click.stop="showDropdown = !showDropdown" type="button" class="account-action__settings">
-          <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
-          <v-icon name="caret-down" class="account-action__icon" scale=".85" />
-          <div v-show="showDropdown" class="account-action__dropdown">
-            <ul class="account-action__dropdown-items">
-              <li class="account-action__dropdown-item">
-                <a href="#"
-                  class="account-action__dropdown-item-link">
-                  My Profile
-                </a>
-              </li>
-              <li class="account-action__dropdown-item">
-                <a href="#"
-                  @click.prevent.stop="logout"
-                  class="account-action__dropdown-item-link">
-                  Logout
-                  <v-icon
-                    v-if="isLoading"
-                    name="spinner"
-                    spin
-                    class="ml-2"
-                  />
-                </a>
-              </li>
-            </ul>
-          </div>
-        </button>
-      </div>
-    </div>
-    <div class="header__sub-menus-container">
-      <ul class="header__sub-menus">
-        <li v-for="(subNav, idx) in $options.navItems[activeIndex].children"
-          :key="idx"
-          class="header__sub-menu-item"
-          :class="{ active: $route.path === subNav.to }">
-          <a :href="`#${subNav.to}`" class="header__menu-link">
-            {{subNav.label}}
-          </a>
-        </li>
-      </ul>
     </div>
   </div>
 </template>
@@ -78,11 +81,13 @@
 import navItems from './navs';
 import ProfileMaker from '../views/components/ProfileMaker';
 import { AuthApi } from '../mixins/api';
+import WaveBackground from '../views/components/WaveMaker'
 
 export default {
   name: 'TheHeader',
   components: {
-    ProfileMaker
+    ProfileMaker,
+    WaveBackground
   },
   mixins: [AuthApi],
   navItems,
@@ -218,7 +223,8 @@ export default {
     height: 33px;
     width: 100%;
     padding: 0 230px;
-    background-color: $brand-primary;
+    //background-color: $brand-primary;
+    z-index: 1;
 
     @include for-size(tablet-portrait-down) {
       padding: 0 20px;
@@ -259,8 +265,9 @@ export default {
         width: 0;
         height: 0;
         border-style: solid;
-        border-width: 0 18px 20px 18px;
-        border-color: transparent transparent $brand-primary transparent;
+        border-width: 0 11px 10px 11px;
+        border-color: transparent transparent #40acdb transparent;
+        opacity: .95;
       }
     }
 
@@ -270,9 +277,16 @@ export default {
   }
 
   .header__account-details {
-    height: 100px;
-    background-color: $brand-primary;
+    height: 130px;
+    background-color: #24a0d6;
     display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .header__account-details-row {
+    display: flex;
+    z-index: 1;
   }
 
   .header__sub-menus {
@@ -354,7 +368,7 @@ export default {
     object-fit: cover;
     position: absolute;
     left: 60px;
-    top: 40%;
+    top: 22%;
     border: 5px solid $white;
     font-size: 70px;
 
