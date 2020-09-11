@@ -172,10 +172,12 @@
       </div>
     </div>
     <!-- Modal Preview -->
-    <PreviewFile
-      :showModalPreview="showModalPreview"
+    <FileViewer
+      :show="showModalPreview"
       :file="file"
-      @close="showModalPreview = false" />
+      :isBusy="file.isLoading"
+      @close="showModalPreview = false"
+    />
     <!-- Modal Preview -->
 		<!-- Modal Approval Confirmation -->
 		<b-modal
@@ -366,7 +368,7 @@ import Tables from "../../helpers/tables"
 import FileUploader from "../components/FileUploader"
 import FileItem from "../components/FileItem"
 import { copyValue } from '../../helpers/extractor'
-import PreviewFile from '../components/PreviewFile'
+import FileViewer from '../components/FileViewer'
 
 export default {
 	name: "Payment",
@@ -374,7 +376,7 @@ export default {
   components: {
     FileUploader,
     FileItem,
-    PreviewFile
+    FileViewer
   },
 	data() {
 		return {

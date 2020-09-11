@@ -188,10 +188,12 @@
         </b-button>
       </div>
     </b-modal>
-    <PreviewFile
-      :showModalPreview="showModalPreview"
+    <FileViewer
+      :show="showModalPreview"
       :file="file"
-      @close="showModalPreview = false" />
+      :isBusy="file.isLoading"
+      @close="showModalPreview = false"
+    />
 
   </div>
 </template>
@@ -199,7 +201,7 @@
 import { StudentApi, EvaluationApi, EvaluationFileApi } from '../../../mixins/api'
 import { EvaluationStatuses, StudentCategories } from '../../../helpers/enum'
 import EvaluationEntry from './EvaluationEntry'
-import PreviewFile from '../../components/PreviewFile'
+import FileViewer from '../../components/FileViewer'
 import  FileUploader from '../../components/FileUploader'
 import  FileItem from '../../components/FileItem'
 import { copyValue } from '../../../helpers/extractor'
@@ -214,7 +216,7 @@ export default {
   mixins: [ StudentApi, EvaluationApi, EvaluationFileApi ],
   components: {
     EvaluationEntry,
-    PreviewFile,
+    FileViewer,
     FileUploader,
     FileItem
   },

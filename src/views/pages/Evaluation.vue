@@ -552,7 +552,7 @@
                         :busy="tables.files.isBusy">
                         <template v-slot:cell(action)="row">
                           <b-button
-                            @click="previewFile(row)"
+                            @click="previewFile(row, data.item)"
                             size="sm" variant="secondary">
                             <v-icon
                               name="search"/>
@@ -603,10 +603,13 @@
         </b-row>
       </div>
     </div>
-    <PreviewFile
-      :showModalPreview="showModalPreview"
+    <FileViewer
+      :show="showModalPreview"
       :file="file"
-      @close="showModalPreview = false" />
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="showModalPreview = false"
+    />
 		<b-modal
 			v-model="showModalApproval"
 			centered
@@ -697,7 +700,7 @@ import { showNotification, formatNumber, clearFields } from "../../helpers/forms
 import Tables from "../../helpers/tables"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import { copyValue } from '../../helpers/extractor'
-import PreviewFile from '../components/PreviewFile'
+import FileViewer from '../components/FileViewer'
 
 const evaluationFields = {
   evaluationStatusId: null,
@@ -710,7 +713,7 @@ export default {
   mixins: [EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi, Tables],
   components: {
     SchoolCategoryTabs,
-    PreviewFile
+    FileViewer
   },
 	data() {
 		return {
@@ -1180,7 +1183,7 @@ export default {
       }
       return ''
     },
-    previewFile(row) {
+    previewFile(row, { student }) {
       const { evaluationId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
@@ -1188,6 +1191,8 @@ export default {
       this.file.notes = notes
       this.showModalPreview = true
       this.file.isLoading = true
+      this.file.owner = student;
+      console.log(student)
       this.getEvaluationFilePreview(evaluationId, id)
         .then(response => {
           this.file.type = response.headers.contentType
