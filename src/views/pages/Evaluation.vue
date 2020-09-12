@@ -552,7 +552,7 @@
                         :busy="tables.files.isBusy">
                         <template v-slot:cell(action)="row">
                           <b-button
-                            @click="previewFile(row, data.item)"
+                            @click="previewFile(row, data)"
                             size="sm" variant="secondary">
                             <v-icon
                               name="search"/>
@@ -609,6 +609,9 @@
       :owner="file.owner"
       :isBusy="file.isLoading"
       @close="showModalPreview = false"
+      @onNavLeft="onFileNavLeft"
+      @onNavRight="onFileNavRight"
+      :enableArrowNav="isActiveNavEnabled"
     />
 		<b-modal
 			v-model="showModalApproval"
@@ -725,6 +728,8 @@ export default {
       evaluationStatuses: EvaluationStatuses,
       semesters: Semesters,
       studentCategories: StudentCategories,
+      lastActiveEvaluation: null,
+      lastActiveFile: null,
       file: {
         type: null,
         src: null,
@@ -1183,16 +1188,21 @@ export default {
       }
       return ''
     },
-    previewFile(row, { student }) {
-      const { evaluationId, id, name, notes } = row.item
+    previewFile(row, data) {
+      const { evaluationId, id, name, notes } = row.item;
+
+      this.lastActiveEvaluation = data;
+      this.lastActiveFile = row;
+      console.log('row', row)
+
       this.file.type = null
       this.file.src = null
       this.file.name = name
       this.file.notes = notes
       this.showModalPreview = true
       this.file.isLoading = true
-      this.file.owner = student;
-      console.log(student)
+      this.file.owner = data.item.student;
+
       this.getEvaluationFilePreview(evaluationId, id)
         .then(response => {
           this.file.type = response.headers.contentType
@@ -1315,6 +1325,41 @@ export default {
         errorList
       )
       showNotification(this, "danger", vNodesMsg)
+    },
+    getCurrentFiles() {
+      const { index: studentIdx } = this.lastActiveEvaluation;
+      const { files } = this.tables?.students?.items[studentIdx];
+      return files;
+    },
+    getCurrentFileIndex() {
+      const { index } = this.lastActiveFile;
+      return index;
+    },
+    onFileNavLeft() {
+      const files = this.getCurrentFiles();
+      let currentIdx = this.getCurrentFileIndex();
+      const isFirst = currentIdx === 0;
+      currentIdx = isFirst ? files.length - 1 : currentIdx - 1;
+      const file = files[currentIdx];
+      const currentFileItem = {
+        ...this.lastActiveFile,
+        index: currentIdx,
+        item: file
+      };
+      this.previewFile(currentFileItem, this.lastActiveEvaluation);
+    },
+    onFileNavRight() {
+      const files = this.getCurrentFiles();
+      let currentIdx = this.getCurrentFileIndex();
+      const isLast = currentIdx === files.length - 1;
+      currentIdx = isLast ? 0 : currentIdx + 1;
+      const file = files[currentIdx];
+      const currentFileItem = {
+        ...this.lastActiveFile,
+        index: currentIdx,
+        item: file
+      };
+      this.previewFile(currentFileItem, this.lastActiveEvaluation);
     }
   },
   computed: {
@@ -1327,6 +1372,14 @@ export default {
         return units
       }
     },
+    isActiveNavEnabled() {
+      if (this.lastActiveEvaluation) {
+        const { index: studentIdx } = this.lastActiveEvaluation;
+        const { files } = this.tables?.students?.items[studentIdx];
+        return files?.length > 0;
+      }
+      return false;
+    }
   }
 }
 </script>

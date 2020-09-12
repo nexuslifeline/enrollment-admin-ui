@@ -61,7 +61,7 @@ export default {
     svg {
       width: 100%;
       height: auto;
-      opacity: .35;
+      opacity: .38;
 
       path {
         width: 100%;
