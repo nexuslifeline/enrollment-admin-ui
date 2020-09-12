@@ -17,7 +17,7 @@
                   </b-col>
                   <b-col md=3>
                     <b-form-select
-                      @input="filterBySchoolCategory()"
+                      @input="loadSubjects()"
                       v-model="filters.subject.schoolCategoryId"
                       class="float-right">
                       <template v-slot:first>
@@ -37,6 +37,7 @@
                       v-model="filters.subject.criteria"
                       type="text"
                       placeholder="Search"
+                      @update="loadSubjects()"
                       debounce="500">
                     </b-form-input>
                   </b-col>
@@ -51,11 +52,7 @@
 									small hover outlined show-empty responsive
 									:fields="tables.subjects.fields"
                   :busy="tables.subjects.isBusy"
-                  :items="tables.subjects.filteredItems"
-                  :current-page="paginations.subject.page"
-                  :per-page="paginations.subject.perPage"
-                  :filter="filters.subject.criteria"
-                  @filtered="onFiltered($event, paginations.subject)">
+                  :items="tables.subjects.items">
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
                       <v-icon
@@ -94,7 +91,7 @@
                       :per-page="paginations.subject.perPage"
                       size="sm"
                       align="end"
-                      @input="recordDetails(paginations.subject)" />
+                      @input="loadSubjects()" />
                     </b-col>
                   </b-row>
               </b-col>
@@ -544,17 +541,18 @@ export default {
 	methods: {
 		loadSubjects(){
       const { subjects } = this.tables
-      const { subject } = this.paginations
+      const { criteria, schoolCategoryId } = this.filters.subject
+      const { subject, subject: { perPage, page }} = this.paginations
 
       subjects.isBusy = true
 
-			let params = { paginate: false }
+			const params = { paginate: true, perPage, page, criteria, schoolCategoryId }
       this.getSubjectList(params)
         .then(({ data }) => {
-          subjects.items = data
-          subjects.filteredItems = data
-          subject.totalRows = data.length
-          this.recordDetails(subject)
+          subjects.items = data.data
+          subject.from = data.meta.from
+          subject.to = data.meta.to
+          subject.totalRows = data.meta.total
           subjects.isBusy = false
         })
     },

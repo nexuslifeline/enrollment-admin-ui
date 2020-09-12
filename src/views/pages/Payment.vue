@@ -45,10 +45,10 @@
             <template v-slot:cell(name)="data">
               <b-media>
                 <template v-slot:aside>
-                  <b-avatar 
-                    rounded 
-                    blank 
-                    size="64" 
+                  <b-avatar
+                    rounded
+                    blank
+                    size="64"
                     :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                     :src="avatar(data.item.student)" />
                 </template>
@@ -118,8 +118,8 @@
                           :items="data.item.files"
                           :busy="tables.files.isBusy">
                           <template v-slot:cell(action)="row">
-                            <b-button 
-                              @click="previewFile(row)" 
+                            <b-button
+                              @click="previewFile(row, data.item)"
                               size="sm" variant="secondary">
                               <v-icon
                                 name="search" />
@@ -176,6 +176,7 @@
       :show="showModalPreview"
       :file="file"
       :isBusy="file.isLoading"
+      :owner="file.owner"
       @close="showModalPreview = false"
     />
     <!-- Modal Preview -->
@@ -642,12 +643,13 @@ export default {
       }
       row.toggleDetails()
     },
-    previewFile(row) {
+    previewFile(row, { student }) {
       const { paymentId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
       this.file.name = name
       this.file.notes = notes
+      this.file.owner = student
       this.showModalPreview = true
       this.file.isLoading = true
       this.getPaymentFilePreview(paymentId, id)
@@ -738,10 +740,16 @@ export default {
       });
     },
     previewPaymentReceiptFile(index) {
+      const selectedFile = this.paymentReceiptFiles[index]
+      const { student } = this.row
       this.file.type = null
       this.file.src = null
+      this.file.name = selectedFile?.name
+      this.file.notes = selectedFile?.notes
+      this.file.isLoading = true
+      this.file.owner = student
 
-      const selectedFile = this.paymentReceiptFiles[index]
+      this.showModalPreview = true
 
       this.getPaymentReceiptFilePreview(this.row.id, selectedFile.id)
         .then(response => {
@@ -751,7 +759,7 @@ export default {
 
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
-          this.showModalPreview = true
+          this.file.isLoading = false
         })
     },
   },
