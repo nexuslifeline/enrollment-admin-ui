@@ -297,6 +297,11 @@
                             Semester:<span class="ml-2">{{ semesters.getEnum(data.item.semesterId).name }}</span>
                           </b-col>
                         </b-row>
+                        <b-row class="pb-1">
+                          <b-col md="12">
+                            Date Submitted:<span class="ml-2">{{ data.item.submittedDate }}</span>
+                          </b-col>
+                        </b-row>
                       </div>
                     </div>
                   </b-tab>
@@ -1138,7 +1143,7 @@ export default {
           courseId
         }
       } = row
-
+      item.isLoading = true
       const params = { paginate: false, schoolCategoryId, courseId }
 
       this.getCurriculumList(params)
@@ -1206,6 +1211,7 @@ export default {
     loadCurriculum(id, row) {
       const { subjects } = this.tables
       subjects.isBusy = true
+      row.item.isLoading = true
       this.getCurriculum(id)
       .then(({ data }) => {
         row.item.curriculum = data
@@ -1225,6 +1231,7 @@ export default {
       const studentCurr = curriculums.find(i => i.id === id)
       item.curriculumId = id
       item.studentCurriculum = studentCurr
+      item.isLoading = true
       this.loadCurriculum(id, row)
     },
     loadSubjectsOfEvaluation(id, row) {
