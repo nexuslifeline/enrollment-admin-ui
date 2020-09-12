@@ -4,7 +4,9 @@
       <h3 class="maintenance__title">We're preparing to serve you better</h3>
       <img class="maintenance__img" src="img/maintenance.svg" />
       <div class="maintenance__message">
-        Thank you for being patient. We are still doing some work with this feature. We will release an update as soon as we can.</div>
+        Thank you for being patient. We are still doing some work with this feature. 
+        We will release an update as soon as we can.
+      </div>
       <p class="maintenance__team">- Nexus Team</p>
     </div>
   </div>

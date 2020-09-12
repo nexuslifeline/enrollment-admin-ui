@@ -27,6 +27,15 @@
         <div v-if="!isBusy && !!file.src"
           class="file-container"
           :class="{ fullscreen: isFullScreen }">
+          <template v-if="enableArrowNav">
+            <button @click="$emit('onNavLeft')" class="preview-file__navs preview-file__nav-left">
+              <v-icon name="chevron-left" scale="1.7" />
+            </button>
+            <button @click="$emit('onNavRight')" class="preview-file__navs preview-file__nav-right">
+              <v-icon name="chevron-right" scale="1.7" />
+            </button>
+          </template>
+
           <div v-if="isFullScreen" class="file-container__header">
             <h4 class="file-container__header-title">
               {{file.name}}
@@ -76,7 +85,11 @@ export default {
     show: Boolean,
     file: Object,
     owner: Object,
-    isBusy: Boolean
+    isBusy: Boolean,
+    enableArrowNav: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -128,7 +141,7 @@ export default {
 
   .preview-file__header {
     margin: -1rem; // offset modal body padding
-    padding: 15px;
+    padding: 10px;
   }
 
   .preview-file__image {
@@ -151,7 +164,7 @@ export default {
     padding: 0 15px;
   }
   .preview-file__file-name {
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 600;
   }
 
@@ -170,6 +183,10 @@ export default {
     &.scrollable {
       overflow: auto;
     }
+
+    .embed-responsive {
+      height: 100%;
+    }
   }
 
   .file-container {
@@ -177,10 +194,7 @@ export default {
     margin: -1rem; // offset modal body padding
     display: flex;
     flex-direction: column;
-
-    @include for-size(tablet-landscape-down) {
-      height: calc(100vh - 50px);
-    }
+    position: relative;
 
     &.fullscreen {
       position: fixed;
@@ -239,7 +253,28 @@ export default {
 
   .file-container__header-title {
     color: $white;
-    font-size: 22px;
+    font-size: 20px;
+
+    @include for-size(phone-only) {
+      font-size: 18px;
+    }
+  }
+
+  .preview-file__navs  {
+    position: absolute;
+    border: 0;
+    outline: 0;
+    top: 30%;
+    background: none;
+    color: $white;
+  }
+
+  .preview-file__nav-left {
+    left: -40px;
+  }
+
+  .preview-file__nav-right {
+    right: -40px;
   }
 
 </style>
