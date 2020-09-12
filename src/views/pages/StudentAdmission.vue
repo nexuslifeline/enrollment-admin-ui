@@ -441,7 +441,8 @@
               <b-form-input
                 v-model="filters.subject.criteria"
                 type="text"
-                placeholder="Search">
+                placeholder="Search"
+                @update="loadSubjects()">
               </b-form-input>
             </b-col>
           </b-row>
@@ -449,15 +450,7 @@
 						small hover outlined show-empty
 						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields2"
-            :filter="filters.subject.criteria"
-						:busy="tables.subjects.isBusy"
-            :current-page="paginations.subject.page"
-            :per-page="paginations.subject.perPage"
-            @filtered="onFiltered($event, paginations.subject)">
-            <!-- <template v-slot:cell(section)>
-						  <b-tr class="d-none">
-						  </b-tr>
-						</template> -->
+						:busy="tables.subjects.isBusy">
 						<template v-slot:cell(action)="row">
 							<b-button
                 @click="addSubject(row)"
@@ -486,7 +479,7 @@
                 :per-page="paginations.subject.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.subject)"
+                @input="loadSubjects()"
               />
             </b-col>
           </b-row>
@@ -970,6 +963,7 @@ export default {
         },
         subject: {
           criteria: null,
+          schoolCategoryId: null,
           departmentId: null
         },
         scheduledSubject: {
@@ -1224,9 +1218,10 @@ export default {
           this.showModalPreview = true
         })
     },
-    loadSubjects(schoolCategoryId){
+    loadSubjects(){
       const { subjects } = this.tables
-      const { subject } = this.paginations
+      const { criteria, schoolCategoryId } = this.filters.subject
+      const { subject, subject: { perPage, page }} = this.paginations
       subjects.items = []
 
       if ([SchoolCategories.SENIOR_HIGH_SCHOOL.id, SchoolCategories.COLLEGE.id, SchoolCategories.GRADUATE_SCHOOL.id].includes(schoolCategoryId)) {
@@ -1234,14 +1229,15 @@ export default {
       }
 
       subjects.isBusy = true
-      let params = { paginate: false, schoolCategoryId }
+      let params = { paginate: true, schoolCategoryId, perPage, page, criteria }
 
 			this.getSubjectList(params)
 				.then(({ data }) => {
-          subjects.items = data
-          // subjects.filteredItems = data
-          subject.totalRows = data.length
-          this.recordDetails(subject)
+          subjects.items = data.data
+          subject.from = data.meta.from
+          subject.to = data.meta.to
+          subject.totalRows = data.meta.total
+          subjects.isBusy = false
 					subjects.isBusy = false
 				})
     },
@@ -1255,7 +1251,9 @@ export default {
       this.studentSubjects = row.subjects
       this.showModalSubjects = true
       this.showDepartment = false
-      this.loadSubjects(row.schoolCategoryId)
+      this.filters.subject.criteria = null
+      this.filters.subject.schoolCategoryId = row.schoolCategoryId
+      this.loadSubjects()
     },
 		addSubject(row){
       const { item } = row
