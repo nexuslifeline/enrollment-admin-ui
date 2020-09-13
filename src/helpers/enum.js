@@ -24,6 +24,10 @@ export class Enum {
   getEnumByValue = (value, fromKey) => {
     return this.values.find((e) => e[fromKey || 'name'] === value);
   };
+
+  getIds = () => {
+    return this.values.map((e) => e.id);
+  }
 }
 
 export const StudentTypes = new Enum({

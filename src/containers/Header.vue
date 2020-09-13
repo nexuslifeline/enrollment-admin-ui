@@ -64,6 +64,7 @@
       <div class="header__sub-menus-container">
         <ul class="header__sub-menus">
           <li v-for="(subNav, idx) in $options.navItems[activeIndex].children"
+            v-if="isAccessible(subNav.permissionIds)"
             :key="idx"
             class="header__sub-menu-item"
             :class="{ active: $route.path === subNav.to }">
@@ -81,7 +82,8 @@
 import navItems from './navs';
 import ProfileMaker from '../views/components/ProfileMaker';
 import { AuthApi } from '../mixins/api';
-import WaveBackground from '../views/components/WaveMaker'
+import WaveBackground from '../views/components/WaveMaker';
+import Access from '../mixins/utils/Access';
 
 export default {
   name: 'TheHeader',
@@ -89,7 +91,7 @@ export default {
     ProfileMaker,
     WaveBackground
   },
-  mixins: [AuthApi],
+  mixins: [AuthApi, Access],
   navItems,
   data() {
     return {

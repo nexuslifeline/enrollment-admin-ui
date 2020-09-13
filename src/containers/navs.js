@@ -1,3 +1,9 @@
+
+import {
+  DepartmentPermissions,
+  SchoolYearPermissions
+} from '../helpers/enum';
+
 export default [
   {
     label: 'Home',
@@ -100,7 +106,8 @@ export default [
     children: [
       {
         label: 'Department',
-        to: '/maintenance/department'
+        to: '/maintenance/department',
+        permissionIds: DepartmentPermissions.getIds()
       },
       {
         label: 'Semester',

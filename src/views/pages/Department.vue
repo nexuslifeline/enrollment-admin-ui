@@ -51,7 +51,15 @@
                 </div>
               </template>
               <template v-slot:cell(action)="row">
-                <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.DepartmentPermissions.EDIT.id,
+                    $options.DepartmentPermissions.DELETE.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
                   </template>
