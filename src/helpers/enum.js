@@ -114,22 +114,22 @@ export const Fees = new Enum({
 
 export const DegreeTypes = new Enum({
   SENIOR_HIGH: { id: 1, name: 'Senior High', levels: [
-    { levelId: 13, schoolCategoryId: 4 }, 
+    { levelId: 13, schoolCategoryId: 4 },
     { levelId: 14, schoolCategoryId: 4 }
   ]},
   ASSOCIATE_DEGREE: { id: 2, name: 'Associate Degree', levels: [
-    { levelId: 15, schoolCategoryId: 5 }, 
+    { levelId: 15, schoolCategoryId: 5 },
     { levelId: 16, schoolCategoryId: 5 },
     { levelId: 17, schoolCategoryId: 5 },
   ]},
   BACHELORS_DEGREE_4_YEARS: { id: 3, name: "Bachelor's Degree (4 yrs)", levels: [
-    { levelId: 15, schoolCategoryId: 5 }, 
+    { levelId: 15, schoolCategoryId: 5 },
     { levelId: 16, schoolCategoryId: 5 },
     { levelId: 17, schoolCategoryId: 5 },
     { levelId: 18, schoolCategoryId: 5 }
   ]},
   BACHELORS_DEGREE_5_YEARS: { id: 4, name: "Bachelor's Degree (5 yrs)", levels: [
-    { levelId: 15, schoolCategoryId: 5 }, 
+    { levelId: 15, schoolCategoryId: 5 },
     { levelId: 16, schoolCategoryId: 5 },
     { levelId: 17, schoolCategoryId: 5 },
     { levelId: 18, schoolCategoryId: 5 },
@@ -472,4 +472,16 @@ export const CivilStatuses = new Enum({
   MARRIED: { id: 2, name: 'Married', description: 'Married' },
   DIVORCED: { id: 3, name: 'Divorced', description: 'Divorced' },
   WIDOWED: { id: 4, name: 'Widowed', description: 'Widowed' }
+});
+
+export const DepartmentPermissions = new Enum({
+  ADD: { id: 101, name: 'Add' },
+  EDIT: { id: 102, name: 'Edit' },
+  DELETE: { id: 103, name: 'Delete' }
+});
+
+export const SchoolYearPermissions = new Enum({
+  ADD: { id: 201, name: 'Add' },
+  EDIT: { id: 202, name: 'Edit' },
+  DELETE: { id: 203, name: 'Delete' }
 });
