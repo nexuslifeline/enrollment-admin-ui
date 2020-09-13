@@ -609,14 +609,16 @@
       </div>
     </div>
     <FileViewer
-      :show="showModalPreview"
+      :show="fileViewer.show"
       :file="file"
       :owner="file.owner"
       :isBusy="file.isLoading"
-      @close="showModalPreview = false"
+      @close="fileViewer.show = false"
       @onNavLeft="onFileNavLeft"
       @onNavRight="onFileNavRight"
-      :enableArrowNav="isActiveNavEnabled"
+      :navCount="fileViewer.activeNavCount"
+      :navActiveIndex="fileViewer.activeNavIndex"
+      :enableArrowNav="fileViewer.isActiveNavEnabled"
     />
 		<b-modal
 			v-model="showModalApproval"
@@ -725,7 +727,12 @@ export default {
   },
 	data() {
 		return {
-      showModalPreview: false,
+      fileViewer: {
+        isActiveNavEnabled: false,
+        activeNavCount: 0,
+        activeNavIndex: 0,
+        show: false,
+      },
 			showModalApproval: false,
       showModalRejection: false,
       showModalSubjects: false,
@@ -1193,18 +1200,22 @@ export default {
       }
       return ''
     },
-    previewFile(row, data) {
-      const { evaluationId, id, name, notes } = row.item;
-
+    setupActiveFileViewer(row, data) {
       this.lastActiveEvaluation = data;
       this.lastActiveFile = row;
-      console.log('row', row)
+      this.fileViewer.isActiveNavEnabled = !!data?.item?.files?.length;
+      this.fileViewer.activeNavCount = data?.item?.files?.length;
+      this.fileViewer.activeNavIndex =  row.index;
+    },
+    previewFile(row, data) {
+      this.setupActiveFileViewer(row, data);
 
+      const { evaluationId, id, name, notes } = row.item;
       this.file.type = null
       this.file.src = null
       this.file.name = name
       this.file.notes = notes
-      this.showModalPreview = true
+      this.fileViewer.show = true
       this.file.isLoading = true
       this.file.owner = data.item.student;
 
@@ -1378,14 +1389,6 @@ export default {
         })
         return units
       }
-    },
-    isActiveNavEnabled() {
-      if (this.lastActiveEvaluation) {
-        const { index: studentIdx } = this.lastActiveEvaluation;
-        const { files } = this.tables?.students?.items[studentIdx];
-        return files?.length > 0;
-      }
-      return false;
     }
   }
 }
