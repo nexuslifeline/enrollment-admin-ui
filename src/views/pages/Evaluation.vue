@@ -579,10 +579,12 @@
                 <div
                   v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id">
                   <b-button
+                    v-if="isAccessible($options.EvaluationAndAdmissionPermissions.DISAPPROVAL.id)"
                     @click="setDisapproval(data)"
                     class="float-right my-2 mr-2"
                     variant="outline-danger">Reject</b-button>
                   <b-button
+                    v-if="isAccessible($options.EvaluationAndAdmissionPermissions.APPROVAL.id)"
                     @click="setApproval(data)"
                     class="float-right m-2"
                     variant="outline-primary">Approve</b-button>
@@ -705,12 +707,13 @@
 </template>
 <script>
 import { EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi } from "../../mixins/api"
-import { SchoolCategories, EvaluationStatuses, Semesters, UserGroups, StudentCategories } from "../../helpers/enum"
+import { SchoolCategories, EvaluationStatuses, Semesters, UserGroups, StudentCategories, EvaluationAndAdmissionPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber, clearFields } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import { copyValue } from '../../helpers/extractor'
 import FileViewer from '../components/FileViewer'
+import Access from '../../mixins/utils/Access'
 
 const evaluationFields = {
   evaluationStatusId: null,
@@ -720,11 +723,12 @@ const evaluationFields = {
 
 export default {
 	name: "Evaluation",
-  mixins: [EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi, Tables],
+  mixins: [EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi, Tables, Access],
   components: {
     SchoolCategoryTabs,
     FileViewer
   },
+  EvaluationAndAdmissionPermissions,
 	data() {
 		return {
       fileViewer: {

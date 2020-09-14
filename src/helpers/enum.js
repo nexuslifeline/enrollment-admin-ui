@@ -485,7 +485,89 @@ export const DepartmentPermissions = new Enum({
 });
 
 export const SchoolYearPermissions = new Enum({
+  ADD: { id: 111, name: 'Add' },
+  EDIT: { id: 112, name: 'Edit' },
+  DELETE: { id: 113, name: 'Delete' }
+});
+
+export const UserGroupPermissions = new Enum({
+  ADD: { id: 131, name: 'Add' },
+  EDIT: { id: 132, name: 'Edit' },
+  DELETE: { id: 133, name: 'Delete' },
+  SETUP_PERMISSION: { id: 134, name: 'Setup Permission' }
+});
+
+export const StudentPermissions = new Enum({
+  ADD: { id: 141, name: 'Add' },
+  EDIT: { id: 142, name: 'Edit' },
+  UPDATE_STUDENT_ACCOUNT: { id: 143, name: 'Update Student Account' },
+  DELETE: { id: 144, name: 'Delete' },
+  UPDATE_ACADEMIC_RECORDS: { id: 145, name: 'Update Academic Records' },
+});
+
+export const PersonnelPermissions = new Enum({
+  ADD: { id: 151, name: 'Add' },
+  EDIT: { id: 152, name: 'Edit' },
+  UPDATE_PERSONNEL_ACCOUNT: { id: 153, name: 'Update Personnel Account' },
+  DELETE: { id: 154, name: 'Delete' }
+});
+
+export const RateSheetPermissions = new Enum({
+  UPDATE: { id: 161, name: 'Update' },
+});
+
+export const FeeCategoryPermissions = new Enum({
+  ADD: { id: 171, name: 'Add' },
+  EDIT: { id: 172, name: 'Edit' },
+  DELETE: { id: 173, name: 'Delete' }
+});
+
+export const SchoolFeePermissions = new Enum({
+  ADD: { id: 181, name: 'Add' },
+  EDIT: { id: 182, name: 'Edit' },
+  DELETE: { id: 183, name: 'Delete' }
+});
+
+export const CurriculumPermissions = new Enum({
+  ADD: { id: 191, name: 'Add' },
+  EDIT: { id: 192, name: 'Edit' },
+  DELETE: { id: 193, name: 'Delete' }
+});
+
+export const SectionAndSchedulePermissions = new Enum({
   ADD: { id: 201, name: 'Add' },
   EDIT: { id: 202, name: 'Edit' },
   DELETE: { id: 203, name: 'Delete' }
+});
+
+export const SubjectPermissions = new Enum({
+  ADD: { id: 211, name: 'Add' },
+  EDIT: { id: 212, name: 'Edit' },
+  DELETE: { id: 213, name: 'Delete' }
+});
+
+export const CoursePermissions = new Enum({
+  ADD: { id: 221, name: 'Add' },
+  EDIT: { id: 222, name: 'Edit' },
+  DELETE: { id: 223, name: 'Delete' }
+});
+
+export const EvaluationAndAdmissionPermissions = new Enum({
+  APPROVAL: { id: 231, name: 'Approval' },
+  DISAPPROVAL: { id: 232, name: 'Disapproval' }
+});
+
+export const StudentSubjectPermissions = new Enum({
+  APPROVAL: { id: 241, name: 'Approval' },
+  DISAPPROVAL: { id: 242, name: 'Disapproval' }
+});
+
+export const StudentFeePermissions = new Enum({
+  APPROVAL: { id: 251, name: 'Approval' },
+  DISAPPROVAL: { id: 252, name: 'Disapproval' }
+});
+
+export const StudentPaymentPermissions = new Enum({
+  APPROVAL: { id: 261, name: 'Approval' },
+  DISAPPROVAL: { id: 262, name: 'Disapproval' }
 });

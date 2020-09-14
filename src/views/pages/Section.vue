@@ -15,7 +15,10 @@
           <b-col md="12">
             <b-row>
               <b-col md="2">
-                <b-button variant="primary" @click="setCreate()">
+                <b-button
+                  v-if="isAccessible($options.SectionAndSchedulePermissions.ADD.id)"
+                  variant="primary"
+                  @click="setCreate()">
                   <v-icon name="plus-circle" /> ADD SECTION
                 </b-button>
               </b-col>
@@ -130,23 +133,28 @@
                   right
                   variant="link"
                   toggle-class="text-decoration-none"
-                  no-caret
-                >
+                  no-caret>
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
                   </template>
-                  <b-dropdown-item @click="loadSchedules(row)">
+                  <b-dropdown-item
+                    @click="loadSchedules(row)">
                     {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
                   </b-dropdown-item>
-                  <b-dropdown-item @click="setUpdate(row, 0)"
+                  <b-dropdown-item
+                    v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
+                    @click="setUpdate(row, 0)"
                     :disabled="showEntry" >
                     Edit
                   </b-dropdown-item>
-                  <b-dropdown-item @click="setUpdate(row, 1)"
+                  <b-dropdown-item
+                    v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
+                    @click="setUpdate(row, 1)"
                     :disabled="showEntry">
                     Setup Schedule
                   </b-dropdown-item>
                   <b-dropdown-item
+                    v-if="isAccessible($options.SectionAndSchedulePermissions.DELETE.id)"
                     @click="
                       (forms.section.fields.id = row.item.id),
                         (showModalConfirmation = true)
@@ -508,18 +516,20 @@ const sectionFields = {
 import { SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, CurriculumApi } from "../../mixins/api";
 import { validate, reset, clearFields, showNotification, } from "../../helpers/forms";
 import { copyValue } from "../../helpers/extractor";
-import { SchoolCategories, Semesters } from '../../helpers/enum'
+import { SchoolCategories, Semesters, SectionAndSchedulePermissions } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 import SchoolYear from '../../mixins/api/SchoolYear';
 import Schedule from '../components/Schedule'
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
+import Access from '../../mixins/utils/Access';
 export default {
   name: "ClassSection",
-  mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, Tables],
+  mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, Tables, Access],
   components: {
     Schedule,
     SchoolCategoryTabs
   },
+  SectionAndSchedulePermissions,
   data() {
     return {
       entryTabIndex: 0,

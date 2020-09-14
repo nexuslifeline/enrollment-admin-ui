@@ -16,7 +16,9 @@
             <b-col md=12>
               <b-row>
                 <b-col md=6 class="bottom-space">
-                  <b-button variant="primary"
+                  <b-button
+                    v-if="isAccessible($options.CurriculumPermissions.ADD.id)"
+                    variant="primary"
                     @click="setCreate()">
                     <v-icon name="plus-circle" /> ADD NEW CURRICULUM
                   </b-button>
@@ -80,7 +82,11 @@
                   </b-badge>
                 </template>
                 <template v-slot:cell(action)="row">
-                  <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+                  <b-dropdown
+                    right
+                    variant="link"
+                    toggle-class="text-decoration-none"
+                    no-caret>
                     <template v-slot:button-content>
                       <v-icon name="ellipsis-v" />
                     </template>
@@ -89,12 +95,13 @@
                       {{row.detailsShowing ? 'Hide' : 'View'}} Details
                     </b-dropdown-item>
                     <b-dropdown-item
+                      v-if="isAccessible($options.CurriculumPermissions.EDIT.id)"
                       @click="setUpdate(row.item.id)"
-                      :disabled="showEntry"
-                      >
+                      :disabled="showEntry">
                       Edit
                     </b-dropdown-item>
                     <b-dropdown-item
+                      v-if="isAccessible($options.CurriculumPermissions.DELETE.id)"
                       @click="forms.curriculum.fields.id = row.item.id, showModalConfirmation = true"
                       :disabled="showModalConfirmation">
                       Delete
@@ -713,11 +720,12 @@
 <script>
 import { SchoolCategoryApi, LevelApi, SemesterApi, CourseApi,
 	SubjectApi, DepartmentApi, CurriculumApi } from "../../mixins/api"
-import { SchoolCategories, Semesters, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups, CurriculumPermissions } from "../../helpers/enum"
 import { showNotification, validate, clearFields, reset } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
+import Access from '../../mixins/utils/Access'
 
 const curriculumFields = {
   id: null,
@@ -735,8 +743,9 @@ const curriculumFields = {
 export default {
 	name: "Curriculum",
 	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi,
-    SubjectApi, DepartmentApi, CurriculumApi, Tables ],
+    SubjectApi, DepartmentApi, CurriculumApi, Tables, Access ],
   components: { SchoolCategoryTabs },
+  CurriculumPermissions,
 	data() {
 		return {
       showModalSubjects: false,

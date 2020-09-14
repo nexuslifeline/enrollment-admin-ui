@@ -139,10 +139,12 @@
                       <b-row v-if="data.item.paymentStatusId === paymentStatuses.SUBMITTED.id">
                         <b-col md=12>
                           <b-button
+                            v-if="isAccessible($options.StudentPaymentPermissions.DISAPPROVAL.id)"
                             @click="setDisapproval(data)"
                             class="float-right my-2"
                             variant="outline-danger">Reject</b-button>
                           <b-button
+                            v-if="isAccessible($options.StudentPaymentPermissions.APPROVAL.id)"
                             @click="setApproval(data)"
                             class="float-right my-2 mr-2"
                             variant="outline-primary">Approve</b-button>
@@ -363,22 +365,24 @@ const paymentReceiptFileFields = {
 }
 
 import { PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi } from "../../mixins/api"
-import { PaymentStatuses } from "../../helpers/enum"
+import { PaymentStatuses, StudentPaymentPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber, clearFields, reset, validate } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 import FileUploader from "../components/FileUploader"
 import FileItem from "../components/FileItem"
 import { copyValue } from '../../helpers/extractor'
 import FileViewer from '../components/FileViewer'
+import Access from '../../mixins/utils/Access'
 
 export default {
 	name: "Payment",
-  mixins: [PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi, Tables],
+  mixins: [PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi, Tables, Access],
   components: {
     FileUploader,
     FileItem,
     FileViewer
   },
+  StudentPaymentPermissions,
 	data() {
 		return {
       showModalPreview: false,

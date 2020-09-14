@@ -10,7 +10,10 @@
         <b-col md=12>
           <b-row>
             <b-col md=8>
-              <b-button class="bottom-space" variant="primary"
+              <b-button
+                v-if="isAccessible($options.CoursePermissions.ADD.id)"
+                class="bottom-space"
+                variant="primary"
                 @click="setCreate()">
                 <v-icon name="plus-circle" /> ADD NEW COURSE
               </b-button>
@@ -48,16 +51,26 @@
               </div>
             </template>
             <template v-slot:cell(action)="row">
-              <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+              <b-dropdown
+                v-if="isAccessible([
+                  $options.CoursePermissions.EDIT.id,
+                  $options.CoursePermissions.DELETE.id
+                ])"
+                right
+                variant="link"
+                toggle-class="text-decoration-none"
+                no-caret>
                 <template v-slot:button-content>
                   <v-icon name="ellipsis-v" />
                 </template>
                 <b-dropdown-item
+                  v-if="isAccessible($options.CoursePermissions.EDIT.id)"
                   @click="setUpdate(row)"
                   :disabled="showModalEntry">
                   Edit
                 </b-dropdown-item>
                 <b-dropdown-item
+                  v-if="isAccessible($options.CoursePermissions.DELETE.id)"
                   @click="forms.course.fields.id = row.item.id, showModalConfirmation = true"
                   :disabled="showModalConfirmation">
                   Delete
@@ -218,11 +231,13 @@ const courseFields = {
 import { CourseApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
-import { DegreeTypes } from '../../helpers/enum'
+import { DegreeTypes, CoursePermissions } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
+import Access from '../../mixins/utils/Access'
 export default {
 	name: "Course",
-	mixins: [ CourseApi, Tables ],
+  mixins: [ CourseApi, Tables, Access ],
+  CoursePermissions,
 	data() {
 		return {
       showModalEntry: false,

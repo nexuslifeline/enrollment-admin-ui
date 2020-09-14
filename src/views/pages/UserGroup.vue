@@ -10,7 +10,9 @@
           <b-col md=12>
             <b-row>
               <b-col md=8>
-                <b-button variant="primary"
+                <b-button
+                  v-if="isAccessible($options.UserGroupPermissions.ADD.id)"
+                  variant="primary"
                   @click="setCreate()">
                   <v-icon name="plus-circle" /> ADD NEW USER GROUP
                 </b-button>
@@ -49,21 +51,33 @@
                 </div>
               </template>
               <template v-slot:cell(action)="row">
-                <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.UserGroupPermissions.EDIT.id,
+                    $options.UserGroupPermissions.DELETE.id,
+                    $options.UserGroupPermissions.SETUP_PERMISSION.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
                   </template>
                   <b-dropdown-item
+                    v-if="isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)"
                     :to="`/maintenance/user-group/${row.item.id}/`"
                     :disabled="showModalEntry">
                     Setup Permission
                   </b-dropdown-item>
                   <b-dropdown-item
+                    v-if="isAccessible($options.UserGroupPermissions.EDIT.id)"
                     @click="setUpdate(row)"
                     :disabled="showModalEntry">
                     Edit
                   </b-dropdown-item>
                   <b-dropdown-item
+                    v-if="isAccessible($options.UserGroupPermissions.DELETE.id)"
                     @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true"
                     :disabled="showModalConfirmation">
                     Delete
@@ -211,9 +225,12 @@ import { UserGroupApi } from "../../mixins/api"
 import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
+import Access from '../../mixins/utils/Access'
+import { UserGroupPermissions } from '../../helpers/enum'
 export default {
 	name: "UserGroup",
-	mixins: [ UserGroupApi, Tables ],
+  mixins: [ UserGroupApi, Tables, Access ],
+  UserGroupPermissions,
 	data() {
 		return {
       showModalEntry: false,

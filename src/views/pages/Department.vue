@@ -182,12 +182,12 @@
             class="mr-2" />
           Yes
         </b-button>
-        <b-button 
+        <b-button
           variant="outline-danger"
           class="btn-close"
           @click="showModalConfirmation=false">
           No
-        </b-button>            
+        </b-button>
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->

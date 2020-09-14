@@ -15,11 +15,11 @@
 							<b-col md="6">
 								<b-form-radio-group @input="loadTranscript()" v-model="filters.student.applicationStatusId">
 									<b-form-radio :value="null">Show All</b-form-radio>
-									<b-form-radio 
+									<b-form-radio
 										:value="applicationStatuses.APPROVED.id">
 										Approved
 									</b-form-radio>
-									<b-form-radio 
+									<b-form-radio
 										:value="applicationStatuses.SUBMITTED.id">
 										Pending
 									</b-form-radio>
@@ -27,19 +27,19 @@
 							</b-col>
               <b-col md="3">
                 <b-form-select
-                  v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id || 
-                    filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id || 
-                    filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id" 
-                  @change="loadTranscript()" 
-                  v-model="filters.student.courseId" 
+                  v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
+                    filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id ||
+                    filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
+                  @change="loadTranscript()"
+                  v-model="filters.student.courseId"
                   class="float-right">
                   <template v-slot:first>
                     <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
                   </template>
                   <b-form-select-option :value="null">None</b-form-select-option>
-                  <b-form-select-option 
-                    v-for="course in options.courses.items" 
-                    :key="course.id" 
+                  <b-form-select-option
+                    v-for="course in options.courses.items"
+                    :key="course.id"
                     :value="course.id">
                     {{course.description}} {{course.major ? `(${course.major})` : ''}}
                   </b-form-select-option>
@@ -50,7 +50,7 @@
 									v-model="filters.student.criteria"
                   debounce="500"
                   @update="loadTranscript()"
-									type="text" 
+									type="text"
 									placeholder="Search">
 								</b-form-input>
 							</b-col>
@@ -280,9 +280,10 @@
                   <b-row class="mb-3">
                     <b-col md=12>
                       <b-button
-                        v-if="data.item.applicationId ?
-                          data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                          data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id"
+                        v-if="!isAccessible($options.StudentFeePermissions.APPROVAL.id) ? false :
+                          (data.item.applicationId ?
+                            data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
+                            data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)"
                         @click="setApproveFees(data)"
                         class="float-right mr-2"
                         variant="outline-primary">
@@ -432,16 +433,18 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
-import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups, BillingTypes, BillingStatuses } from "../../helpers/enum"
+import { SchoolCategories, TranscriptStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups, BillingTypes, BillingStatuses, StudentFeePermissions } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
+import Access from '../../mixins/utils/Access'
 export default {
 	name: "StudentFee",
-  mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi, Tables],
+  mixins: [StudentApi, CourseApi, TranscriptApi, RateSheetApi, SchoolFeeApi, Tables, Access],
   components: {
     SchoolCategoryTabs
   },
+  StudentFeePermissions,
 	data() {
 		return {
       showModalFees: false,

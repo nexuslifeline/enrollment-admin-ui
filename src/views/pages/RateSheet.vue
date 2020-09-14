@@ -152,6 +152,7 @@
               </b-card-body>
               <template v-slot:footer>
                 <b-button
+                  v-if="isAccessible($options.RateSheetPermissions.UPDATE.id)"
                   :disabled="forms.rateSheet.isProcessing"
                   class="float-right btn-save"
                   variant="outline-primary"
@@ -241,12 +242,14 @@
 </template>
 <script>
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
-import { SchoolCategories, Semesters, UserGroups, Fees } from "../../helpers/enum"
+import { SchoolCategories, Semesters, UserGroups, Fees, RateSheetPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber } from '../../helpers/forms'
 import Tables from '../../helpers/tables'
+import Access from '../../mixins/utils/Access'
 export default {
 	name: "RateSheet",
-	mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi, Tables ],
+  mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi, Tables, Access ],
+  RateSheetPermissions,
 	data() {
 		return {
       isLoaded: false,
@@ -445,12 +448,12 @@ export default {
 			this.getCoursesOfLevelList(levelId, params)
 				.then(({ data }) => {
           courses.items = data
-          
+
 					if(data.length > 0){
             rateSheet.fields.semesterId = semesters.getEnum(1).id
             rateSheet.fields.courseId = courses.items[0].id
 					}
-					
+
           this.loadFeesOfLevel()
 					this.isLoaded = false
 				})
@@ -463,7 +466,7 @@ export default {
       rateSheetFees.isBusy = true
       rateSheet.fields.id = null //clear id of rate sheet field
       rateSheet.fields.fees = []
-      
+
       this.getRateSheetList(params)
         .then(({ data }) => {
           if(data.data.length > 0)
@@ -527,7 +530,7 @@ export default {
         return
       }
 
-      fields.fees.push({ 
+      fields.fees.push({
         id: item.id,
         name : item.name,
         isIntegrated: item.isIntegrated,
@@ -541,18 +544,18 @@ export default {
     createUpdateRateSheet(){
       const { rateSheet, rateSheet: { fields } } = this.forms
       rateSheet.isProcessing = true
-      const data = { 
+      const data = {
         ...fields,
-        fees:[] 
+        fees:[]
       }
 
       fields.fees.forEach(rs => {
-        data.fees.push({ 
+        data.fees.push({
           rateSheetId: rs.pivot.rateSheetId,
           schoolFeeId: rs.pivot.schoolFeeId,
           amount: rs.pivot.amount,
-          notes: rs.pivot.notes 
-        })  
+          notes: rs.pivot.notes
+        })
       })
 
       if(fields.id === null){
@@ -586,7 +589,7 @@ export default {
 				// this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
 				this.schoolCategoryId = userGroup.schoolCategoryId
       }
-      
+
       if (UserGroups.SUPER_USER.id == userGroup.id) {
         this.schoolCategoryId = SchoolCategories.getEnum(1).id
         this.userGroupId = UserGroups.SUPER_USER.id

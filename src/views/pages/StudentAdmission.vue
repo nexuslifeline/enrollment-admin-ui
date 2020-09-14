@@ -257,12 +257,14 @@
               </div> -->
             </b-card>
             <b-button
-              v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+              v-if="!isAccessible($options.StudentSubjectPermissions.DISAPPROVAL.id) ? false :
+                data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
               @click="setDisapproval(data)"
               class="float-right my-2 mr-2"
               variant="outline-danger">Reject</b-button>
             <b-button
-              v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+              v-if="!isAccessible($options.StudentSubjectPermissions.APPROVAL.id) ? false :
+                data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
               @click="setApproval(data)"
               class="float-right m-2"
               variant="outline-primary">Approve</b-button>
@@ -578,10 +580,11 @@
 </template>
 <script>
 import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
-import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, Days, UserGroups } from "../../helpers/enum"
+import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, Days, UserGroups, StudentSubjectPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
+import Access from '../../mixins/utils/Access'
 
 const transcriptFields = {
   transcriptStatusId: null,
@@ -604,10 +607,11 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-  mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables],
+  mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables, Access],
   components: {
     SchoolCategoryTabs
   },
+  StudentSubjectPermissions,
 	data() {
 		return {
       showModalPreview: false,

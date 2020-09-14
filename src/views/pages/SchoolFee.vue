@@ -5,85 +5,96 @@
         <h4 class="page-content__title">School Fee Management</h4>
       </div>
       <div>
-                  <!-- add button and search -->
-            <b-row class="mb-3">
-              <b-col md=12>
-                <b-row>
-                  <b-col md=8>
-                    <b-button variant="primary"
-                      @click="setCreate()">
-                      <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE
-                    </b-button>
-                  </b-col>
-                  <b-col md=4>
-                    <b-form-input
-                      v-model="filters.schoolFee.criteria"
-                      type="text"
-                      placeholder="Search"
-                      debounce="500">
-                    </b-form-input>
-                  </b-col>
-                </b-row>
+      <!-- add button and search -->
+      <b-row class="mb-3">
+        <b-col md=12>
+          <b-row>
+            <b-col md=8>
+              <b-button
+                v-if="isAccessible($options.SchoolFeePermissions.ADD.id)"
+                variant="primary"
+                @click="setCreate()">
+                <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE
+              </b-button>
+            </b-col>
+            <b-col md=4>
+              <b-form-input
+                v-model="filters.schoolFee.criteria"
+                type="text"
+                placeholder="Search"
+                debounce="500">
+              </b-form-input>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+      <!-- end add button and search -->
+      <!-- table -->
+      <b-row >
+        <b-col md=12>
+          <b-table
+            small hover outlined show-empty
+            :fields="tables.schoolFees.fields"
+            :busy="tables.schoolFees.isBusy"
+            :items="tables.schoolFees.items"
+            :current-page="paginations.schoolFee.page"
+            :per-page="paginations.schoolFee.perPage"
+            :filter="filters.schoolFee.criteria"
+            @filtered="onFiltered($event, paginations.schoolFee)">
+            <!-- :filter="filters.schoolFee.criteria> -->
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon
+                  name="spinner"
+                  spin
+                  class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
+            <template v-slot:cell(action)="row">
+              <b-dropdown
+                v-if="isAccessible([
+                  $options.SchoolFeePermissions.EDIT.id,
+                  $options.SchoolFeePermissions.DELETE.id
+                ]) || row.item.id !== fees.TUITION_FEE.id"
+                right variant="link"
+                toggle-class="text-decoration-none"
+                no-caret>
+                <template v-slot:button-content>
+                  <v-icon name="ellipsis-v" />
+                </template>
+                <b-dropdown-item
+                  v-if="isAccessible($options.SchoolFeePermissions.EDIT.id)"
+                  @click="setUpdate(row)"
+                  :disabled="showModalEntry">
+                  Edit
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-if="isAccessible($options.SchoolFeePermissions.DELETE.id)"
+                  @click="forms.schoolFee.fields.id = row.item.id, showModalConfirmation = true"
+                  :disabled="showModalConfirmation">
+                  Delete
+                </b-dropdown-item>
+              </b-dropdown>
+            </template>
+          </b-table>
+          <b-row>
+            <b-col md=6>
+              Showing {{ paginations.schoolFee.from }} to {{ paginations.schoolFee.to }} of {{ paginations.schoolFee.totalRows }} records.
+              </b-col>
+            <b-col md=6>
+              <b-pagination
+                v-model="paginations.schoolFee.page"
+                :total-rows="paginations.schoolFee.totalRows"
+                :per-page="paginations.schoolFee.perPage"
+                size="sm"
+                align="end"
+                @input="recordDetails(paginations.schoolFee)" />
               </b-col>
             </b-row>
-            <!-- end add button and search -->
-            <!-- table -->
-            <b-row >
-              <b-col md=12>
-                <b-table
-									small hover outlined show-empty
-									:fields="tables.schoolFees.fields"
-                  :busy="tables.schoolFees.isBusy"
-                  :items="tables.schoolFees.items"
-                  :current-page="paginations.schoolFee.page"
-                  :per-page="paginations.schoolFee.perPage"
-                  :filter="filters.schoolFee.criteria"
-                  @filtered="onFiltered($event, paginations.schoolFee)">
-                  <!-- :filter="filters.schoolFee.criteria> -->
-                  <template v-slot:table-busy>
-                    <div class="text-center my-2">
-                      <v-icon
-                        name="spinner"
-                        spin
-                        class="mr-2" />
-                      <strong>Loading...</strong>
-                    </div>
-                  </template>
-                  <template v-slot:cell(action)="row">
-                    <b-dropdown v-if="row.item.id !== fees.TUITION_FEE.id" right variant="link" toggle-class="text-decoration-none" no-caret>
-                      <template v-slot:button-content>
-                        <v-icon name="ellipsis-v" />
-                      </template>
-                      <b-dropdown-item
-                        @click="setUpdate(row)"
-                        :disabled="showModalEntry">
-                        Edit
-                      </b-dropdown-item>
-                      <b-dropdown-item
-                        @click="forms.schoolFee.fields.id = row.item.id, showModalConfirmation = true"
-                        :disabled="showModalConfirmation">
-                        Delete
-                      </b-dropdown-item>
-                    </b-dropdown>
-                  </template>
-								</b-table>
-                <b-row>
-                  <b-col md=6>
-                    Showing {{ paginations.schoolFee.from }} to {{ paginations.schoolFee.to }} of {{ paginations.schoolFee.totalRows }} records.
-                    </b-col>
-                  <b-col md=6>
-                    <b-pagination
-                      v-model="paginations.schoolFee.page"
-                      :total-rows="paginations.schoolFee.totalRows"
-                      :per-page="paginations.schoolFee.perPage"
-                      size="sm"
-                      align="end"
-                      @input="recordDetails(paginations.schoolFee)" />
-                    </b-col>
-                  </b-row>
-              </b-col>
-            </b-row>
-            <!-- end table -->
+        </b-col>
+      </b-row>
+      <!-- end table -->
       </div>
     </div>
     <!-- Modal Entry -->
@@ -218,10 +229,12 @@ import { SchoolFeeApi, SchoolFeeCategoryApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
-import { Fees } from '../../helpers/enum'
+import { Fees, SchoolFeePermissions } from '../../helpers/enum'
+import Access from '../../mixins/utils/Access'
 export default {
 	name: "schoolFee",
-	mixins: [ SchoolFeeApi, SchoolFeeCategoryApi, Tables ],
+  mixins: [ SchoolFeeApi, SchoolFeeCategoryApi, Tables, Access ],
+  SchoolFeePermissions,
 	data() {
 		return {
       fees: Fees,
