@@ -3,10 +3,11 @@
     <div class="header__menus-container">
       <ul class="header__menus">
         <li v-for="(nav, idx) in $options.navItems"
+          v-if="isAccessible(nav.permissionIds)"
           :key="idx"
           class="header__menu-item"
           :class="{ active: $route.path.startsWith(nav.to) }">
-          <a :href="`#${nav.to}`" class="header__menu-link">
+          <a :href="`#${redirectTo(nav)}`" class="header__menu-link">
             {{nav.label}}
           </a>
         </li>
@@ -126,6 +127,14 @@ export default {
   methods: {
     hideDropdownItems() {
       this.showDropdown = false;
+    },
+    redirectTo(nav) {
+      const { children } = nav
+      const accessibleChildren = children.filter(child => this.isAccessible(child.permissionIds))
+      if (accessibleChildren.length > 0) {
+        return accessibleChildren[0].to
+      }
+      return nav.to
     },
     logout() { // Note! needs to be refactored
       if(localStorage.adminAccessToken) {
