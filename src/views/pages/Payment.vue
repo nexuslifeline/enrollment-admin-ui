@@ -119,7 +119,7 @@
                           :busy="tables.files.isBusy">
                           <template v-slot:cell(action)="row">
                             <b-button
-                              @click="previewFile(row, data.item)"
+                              @click="previewFile(row, data)"
                               size="sm" variant="secondary">
                               <v-icon
                                 name="search" />
@@ -173,11 +173,28 @@
     </div>
     <!-- Modal Preview -->
     <FileViewer
-      :show="showModalPreview"
+      :show="fileViewer.paymentFile.show"
       :file="file"
       :isBusy="file.isLoading"
       :owner="file.owner"
-      @close="showModalPreview = false"
+      @close="fileViewer.paymentFile.show = false"
+      @onNavLeft="onFileNavLeft"
+      @onNavRight="onFileNavRight"
+      :navCount="fileViewer.paymentFile.activeNavCount"
+      :navActiveIndex="fileViewer.paymentFile.activeNavIndex"
+      :enableArrowNav="fileViewer.paymentFile.isActiveNavEnabled"
+    />
+    <FileViewer
+      :show="fileViewer.paymentReceiptFile.show"
+      :file="file"
+      :isBusy="file.isLoading"
+      :owner="file.owner"
+      @close="fileViewer.paymentReceiptFile.show = false"
+      @onNavLeft="onPaymentReceiptFileNavLeft"
+      @onNavRight="onPaymentReceiptFileNavRight"
+      :navCount="fileViewer.paymentReceiptFile.activeNavCount"
+      :navActiveIndex="fileViewer.paymentReceiptFile.activeNavIndex"
+      :enableArrowNav="fileViewer.paymentReceiptFile.isActiveNavEnabled"
     />
     <!-- Modal Preview -->
 		<!-- Modal Approval Confirmation -->
@@ -381,6 +398,20 @@ export default {
   },
 	data() {
 		return {
+      fileViewer: {
+        paymentFile: {
+          isActiveNavEnabled: false,
+          activeNavCount: 0,
+          activeNavIndex: 0,
+          show: false,
+        },
+        paymentReceiptFile: {
+          isActiveNavEnabled: false,
+          activeNavCount: 0,
+          activeNavIndex: 0,
+          show: false,
+        }
+      },
       showModalPreview: false,
 			showModalApproval: false,
       showModalRejection: false,
@@ -390,6 +421,8 @@ export default {
       showPaymentReceiptFileModal: false,
       paymentReceiptFiles: [],
       selectedPaymentReceiptFileIndex: null,
+      lastActivePayment: null,
+      lastActiveFile: null,
       file: {
         type: null,
         src: null,
@@ -643,14 +676,22 @@ export default {
       }
       row.toggleDetails()
     },
-    previewFile(row, { student }) {
+    setupActiveFileViewer(row, data) {
+      this.lastActivePayment = data;
+      this.lastActiveFile = row;
+      this.fileViewer.paymentFile.isActiveNavEnabled = data?.item?.files?.length > 1;
+      this.fileViewer.paymentFile.activeNavCount = data?.item?.files?.length;
+      this.fileViewer.paymentFile.activeNavIndex =  row.index;
+    },
+    previewFile(row, data) {
+      this.setupActiveFileViewer(row, data);
       const { paymentId, id, name, notes } = row.item
       this.file.type = null
       this.file.src = null
       this.file.name = name
       this.file.notes = notes
-      this.file.owner = student
-      this.showModalPreview = true
+      this.fileViewer.paymentFile.show = true
+      this.file.owner = data.item.student
       this.file.isLoading = true
       this.getPaymentFilePreview(paymentId, id)
         .then(response => {
@@ -658,7 +699,6 @@ export default {
           this.file.isLoading = false
           const file = new Blob([response.data], { type: response.headers.contentType })
           const reader = new FileReader();
-
           reader.onload = e => this.file.src = e.target.result
           reader.readAsDataURL(file);
         })
@@ -739,17 +779,23 @@ export default {
         selectedFile.isBusy = false
       });
     },
+    setupPaymentReceiptActiveFileViewer(index) {
+      this.lastActiveFile = this.paymentReceiptFiles[index]
+      this.fileViewer.paymentReceiptFile.isActiveNavEnabled = this.paymentReceiptFiles?.length > 1
+      this.fileViewer.paymentReceiptFile.activeNavCount = this.paymentReceiptFiles?.length;
+      this.fileViewer.paymentReceiptFile.activeNavIndex =  index
+    },
     previewPaymentReceiptFile(index) {
       const selectedFile = this.paymentReceiptFiles[index]
       const { student } = this.row
+      const { userable } = this.$store?.state?.user
       this.file.type = null
       this.file.src = null
       this.file.name = selectedFile?.name
       this.file.notes = selectedFile?.notes
       this.file.isLoading = true
-      this.file.owner = student
-
-      this.showModalPreview = true
+      this.fileViewer.paymentFile.show = true
+      this.file.owner = userable
 
       this.getPaymentReceiptFilePreview(this.row.id, selectedFile.id)
         .then(response => {
@@ -761,6 +807,67 @@ export default {
           reader.readAsDataURL(file);
           this.file.isLoading = false
         })
+    },
+    getCurrentFiles() {
+      const { index: studentIdx } = this.lastActivePayment;
+      const { files } = this.tables?.payments?.items[studentIdx];
+      return files;
+    },
+    getCurrentFileIndex() {
+      const { index } = this.lastActiveFile;
+      return index;
+    },
+    onFileNavLeft() {
+      const files = this.getCurrentFiles();
+      let currentIdx = this.getCurrentFileIndex();
+      const isFirst = currentIdx === 0;
+      currentIdx = isFirst ? files.length - 1 : currentIdx - 1;
+      const file = files[currentIdx];
+      const currentFileItem = {
+        ...this.lastActiveFile,
+        index: currentIdx,
+        item: file
+      };
+      this.previewFile(currentFileItem, this.lastActivePayment);
+    },
+    onFileNavRight() {
+      const files = this.getCurrentFiles();
+      let currentIdx = this.getCurrentFileIndex();
+      const isLast = currentIdx === files.length - 1;
+      currentIdx = isLast ? 0 : currentIdx + 1;
+      const file = files[currentIdx];
+      const currentFileItem = {
+        ...this.lastActiveFile,
+        index: currentIdx,
+        item: file
+      };
+      this.previewFile(currentFileItem, this.lastActivePayment);
+    },
+    onPaymentReceiptFileNavLeft() {
+      const files = this.paymentReceiptFiles
+      let currentIdx = this.paymentReceiptFiles.indexOf(this.lastActiveFile)
+      const isFirst = currentIdx === 0;
+      currentIdx = isFirst ? files.length - 1 : currentIdx - 1;
+      const file = files[currentIdx];
+      const currentFileItem = {
+        ...this.lastActiveFile,
+        index: currentIdx,
+        item: file
+      };
+      this.previewPaymentReceiptFile(currentIdx);
+    },
+    onPaymentReceiptFileNavRight() {
+      const files = this.paymentReceiptFiles
+      let currentIdx = this.paymentReceiptFiles.indexOf(this.lastActiveFile)
+      const isLast = currentIdx === files.length - 1;
+      currentIdx = isLast ? 0 : currentIdx + 1;
+      const file = files[currentIdx];
+      const currentFileItem = {
+        ...this.lastActiveFile,
+        index: currentIdx,
+        item: file
+      };
+      this.previewPaymentReceiptFile(currentIdx);
     },
   },
 }

@@ -24,3 +24,6 @@ export { default as EvaluationFileApi } from './EvaluationFile';
 export { default as PaymentReceiptFileApi } from './PaymentReceiptFile';
 export { default as StudentFeeApi } from './StudentFee';
 export { default as PermissionGroupApi } from './PermissionGroup';
+export { default as BankAccountApi } from './BankAccount';
+export { default as EWalletAccountApi } from './EWalletAccount';
+export { default as PeraPadalaAccountApi } from './PeraPadalaAccount';
