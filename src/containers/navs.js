@@ -1,7 +1,21 @@
 
 import {
   DepartmentPermissions,
-  SchoolYearPermissions
+  SchoolYearPermissions,
+  UserGroupPermissions,
+  StudentPermissions,
+  PersonnelPermissions,
+  RateSheetPermissions,
+  FeeCategoryPermissions,
+  SchoolFeePermissions,
+  CurriculumPermissions,
+  SectionAndSchedulePermissions,
+  SubjectPermissions,
+  CoursePermissions,
+  EvaluationAndAdmissionPermissions,
+  StudentSubjectPermissions,
+  StudentFeePermissions,
+  StudentPaymentPermissions, Semesters
 } from '../helpers/enum';
 
 export default [
@@ -23,32 +37,49 @@ export default [
     name: 'Approval',
     label: 'Approval',
     to: '/approval',
+    permissionIds: [
+      ...EvaluationAndAdmissionPermissions.getIds(),
+      ...StudentSubjectPermissions.getIds(),
+      ...StudentFeePermissions.getIds(),
+      ...StudentPaymentPermissions.getIds()
+    ],
     children: [
       {
         label: 'Evaluation',
-        to: '/approval/evaluation'
+        to: '/approval/evaluation',
+        permissionIds: EvaluationAndAdmissionPermissions.getIds()
       },
       {
         label: 'Subjects',
-        to: '/approval/student-subject-enlisment'
+        to: '/approval/student-subject-enlisment',
+        permissionIds: StudentSubjectPermissions.getIds()
       },
       {
         label: 'Assessment Fee',
-        to: '/approval/student-assessment-fee'
+        to: '/approval/student-assessment-fee',
+        permissionIds: StudentFeePermissions.getIds()
       },
       {
         label: 'Payment',
-        to: '/approval/payment'
+        to: '/approval/payment',
+        permissionIds: StudentPaymentPermissions.getIds()
       }
     ]
   },
   {
     label: 'Registrar',
     to: '/registrar',
+    permissionIds: [
+      ...CurriculumPermissions.getIds(),
+      ...SectionAndSchedulePermissions.getIds(),
+      ...SubjectPermissions.getIds(),
+      ...CoursePermissions.getIds()
+    ],
     children: [
       {
         label: 'Curriculum',
-        to: '/registrar/curriculum'
+        to: '/registrar/curriculum',
+        permissionIds: CurriculumPermissions.getIds()
       },
       // {
       //   label: 'Schedule',
@@ -56,47 +87,64 @@ export default [
       // },
       {
         label: 'Section',
-        to: '/registrar/section'
+        to: '/registrar/section',
+        permissionIds: SectionAndSchedulePermissions.getIds()
       },
       {
         label: 'Subject',
-        to: '/registrar/subject'
+        to: '/registrar/subject',
+        permissionIds: SubjectPermissions.getIds()
       },
       {
         label: 'Course',
-        to: '/registrar/course'
+        to: '/registrar/course',
+        permissionIds: CoursePermissions.getIds()
       }
     ]
   },
   {
     label: 'Finance',
     to: '/finance',
+    permissionIds: [
+      ...RateSheetPermissions.getIds(),
+      ...FeeCategoryPermissions.getIds(),
+      ...SchoolFeePermissions.getIds()
+    ],
     children: [
       {
         label: 'Rate Sheet',
-        to: '/finance/rate-sheet'
+        to: '/finance/rate-sheet',
+        permissionIds: RateSheetPermissions.getIds()
       },
       {
         label: 'Fee Category',
-        to: '/finance/school-fee-category'
+        to: '/finance/school-fee-category',
+        permissionIds: FeeCategoryPermissions.getIds()
       },
       {
         label: 'School Fee',
-        to: '/finance/school-fee'
+        to: '/finance/school-fee',
+        permissionIds: SchoolFeePermissions.getIds()
       }
     ]
   },
   {
     label: 'Master Files',
     to: '/master-files',
+    permissionIds: [
+      ...StudentPermissions.getIds(),
+      ...PersonnelPermissions.getIds()
+    ],
     children: [
       {
         label: 'Student',
-        to: '/master-files/student/' // added trailing slash here to satisfy the tab active check
+        to: '/master-files/student/', // added trailing slash here to satisfy the tab active check
+        permissionIds: StudentPermissions.getIds()
       },
       {
         label: 'Personnel',
-        to: '/master-files/user'
+        to: '/master-files/user',
+        permissionIds: PersonnelPermissions.getIds()
       }
     ]
   },
@@ -115,7 +163,8 @@ export default [
       },
       {
         label: 'School Year',
-        to: '/maintenance/school-year'
+        to: '/maintenance/school-year',
+        permissionIds: SchoolYearPermissions.getIds()
       },
       {
         label: 'Category',
@@ -135,7 +184,8 @@ export default [
       },
       {
         label: 'User Group',
-        to: '/maintenance/user-group'
+        to: '/maintenance/user-group',
+        permissionIds: UserGroupPermissions.getIds()
       },
     ]
   }
