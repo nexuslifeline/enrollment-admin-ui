@@ -122,6 +122,18 @@ export default [
         to: '/maintenance/school-category'
       },
       {
+        label: 'Bank Account',
+        to: '/maintenance/bank-account'
+      },
+      {
+        label: 'Pera Padala Account',
+        to: '/maintenance/pera-padala-account'
+      },
+      {
+        label: 'E Wallet Account',
+        to: '/maintenance/e-wallet-account'
+      },
+      {
         label: 'User Group',
         to: '/maintenance/user-group'
       },

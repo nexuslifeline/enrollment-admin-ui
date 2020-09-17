@@ -44,6 +44,9 @@ const AcademicRecordRequirements = () => import('@/views/pages/academic-records/
 const UserGroupPermissions = () => import('@/views/pages/user-group-permissions/UserGroupPermissions')
 const Permissions = () => import('@/views/pages/user-group-permissions/Permissions')
 const SchoolCategories = () => import('@/views/pages/user-group-permissions/SchoolCategories')
+const BankAccount = () => import('@/views/pages/BankAccount')
+const PeraPadalaAccount = () => import('@/views/pages/PeraPadalaAccount')
+const EWalletAccount = () => import('@/views/pages/EWalletAccount')
 
 Vue.use(Router)
 
@@ -214,6 +217,24 @@ function configRoutes () {
               path: 'school-year',
               name: 'School Year',
               component: SchoolYear,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'bank-account',
+              name: 'Bank Account',
+              component: BankAccount,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'pera-padala-account',
+              name: 'Pera Padala Account',
+              component: PeraPadalaAccount,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'e-wallet-account',
+              name: 'E Wallet Account',
+              component: EWalletAccount,
               meta: { requiresAuth: true, userType: 0 }
             },
             {

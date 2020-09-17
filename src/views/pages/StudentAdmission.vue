@@ -452,7 +452,7 @@
 						small hover outlined show-empty
 						:items.sync="tables.subjects.items"
 						:fields="tables.subjects.fields2"
-						:busy="tables.subjects.isBusy">
+						:busy="tables.subjects.isBusy2">
 						<template v-slot:cell(action)="row">
 							<b-button
                 @click="addSubject(row)"
@@ -645,6 +645,7 @@ export default {
 			tables: {
 				students: {
 					isBusy: false,
+          isBusy2: false, //isbusy state of modal subjects
 					filterIncludedFields: ["firstName", "lastName"],
 					fields: [
 						{
@@ -1178,11 +1179,14 @@ export default {
 
         const params = { paginate: false }
 
-				this.isLoading = true
+        this.isLoading = true
+        this.tables.subjects.isBusy = true
 				this.getSubjectsOfTranscript(transcriptId, params)
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
-						this.isLoading = false
+            this.isLoading = false
+            this.tables.subjects.isBusy = false
+
         })
 
 				// if (admissionId) {
@@ -1232,7 +1236,7 @@ export default {
         this.showDepartment = true
       }
 
-      subjects.isBusy = true
+      subjects.isBusy2 = true
       let params = { paginate: true, schoolCategoryId, perPage, page, criteria }
 
 			this.getSubjectList(params)
@@ -1241,8 +1245,7 @@ export default {
           subject.from = data.meta.from
           subject.to = data.meta.to
           subject.totalRows = data.meta.total
-          subjects.isBusy = false
-					subjects.isBusy = false
+					subjects.isBusy2 = false
 				})
     },
     loadSections() {
