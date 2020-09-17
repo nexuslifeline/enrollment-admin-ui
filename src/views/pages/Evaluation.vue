@@ -784,6 +784,12 @@ export default {
               thStyle: { width: "20%"}
             },
             {
+							key: "submittedDate",
+							label: "Date Submitted",
+							tdClass: "align-middle",
+              thStyle: { width: "10%"}
+            },
+            {
               key: "studentCategory.name",
 							label: "Category",
 							tdClass: "align-middle text-center font-weight-bold",
@@ -1064,13 +1070,18 @@ export default {
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
       const { evaluationStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
-			const applicationStatusId = EvaluationStatuses.SUBMITTED.id
+      const applicationStatusId = EvaluationStatuses.SUBMITTED.id
+      const orderBy = 'submitted_date'
+      const sort = 'DESC'
 			let params = {
 				paginate: true,
-				perPage, page,
+        perPage,
+        page,
         evaluationStatusId,
         schoolCategoryId,
         courseId,
+        orderBy,
+        sort,
         criteria }
 			this.getEvaluationList(params)
 				.then(response => {

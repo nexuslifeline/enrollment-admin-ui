@@ -479,13 +479,13 @@ export default {
 							key: "referenceNo",
 							label: "Ref No.",
 							tdClass: "align-middle",
-							thStyle: { width: "15%"}
+							thStyle: { width: "12%"}
             },
             {
 							key: "paymentMode.name",
 							label: "Payment Mode",
 							tdClass: "align-middle",
-              thStyle: { width: "20%"}
+              thStyle: { width: "18%"}
 						},
 						{
 							key: "amount",
@@ -497,7 +497,14 @@ export default {
                 return formatNumber(value)
               }
             },
-            	{
+            {
+							key: "submittedDate",
+							label: "Date Submitted",
+              tdClass: "align-middle text-center",
+              thClass: "text-center",
+              thStyle: { width: "10%"}
+						},
+            {
 							key: "paymentStatusId",
 							label: "Status",
               tdClass: "align-middle text-center",
@@ -586,12 +593,16 @@ export default {
       const { payments } = this.tables
       const { payment, payment: { perPage, page } } = this.paginations
       const { paymentStatusId, criteria } = this.filters.payment
+      const orderBy = 'submitted_date'
+      const sort = 'DESC'
       payments.isBusy = true
 			let params = {
 				paginate: true,
         perPage,
         page,
         paymentStatusId,
+        orderBy,
+        sort,
         criteria }
 
       this.getPaymentList(params)
