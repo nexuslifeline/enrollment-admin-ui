@@ -1,10 +1,10 @@
 <template>
   <div>
-    <b-card v-if="!showEntry">
+    <b-card>
       <h5 slot="header">
         <span>
-          Student Evaluations <br>
-          <small>List of all evaluation of the student.</small>
+          Requirements <br>
+          <small>List of all requirement of the student.</small>
         </span>
       </h5>
       <b-card-body>
@@ -36,7 +36,7 @@
                   :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                   :src="avatar(data.item.student)" />
               </template>
-              <span><b-link @click="setUpdate(data)">{{ data.item.student.name }}</b-link></span><br>
+              <span>{{ data.item.student.name }}</span><br>
               <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
               <small>Address : {{ data.item.student.address ?
                 data.item.student.address.currentCompleteAddress : "" }}
@@ -77,7 +77,7 @@
                 <v-icon name="ellipsis-v" />
               </template>
               <b-dropdown-item
-                @click="setUpdate(row)" >
+                :to="`/master-files/student/${$route.params.studentId}/school-records/requirements/${row.item.id}`">
                 Edit
               </b-dropdown-item>
             </b-dropdown>
@@ -85,75 +85,33 @@
         </b-table>
       </b-card-body>
     </b-card>
-    <EvaluationEntry
-      @save="onUpdateEvaluation()"
-      @close="showEntry = false"
-      :isProcessing="isProcessing"
-      :isLoading="isEntryLoading"
-      :form="forms.evaluation.fields"
-      v-else />
   </div>
 </template>
 <script>
-import { StudentApi, EvaluationApi } from '../../../mixins/api'
+import { StudentApi, EvaluationApi, EvaluationFileApi } from '../../../mixins/api'
 import { EvaluationStatuses, StudentCategories } from '../../../helpers/enum'
-import EvaluationEntry from './EvaluationEntry'
-import { copyValue } from '../../../helpers/extractor'
-import { clearFields, showNotification } from '../../../helpers/forms'
+import { clearFields, reset, showNotification } from '../../../helpers/forms'
 
-const evaluationFields = {
+const evaluationFileFields = {
   id: null,
-  student: {
-    studentNo: null,
-    name: null,
-    mobileNo: null,
-    email: null,
-    address: {
-      currentCompleteAddress: null
-    }
-  },
-  studentCategory: null,
-  level: null,
-  course: null,
-  studentCategoryId: null,
-  lastSchoolAttended: null,
-  lastSchoolLevelId: null,
-  from: null,
-  to: null,
-  studentCurriculumId: null,
-  schoolCategoryId: null,
-  curriculumId: null,
-  courseId: null,
-  levelId: null,
-  semesterId: null,
-  subjects: null,
-  evaluationStatusId: null
+  notes: null
 }
 
 export default {
-  mixins: [ StudentApi, EvaluationApi ],
-  components: {
-    EvaluationEntry
-  },
+  mixins: [ StudentApi, EvaluationApi, EvaluationFileApi ],
   created() {
     this.studentId = this.$route.params.studentId
     this.loadStudentEvaluationList()
   },
   data() {
     return {
+      evaluationFiles: [],
       isProcessing: false,
       showEntry: false,
       isEntryLoading: false,
       studentCategories: StudentCategories,
       evaluationStatuses: EvaluationStatuses,
       studentId: null,
-      forms: {
-        evaluation: {
-          fields: { ...evaluationFields },
-          states: { ...evaluationFields },
-          errors: { ...evaluationFields }
-        }
-      },
       tables: {
         evaluations: {
           isBusy: false,
@@ -212,42 +170,35 @@ export default {
 						},
 					],
           items: []
-        }
-      }
+        },
+        files: {
+					isBusy: false,
+					fields: [
+            {
+							key: "name",
+							label: "Filename",
+							tdClass: "align-middle",
+              thStyle: { width: "40%" }
+						},
+            {
+							key: "notes",
+							label: "Notes",
+							tdClass: "align-middle",
+              thStyle: { width: "auto" }
+						},
+						{
+              key: "action",
+              label: "",
+							tdClass: "align-middle",
+							thStyle: { width: "35px" }
+            }
+          ],
+					items: []
+				},
+      },
     }
   },
   methods: {
-    onUpdateEvaluation() {
-      const { fields, fields: { student, level, course, studentCategory, ...evaluation } } = this.forms.evaluation
-      const subjects = evaluation.subjects.map(s => {
-        const subject = {
-          subjectId: s.id,
-          levelId: s.pivot.levelId,
-          semesterId: s.pivot.semesterId,
-          grade: s.pivot.grade,
-          notes: s.pivot.notes,
-          isTaken: s.pivot.isTaken
-        }
-        return subject
-      })
-      const data = { ...evaluation, subjects }
-      // console.log(data)
-      // return
-      this.isProcessing = true;
-      this.updateEvaluation(data, evaluation.id)
-      .then(({ data }) => {
-        // this.loadEvaluation()
-        this.isProcessing = false
-        this.showEntry = false
-        showNotification(this, "success", "Updated Successfully.")
-        this.loadStudentEvaluationList()
-      }).catch((error) => {
-        this.isProcessing = false;
-        const errors = error.response.data.errors
-        // this.showBulletedNotification(errors)
-      });
-
-    },
     loadStudentEvaluationList() {
       const evaluationStatusId = EvaluationStatuses.APPROVED.id
       const params = { paginate: false, evaluationStatusId }
@@ -275,19 +226,6 @@ export default {
       }
       return ''
     },
-    setUpdate(row) {
-      this.isEntryLoading = true
-      this.showEntry = true
-      const { fields } = this.forms.evaluation
-      clearFields(fields)
-      fields.subjects = []
-      this.getEvaluation(row.item.id)
-      .then(({ data }) => {
-        copyValue(data, fields)
-        this.isEntryLoading = false
-      })
-      // this.evaluationEntryInfo = row.item
-    }
   }
 }
 </script>

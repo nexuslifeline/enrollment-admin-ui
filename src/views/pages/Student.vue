@@ -84,10 +84,10 @@
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
                   </template>
+                  <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
                   <b-dropdown-item
-                    v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)"
-                    :to="`/master-files/student/${row.item.id}/academic-records`" >
-                    Update Academic Records
+                    :to="`/master-files/student/${row.item.id}/school-records`" >
+                    Update School Records
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.StudentPermissions.EDIT.id)"

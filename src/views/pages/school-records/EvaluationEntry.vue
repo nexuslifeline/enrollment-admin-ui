@@ -11,45 +11,47 @@
         <b-card>
           <b-row>
             <b-col md="12">
-              <b-row class="mb-2">
-                <b-col md=12>
-                  <span class="font-weight-bold">Student Information</span>
-                  <hr class="bg-light mt-1 mb-0">
-                </b-col>
-              </b-row>
-              <b-row class="pb-1">
-                <b-col md=6>
-                  Student Number : <span class="font-weight-bold">{{ form.student.studentNo ? form.student.studentNo : 'Awaiting Confirmation' }}</span>
-                </b-col>
-                <b-col md=6>
-                  Name : <span class="font-weight-bold">{{ form.student.name }}</span>
-                </b-col>
-              </b-row>
-              <b-row class="pb-1">
-                <b-col md=6>
-                  Student Category :
-                  <b-badge
-                    :variant="form.studentCategoryId === studentCategories.NEW.id
-                      ? 'success'
-                      : form.studentCategoryId === studentCategories.OLD.id ? 'primary' : 'warning'">
-                    {{ form.studentCategory ? form.studentCategory.name : "" }}
-                  </b-badge>
-                </b-col>
-                <b-col md=6>
-                  Contact Number : <span class="font-weight-bold">{{ form.student.mobileNo }}</span>
-                </b-col>
-              </b-row>
-              <b-row class="pb-1">
-                <b-col md=6>
-                  Email : <span class="font-weight-bold">{{ form.student.email }}</span>
-                </b-col>
-                <b-col md=6>
-                  Address :
-                  <span class="font-weight-bold">
-                    {{ form.student.address ? form.student.address.currentCompleteAddress : "" }}
-                  </span>
-                </b-col>
-              </b-row>
+              <div v-if="forms.evaluation.fields.student">
+                <b-row class="mb-2">
+                  <b-col md=12>
+                    <span class="font-weight-bold">Student Information</span>
+                    <hr class="bg-light mt-1 mb-0">
+                  </b-col>
+                </b-row>
+                <b-row class="pb-1">
+                  <b-col md=6>
+                    Student Number : <span class="font-weight-bold">{{ forms.evaluation.fields.student.studentNo ? forms.evaluation.fields.student.studentNo : 'Awaiting Confirmation' }}</span>
+                  </b-col>
+                  <b-col md=6>
+                    Name : <span class="font-weight-bold">{{ forms.evaluation.fields.student.name }}</span>
+                  </b-col>
+                </b-row>
+                <b-row class="pb-1">
+                  <b-col md=6>
+                    Student Category :
+                    <b-badge
+                      :variant="forms.evaluation.fields.studentCategoryId === studentCategories.NEW.id
+                        ? 'success'
+                        : forms.evaluation.fields.studentCategoryId === studentCategories.OLD.id ? 'primary' : 'warning'">
+                      {{ forms.evaluation.fields.studentCategory ? forms.evaluation.fields.studentCategory.name : "" }}
+                    </b-badge>
+                  </b-col>
+                  <b-col md=6>
+                    Contact Number : <span class="font-weight-bold">{{ forms.evaluation.fields.student.mobileNo }}</span>
+                  </b-col>
+                </b-row>
+                <b-row class="pb-1">
+                  <b-col md=6>
+                    Email : <span class="font-weight-bold">{{ forms.evaluation.fields.student.email }}</span>
+                  </b-col>
+                  <b-col md=6>
+                    Address :
+                    <span class="font-weight-bold">
+                      {{ forms.evaluation.fields.student.address ? forms.evaluation.fields.student.address.currentCompleteAddress : "" }}
+                    </span>
+                  </b-col>
+                </b-row>
+              </div>
               <b-row class="my-2 pb-1">
                 <b-col md=12>
                   <span class="font-weight-bold">Previous Educational Background</span>
@@ -61,7 +63,7 @@
                   <b-form-group>
                     <label>Last School Attended</label>
                     <b-form-input
-                      v-model="form.lastSchoolAttended"
+                      v-model="forms.evaluation.fields.lastSchoolAttended"
                       debounce="500" />
                   </b-form-group>
                 </b-col>
@@ -69,7 +71,7 @@
                   <b-form-group>
                     <label>Last School Level</label>
                     <b-form-select
-                      v-model='form.lastSchoolLevelId'>
+                      v-model='forms.evaluation.fields.lastSchoolLevelId'>
                       <template v-slot:first>
                         <b-form-select-option :value='null' disabled>-- School Level --</b-form-select-option>
                       </template>
@@ -83,7 +85,7 @@
                   <b-form-group>
                     <label>From</label>
                     <b-form-input
-                      v-model="form.lastSchoolYearFrom"
+                      v-model="forms.evaluation.fields.lastSchoolYearFrom"
                       debounce="500" />
                   </b-form-group>
                 </b-col>
@@ -91,7 +93,7 @@
                   <b-form-group>
                     <label>To</label>
                     <b-form-input
-                      v-model="form.lastSchoolYearTo"
+                      v-model="forms.evaluation.fields.lastSchoolYearTo"
                       debounce="500" />
                   </b-form-group>
                 </b-col>
@@ -107,7 +109,7 @@
                   <b-form-group>
                     <label>Curriculum</label>
                     <b-form-select
-                      v-model="form.studentCurriculumId">
+                      v-model="forms.evaluation.fields.studentCurriculumId">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
                       </template>
@@ -125,7 +127,7 @@
                   <b-form-group>
                     <label>Level</label>
                     <b-form-select
-                      v-model="form.levelId">
+                      v-model="forms.evaluation.fields.levelId">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Level --</b-form-select-option>
                       </template>
@@ -143,7 +145,7 @@
                   <b-form-group>
                     <label>Status</label>
                     <b-form-select
-                      v-model="form.evaluationStatusId">
+                      v-model="forms.evaluation.fields.evaluationStatusId">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Status --</b-form-select-option>
                       </template>
@@ -157,13 +159,13 @@
                   </b-form-group>
                 </b-col>
               </b-row>
-              <b-row v-if="form.course">
+              <b-row v-if="forms.evaluation.fields.course">
                 <b-col md="6">
                   <b-form-group>
                     <label>Course</label>
                     <b-form-select
-                      @change="$event === null ? form.semesterId = null : ''"
-                      v-model="form.courseId">
+                      @change="$event === null ? forms.evaluation.fields.semesterId = null : ''"
+                      v-model="forms.evaluation.fields.courseId">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
                       </template>
@@ -181,7 +183,7 @@
                   <b-form-group>
                     <label>Semester</label>
                     <b-form-select
-                      v-model="form.semesterId">
+                      v-model="forms.evaluation.fields.semesterId">
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
                       </template>
@@ -205,7 +207,7 @@
                 <h5>Evaluation Form</h5>
                 <b-form-select
                   class="w-50"
-                  v-model="form.curriculumId">
+                  v-model="forms.evaluation.fields.curriculumId">
                   <template v-slot:first>
                     <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
                   </template>
@@ -218,16 +220,16 @@
                 </b-form-select>
               </b-col>
             </b-row>
-            <div v-if="form.subjects">
-              <b-row v-if="form.courseId === null">
+            <div v-if="forms.evaluation.fields.subjects">
+              <b-row v-if="forms.evaluation.fields.courseId === null">
                 <b-col md=12>
                   <b-row>
                     <b-col md=6>
-                      <h5>{{ form.level ? form.level.name : "" }}</h5>
+                      <h5>{{ forms.evaluation.fields.level ? forms.evaluation.fields.level.name : "" }}</h5>
                     </b-col>
                     <b-col md=3 offset-md=9>
                       <b-button class="float-right mb-2" variant="outline-primary"
-                        @click="onAddSubject(form.levelId)">
+                        @click="onAddSubject(forms.evaluation.fields.levelId)">
                         <v-icon name="plus-circle" /> ADD SUBJECT
                       </b-button>
                     </b-col>
@@ -236,7 +238,7 @@
                     class="mb-4"
                     hover outlined small responsive show-empty
                     :fields="tables.subjects.fields"
-                    :items="form.subjects"
+                    :items="forms.evaluation.fields.subjects"
                     :busy="tables.subjects.isBusy">
                     <template v-slot:cell(action)="row">
                       <b-button
@@ -247,7 +249,7 @@
                     </template>
                     <template v-slot:head(pivot.isTaken)>
                       <b-form-checkbox
-                        @input="toggleCheckAll(form.subjects, $event)"
+                        @input="toggleCheckAll(forms.evaluation.fields.subjects, $event)"
                         v-model="isTakenAll">
                         Credited
                       </b-form-checkbox>
@@ -281,10 +283,10 @@
                       </b-form-input>
                     </template>
                     <template v-slot:cell(labs)="row">
-                      {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                      {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
                     </template>
                     <template v-slot:cell(units)="row">
-                      {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
+                      {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                     </template>
                     <template v-slot:custom-foot>
                       <b-tr class="font-weight-bold">
@@ -293,20 +295,20 @@
                         </b-td>
                         <b-td class="text-center">
                           <span class="text-danger">
-                            {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
-                              totalUnits(form.subjects, 'units') }}
+                            {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
+                              totalUnits(forms.evaluation.fields.subjects, 'units') }}
                           </span>
                         </b-td>
                         <b-td class="text-center">
                           <span class="text-danger">
-                            {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
-                              totalUnits(form.subjects, 'labs') }}
+                            {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
+                              totalUnits(forms.evaluation.fields.subjects, 'labs') }}
                           </span>
                         </b-td>
                         <b-td class="text-center">
                           <span class="text-danger">
-                            {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
-                              totalUnits(form.subjects, 'totalUnits') }}
+                            {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
+                              totalUnits(forms.evaluation.fields.subjects, 'totalUnits') }}
                           </span>
                         </b-td>
                         <b-td class="text-center">
@@ -316,7 +318,7 @@
                   </b-table>
                 </b-col>
               </b-row>
-              <b-row>
+              <b-row v-else>
                 <b-col md=12>
                   <b-list-group>
                     <b-list-group-item
@@ -336,7 +338,7 @@
                           Show All Semesters
                         </b-form-checkbox>
                         <b-card
-                          v-for="semester in filterSemester(form.subjects, level)"
+                          v-for="semester in filterSemester(forms.evaluation.fields.subjects, level)"
                           :key="semester.id">
                           <b-row>
                             <b-col md=6>
@@ -353,7 +355,7 @@
                             <b-col md=12>
                               <b-table
                                 responsive small hover outlined show-empty
-                                :items="filterSubjects(form.subjects, level.id, semester.id).items"
+                                :items="filterSubjects(forms.evaluation.fields.subjects, level.id, semester.id).items"
                                 :fields="tables.subjects.fields"
                                 :busy="tables.subjects.isBusy">
                                 <template v-slot:cell(action)="row">
@@ -386,10 +388,10 @@
                                   </b-form-input>
                                 </template>
                                 <template v-slot:cell(labs)="row">
-                                  {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
+                                  {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.labs }}
                                 </template>
                                 <template v-slot:cell(units)="row">
-                                  {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
+                                  {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' : row.item.units }}
                                 </template>
                                 <template v-slot:custom-foot>
                                   <b-tr class="font-weight-bold">
@@ -398,20 +400,20 @@
                                     </b-td>
                                     <b-td class="text-center">
                                       <span class="text-danger">
-                                        {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                          totalUnits(filterSubjects(form.subjects, level.id, semester.id).items, 'units') }}
+                                        {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                          totalUnits(filterSubjects(forms.evaluation.fields.subjects, level.id, semester.id).items, 'units') }}
                                       </span>
                                     </b-td>
                                     <b-td class="text-center">
                                       <span class="text-danger">
-                                        {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                          totalUnits(filterSubjects(form.subjects, level.id, semester.id).items, 'labs') }}
+                                        {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                          totalUnits(filterSubjects(forms.evaluation.fields.subjects, level.id, semester.id).items, 'labs') }}
                                       </span>
                                     </b-td>
                                     <b-td class="text-center">
                                       <span class="text-danger">
-                                        {{ form.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
-                                          totalUnits(filterSubjects(form.subjects, level.id, semester.id).items, 'totalUnits') }}
+                                        {{ forms.evaluation.fields.schoolCategoryId === schoolCategories.VOCATIONAL.id ? 'N/A' :
+                                          totalUnits(filterSubjects(forms.evaluation.fields.subjects, level.id, semester.id).items, 'totalUnits') }}
                                       </span>
                                     </b-td>
                                     <b-td class="text-center">
@@ -420,8 +422,8 @@
                                 </template>
                                 <template v-slot:head(pivot.isTaken)>
                                   <b-form-checkbox
-                                    @input="toggleCheckAll(filterSubjects(form.subjects, level.id, semester.id).items, $event)"
-                                    v-model="filterSubjects(form.subjects, level.id, semester.id).isTakenAll">
+                                    @input="toggleCheckAll(filterSubjects(forms.evaluation.fields.subjects, level.id, semester.id).items, $event)"
+                                    v-model="filterSubjects(forms.evaluation.fields.subjects, level.id, semester.id).isTakenAll">
                                     Credited
                                   </b-form-checkbox>
                                 </template>
@@ -446,17 +448,17 @@
         <template v-slot:footer>
           <b-button
             class="float-right btn-save ml-2"
-            @click="$emit('close')"
+            :to="`/master-files/student/${$route.params.studentId}/school-records/evaluations`"
             variant="outline-danger">
             Close
           </b-button>
           <b-button
-            :disabled="isProcessing"
+            :disabled="forms.evaluation.isProcessing"
             class="float-right btn-save"
-            @click="$emit('save')"
+            @click="onUpdateEvaluation()"
             variant="outline-primary">
             <v-icon
-              v-if="isProcessing"
+              v-if="forms.evaluation.isProcessing"
               name="sync"
               spin
               class="mr-2" />
@@ -533,19 +535,35 @@
   </div>
 </template>
 <script>
+const evaluationFields = {
+  id: null,
+  student: null,
+  studentCategory: null,
+  lastSchoolAttended: null,
+  lastSchoolLevelId: null,
+  lastSchoolYearFrom: null,
+  lastSchoolYearTo: null,
+  studentCurriculumId: null,
+  levelId: null,
+  submittedDate: null,
+  courseId: null,
+  semesterId: null,
+  curriculumId: null,
+  evaluationStatusId: null,
+  schoolCategoryId: null,
+  subjects: null
+}
+
 import { StudentCategories, EvaluationStatuses, Semesters, SchoolCategories } from '../../../helpers/enum'
-import { LevelApi, CourseApi, CurriculumApi, SubjectApi } from '../../../mixins/api'
+import { LevelApi, CourseApi, CurriculumApi, SubjectApi, EvaluationApi } from '../../../mixins/api'
 import tables from '../../../helpers/tables'
-import { showNotification } from '../../../helpers/forms'
+import { clearFields, showNotification } from '../../../helpers/forms'
+import { copyValue } from '../../../helpers/extractor'
 export default {
-  mixins: [LevelApi, CourseApi, CurriculumApi, SubjectApi, tables],
-  props: {
-    form: Object,
-    isProcessing: false,
-    isLoading: false
-  },
+  mixins: [LevelApi, CourseApi, CurriculumApi, SubjectApi, EvaluationApi, tables],
   data() {
     return {
+      isLoading: false,
       isLoadingCurriculum: false,
       isTakenAll: false,
       schoolCategories: SchoolCategories,
@@ -555,6 +573,12 @@ export default {
       levelId: null,
       semesterId: null,
       showModalSubjects: false,
+      forms: {
+        evaluation: {
+          isProcessing: false,
+          fields: { ...evaluationFields }
+        }
+      },
       options: {
         courseLevels : {
           items: []
@@ -702,16 +726,58 @@ export default {
           departmentId: null
 				}
       },
+      evaluationId: null
     }
   },
   created(){
+    this.evaluationId = this.$route.params.evaluationId
+    this.loadEvaluation()
     this.loadLevelList()
     this.loadCourseList()
     this.loadCurriculumList()
   },
   methods: {
+    onUpdateEvaluation() {
+      const { fields, fields: { student, level, course, studentCategory, ...evaluation } } = this.forms.evaluation
+      const subjects = evaluation.subjects.map(s => {
+        const subject = {
+          subjectId: s.id,
+          levelId: s.pivot.levelId,
+          semesterId: s.pivot.semesterId,
+          grade: s.pivot.grade,
+          notes: s.pivot.notes,
+          isTaken: s.pivot.isTaken
+        }
+        return subject
+      })
+      const data = { ...evaluation, subjects }
+      this.forms.evaluation.isProcessing = true;
+      this.updateEvaluation(data, evaluation.id)
+      .then(({ data }) => {
+        this.forms.evaluation.isProcessing = false
+        this.showEntry = false
+        showNotification(this, "success", "Updated Successfully.")
+        // this.loadStudentEvaluationList()
+        this.$router.push({path: `/master-files/student/${this.$route.params.studentId}/school-records/evaluations`, query: { success: true } })
+      }).catch((error) => {
+        this.forms.evaluation.isProcessing = false;
+        const errors = error.response.data.errors
+      });
+    },
+    loadEvaluation() {
+      this.isLoading = true
+      const { fields } = this.forms.evaluation
+      clearFields(fields)
+      fields.subjects = []
+      this.getEvaluation(this.evaluationId)
+      .then(({ data }) => {
+        copyValue(data, fields)
+        this.isLoading = false
+      })
+      // this.evaluationEntryInfo = row.item
+    },
     loadSubjects(){
-			const { schoolCategoryId } = this.form
+			const { schoolCategoryId } = this.forms.evaluation.fields
       const { addSubjects } = this.tables
       const { addSubject } = this.paginations
       addSubjects.isBusy = true
@@ -754,7 +820,7 @@ export default {
       const { courseLevels: levels } = this.options
       let params = { paginate: false }
       this.isLoadingCurriculum = true
-      this.getLevelsOfCourse(this.form.courseId, params)
+      this.getLevelsOfCourse(this.forms.evaluation.fields.courseId, params)
         .then(({ data }) => {
           levels.items = data
           this.isLoadingCurriculum = false
@@ -817,7 +883,7 @@ export default {
 			this.showModalSubjects = true
     },
     addSubject(row){
-      const { subjects } = this.form
+      const { subjects } = this.forms.evaluation.fields
       const { item } = row
       // check if subject exist in the table
       const result = subjects.find(subject => subject.id === item.id)
@@ -837,18 +903,18 @@ export default {
 			})
 		},
 		removeSubject(row){
-      const { subjects } = this.form
+      const { subjects } = this.forms.evaluation.fields
       const index = subjects.findIndex(i => i.id === row.item.id)
 			subjects.splice(index, 1);
     },
   },
   watch: {
-    'form.courseId': function (newVal, oldVal){
+    'forms.evaluation.fields.courseId': function (newVal, oldVal){
       if (oldVal === null || oldVal === 0) {
         this.loadLevelsOfCourse()
       }
     },
-    'form.schoolCategoryId': function (newVal, oldVal){
+    'forms.evaluation.fields.schoolCategoryId': function (newVal, oldVal){
       if (oldVal === null || oldVal === 0) {
         this.loadSubjects()
       }

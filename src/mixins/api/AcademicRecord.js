@@ -5,6 +5,9 @@ export default {
     getAcademicRecordList(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records`, { params: params });
     },
+    getAcademicRecord(id) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/${id}`);
+    },
     getSubjectsOfAcademicRecord(academicRecordId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/subjects`, { params: params });
     },

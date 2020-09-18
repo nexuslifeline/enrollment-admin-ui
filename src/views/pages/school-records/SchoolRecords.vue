@@ -11,7 +11,7 @@
             :class="{ active: $route.path.includes(item.to)}">
             <router-link
               class="sub-nav__link"
-              :to="`/master-files/student/${$route.params.studentId}/academic-records${item.to}`">
+              :to="`/master-files/student/${$route.params.studentId}/school-records${item.to}`">
               {{item.label}}
             </router-link>
           </li>

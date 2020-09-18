@@ -36,11 +36,13 @@ const Semester = () => import('@/views/pages/Semester')
 const SchoolYear = () => import('@/views/pages/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
 const DemoPage = () => import('@/views/pages/DemoPage')
-const AcademicRecords = () => import('@/views/pages/academic-records/AcademicRecords')
-const AcademicRecordEvaluation = () => import('@/views/pages/academic-records/Evaluation')
-const AcademicRecordSubjects = () => import('@/views/pages/academic-records/Subjects')
-const AcademicRecordAssessment = () => import('@/views/pages/academic-records/Assessment')
-const AcademicRecordRequirements = () => import('@/views/pages/academic-records/Requirements')
+const SchoolRecords = () => import('@/views/pages/school-records/SchoolRecords')
+const SchoolRecordEvaluation = () => import('@/views/pages/school-records/Evaluation')
+const SchoolRecordEvaluationEntry = () => import('@/views/pages/school-records/EvaluationEntry')
+const SchoolRecordEnrollments = () => import('@/views/pages/school-records/Enrollments')
+const SchoolRecordEnrollmentEntry = () => import('@/views/pages/school-records/EnrollmentEntry')
+const SchoolRecordRequirements = () => import('@/views/pages/school-records/Requirements')
+const SchoolRecordRequirementEntry = () => import('@/views/pages/school-records/RequirementEntry')
 const UserGroupPermissions = () => import('@/views/pages/user-group-permissions/UserGroupPermissions')
 const Permissions = () => import('@/views/pages/user-group-permissions/Permissions')
 const SchoolCategories = () => import('@/views/pages/user-group-permissions/SchoolCategories')
@@ -298,8 +300,8 @@ function configRoutes () {
                   meta: { requiresAuth: true, userType: 0 }
                 },
                 {
-                  path: ':studentId/academic-records',
-                  component: AcademicRecords,
+                  path: ':studentId/school-records',
+                  component: SchoolRecords,
                   children: [
                     {
                       path: '/',
@@ -308,25 +310,43 @@ function configRoutes () {
                     {
                       path: 'evaluations',
                       name: 'Evaluations',
-                      component: AcademicRecordEvaluation,
+                      component: SchoolRecordEvaluation,
+                      meta: { requiresAuth: true },
+                    },
+                    {
+                      path: 'evaluations/:evaluationId',
+                      name: 'Evaluation Entry',
+                      component: SchoolRecordEvaluationEntry,
                       meta: { requiresAuth: true }
                     },
                     {
-                      path: 'subjects',
-                      name: 'Subjects',
-                      component: AcademicRecordSubjects,
+                      path: 'enrollments',
+                      name: 'Enrollments',
+                      component: SchoolRecordEnrollments,
                       meta: { requiresAuth: true }
                     },
                     {
-                      path: 'assessment',
-                      name: 'Assessment',
-                      component: AcademicRecordAssessment,
+                      path: 'enrollments/:academicRecordId',
+                      name: 'Enrollment Entry',
+                      component: SchoolRecordEnrollmentEntry,
                       meta: { requiresAuth: true }
                     },
+                    // {
+                    //   path: 'assessment',
+                    //   name: 'Assessment',
+                    //   component: SchoolRecordAssessment,
+                    //   meta: { requiresAuth: true }
+                    // },
                     {
                       path: 'requirements',
                       name: 'Requirements',
-                      component: AcademicRecordRequirements,
+                      component: SchoolRecordRequirements,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'requirements/:evaluationId',
+                      name: 'Requirement Entry',
+                      component: SchoolRecordRequirementEntry,
                       meta: { requiresAuth: true }
                     },
                   ]

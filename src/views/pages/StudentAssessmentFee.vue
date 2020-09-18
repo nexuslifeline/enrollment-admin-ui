@@ -55,108 +55,153 @@
             </b-form-input>
           </b-col>
         </b-row> <!-- row button and search input -->
-          <b-table
-            details-td-class="table-secondary"
-            hover outlined small responsive show-empty
-            :fields="tables.students.fields"
-            :items="tables.students.items"
-            :busy="tables.students.isBusy">
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(name)="data">
-              <b-media>
-                <template v-slot:aside>
-                  <b-avatar
-                    rounded
-                    blank
-                    size="64"
-                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
-                    :src="avatar(data.item.student)" />
-                </template>
-                <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
-                <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-                <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
-              </b-media>
-            </template>
-            <template v-slot:cell(contact)="data">
-              Email : {{ data.item.student.email }} <br>
-              <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
-              <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
-            </template>
-            <template v-slot:cell(education)="data">
-              <span>{{ getName(data.item, 'level') + " "
-                + getName(data.item, 'semester') + " "
-                + getName(data.item, 'studentType') }}</span><br>
-              <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
-            </template>
-            <template v-slot:cell(status)="data">
-              <b-badge
-                :variant="(data.item.applicationId ?
-                data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
-                  ? 'warning'
-                  : 'primary'">
-                {{ (data.item.applicationId ?
-                data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) ? 'Pending' : 'Approved' }}
-              </b-badge>
-            </template>
-            <template v-slot:cell(action)="row">
+        <b-table
+          details-td-class="table-secondary"
+          hover outlined small responsive show-empty
+          :fields="tables.students.fields"
+          :items="tables.students.items"
+          :busy="tables.students.isBusy">
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
               <v-icon
-                :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
-                @click="loadDetails(row)" />
-            </template>
-            <template v-slot:row-details="data">
-              <b-overlay :show="data.item.isLoading" rounded="sm">
-                <b-row class="m-2">
-                  <b-col md="2">
-                    <h6>Level</h6>
-                    <h6>{{ getName(data.item, 'level') }}</h6>
-                  </b-col>
-                  <b-col md="2">
-                    <div v-if="getName(data.item, 'course') != ''">
-                      <h6>Course</h6>
-                      <h6>{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</h6>
-                    </div>
-                  </b-col>
-                  <b-col md="2">
-                    <div v-show="getName(data.item, 'course') != ''">
-                      <h6>Semester</h6>
-                      <h6>{{ getName(data.item, 'semester') }}</h6>
-                    </div>
-                  </b-col>
-                  <b-col md="2">
-                    <h6>School Year</h6>
-                    <h6>{{ getName(data.item, 'schoolYear') }}</h6>
-                  </b-col>
-                  <b-col md="2">
-                    <h6>Section</h6>
-                    <h6>{{ getName(data.item, 'section') }}</h6>
-                  </b-col>
-                  <b-col md="2">
-                    <h6>Student Type</h6>
-                    <h6>{{ getName(data.item, 'studentType') }}</h6>
+                name="spinner"
+                spin
+                class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="data">
+            <b-media>
+              <template v-slot:aside>
+                <b-avatar
+                  rounded
+                  blank
+                  size="64"
+                  :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                  :src="avatar(data.item.student)" />
+              </template>
+              <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
+              <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+              <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
+            </b-media>
+          </template>
+          <template v-slot:cell(contact)="data">
+            Email : {{ data.item.student.email }} <br>
+            <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+          </template>
+          <template v-slot:cell(education)="data">
+            <span>{{ getName(data.item, 'level') + " "
+              + getName(data.item, 'semester') + " "
+              + getName(data.item, 'studentType') }}</span><br>
+            <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
+          </template>
+          <template v-slot:cell(status)="data">
+            <b-badge
+              :variant="(data.item.applicationId ?
+              data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
+              data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
+                ? 'warning'
+                : 'primary'">
+              {{ (data.item.applicationId ?
+              data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
+              data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) ? 'Pending' : 'Approved' }}
+            </b-badge>
+          </template>
+          <template v-slot:cell(action)="row">
+            <v-icon
+              :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
+              @click="loadDetails(row)" />
+          </template>
+          <template v-slot:row-details="data">
+            <b-overlay :show="data.item.isLoading" rounded="sm">
+              <b-row class="m-2">
+                <b-col md="2">
+                  <h6>Level</h6>
+                  <h6>{{ getName(data.item, 'level') }}</h6>
+                </b-col>
+                <b-col md="2">
+                  <div v-if="getName(data.item, 'course') != ''">
+                    <h6>Course</h6>
+                    <h6>{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</h6>
+                  </div>
+                </b-col>
+                <b-col md="2">
+                  <div v-show="getName(data.item, 'course') != ''">
+                    <h6>Semester</h6>
+                    <h6>{{ getName(data.item, 'semester') }}</h6>
+                  </div>
+                </b-col>
+                <b-col md="2">
+                  <h6>School Year</h6>
+                  <h6>{{ getName(data.item, 'schoolYear') }}</h6>
+                </b-col>
+                <b-col md="2">
+                  <h6>Section</h6>
+                  <h6>{{ getName(data.item, 'section') }}</h6>
+                </b-col>
+                <b-col md="2">
+                  <h6>Student Type</h6>
+                  <h6>{{ getName(data.item, 'studentType') }}</h6>
+                </b-col>
+              </b-row>
+              <b-card v-if="data.item.subjects">
+                <b-row class="mb-3">
+                  <b-col md=6>
+                    <h5>SUBJECTS</h5>
                   </b-col>
                 </b-row>
-                <b-card v-if="data.item.subjects">
-                  <b-row class="mb-3">
-                    <b-col md=6>
-                      <h5>SUBJECTS</h5>
+                <b-table
+                  hover outlined small responsive show-empty
+                  :fields="tables.subjects.fields"
+                  :items="data.item.subjects"
+                  :busy="tables.subjects.isBusy">
+                </b-table>
+                <template v-slot:table-busy>
+                  <div class="text-center my-2">
+                    <v-icon
+                      name="spinner"
+                      spin
+                      class="mr-2" />
+                    <strong>Loading...</strong>
+                  </div>
+                </template>
+                <template v-slot:footer>
+                  <b-row>
+                    <b-col md=10>
+                      <h5 class="float-right font-weight-bold">TUITION FEE</h5>
+                    </b-col>
+                    <b-col md=2>
+                      <h5 class="float-right pr-2 font-weight-bold">{{ subjectsTotalAmount(data.item.subjects) }}</h5>
                     </b-col>
                   </b-row>
-                  <b-table
-                    hover outlined small responsive show-empty
-                    :fields="tables.subjects.fields"
-                    :items="data.item.subjects"
-                    :busy="tables.subjects.isBusy">
-                  </b-table>
+                </template>
+              </b-card>
+              <b-card v-if="data.item.fees">
+                <b-row class="mb-3">
+                  <b-col md=4>
+                    <h5 class="pt-2">STUDENT FEES</h5>
+                  </b-col>
+                  <b-col md=4 class="text-center">
+                    <span v-if="data.item.msg" class="text-danger font-weight-bold">{{ data.item.msg }}</span>
+                  </b-col>
+                  <b-col md=4>
+                    <b-button
+                      @click="onAddFees(data.item.fees)"
+                      v-if="data.item.applicationId ?
+                        data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
+                        data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id"
+                      variant="outline-primary"
+                      class="float-right">
+                      <v-icon name="plus-circle" /> New Item
+                    </b-button>
+                  </b-col>
+                </b-row>
+                <b-table
+                  hover outlined small responsive show-empty
+                  :fields="tables.studentFees.fields"
+                  :items="data.item.fees"
+                  :busy="tables.studentFees.isBusy">
                   <template v-slot:table-busy>
                     <div class="text-center my-2">
                       <v-icon
@@ -166,155 +211,110 @@
                       <strong>Loading...</strong>
                     </div>
                   </template>
-                  <template v-slot:footer>
-                    <b-row>
-                      <b-col md=10>
-                        <h5 class="float-right font-weight-bold">TUITION FEE</h5>
-                      </b-col>
-                      <b-col md=2>
-                        <h5 class="float-right pr-2 font-weight-bold">{{ subjectsTotalAmount(data.item.subjects) }}</h5>
-                      </b-col>
-                    </b-row>
+                  <template v-slot:cell(pivot.notes)="row">
+                    <b-form-input
+                      v-model="row.item.pivot.notes"
+                      :disabled="data.item.application ?
+                        data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
+                        data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id" />
                   </template>
-                </b-card>
-                <b-card v-if="data.item.fees">
-                  <b-row class="mb-3">
-                    <b-col md=4>
-                      <h5 class="pt-2">STUDENT FEES</h5>
-                    </b-col>
-                    <b-col md=4 class="text-center">
-                      <span v-if="data.item.msg" class="text-danger font-weight-bold">{{ data.item.msg }}</span>
-                    </b-col>
-                    <b-col md=4>
-                      <b-button
-                        @click="onAddFees(data.item.fees)"
-                        v-if="data.item.applicationId ?
+                  <template v-slot:cell(pivot.amount)="row">
+                    <vue-autonumeric
+                      :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || (data.item.application ?
+                        data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
+                        data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id)"
+                      v-model="row.item.pivot.amount"
+                      class="form-control text-right"
+                      :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
+                    </vue-autonumeric>
+                  </template>
+                  <template v-slot:cell(action)="row">
+                    <b-button
+                      v-if="(data.item.applicationId ?
                           data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                          data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id"
-                        variant="outline-primary"
-                        class="float-right">
-                        <v-icon name="plus-circle" /> New Item
-                      </b-button>
+                          data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
+                          && row.item.id !== fees.TUITION_FEE.id"
+                      @click="removeFee(data.item.fees, row)"
+                      size="sm" variant="danger">
+                      <v-icon name="trash" />
+                    </b-button>
+                  </template>
+                </b-table>
+                <template v-slot:footer>
+                  <b-row>
+                    <b-col md=4>
+                      <b-form-group
+                        label="INITIAL FEE TOTAL :"
+                        label-for="enrollmentFee"
+                        label-class="font-weight-bold"
+                        label-cols="4">
+                        <vue-autonumeric
+                          class="form-control text-right"
+                          v-model="data.item.enrollmentFee"
+                          :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
+                        </vue-autonumeric>
+                      </b-form-group>
+                    </b-col>
+                    <b-col md=4>
+                      <b-form-group
+                        label="PREVIOUS BALANCE :"
+                        label-for="enrollmentFee"
+                        label-class="font-weight-bold"
+                        label-cols="4">
+                        <vue-autonumeric
+                          class="form-control text-right"
+                          v-model="data.item.previousBalance"
+                          :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
+                        </vue-autonumeric>
+                      </b-form-group>
+                    </b-col>
+                    <b-col md=2>
+                      <h5 class="float-right font-weight-bold">Total</h5>
+                    </b-col>
+                    <b-col md=2>
+                      <h5 class="float-right font-weight-bold">{{ feesTotalAmount(data.item.fees) }}</h5>
                     </b-col>
                   </b-row>
-                  <b-table
-                    hover outlined small responsive show-empty
-                    :fields="tables.studentFees.fields"
-                    :items="data.item.fees"
-                    :busy="tables.studentFees.isBusy">
-                    <template v-slot:table-busy>
-                      <div class="text-center my-2">
-                        <v-icon
-                          name="spinner"
-                          spin
-                          class="mr-2" />
-                        <strong>Loading...</strong>
-                      </div>
-                    </template>
-                    <template v-slot:cell(pivot.notes)="row">
-                      <b-form-input
-                        v-model="row.item.pivot.notes"
-                        :disabled="data.item.application ?
-                          data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
-                          data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id" />
-                    </template>
-                    <template v-slot:cell(pivot.amount)="row">
-                      <vue-autonumeric
-                        :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || (data.item.application ?
-                          data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
-                          data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id)"
-                        v-model="row.item.pivot.amount"
-                        class="form-control text-right"
-                        :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
-                      </vue-autonumeric>
-                    </template>
-                    <template v-slot:cell(action)="row">
-                      <b-button
-                        v-if="(data.item.applicationId ?
-                            data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                            data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
-                            && row.item.id !== fees.TUITION_FEE.id"
-                        @click="removeFee(data.item.fees, row)"
-                        size="sm" variant="danger">
-                        <v-icon name="trash" />
-                      </b-button>
-                    </template>
-                  </b-table>
-                  <template v-slot:footer>
-                    <b-row>
-                      <b-col md=4>
-                        <b-form-group
-                          label="INITIAL FEE TOTAL :"
-                          label-for="enrollmentFee"
-                          label-class="font-weight-bold"
-                          label-cols="4">
-                          <vue-autonumeric
-                            class="form-control text-right"
-                            v-model="data.item.enrollmentFee"
-                            :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
-                          </vue-autonumeric>
-                        </b-form-group>
-                      </b-col>
-                      <b-col md=4>
-                        <b-form-group
-                          label="PREVIOUS BALANCE :"
-                          label-for="enrollmentFee"
-                          label-class="font-weight-bold"
-                          label-cols="4">
-                          <vue-autonumeric
-                            class="form-control text-right"
-                            v-model="data.item.previousBalance"
-                            :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
-                          </vue-autonumeric>
-                        </b-form-group>
-                      </b-col>
-                      <b-col md=2>
-                        <h5 class="float-right font-weight-bold">Total</h5>
-                      </b-col>
-                      <b-col md=2>
-                        <h5 class="float-right font-weight-bold">{{ feesTotalAmount(data.item.fees) }}</h5>
-                      </b-col>
-                    </b-row>
-                  </template>
-                </b-card>
-                <b-row class="mb-3">
-                  <b-col md=12>
-                    <b-button
-                      v-if="!isAccessible($options.StudentFeePermissions.APPROVAL.id) ? false :
-                        (data.item.applicationId ?
-                          data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                          data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)"
-                      @click="setApproveFees(data)"
-                      class="float-right mr-2"
-                      variant="outline-primary">
-                      <v-icon
-                        v-if="isProcessing"
-                        name="sync"
-                        class="mr-2"
-                        spin
-                      />
-                      Approve
-                    </b-button>
-                  </b-col>
-                </b-row>
-              </b-overlay>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{paginations.student.from}} to {{paginations.student.to}} of {{paginations.student.totalRows}} records.
-            </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.student.page"
-                :total-rows="paginations.student.totalRows"
-                :per-page="paginations.student.perPage"
-                size="sm"
-                align="end"
-                @input="loadAcademicRecord()"
-              />
-            </b-col>
-          </b-row>
+                </template>
+              </b-card>
+              <b-row class="mb-3">
+                <b-col md=12>
+                  <b-button
+                    v-if="!isAccessible($options.StudentFeePermissions.APPROVAL.id) ? false :
+                      (data.item.applicationId ?
+                        data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
+                        data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)"
+                    @click="setApproveFees(data)"
+                    class="float-right mr-2"
+                    variant="outline-primary">
+                    <v-icon
+                      v-if="isProcessing"
+                      name="sync"
+                      class="mr-2"
+                      spin
+                    />
+                    Approve
+                  </b-button>
+                </b-col>
+              </b-row>
+            </b-overlay>
+          </template>
+        </b-table>
+        <b-row>
+          <b-col md=6>
+            Showing {{paginations.student.from}} to {{paginations.student.to}} of {{paginations.student.totalRows}} records.
+          </b-col>
+          <b-col md=6>
+            <b-pagination
+              v-model="paginations.student.page"
+              :total-rows="paginations.student.totalRows"
+              :per-page="paginations.student.perPage"
+              size="sm"
+              align="end"
+              @input="loadAcademicRecord()"
+            />
+          </b-col>
+        </b-row>
       </div>
     </div>
     <!-- MODAL FEES -->
@@ -754,6 +754,8 @@ export default {
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
       const { applicationStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
+      const orderBy = 'updated_at'
+      const sort = 'DESC'
 			const academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id
 			let params = {
 				paginate: true,
@@ -762,6 +764,8 @@ export default {
 				schoolCategoryId,
 				courseId,
         applicationStatusId,
+        orderBy,
+        sort,
         criteria }
 			this.getAcademicRecordList(params)
 				.then(response => {

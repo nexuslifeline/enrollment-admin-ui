@@ -1142,6 +1142,7 @@ export default {
 				schoolCategoryId,
 				courseId,
         applicationStatusId,
+  sort,
         criteria }
 			this.getAcademicRecordList(params)
 				.then(response => {
@@ -1286,6 +1287,7 @@ export default {
 				this.schoolCategoryId = userGroup.schoolCategoryId
 			}
 			this.loadAcademicRecord()
+ecord()
     },
     // filterByDepartment() {
     //   const { subjects } = this.tables

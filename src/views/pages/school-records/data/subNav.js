@@ -6,12 +6,8 @@ export default {
       to: `/evaluations`
     },
     {
-      label: 'Subjects',
-      to: '/subjects'
-    },
-    {
-      label: 'Assessment',
-      to: '/assessment'
+      label: 'Enrollments',
+      to: '/enrollments'
     },
     {
       label: 'Requirements',
