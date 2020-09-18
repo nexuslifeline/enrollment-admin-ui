@@ -7,17 +7,17 @@
       <SchoolCategoryTabs
         :showAll="true"
         :schoolCategoryId="schoolCategoryId"
-        @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadTranscript()"
-        @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadTranscript()"
+        @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadAcademicRecord()"
+        @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadAcademicRecord()"
       />
       <div>
       <b-row class="mb-2"> <!-- row button and search input -->
         <b-col md="6">
-          <b-form-radio-group @input="loadTranscript()" v-model="filters.student.transcriptStatusId">
+          <b-form-radio-group @input="loadAcademicRecord()" v-model="filters.student.academicRecordStatusId">
             <b-form-radio :value="null">Show All</b-form-radio>
             <b-form-radio
-              v-for="status in transcriptStatuses.values"
-              v-if="status.id != transcriptStatuses.ENROLLED.id"
+              v-for="status in AcademicRecordStatuses.values"
+              v-if="status.id != AcademicRecordStatuses.ENROLLED.id"
               :value="status.id"
               :key="status.id">
               {{ status.name }}
@@ -29,7 +29,7 @@
             v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
               filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id ||
               filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
-            @change="loadTranscript()"
+            @change="loadAcademicRecord()"
             v-model="filters.student.courseId"
             class="float-right">
             <template v-slot:first>
@@ -48,7 +48,7 @@
           <b-form-input
             v-model="filters.student.criteria"
             debounce="500"
-            @update="loadTranscript()"
+            @update="loadAcademicRecord()"
             type="text"
             placeholder="Search">
           </b-form-input>
@@ -99,10 +99,10 @@
         </template>
         <template v-slot:cell(status)="data">
           <b-badge
-            :variant="data.item.transcriptStatusId === transcriptStatuses.FINALIZED.id
+            :variant="data.item.academicRecordStatusId === AcademicRecordStatuses.FINALIZED.id
               ? 'primary'
               : 'warning'">
-            {{ transcriptStatuses.getEnum(data.item.transcriptStatusId).name }}
+            {{ AcademicRecordStatuses.getEnum(data.item.academicRecordStatusId).name }}
           </b-badge>
         </template>
         <template v-slot:cell(action)="row">
@@ -148,7 +148,7 @@
                       class="section-select"
                       v-model="data.item.sectionId"
                       @change="prePopulateStudentSubjects(data)"
-                      :disabled="data.item.transcriptStatusId !== transcriptStatuses.DRAFT.id"
+                      :disabled="data.item.academicRecordStatusId !== AcademicRecordStatuses.DRAFT.id"
                       >
                       <template v-slot:first>
                         <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
@@ -167,7 +167,7 @@
                     </b-button> -->
 
                   <button class="btn btn-outline-primary add-subject-button"
-                    v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                    v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
                     @click="onAddSubject(data.item)">
                     <v-icon name="plus-circle" /> ADD SUBJECT
                   </button>
@@ -180,7 +180,7 @@
                   :busy="tables.subjects.isBusy">
                   <template v-slot:cell(action)="row">
                     <b-button
-                      v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                      v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
                       @click="removeSubject(data.item.subjects, row)"
                       size="sm" variant="danger">
                       <v-icon name="trash" />
@@ -188,7 +188,7 @@
                   </template>
                   <template v-slot:cell(section)="row">
                     <span>{{ row.item.section ? row.item.section.name : '' }}</span>
-                    <span v-if="data.item.transcriptStatusId === transcriptStatuses.DRAFT.id">
+                    <span v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id">
                       <a class="float-right" href="#" @click.prevent="onShowModalSection(row.item, data)">[Change]</a>
                       <br>
                       <a class="float-right" href="#" @click.prevent="onSectionSubjectClear(row)">[Clear]</a>
@@ -258,13 +258,13 @@
             </b-card>
             <b-button
               v-if="!isAccessible($options.StudentSubjectPermissions.DISAPPROVAL.id) ? false :
-                data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
               @click="setDisapproval(data)"
               class="float-right my-2 mr-2"
               variant="outline-danger">Reject</b-button>
             <b-button
               v-if="!isAccessible($options.StudentSubjectPermissions.APPROVAL.id) ? false :
-                data.item.transcriptStatusId === transcriptStatuses.DRAFT.id"
+                data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
               @click="setApproval(data)"
               class="float-right m-2"
               variant="outline-primary">Approve</b-button>
@@ -282,7 +282,7 @@
             :per-page="paginations.student.perPage"
             size="sm"
             align="end"
-            @input="loadTranscript()"
+            @input="loadAcademicRecord()"
           />
         </b-col>
       </b-row>
@@ -579,15 +579,15 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
-import { SchoolCategories, ApplicationStatuses, TranscriptStatuses, StudentFeeStatuses, Days, UserGroups, StudentSubjectPermissions } from "../../helpers/enum"
+import { StudentApi, CourseApi, AcademicRecordApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi } from "../../mixins/api"
+import { SchoolCategories, ApplicationStatuses, AcademicRecordStatuses, StudentFeeStatuses, Days, UserGroups, StudentSubjectPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber } from "../../helpers/forms"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
 import Access from '../../mixins/utils/Access'
 
-const transcriptFields = {
-  transcriptStatusId: null,
+const acdemicRecordFields = {
+  academicRecordStatusId: null,
   sectionId: null,
 }
 
@@ -596,7 +596,7 @@ const studentFeeFields = {
   semesterId: null,
   levelId: null,
   courseId: null,
-  transcriptId: null,
+  academicRecordId: null,
   studentFeeStatusId: null
 }
 
@@ -607,7 +607,7 @@ const applicationAdmissionFields = {
 
 export default {
 	name: "Student",
-  mixins: [StudentApi, CourseApi, TranscriptApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables, Access],
+  mixins: [StudentApi, CourseApi, AcademicRecordApi, AdmissionFileApi, SubjectApi, DepartmentApi, SectionApi, Tables, Access],
   components: {
     SchoolCategoryTabs
   },
@@ -620,7 +620,7 @@ export default {
       showModalSubjects: false,
       showModalSection: false,
 			isLoading: false,
-      transcriptStatuses: TranscriptStatuses,
+      AcademicRecordStatuses: AcademicRecordStatuses,
       days: Days,
       file: {
         type: null,
@@ -629,10 +629,10 @@ export default {
         notes: null
       },
       forms: {
-        transcript: {
-          fields: { ...transcriptFields },
-          states: { ...transcriptFields },
-          errors: { ...transcriptFields }
+        academicRecord: {
+          fields: { ...acdemicRecordFields },
+          states: { ...acdemicRecordFields },
+          errors: { ...acdemicRecordFields }
         },
         studentFee: {
           fields: { ...studentFeeFields}
@@ -964,7 +964,7 @@ export default {
 					criteria: null,
 					schoolCategoryId: null,
 					courseId: null,
-					transcriptStatusId: null
+					academicRecordStatusId: null
         },
         subject: {
           criteria: null,
@@ -1013,9 +1013,9 @@ export default {
     setApproval(row) {
       this.forms.applicationAdmission.fields.approvalNotes =  null
       if (!row.item.subjects) {
-        const { id: transcriptId } = row.item
+        const { id: academicRecordId } = row.item
         const params = { paginate: false }
-        this.getSubjectsOfTranscript(transcriptId, params)
+        this.getSubjectsOfAcademicRecord(academicRecordId, params)
 					.then(({ data }) => {
             this.$set(row.item, 'subjects', data)
             this.$set(row.item, 'isBusy', false)
@@ -1030,7 +1030,7 @@ export default {
     },
     onApproval() {
       const {
-        id: transcriptId,
+        id: academicRecordId,
         applicationId,
         admissionId
       } = this.row
@@ -1038,7 +1038,7 @@ export default {
       const {
         applicationAdmission: { fields: application },
         applicationAdmission: { fields: admission },
-        transcript: { fields: transcript },
+        academicRecord: { fields: academicRecord },
         studentFee: { fields: studentFee }
       } = this.forms
 
@@ -1059,21 +1059,21 @@ export default {
       studentFee.levelId = this.row.levelId,
       studentFee.courseId = this.row.courseId,
       studentFee.studentFeeStatusId = StudentFeeStatuses.DRAFT.id
-      studentFee.transcriptId = transcriptId
+      studentFee.academicRecordId = academicRecordId
 
-      transcript.transcriptStatusId = TranscriptStatuses.FINALIZED.id
-      transcript.sectionId =  this.row.sectionId
+      academicRecord.academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id
+      academicRecord.sectionId =  this.row.sectionId
 
       const data = {
         ...applicationAdmission[index],
         studentFee,
-        ...transcript,
+        ...academicRecord,
         subjects
       }
 
       this.isProcessing = true;
-      this.updateTranscript(data, transcriptId).then(({ data }) => {
-        this.row.transcriptStatusId = TranscriptStatuses.FINALIZED.id
+      this.updateAcademicRecord(data, academicRecordId).then(({ data }) => {
+        this.row.academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id
         this.isProcessing = false
         this.showModalApproval = false
         showNotification(this, "success", "Approved Successfully.")
@@ -1094,7 +1094,7 @@ export default {
     onDisapproval() {
       this.isProcessing = true;
       const {
-        id: transcriptId,
+        id: academicRecordId,
         applicationId,
         admissionId
       } = this.row
@@ -1102,7 +1102,7 @@ export default {
       const {
         applicationAdmission: { fields: application },
         applicationAdmission: { fields: admission },
-        transcript: { fields: transcript }
+        academicRecord: { fields: academicRecord }
       } = this.forms
 
       const data = applicationId
@@ -1119,8 +1119,8 @@ export default {
           }
         }
 
-      this.updateTranscript(data, transcriptId).then(({ data }) => {
-        this.loadTranscript()
+      this.updateAcademicRecord(data, academicRecordId).then(({ data }) => {
+        this.loadAcademicRecord()
         this.isProcessing = false
         this.showModalRejection = false
         showNotification(this, "success", "Rejected Successfully.")
@@ -1129,21 +1129,21 @@ export default {
         this.isProcessing = false;
       });
     },
-		loadTranscript(){
+		loadAcademicRecord(){
       const { students } = this.tables
       const { student, student: { perPage, page } } = this.paginations
       students.isBusy = true
-      const { transcriptStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
+      const { academicRecordStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
 			const applicationStatusId = ApplicationStatuses.SUBMITTED.id
 			let params = {
 				paginate: true,
 				perPage, page,
-				transcriptStatusId,
+				academicRecordStatusId,
 				schoolCategoryId,
 				courseId,
         applicationStatusId,
         criteria }
-			this.getTranscriptList(params)
+			this.getAcademicRecordList(params)
 				.then(response => {
 					const res = response.data
 					students.items = res.data;
@@ -1151,7 +1151,7 @@ export default {
 					student.to = res.meta.to
 					student.totalRows = res.meta.total
           students.isBusy = false
-          this.forms.transcript.sectionId = res.data.sectionId
+          this.forms.academicRecord.sectionId = res.data.sectionId
 				})
     },
     loadDepartmentList(){
@@ -1173,7 +1173,7 @@ export default {
 	  loadDetails(row){
 			if (!row.detailsShowing) {
 				const {
-					id: transcriptId,
+					id: academicRecordId,
 					admissionId
 				} = row.item
 
@@ -1181,7 +1181,7 @@ export default {
 
         this.isLoading = true
         this.tables.subjects.isBusy = true
-				this.getSubjectsOfTranscript(transcriptId, params)
+				this.getSubjectsOfAcademicRecord(academicRecordId, params)
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
             this.isLoading = false
@@ -1285,7 +1285,7 @@ export default {
 				this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
 				this.schoolCategoryId = userGroup.schoolCategoryId
 			}
-			this.loadTranscript()
+			this.loadAcademicRecord()
     },
     // filterByDepartment() {
     //   const { subjects } = this.tables

@@ -35,8 +35,8 @@ export default {
     getEvaluationsOfStudent(studentId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/evaluations`, { params: params });
     },
-    getTranscriptsOfStudent(studentId, params) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/transcripts`, { params: params });
+    getAcademicRecordsOfStudent(studentId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/academic-records`, { params: params });
     },
     getStudentFeesOfStudent(studentId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/student-fees`, { params: params });

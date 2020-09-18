@@ -639,7 +639,6 @@ export default {
           this.showModalApproval = false
           showNotification(this, "success", "Approved Successfully.")
         }).catch((error) => {
-          console.log(error)
           this.isProcessing = false;
         });
     },
@@ -664,7 +663,6 @@ export default {
           this.showModalRejection = false
           showNotification(this, "success", "Rejected Successfully.")
         }).catch((error) => {
-          console.log(error)
           this.isProcessing = false;
         });
     },
@@ -681,11 +679,9 @@ export default {
                 this.$set(row.item, 'files', data)
                 row.item.isLoading = false
               }).catch((error) => {
-                console.log(error)
                 row.item.isLoading = false
               });
           }).catch((error) => {
-            console.log(error)
             row.item.isLoading = false
           });
       }
@@ -796,11 +792,12 @@ export default {
     },
     setupPaymentReceiptActiveFileViewer(index) {
       this.lastActiveFile = this.paymentReceiptFiles[index]
-      this.fileViewer.paymentReceiptFile.isActiveNavEnabled = this.paymentReceiptFiles?.length > 1
+      this.fileViewer.paymentReceiptFile.isActiveNavEnabled = true;
       this.fileViewer.paymentReceiptFile.activeNavCount = this.paymentReceiptFiles?.length;
       this.fileViewer.paymentReceiptFile.activeNavIndex =  index
     },
     previewPaymentReceiptFile(index) {
+      this.setupPaymentReceiptActiveFileViewer(index)
       const selectedFile = this.paymentReceiptFiles[index]
       const { student } = this.row
       const { userable } = this.$store?.state?.user
@@ -809,7 +806,7 @@ export default {
       this.file.name = selectedFile?.name
       this.file.notes = selectedFile?.notes
       this.file.isLoading = true
-      this.fileViewer.paymentFile.show = true
+      this.fileViewer.paymentReceiptFile.show = true
       this.file.owner = userable
 
       this.getPaymentReceiptFilePreview(this.row.id, selectedFile.id)

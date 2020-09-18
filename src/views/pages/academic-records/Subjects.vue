@@ -11,9 +11,9 @@
         <b-table
           details-td-class="table-secondary"
           hover outlined small show-empty
-          :fields="tables.transcripts.fields"
-          :items="tables.transcripts.items"
-          :busy="tables.transcripts.isBusy">
+          :fields="tables.academicRecords.fields"
+          :items="tables.academicRecords.items"
+          :busy="tables.academicRecords.isBusy">
           <template v-slot:cell(name)="row">
             <b-media>
               <template v-slot:aside>
@@ -79,12 +79,12 @@
                     <b-form-group>
                       <label>Status</label>
                       <b-form-select
-                        v-model="data.item.transcriptStatusId">
+                        v-model="data.item.academicRecordStatusId">
                         <template v-slot:first>
                           <b-form-select-option :value="null" disabled>-- Status --</b-form-select-option>
                         </template>
                         <b-form-select-option
-                          v-for="status in transcriptStatuses.values"
+                          v-for="status in AcademicRecordStatuses.values"
                           :key="status.id"
                           :value="status.id">
                           {{ status.name }}
@@ -289,19 +289,19 @@
   </div>
 </template>
 <script>
-import { StudentApi, TranscriptApi, SectionApi, LevelApi, CourseApi, SubjectApi } from '../../../mixins/api'
-import { StudentCategories, TranscriptStatuses, Semesters, SchoolCategories } from '../../../helpers/enum'
+import { StudentApi, AcademicRecordApi, SectionApi, LevelApi, CourseApi, SubjectApi } from '../../../mixins/api'
+import { StudentCategories, AcademicRecordStatuses, Semesters, SchoolCategories } from '../../../helpers/enum'
 import EvaluationEntry from './EvaluationEntry'
 import tables from '../../../helpers/tables'
 import { showNotification } from '../../../helpers/forms'
 export default {
-  mixins: [ StudentApi, TranscriptApi, SectionApi, LevelApi, CourseApi, SubjectApi, tables ],
+  mixins: [ StudentApi, AcademicRecordApi, SectionApi, LevelApi, CourseApi, SubjectApi, tables ],
   components: {
     EvaluationEntry
   },
   created() {
     this.studentId = this.$route.params.studentId
-    this.loadStudentTranscriptList()
+    this.loadStudentAcademicRecordList()
     this.loadSectionList()
     this.loadCourseList()
     this.loadLevelList()
@@ -310,12 +310,12 @@ export default {
     return {
       isProcessing: false,
       studentCategories: StudentCategories,
-      transcriptStatuses: TranscriptStatuses,
+      AcademicRecordStatuses: AcademicRecordStatuses,
       semesters: Semesters,
       showModalSubjects: false,
       studentSubjects: [],
       tables: {
-        transcripts: {
+        academicRecords: {
 					isBusy: false,
 					filterIncludedFields: ["firstName", "lastName"],
 					fields: [
@@ -451,9 +451,9 @@ export default {
   methods: {
     onUpdateSubjects(item) {
       const {
-        id: transcriptId,
+        id: academicRecordId,
         levelId,
-        transcriptStatusId,
+        academicRecordStatusId,
         courseId,
         semesterId,
         sectionId,
@@ -467,7 +467,7 @@ export default {
 
       const data = {
         levelId,
-        transcriptStatusId,
+        academicRecordStatusId,
         courseId,
         semesterId,
         sectionId,
@@ -475,10 +475,10 @@ export default {
       }
 
       this.isProcessing = true;
-      this.updateTranscript(data, transcriptId)
+      this.updateAcademicRecord(data, academicRecordId)
       .then(({ data }) => {
         this.isProcessing = false
-        this.loadStudentTranscriptList()
+        this.loadStudentAcademicRecordList()
         showNotification(this, "success", "Approved Successfully.")
       }).catch((error) => {
 				const errors = error.response.data.errors
@@ -509,15 +509,15 @@ export default {
         sections.items = data
       })
     },
-    loadStudentTranscriptList() {
-      const transcriptStatusId = TranscriptStatuses.FINALIZED.id
-      const params = { paginate: false, transcriptStatusId }
-      const { transcripts } = this.tables
-      transcripts.isBusy = true
-      this.getTranscriptsOfStudent(this.studentId, params)
+    loadStudentAcademicRecordList() {
+      const academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id
+      const params = { paginate: false, academicRecordStatusId }
+      const { academicRecords } = this.tables
+      academicRecords.isBusy = true
+      this.getAcademicRecordsOfStudent(this.studentId, params)
       .then(({ data }) => {
-        transcripts.isBusy = false
-        transcripts.items = data
+        academicRecords.isBusy = false
+        academicRecords.items = data
       })
     },
     loadSubjects(schoolCategoryId){
@@ -555,13 +555,13 @@ export default {
     loadDetails(row){
 			if (!row.detailsShowing) {
 				const {
-					id: transcriptId,
+					id: academicRecordId,
 					admissionId
 				} = row.item
         const params = { paginate: false }
 
 				this.isLoading = true
-				this.getSubjectsOfTranscript(transcriptId, params)
+				this.getSubjectsOfAcademicRecord(academicRecordId, params)
 					.then(({ data }) => {
 						this.$set(row.item, 'subjects', data)
 						this.isLoading = false

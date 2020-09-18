@@ -7,7 +7,7 @@ export { default as SemesterApi } from './Semester';
 export { default as SubjectApi } from './Subject';
 export { default as RateSheetApi } from './RateSheet';
 export { default as SchoolFeeApi } from './SchoolFee';
-export { default as TranscriptApi } from './Transcript';
+export { default as AcademicRecordApi } from './AcademicRecord';
 export { default as AdmissionFileApi } from './AdmissionFile';
 export { default as UserGroupApi } from './UserGroup';
 export { default as PersonnelApi } from './Personnel';

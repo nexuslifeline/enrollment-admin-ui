@@ -87,7 +87,7 @@ export const ApplicationStatuses = new Enum({
   COMPLETED: { id: 7, name: 'Completed' },
 });
 
-export const TranscriptStatuses = new Enum({
+export const AcademicRecordStatuses = new Enum({
   DRAFT: { id: 1, name: 'Draft' },
   FINALIZED: { id: 2, name: 'Finalized' },
   ENROLLED: { id: 3, name: 'Enrolled' }
