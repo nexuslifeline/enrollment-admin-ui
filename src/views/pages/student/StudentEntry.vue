@@ -708,7 +708,7 @@
         </div>
       </div>
     </div>
-    <div class="w-100 mt-3 mb-4">
+    <div class="action-container">
       <b-button class="float-right ml-2"
         :to="`/master-files/student`"
         variant="outline-danger"
@@ -1271,6 +1271,11 @@ export default {
     @include for-size(phone-only) {
       margin-top: 20px;
     }
+  }
+
+  .action-container {
+    margin: 20px 0;
+    height: 50px;
   }
 
 </style>
