@@ -29,7 +29,8 @@ const User = () => import('@/views/pages/User')
 const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
-const Student = () => import('@/views/pages/Student')
+const StudentList = () => import('@/views/pages/student/StudentList')
+const StudentEntry = () => import('@/views/pages/student/StudentEntry')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
 const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
@@ -296,7 +297,19 @@ function configRoutes () {
                 {
                   path: '/',
                   name: 'Student List',
-                  component: Student,
+                  component: StudentList,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+                {
+                  path: 'add',
+                  name: 'Student Add',
+                  component: StudentEntry,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+                {
+                  path: ':studentId',
+                  name: 'Student Edit',
+                  component: StudentEntry,
                   meta: { requiresAuth: true, userType: 0 }
                 },
                 {

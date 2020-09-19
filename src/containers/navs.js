@@ -15,7 +15,10 @@ import {
   EvaluationAndAdmissionPermissions,
   StudentSubjectPermissions,
   StudentFeePermissions,
-  StudentPaymentPermissions, Semesters
+  StudentPaymentPermissions, Semesters,
+  BankAccountPermissions,
+  EWalletAccountPermissions,
+  PeraPadalaAccountPermissions
 } from '../helpers/enum';
 
 export default [
@@ -172,15 +175,18 @@ export default [
       },
       {
         label: 'Bank Account',
-        to: '/maintenance/bank-account'
+        to: '/maintenance/bank-account',
+        permissionIds: BankAccountPermissions.getIds()
       },
       {
         label: 'Pera Padala Account',
-        to: '/maintenance/pera-padala-account'
+        to: '/maintenance/pera-padala-account',
+        permissionIds: PeraPadalaAccountPermissions.getIds()
       },
       {
         label: 'E Wallet Account',
-        to: '/maintenance/e-wallet-account'
+        to: '/maintenance/e-wallet-account',
+        permissionIds: EWalletAccountPermissions.getIds()
       },
       {
         label: 'User Group',
