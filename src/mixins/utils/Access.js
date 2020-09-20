@@ -8,7 +8,7 @@ export default {
       }
 
       const { user } = this.$store.state;
-      if (user?.userGroup === UserGroups.SUPER_USER.id) {
+      if (user?.userGroup.id === UserGroups.SUPER_USER.id) {
         return true; // Super User
       }
 

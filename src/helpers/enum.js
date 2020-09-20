@@ -571,3 +571,21 @@ export const StudentPaymentPermissions = new Enum({
   APPROVAL: { id: 261, name: 'Approval' },
   DISAPPROVAL: { id: 262, name: 'Disapproval' }
 });
+
+export const BankAccountPermissions = new Enum({
+  ADD: { id: 263, name: 'Add' },
+  EDIT: { id: 264, name: 'Edit' },
+  DELETE: { id: 265, name: 'Delete' }
+});
+
+export const EWalletAccountPermissions = new Enum({
+  ADD: { id: 266, name: 'Add' },
+  EDIT: { id: 267, name: 'Edit' },
+  DELETE: { id: 268, name: 'Delete' }
+});
+
+export const PeraPadalaAccountPermissions = new Enum({
+  ADD: { id: 269, name: 'Add' },
+  EDIT: { id: 270, name: 'Edit' },
+  DELETE: { id: 271, name: 'Delete' }
+});

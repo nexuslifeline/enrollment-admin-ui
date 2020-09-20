@@ -8,8 +8,8 @@ export default {
     getStudentList(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students`, { params: params })
     },
-    getStudent(id) {
-
+    getStudent(studentId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}`)
     },
     addStudent(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students`, data)
