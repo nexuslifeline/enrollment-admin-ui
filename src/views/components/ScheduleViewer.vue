@@ -9,7 +9,7 @@
       <div class="schedule-view__times">
         <div
           v-for="(item, idx) in times"
-          v-if="showExtendedTime || (!showExtendedTime && idx < 24)"
+          v-if="showExtendedTime || (!showExtendedTime && idx < $options.constants.EXTENDED_TIME_START_INDEX)"
           :key="idx"
           class="schedule-view__time-item"
           :style="{ height: `${cellHeight}px` }">
@@ -17,15 +17,17 @@
         </div>
       </div>
       <div v-for="(day, dayIdx) in Array.from({ length: days.length })" :key="dayIdx" class="schedule-view__column">
-        <template v-for="(time, idx) in times" v-if="showExtendedTime || (!showExtendedTime && idx < 24)">
+        <template
+          v-for="(time, idx) in times"
+          v-if="showExtendedTime || (!showExtendedTime && idx < $options.constants.EXTENDED_TIME_START_INDEX)">
           <template v-if="!!getCurrentTimeGroup(dayIdx, time).data">
             <div v-if="isFirstSelected(dayIdx, time)"
               :key="idx"
               :style="{
                 height: `${computeHeight(getCurrentTimeGroup(dayIdx, time))}px`,
-                backgroundColor: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % 16).light}`,
-                borderLeft: `4px solid ${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % 16).bg}`,
-                color: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % 16).bg}`
+                backgroundColor: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).light}`,
+                borderLeft: `4px solid ${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`,
+                color: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
               }"
               class="schedule-view__cell-item"
               :class="{ selected: isSelected(dayIdx, time) }">
@@ -38,13 +40,14 @@
                 </p>
               </div>
               <p class="time-group__time">
+                <v-icon name="clock" scale=".8" class="mr-2" />
                 {{formatTo12hr(getCurrentTimeGroup(dayIdx, time).start)}} - {{formatTo12hr(getCurrentTimeGroup(dayIdx, time).end)}}
               </p>
               <button
                 v-if="!!options && !!options.length"
                 @click.stop="toggleDropdown(`${dayIdx}${idx}`)"
                 :style="{
-                  color: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % 16).bg}`
+                  color: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
                 }"
                 class="time-group__options">
                 <span class="time-group__option-items">
@@ -82,9 +85,21 @@
   </div>
 </template>
 <script>
-import { colorFactory } from '../../helpers/colors';
+import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
+
+const COLOR_FACTORY_LENGTH = getColorFactoryLength();
+const TIME_OFFSET = 7;
+const TIME_LENGTH = 16;
+const EXTENDED_TIME_START_INDEX = 24;
+
 export default {
   colorFactory,
+  constants: {
+    COLOR_FACTORY_LENGTH,
+    TIME_OFFSET,
+    TIME_LENGTH,
+    EXTENDED_TIME_START_INDEX
+  },
   props: {
     showExtendedTime: {
       type: Boolean,
@@ -113,8 +128,9 @@ export default {
     }
   },
   created() {
-    const offset = 7;
-    Array.from({ length: 16 }).forEach((v, idx) => this.addTimeItem(idx + offset));
+    const offset = this.$options.constants.TIME_OFFSET;
+    const length = this.$options.constants.TIME_LENGTH;
+    Array.from({ length }).forEach((v, idx) => this.addTimeItem(idx + offset));
   },
   mounted() {
     window.addEventListener('click', this.hideDropdownItems)
@@ -124,8 +140,7 @@ export default {
   },
   methods: {
     addTimeItem(h) {
-      this.times.push({ h, m: "00" });
-      this.times.push({ h, m: "30" });
+      this.times.push({ h, m: "00" }, { h, m: "30" });
     },
     formatTo12hr(time) {
       if (time && typeof time === 'string') {
@@ -337,6 +352,8 @@ export default {
     margin: 0;
     padding: 5px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
   }
 
   .time-group__options {
