@@ -159,7 +159,7 @@ export default {
       }
 
       const hour = parseInt(time.h);
-      return `${(hour + 11) % 12 + 1}:${time.m} ${hour > 12 ? 'pm' : 'am'}`;
+      return `${(hour + 11) % 12 + 1}:${time.m} ${hour > 11 && hour < 24 ? 'pm' : 'am'}`;
     },
     isSelected(cellDay, cellTime) {
       const daySelected = this.getCurrentTimeGroup(cellDay, cellTime);
