@@ -23,51 +23,53 @@
           <template v-for="timeGroup in [getCurrentTimeGroup(dayIdx, time) || {}]">
             <template v-for="dayTimeKey in [`${dayIdx}-${idx}`]">
               <template v-if="!!timeGroup.data">
-                <div v-if="isFirstSelected(dayIdx, time)"
-                  :key="idx"
-                  :style="{
-                    height: `${computeHeight(timeGroup)}px`,
-                    backgroundColor: `${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).light}`,
-                    borderLeft: `4px solid ${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`,
-                    color: `${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
-                  }"
-                  class="schedule-view__cell-item"
-                  :class="{ selected: isSelected(dayIdx, time) }">
-                  <div class="time-group__details">
-                    <p class="time-group__title">
-                      {{timeGroup.data.title}}
-                    </p>
-                    <p class="time-group__description">
-                      {{timeGroup.data.description}}
-                    </p>
-                  </div>
-                  <p class="time-group__time">
-                    <v-icon name="clock" scale=".8" class="mr-2" />
-                    {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
-                  </p>
-                  <button
-                    v-if="!!options && !!options.length"
-                    @click.stop="toggleDropdown(dayTimeKey)"
+                <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
+                  <div v-if="isFirstSelected(dayIdx, time)"
+                    :key="idx"
                     :style="{
-                      color: `${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
+                      height: `${computeHeight(timeGroup)}px`,
+                      backgroundColor: `${factory.light}`,
+                      borderLeft: `4px solid ${factory.bg}`,
+                      color: `${factory.bg}`
                     }"
-                    class="time-group__options">
-                    <span class="time-group__option-items">
-                      <v-icon name="ellipsis-v" scale=".8" />
-                      <div v-if="openItems.includes(dayTimeKey)" class="time-group__option-dropdown-area">
-                        <ul class="time-group__option-dropdown">
-                          <li
-                            v-for="(option, optIdx) in options"
-                            @click="option.callback(timeGroup)"
-                            :key="optIdx"
-                            class="time-group__option-dropdown-item">
-                            {{option.label}}
-                          </li>
-                        </ul>
-                      </div>
-                    </span>
-                  </button>
-                </div>
+                    class="schedule-view__cell-item"
+                    :class="{ selected: isSelected(dayIdx, time) }">
+                    <div class="time-group__details">
+                      <p class="time-group__title">
+                        {{timeGroup.data.title}}
+                      </p>
+                      <p class="time-group__description">
+                        {{timeGroup.data.description}}
+                      </p>
+                    </div>
+                    <p class="time-group__time">
+                      <v-icon name="clock" scale=".8" class="mr-2" />
+                      {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
+                    </p>
+                    <button
+                      v-if="!!options && !!options.length"
+                      @click.stop="toggleDropdown(dayTimeKey)"
+                      :style="{
+                        color: `${factory.bg}`
+                      }"
+                      class="time-group__options">
+                      <span class="time-group__option-items">
+                        <v-icon name="ellipsis-v" scale=".8" />
+                        <div v-if="openItems.includes(dayTimeKey)" class="time-group__option-dropdown-area">
+                          <ul class="time-group__option-dropdown">
+                            <li
+                              v-for="(option, optIdx) in options"
+                              @click="option.callback(timeGroup)"
+                              :key="optIdx"
+                              class="time-group__option-dropdown-item">
+                              {{option.label}}
+                            </li>
+                          </ul>
+                        </div>
+                      </span>
+                    </button>
+                  </div>
+                </template>
               </template>
               <template v-else>
                 <template v-for="formattedTime in [`${times[idx].h}:${times[idx].m}`]">
