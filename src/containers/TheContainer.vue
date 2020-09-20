@@ -9,9 +9,7 @@
           <div class="c-body">
             <main class="c-main">
               <div class="container-fluid">
-                <transition name="fade">
-                  <router-view></router-view>
-                </transition>
+                <router-view></router-view>
               </div>
             </main>
             <!-- <TheFooter/> -->
@@ -61,15 +59,6 @@ export default {
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
 .main-content {
   display: flex;
   padding: 0;

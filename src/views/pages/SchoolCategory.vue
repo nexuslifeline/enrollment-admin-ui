@@ -1,64 +1,64 @@
 <template>
-  <div class="c-app">
+  <div class="c-page-content">
     <div>
       <div class="page-content__title-container">
         <h4 class="page-content__title">School Category Management</h4>
       </div>
       <div>
-                    <!-- add button and search -->
-            <b-row class="mb-3">
-              <b-col md=12>
-                <b-row>
-                  <b-col md=4 offset-md="8"> 
-                    <b-form-input
-                      v-model="filters.schoolCategory.criteria"
-                      type="text" 
-                      placeholder="Search" >
-                    </b-form-input>
-                  </b-col>
-                </b-row>
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=4 offset-md="8"> 
+                <b-form-input
+                  v-model="filters.schoolCategory.criteria"
+                  type="text" 
+                  placeholder="Search" >
+                </b-form-input>
               </b-col>
             </b-row>
-            <!-- end add button and search -->
-            <!-- table -->
-            <b-row >
-              <b-col md=12>
-                <b-table
-									hover outlined show-empty
-									:fields="tables.schoolCategories.fields"
-                  :busy="tables.schoolCategories.isBusy"
-                  :items.sync="tables.schoolCategories.items"
-                  :current-page="paginations.schoolCategory.page"
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              hover outlined show-empty
+              :fields="tables.schoolCategories.fields"
+              :busy="tables.schoolCategories.isBusy"
+              :items.sync="tables.schoolCategories.items"
+              :current-page="paginations.schoolCategory.page"
+              :per-page="paginations.schoolCategory.perPage"
+              :filter="filters.schoolCategory.criteria">
+              <!-- :filter="filters.schoolCategory.criteria> -->
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon 
+                    name="spinner" 
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.schoolCategory.from }} to {{ paginations.schoolCategory.to }} of {{ paginations.schoolCategory.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  v-model="paginations.schoolCategory.page"
+                  :total-rows="paginations.schoolCategory.totalRows"
                   :per-page="paginations.schoolCategory.perPage"
-                  :filter="filters.schoolCategory.criteria">
-                  <!-- :filter="filters.schoolCategory.criteria> -->
-                  <template v-slot:table-busy>
-                    <div class="text-center my-2">
-                      <v-icon 
-                        name="spinner" 
-                        spin
-                        class="mr-2" />
-                      <strong>Loading...</strong>
-                    </div>
-                  </template>
-								</b-table>
-                <b-row>
-                  <b-col md=6>
-                    Showing {{ paginations.schoolCategory.from }} to {{ paginations.schoolCategory.to }} of {{ paginations.schoolCategory.totalRows }} records.
-                    </b-col>
-                  <b-col md=6>
-                    <b-pagination
-                      v-model="paginations.schoolCategory.page"
-                      :total-rows="paginations.schoolCategory.totalRows"
-                      :per-page="paginations.schoolCategory.perPage"
-                      size="sm"
-                      align="end"
-                      @input="recordDetails(paginations.schoolCategory)" />
-                    </b-col>
-                  </b-row>
-              </b-col>
-            </b-row>
-            <!-- end table -->
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.schoolCategory)" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
     </div>
   </div>

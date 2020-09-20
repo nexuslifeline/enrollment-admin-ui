@@ -196,7 +196,7 @@ export default {
     padding: 0 15px;
   }
   .preview-file__file-name {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 600;
   }
 

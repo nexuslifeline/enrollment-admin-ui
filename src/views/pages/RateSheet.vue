@@ -1,5 +1,5 @@
 <template>
-	<div class="c-app">
+	<div class="c-page-content">
       <div>
         <div class="page-content__title-container">
           <h4 class="page-content__title">Rate Sheet Management</h4>

@@ -1,5 +1,5 @@
 <template>
-  <div class="c-app">
+  <div class="c-page-content">
     <div class="main-container">
       <div class="left-pane">
         <p class="sub-nav__title">{{$options.subNav.title}}</p>
