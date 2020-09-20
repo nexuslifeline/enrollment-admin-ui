@@ -70,6 +70,7 @@
             class="schedule-view__cell-item"
             :class="{ highlighted: highlightedItems.includes(`${dayIdx}-${idx}`) }"
             @click="$emit('onCellItemClick', { dayIdx, time: `${times[idx].h}:${times[idx].m}` })"
+            @dblclick="$emit('onCellItemDblClick', { dayIdx, time: `${times[idx].h}:${times[idx].m}` })"
             @mousedown="onCellMousedown(dayIdx, idx)"
             @mouseup="onCellMouseup(dayIdx, idx)"
             @mouseover="onCellMouseover(dayIdx, idx)"

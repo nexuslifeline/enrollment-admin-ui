@@ -9,6 +9,7 @@
         <ScheduleViewer
           :selectedItems="selectedSchedules"
           @onCellItemClick="onCellItemClick"
+          @onCellItemDblClick="onCellItemDblClick"
           @onMultipleCellSelect="onMultipleCellSelect"
           :showExtendedTime="false"
           :options="[{
@@ -83,6 +84,9 @@ export default {
   methods: {
     onCellItemClick(item) {
       console.log('onCellItemClick', item)
+    },
+    onCellItemDblClick(item) {
+      console.log('onCellItemDblClick', item)
     },
     onEditSeletedItem(item) {
       console.log('item selected', item)
