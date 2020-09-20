@@ -4,10 +4,12 @@
       <Toggle v-model="isEnable" />
       <p>Checked: {{isEnable}}</p>
       <h1 class="text-center">Schedule Viewer Sample Usage</h1>
+      <center><button @click="addSubject">Add Subjet</button></center>
       <div class="schedule-view">
         <ScheduleViewer
           :selectedItems="selectedSchedules"
           @onCellItemClick="onCellItemClick"
+          @onMultipleCellSelect="onMultipleCellSelect"
           :showExtendedTime="false"
           :options="[{
             label: 'Edit Schedule',
@@ -65,7 +67,7 @@ export default {
             description: "Paul Christian Rueda | Section A" // can be instructor name, section, etc
           }
         },
-         {
+        {
           dayIndex: 4,
           start: "9:00", // 24 hrs time format
           end: "11:00", // 24 hrs time format
@@ -74,7 +76,7 @@ export default {
             title: "Java Programming", // can subject title
             description: "John Doe | Section B" // can be instructor name, section, etc
           }
-        },
+        }
       ]
     }
   },
@@ -87,6 +89,31 @@ export default {
     },
     onDeleteSeletedItem(item) {
       console.log('delete selected', item)
+    },
+    onMultipleCellSelect(item) {
+      console.log('multiple cell selection item: ', item)
+    },
+    addSubject() {
+      this.selectedSchedules.push({
+        dayIndex: 5,
+        start: "11:00", // 24 hrs time format
+        end: "12:00", // 24 hrs time format
+        data: {
+          id: 6, // can be subject id
+          title: "Intro to Networking", // can subject title
+          description: "Juan Dela Cruz | Section B" // can be instructor name, section, etc
+        }
+      });
+      this.selectedSchedules.push({
+        dayIndex: 5,
+        start: "13:00", // 24 hrs time format
+        end: "15:00", // 24 hrs time format
+        data: {
+          id: 6, // can be subject id
+          title: "Intro to Networking", // can subject title
+          description: "Juan Dela Cruz | Section B" // can be instructor name, section, etc
+        }
+      });
     }
   }
 }

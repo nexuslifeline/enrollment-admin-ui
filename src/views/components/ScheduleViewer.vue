@@ -68,7 +68,11 @@
             v-else
             :key="idx"
             class="schedule-view__cell-item"
+            :class="{ highlighted: highlightedItems.includes(`${dayIdx}-${idx}`) }"
             @click="$emit('onCellItemClick', { dayIdx, time: `${times[idx].h}:${times[idx].m}` })"
+            @mousedown="onCellMousedown(dayIdx, idx)"
+            @mouseup="onCellMouseup(dayIdx, idx)"
+            @mouseover="onCellMouseover(dayIdx, idx)"
             :style="{ height: `${cellHeight}px` }"
           />
         </template>
@@ -94,40 +98,7 @@ export default {
   },
   data() {
     return {
-      times: [
-        { h: "7", m: "00"},
-        { h: "7", m: "30"},
-        { h: "8", m: "00"},
-        { h: "8", m: "30"},
-        { h: "9", m: "00"},
-        { h: "9", m: "30"},
-        { h: "10", m: "00"},
-        { h: "10", m: "30"},
-        { h: "11", m: "00"},
-        { h: "11", m: "30"},
-        { h: "12", m: "00"},
-        { h: "12", m: "30"},
-        { h: "13", m: "00"},
-        { h: "13", m: "30"},
-        { h: "14", m: "00"},
-        { h: "14", m: "30"},
-        { h: "15", m: "00"},
-        { h: "15", m: "30"},
-        { h: "16", m: "00"},
-        { h: "16", m: "30"},
-        { h: "17", m: "00"},
-        { h: "17", m: "30"},
-        { h: "18", m: "00"},
-        { h: "18", m: "30"},
-        { h: "19", m: "00"},
-        { h: "19", m: "30"},
-        { h: "20", m: "00"},
-        { h: "20", m: "30"},
-        { h: "21", m: "00"},
-        { h: "21", m: "30"},
-        { h: "22", m: "00"},
-        { h: "22", m: "30"}
-      ],
+      times: [],
       days: [
         "Monday",
         "Tuesday",
@@ -136,8 +107,13 @@ export default {
         "Friday",
         "Saturday"
       ],
-      openItems: []
+      openItems: [],
+      highlightedItems: []
     }
+  },
+  created() {
+    const offset = 7;
+    Array.from({ length: 16 }).forEach((v, idx) => this.addTimeItem(idx + offset));
   },
   mounted() {
     window.addEventListener('click', this.hideDropdownItems)
@@ -146,6 +122,10 @@ export default {
     window.removeEventListener('click', this.hideDropdownItems)
   },
   methods: {
+    addTimeItem(h) {
+      this.times.push({ h, m: "00" });
+      this.times.push({ h, m: "30" });
+    },
     formatTo12hr(time) {
       if (time && typeof time === 'string') {
         const h = time.trim().split(':')[0];
@@ -202,6 +182,39 @@ export default {
     },
     hideDropdownItems() {
       this.openItems = [];
+    },
+    isAlreadyHighlighted(key) {
+      return this.highlightedItems.includes(key);
+    },
+    onCellMousedown(dayIdx, timeIdx) {
+      this.isMousedown = true;
+      this.activeSelectionDayIdx = dayIdx;
+      const key = `${dayIdx}-${timeIdx}`;
+      if (!!this.highlightedItems.length) {
+        this.highlightedItems = [key];
+      } else {
+        this.highlightedItems.push(key);
+      }
+    },
+    onCellMouseup(dayIdx, timeIdx) {
+      this.isMousedown = false;
+      if (this.highlightedItems.length > 1) { // should be more than 1 cell to fire the event
+        const startIdx = this.highlightedItems[0]?.split('-')[1];
+        const endIdx = this.highlightedItems[this.highlightedItems.length - 1]?.split('-')[1];
+        const start = this.times[startIdx];
+        const end = this.times[endIdx];
+
+        this.$emit('onMultipleCellSelect', {
+          dayIdx,
+          startTime: `${start?.h}:${start?.m}`,
+          endTime: `${end?.h}:${end?.m}`
+        });
+      }
+    },
+    onCellMouseover(dayIdx, timeIdx) {
+      if (this.isMousedown && this.activeSelectionDayIdx === dayIdx) {
+        this.highlightedItems.push(`${dayIdx}-${timeIdx}`);
+      }
     }
   }
 }
@@ -292,6 +305,10 @@ export default {
       align-items: flex-start;
       //background-color: $blue;
       //border: 1px solid red;
+    }
+
+    &.highlighted {
+      background-color: $light-blue;
     }
 
   }
