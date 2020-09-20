@@ -24,7 +24,7 @@
             <template v-for="dayTimeKey in [`${dayIdx}-${idx}`]">
               <template v-if="!!timeGroup.data">
                 <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
-                  <div v-if="isFirstSelected(timeGroup)"
+                  <div v-if="isFirstSelected(dayIdx, time, timeGroup)"
                     :key="idx"
                     :style="{
                       height: `${computeHeight(timeGroup)}px`,
@@ -32,8 +32,7 @@
                       borderLeft: `4px solid ${factory.bg}`,
                       color: `${factory.bg}`
                     }"
-                    class="schedule-view__cell-item"
-                    :class="{ selected: isSelected(dayIdx, time) }">
+                    class="schedule-view__cell-item selected">
                     <div class="time-group__details">
                       <p class="time-group__title">
                         {{timeGroup.data.title}}
@@ -161,15 +160,7 @@ export default {
       const hour = parseInt(time.h);
       return `${(hour + 11) % 12 + 1}:${time.m} ${hour > 11 && hour < 24 ? 'pm' : 'am'}`;
     },
-    isSelected(cellDay, cellTime) {
-      const daySelected = this.getCurrentTimeGroup(cellDay, cellTime);
-      if (!!Object.keys(daySelected)?.length) {
-        const { start, end } = daySelected;
-        return this.isTimeBetween(cellTime, { start, end });
-      }
-      return false;
-    },
-    isFirstSelected(timeGroup) {
+    isFirstSelected(cellDay, cellTime, timeGroup) {
       //const timeGroup = this.getCurrentTimeGroup(cellDay, cellTime);
       if (!!Object.keys(timeGroup)?.length) {
         return this.isTimeStart(cellTime, timeGroup.start);
