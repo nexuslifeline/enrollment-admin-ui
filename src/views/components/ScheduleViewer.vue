@@ -20,65 +20,72 @@
         <template
           v-for="(time, idx) in times"
           v-if="showExtendedTime || (!showExtendedTime && idx < $options.constants.EXTENDED_TIME_START_INDEX)">
-          <template v-if="!!getCurrentTimeGroup(dayIdx, time).data">
-            <div v-if="isFirstSelected(dayIdx, time)"
-              :key="idx"
-              :style="{
-                height: `${computeHeight(getCurrentTimeGroup(dayIdx, time))}px`,
-                backgroundColor: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).light}`,
-                borderLeft: `4px solid ${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`,
-                color: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
-              }"
-              class="schedule-view__cell-item"
-              :class="{ selected: isSelected(dayIdx, time) }">
-              <div class="time-group__details">
-                <p class="time-group__title">
-                  {{getCurrentTimeGroup(dayIdx, time).data.title}}
-                </p>
-                <p class="time-group__description">
-                  {{getCurrentTimeGroup(dayIdx, time).data.description}}
-                </p>
-              </div>
-              <p class="time-group__time">
-                <v-icon name="clock" scale=".8" class="mr-2" />
-                {{formatTo12hr(getCurrentTimeGroup(dayIdx, time).start)}} - {{formatTo12hr(getCurrentTimeGroup(dayIdx, time).end)}}
-              </p>
-              <button
-                v-if="!!options && !!options.length"
-                @click.stop="toggleDropdown(`${dayIdx}${idx}`)"
+          <template v-for="timeGroup in [getCurrentTimeGroup(dayIdx, time) || {}]">
+            <template v-if="!!timeGroup.data">
+              <div v-if="isFirstSelected(dayIdx, time)"
+                :key="idx"
                 :style="{
-                  color: `${$options.colorFactory(getCurrentTimeGroup(dayIdx, time).data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
+                  height: `${computeHeight(timeGroup)}px`,
+                  backgroundColor: `${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).light}`,
+                  borderLeft: `4px solid ${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`,
+                  color: `${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
                 }"
-                class="time-group__options">
-                <span class="time-group__option-items">
-                  <v-icon name="ellipsis-v" scale=".8" />
-                  <div v-if="openItems.includes(`${dayIdx}${idx}`)" class="time-group__option-dropdown-area">
-                    <ul class="time-group__option-dropdown">
-                      <li
-                        v-for="(option, optIdx) in options"
-                        @click="option.callback(getCurrentTimeGroup(dayIdx, time))"
-                        :key="optIdx"
-                        class="time-group__option-dropdown-item">
-                        {{option.label}}
-                      </li>
-                    </ul>
-                  </div>
-                </span>
-              </button>
-            </div>
+                class="schedule-view__cell-item"
+                :class="{ selected: isSelected(dayIdx, time) }">
+                <div class="time-group__details">
+                  <p class="time-group__title">
+                    {{timeGroup.data.title}}
+                  </p>
+                  <p class="time-group__description">
+                    {{timeGroup.data.description}}
+                  </p>
+                </div>
+                <p class="time-group__time">
+                  <v-icon name="clock" scale=".8" class="mr-2" />
+                  {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
+                </p>
+                <button
+                  v-if="!!options && !!options.length"
+                  @click.stop="toggleDropdown(`${dayIdx}${idx}`)"
+                  :style="{
+                    color: `${$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH).bg}`
+                  }"
+                  class="time-group__options">
+                  <span class="time-group__option-items">
+                    <v-icon name="ellipsis-v" scale=".8" />
+                    <div v-if="openItems.includes(`${dayIdx}${idx}`)" class="time-group__option-dropdown-area">
+                      <ul class="time-group__option-dropdown">
+                        <li
+                          v-for="(option, optIdx) in options"
+                          @click="option.callback(timeGroup)"
+                          :key="optIdx"
+                          class="time-group__option-dropdown-item">
+                          {{option.label}}
+                        </li>
+                      </ul>
+                    </div>
+                  </span>
+                </button>
+              </div>
+            </template>
+            <template v-else>
+              <template v-for="dayTimeKey in [`${dayIdx}-${idx}`]">
+                <template v-for="formattedTime in [`${times[idx].h}:${times[idx].m}`]">
+                  <div
+                    :key="idx"
+                    class="schedule-view__cell-item"
+                    :class="{ highlighted: highlightedItems.includes(dayTimeKey) }"
+                    @click="$emit('onCellItemClick', { dayIdx, time: formattedTime })"
+                    @dblclick="$emit('onCellItemDblClick', { dayIdx, time: formattedTime })"
+                    @mousedown="onCellMousedown(dayIdx, idx)"
+                    @mouseup="onCellMouseup(dayIdx, idx)"
+                    @mouseover="onCellMouseover(dayIdx, idx)"
+                    :style="{ height: `${cellHeight}px` }"
+                  />
+                </template>
+              </template>
+            </template>
           </template>
-          <div
-            v-else
-            :key="idx"
-            class="schedule-view__cell-item"
-            :class="{ highlighted: highlightedItems.includes(`${dayIdx}-${idx}`) }"
-            @click="$emit('onCellItemClick', { dayIdx, time: `${times[idx].h}:${times[idx].m}` })"
-            @dblclick="$emit('onCellItemDblClick', { dayIdx, time: `${times[idx].h}:${times[idx].m}` })"
-            @mousedown="onCellMousedown(dayIdx, idx)"
-            @mouseup="onCellMouseup(dayIdx, idx)"
-            @mouseover="onCellMouseover(dayIdx, idx)"
-            :style="{ height: `${cellHeight}px` }"
-          />
         </template>
       </div>
     </div>
