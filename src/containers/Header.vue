@@ -232,8 +232,10 @@ export default {
 
   .header__sub-menus-container {
     height: 33px;
-    width: 100%;
-    padding: 0 230px;
+    //width: 100%;
+    flex: 1;
+    margin-left: 230px;
+    //padding: 0 230px;
     //background-color: $brand-primary;
     z-index: 1;
 

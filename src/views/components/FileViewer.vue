@@ -79,7 +79,7 @@
         <div v-else class="file-container" />
       </b-overlay>
       <div slot="modal-footer" class="w-100 preview-file__footer">
-        <div v-if="!isFullScreen && !!navCount" class="nav-dots__container">
+        <div v-if="!isFullScreen && navCount > 1" class="nav-dots__container">
           <ul class="nav-dots">
             <li
               v-for="(v, idx) in Array.from({ length: navCount })"
@@ -89,7 +89,7 @@
             />
           </ul>
         </div>
-        <p class="font-weight-bold">{{file.notes}}</p>
+        <p v-if="!isFullScreen" class="font-weight-bold">{{file.notes}}</p>
       </div>
     </b-modal>
   </div>
@@ -207,10 +207,10 @@ export default {
   .file-content {
     height: 100%;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    //display: flex;
+    //flex-direction: column;
+    //align-items: center;
+    //justify-content: center;
 
     &.scrollable {
       overflow: auto;
@@ -328,17 +328,19 @@ export default {
   }
 
   .nav-dots__item {
-    height: 9px;
-    width: 9px;
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
     background-color: $gray;
+    border: 3px solid $brand-primary;
     margin: 0 4px;
-    opacity: .8;
+    opacity: .85;
 
     &.active {
-      width: 33px;
       border-radius: 5px;
-      background-color: $dark-blue;
+      background-color: $brand-primary;
+      border: 0;
+      opacity: 1;
     }
   }
 
