@@ -107,14 +107,24 @@ export default {
           title: "Intro to Networking", // can subject title
           description: "Juan Dela Cruz | Section B" // can be instructor name, section, etc
         }
-      });
-      this.selectedSchedules.push({
+      },
+      {
         dayIndex: 5,
         start: "13:00", // 24 hrs time format
         end: "15:00", // 24 hrs time format
         data: {
           id: 6, // can be subject id
           title: "Intro to Networking", // can subject title
+          description: "Juan Dela Cruz | Section B" // can be instructor name, section, etc
+        }
+      },
+      {
+        dayIndex: 3,
+        start: "8:00", // 24 hrs time format
+        end: "12:30", // 24 hrs time format
+        data: {
+          id: 8, // can be subject id
+          title: "Multimedia", // can subject title
           description: "Juan Dela Cruz | Section B" // can be instructor name, section, etc
         }
       });
