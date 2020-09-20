@@ -24,7 +24,7 @@
             <template v-for="dayTimeKey in [`${dayIdx}-${idx}`]">
               <template v-if="!!timeGroup.data">
                 <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
-                  <div v-if="isFirstSelected(dayIdx, time)"
+                  <div v-if="isFirstSelected(timeGroup)"
                     :key="idx"
                     :style="{
                       height: `${computeHeight(timeGroup)}px`,
@@ -169,8 +169,8 @@ export default {
       }
       return false;
     },
-    isFirstSelected(cellDay, cellTime) {
-      const timeGroup = this.getCurrentTimeGroup(cellDay, cellTime);
+    isFirstSelected(timeGroup) {
+      //const timeGroup = this.getCurrentTimeGroup(cellDay, cellTime);
       if (!!Object.keys(timeGroup)?.length) {
         return this.isTimeStart(cellTime, timeGroup.start);
       }
