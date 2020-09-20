@@ -83,6 +83,7 @@ import 'vue-awesome/icons/chevron-left'
 import 'vue-awesome/icons/chevron-right'
 import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/compress'
+import 'vue-awesome/icons/ellipsis-v'
 import Icon from 'vue-awesome/components/Icon'
 // import vSelect from 'vue-select'
 
