@@ -50,12 +50,32 @@ export default {
         },
         {
           dayIndex: 0,
-          start: "9:00", // 24 hrs time format
+          start: "8:00", // 24 hrs time format
           end: "11:00", // 24 hrs time format
           data: {
             id: 21, // can be subject id
             title: "Data Structure", // can subject title
             description: "Denis Gutierrez | Section B" // can be instructor name, section, etc
+          }
+        },
+        {
+          dayIndex: 0,
+          start: "11:00", // 24 hrs time format
+          end: "12:00", // 24 hrs time format
+          data: {
+            id: 92, // can be subject id
+            title: "English", // can subject title
+            description: "Gelyn Joy Manalang | Section B" // can be instructor name, section, etc
+          }
+        },
+        {
+          dayIndex: 0,
+          start: "12:30", // 24 hrs time format
+          end: "14:00", // 24 hrs time format
+          data: {
+            id: 90, // can be subject id
+            title: "Mathematics", // can subject title
+            description: "Gelyn Joy Manalang | Section B" // can be instructor name, section, etc
           }
         },
         {

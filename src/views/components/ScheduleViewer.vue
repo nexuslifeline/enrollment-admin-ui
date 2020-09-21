@@ -16,74 +16,90 @@
           {{formatTo12hr(item)}}
         </div>
       </div>
-      <div v-for="(day, dayIdx) in Array.from({ length: days.length })" :key="dayIdx" class="schedule-view__column">
+      <div v-for="(day, dayIndex) in Array.from({ length: days.length })" :key="dayIndex" class="schedule-view__column">
         <template
           v-for="(time, idx) in times"
           v-if="showExtendedTime || (!showExtendedTime && idx < $options.constants.EXTENDED_TIME_START_INDEX)">
-          <template v-for="timeGroup in [getCurrentTimeGroup(dayIdx, time) || {}]">
-            <template v-for="dayTimeKey in [`${dayIdx}-${idx}`]">
-              <template v-if="!!timeGroup.data">
-                <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
-                  <div v-if="isFirstSelected(dayIdx, time, timeGroup)"
-                    :key="idx"
-                    :style="{
-                      height: `${computeHeight(timeGroup)}px`,
-                      backgroundColor: `${factory.light}`,
-                      borderLeft: `4px solid ${factory.bg}`,
-                      color: `${factory.bg}`
-                    }"
-                    class="schedule-view__cell-item selected">
-                    <div class="time-group__details">
-                      <p class="time-group__title">
-                        {{timeGroup.data.title}}
-                      </p>
-                      <p class="time-group__description">
-                        {{timeGroup.data.description}}
-                      </p>
-                    </div>
-                    <p class="time-group__time">
-                      <v-icon name="clock" scale=".8" class="mr-2" />
-                      {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
-                    </p>
-                    <button
-                      v-if="!!options && !!options.length"
-                      @click.stop="toggleDropdown(dayTimeKey)"
+          <template v-for="dayTimeKey in [`${dayIndex}-${idx}`]">
+            <template v-if="hasTimeGroup(dayIndex, time)">
+              <template v-for="timeGroup in [...getCurrentTimeGroup(dayIndex, time) || {}]">
+                <template v-if="!!timeGroup.data">
+                  <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
+                    <div v-if="isFirstSelected(dayIndex, time, timeGroup)"
+                      :key="idx"
                       :style="{
+                        height: `${computeHeight(timeGroup)}px`,
+                        backgroundColor: `${factory.light}`,
+                        borderLeft: `4px solid ${factory.bg}`,
                         color: `${factory.bg}`
                       }"
-                      class="time-group__options">
-                      <span class="time-group__option-items">
-                        <v-icon name="ellipsis-v" scale=".8" />
-                        <div v-if="openItems.includes(dayTimeKey)" class="time-group__option-dropdown-area">
-                          <ul class="time-group__option-dropdown">
-                            <li
-                              v-for="(option, optIdx) in options"
-                              @click="option.callback(timeGroup)"
-                              :key="optIdx"
-                              class="time-group__option-dropdown-item">
-                              {{option.label}}
-                            </li>
-                          </ul>
-                        </div>
-                      </span>
-                    </button>
-                  </div>
+                      class="schedule-view__cell-item selected">
+                      <div class="time-group__details">
+                        <p class="time-group__title">
+                          {{timeGroup.data.title}}
+                        </p>
+                        <p class="time-group__description">
+                          {{timeGroup.data.description}}
+                        </p>
+                      </div>
+                      <p class="time-group__time">
+                        <v-icon name="clock" scale=".8" class="mr-2" />
+                        {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
+                      </p>
+                      <button
+                        v-if="!!options && !!options.length"
+                        @click.stop="toggleDropdown(dayTimeKey)"
+                        :style="{
+                          color: `${factory.bg}`
+                        }"
+                        class="time-group__options">
+                        <span class="time-group__option-items">
+                          <v-icon name="ellipsis-v" scale=".8" />
+                          <div v-if="openItems.includes(dayTimeKey)" class="time-group__option-dropdown-area">
+                            <ul class="time-group__option-dropdown">
+                              <li
+                                v-for="(option, optIdx) in options"
+                                @click="option.callback(timeGroup)"
+                                :key="optIdx"
+                                class="time-group__option-dropdown-item">
+                                {{option.label}}
+                              </li>
+                            </ul>
+                          </div>
+                        </span>
+                      </button>
+                    </div>
+                    <template v-for="formattedTime in [`${time.h}:${time.m}`]">
+                      <div
+                        v-if="isLastSelected(dayIndex, time, timeGroup) && !hasSelectedWithStartTime(dayIndex, time)"
+                        :key="idx"
+                        class="schedule-view__cell-item"
+                        :class="{ highlighted: highlightedItems.includes(dayTimeKey) }"
+                        @click="$emit('onCellItemClick', { dayIndex, time: formattedTime })"
+                        @dblclick="$emit('onCellItemDblClick', { dayIndex, time: formattedTime })"
+                        @mousedown="onCellMousedown(dayIndex, idx)"
+                        @mouseup="onCellMouseup(dayIndex, idx)"
+                        @mouseover="onCellMouseover(dayIndex, idx)"
+                        :style="{ height: `${cellHeight / 2}px` }"
+                      />
+                    </template>
+                  </template>
                 </template>
               </template>
-              <template v-else>
-                <template v-for="formattedTime in [`${times[idx].h}:${times[idx].m}`]">
-                  <div
-                    :key="idx"
-                    class="schedule-view__cell-item"
-                    :class="{ highlighted: highlightedItems.includes(dayTimeKey) }"
-                    @click="$emit('onCellItemClick', { dayIdx, time: formattedTime })"
-                    @dblclick="$emit('onCellItemDblClick', { dayIdx, time: formattedTime })"
-                    @mousedown="onCellMousedown(dayIdx, idx)"
-                    @mouseup="onCellMouseup(dayIdx, idx)"
-                    @mouseover="onCellMouseover(dayIdx, idx)"
-                    :style="{ height: `${cellHeight}px` }"
-                  />
-                </template>
+            </template>
+            <template v-else>
+              <template v-for="formattedTime in [`${time.h}:${time.m}`]">
+                <div
+                  :key="idx"
+                  class="schedule-view__cell-item"
+                  :class="{ highlighted: highlightedItems.includes(dayTimeKey) }"
+                  @click="$emit('onCellItemClick', { dayIndex, time: formattedTime })"
+                  @dblclick="$emit('onCellItemDblClick', { dayIndex, time: formattedTime })"
+                  @mousedown="onCellMousedown(dayIndex, idx)"
+                  @mouseup="onCellMouseup(dayIndex, idx)"
+                  @mouseover="onCellMouseover(dayIndex, idx)"
+                  :style="{ height: `${cellHeight}px` }"
+                />
               </template>
             </template>
           </template>
@@ -161,22 +177,44 @@ export default {
       return `${(hour + 11) % 12 + 1}:${time.m} ${hour > 11 && hour < 24 ? 'pm' : 'am'}`;
     },
     isFirstSelected(cellDay, cellTime, timeGroup) {
-      //const timeGroup = this.getCurrentTimeGroup(cellDay, cellTime);
       if (!!Object.keys(timeGroup)?.length) {
-        return this.isTimeStart(cellTime, timeGroup.start);
+        return this.isEqualToTimeStart(cellTime, timeGroup.start);
       }
       return false;
     },
-    isTimeStart(cellTime, timeGroupStart) {
+    isLastSelected(cellDay, cellTime, timeGroup) {
+      if (!!Object.keys(timeGroup)?.length) {
+        return this.isEqualToTimeEnd(cellTime, timeGroup.end);
+      }
+      return false;
+    },
+    hasSelectedWithStartTime(cellDay, cellTime) {
+      return this.selectedItems.some(v => v.dayIndex === cellDay && this.isEqualToTimeStart(cellTime, v.start));
+    },
+    isEqualToTimeStart(cellTime, timeGroupStart) {
       const iCellTime = parseInt(`${cellTime.h}${cellTime.m}`);
       return iCellTime === this.convertToTimeInt(timeGroupStart);
+    },
+    isEqualToTimeEnd(cellTime, timeGroupEnd) {
+      const iCellTime = parseInt(`${cellTime.h}${cellTime.m}`);
+      return iCellTime === this.convertToTimeInt(timeGroupEnd);
     },
     isTimeBetween(cellTime, { start, end }) {
       const iCellTime = parseInt(`${cellTime.h}${cellTime.m}`);
       return iCellTime >= this.convertToTimeInt(start) && iCellTime <= this.convertToTimeInt(end);
     },
     getCurrentTimeGroup(cellDay, cellTime) {
-      return this.selectedItems.find(v => v.dayIndex === cellDay && this.isTimeBetween(cellTime, { start: v.start, end: v.end })) || {};
+      return this.selectedItems.filter(v =>
+        v.dayIndex === cellDay && this.isTimeBetween(cellTime, { start: v.start, end: v.end })
+      ) || {};
+    },
+    hasTimeGroup(cellDay, cellTime) {
+      return this.selectedItems.some(v =>
+        v.dayIndex === cellDay && this.isTimeBetween(cellTime, { start: v.start, end: v.end })
+      );
+    },
+    isFirstOnHalfCell(timeGroup) {
+      return this.selectedItems.some(v => v.dayIndex === timeGroup.dayIndex && this.convertToTimeInt(v.end) === this.convertToTimeInt(timeGroup.start))
     },
     convertToTimeInt(v) {
       return parseInt(v?.replace(':', '')?.trim());
@@ -187,7 +225,9 @@ export default {
     },
     computeHeight(timeGroup) {
       const multiplier = parseInt(this.getRowSpan(timeGroup));
-      return (parseInt(this.cellHeight) * multiplier);
+      const cellHeight = parseInt(this.cellHeight);
+      const computedHeight = (cellHeight * multiplier) - (this.isFirstOnHalfCell(timeGroup) ? cellHeight : (cellHeight / 2));
+      return computedHeight;
     },
     toggleDropdown(key) {
       if (this.openItems.length) {
@@ -202,17 +242,17 @@ export default {
     isAlreadyHighlighted(key) {
       return this.highlightedItems.includes(key);
     },
-    onCellMousedown(dayIdx, timeIdx) {
+    onCellMousedown(dayIndex, timeIdx) {
       this.isMousedown = true;
-      this.activeSelectionDayIdx = dayIdx;
-      const key = `${dayIdx}-${timeIdx}`;
+      this.activeSelectiondayIndex = dayIndex;
+      const key = `${dayIndex}-${timeIdx}`;
       if (!!this.highlightedItems.length) {
         this.highlightedItems = [key];
       } else {
         this.highlightedItems.push(key);
       }
     },
-    onCellMouseup(dayIdx, timeIdx) {
+    onCellMouseup(dayIndex, timeIdx) {
       this.isMousedown = false;
       if (this.highlightedItems.length > 1) { // should be more than 1 cell to fire the event
         const startIdx = this.highlightedItems[0]?.split('-')[1];
@@ -221,15 +261,15 @@ export default {
         const end = this.times[endIdx];
 
         this.$emit('onMultipleCellSelect', {
-          dayIdx,
+          dayIndex,
           startTime: `${start?.h}:${start?.m}`,
           endTime: `${end?.h}:${end?.m}`
         });
       }
     },
-    onCellMouseover(dayIdx, timeIdx) {
-      if (this.isMousedown && this.activeSelectionDayIdx === dayIdx) {
-        this.highlightedItems.push(`${dayIdx}-${timeIdx}`);
+    onCellMouseover(dayIndex, timeIdx) {
+      if (this.isMousedown && this.activeSelectiondayIndex === dayIndex) {
+        this.highlightedItems.push(`${dayIndex}-${timeIdx}`);
       }
     }
   }
