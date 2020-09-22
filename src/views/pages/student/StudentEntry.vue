@@ -32,14 +32,12 @@
             <b-row>
               <b-col md="6">
                 <b-form-group>
-                  <label class="required">Student No.</label>
+                  <label >Student No.</label>
                   <b-form-input
                     v-model="forms.student.fields.studentNo"
-                    :state="forms.student.states.studentNo"
+                    placeholder="Awaiting Confirmation"
+                    readonly
                     debounce="500"/>
-                  <b-form-invalid-feedback>
-                    {{forms.student.errors.studentNo}}
-                  </b-form-invalid-feedback>
                 </b-form-group>
                 <b-form-group>
                   <label class="required">Firstname</label>
@@ -79,12 +77,12 @@
                 <b-form-group>
                   <label>Mobile No.</label>
                   <b-form-input
-                    v-model="forms.student.fields.mobileNo" 
+                    v-model="forms.student.fields.mobileNo"
                     debounce="500"/>
                 </b-form-group>
                 <b-form-group>
                   <label class="required">Civil Status</label>
-                  <b-form-select 
+                  <b-form-select
                     v-model="forms.student.fields.civilStatusId"
                     :state="forms.student.states.civilStatusId" >
                     <template v-slot:first>
@@ -953,6 +951,11 @@ export default {
   },
   created() {
     this.isLoading = true
+    if (this.$route.params.studentId && isNaN(this.$route.params.studentId)) {
+      this.$router.push('/master-files/student')
+      return
+    }
+
     this.setCreate()
     this.entryMode = this.$route?.params?.studentId ? 'Edit' : 'Add'
     if (this.entryMode === 'Edit') {
@@ -1016,8 +1019,10 @@ export default {
       reset(family)
       reset(education)
 
+      const { studentNo, ...studentFields } = student.fields
+
       const data = {
-        ...student.fields,
+        ...studentFields,
         address: { ...address.fields },
         family: { ...family.fields },
         education: { ...education.fields }
