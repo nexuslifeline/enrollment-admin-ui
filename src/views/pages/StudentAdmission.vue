@@ -223,7 +223,7 @@
                           {{ totalUnits(data.item.subjects, 'totalUnits') }}
                       </span>
                     </b-td>
-                    <b-td></b-td>
+                    <b-td colspan="2"></b-td>
                   </b-tr>
                 </template>
                 </b-table>
@@ -1135,6 +1135,8 @@ export default {
       students.isBusy = true
       const { academicRecordStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
 			const applicationStatusId = ApplicationStatuses.SUBMITTED.id
+      const orderBy = "updated_at"
+      const sort = "DESC"
 			let params = {
 				paginate: true,
 				perPage, page,
@@ -1142,7 +1144,8 @@ export default {
 				schoolCategoryId,
 				courseId,
         applicationStatusId,
-  sort,
+        orderBy,
+        sort,
         criteria }
 			this.getAcademicRecordList(params)
 				.then(response => {
@@ -1287,7 +1290,6 @@ export default {
 				this.schoolCategoryId = userGroup.schoolCategoryId
 			}
 			this.loadAcademicRecord()
-ecord()
     },
     // filterByDepartment() {
     //   const { subjects } = this.tables
