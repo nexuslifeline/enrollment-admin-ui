@@ -407,6 +407,7 @@
                       <ScheduleViewer
                         v-if="showEntry"
                         @onMultipleCellSelect="setAddSchedule"
+                        @onCellItemDblClick="setAddSchedule"
                         :selectedItems="forms.section.fields.schedules"
                         :showExtendedTime="false"
                         :options="[{
@@ -1157,10 +1158,19 @@ export default {
       fields.subjectId = null
       fields.personnelId = null
       if (dayTime) {
-        dayTime.startTime = dayTime.startTime.length === 4 ? `0${dayTime.startTime}` : dayTime.startTime
-        dayTime.endTime = dayTime.endTime.length === 4 ? `0${dayTime.endTime}` : dayTime.endTime
-        fields.start = dayTime.startTime
-        fields.end = dayTime.endTime
+        let startTime = null
+        let endTime = null
+
+        if (dayTime.startTime && dayTime.endTime) {
+          startTime = dayTime.startTime.length === 4 ? `0${dayTime.startTime}` : dayTime.startTime
+          endTime = dayTime.endTime.length === 4 ? `0${dayTime.endTime}` : dayTime.endTime
+        } else {
+          startTime = dayTime.time.length === 4 ? `0${dayTime.time}` : dayTime.time
+          endTime = this.computeTimeByHour(startTime, 1)
+        }
+
+        fields.start = startTime
+        fields.end = endTime
         fields.dayIds = [Number(dayTime.dayIndex) + 1]
       }
       this.showModalSchedule = true
