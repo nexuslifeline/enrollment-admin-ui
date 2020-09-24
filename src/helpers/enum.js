@@ -200,9 +200,9 @@ export const Days = new Enum({
   TUESDAY: { id: 2, name: 'Tuesday', abbrev: 'Tue' },
   WEDNESDAY: { id: 3, name: 'Wednesday', abbrev: 'Wed' },
   THURSDAY: { id: 4, name: 'Thursday', abbrev: 'Thu' },
-  FRIDAY: { id: 4, name: 'Friday', abbrev: 'Fri' },
-  SATURDAY: { id: 4, name: 'Saturday', abbrev: 'Sat' },
-  SUNDAY: { id: 4, name: 'Sunday', abbrev: 'Sun' }
+  FRIDAY: { id: 5, name: 'Friday', abbrev: 'Fri' },
+  SATURDAY: { id: 6, name: 'Saturday', abbrev: 'Sat' },
+  // SUNDAY: { id: 7, name: 'Sunday', abbrev: 'Sun' }
 });
 
 export const Countries = new Enum({

@@ -4,13 +4,13 @@
       <div class="page-content__title-container">
         <h4 class="page-content__title">Section and Schedule Management</h4>
       </div>
-      <SchoolCategoryTabs
-        :showAll="true"
-        :schoolCategoryId="null"
-        @clickAll="filters.section.schoolCategoryId = null, filterSection()"
-        @click="filters.section.schoolCategoryId = $event, filterSection()"
-      />
       <div v-show="!showEntry">
+         <SchoolCategoryTabs
+          :showAll="true"
+          :schoolCategoryId="null"
+          @clickAll="filters.section.schoolCategoryId = null, filterSection()"
+          @click="filters.section.schoolCategoryId = $event, filterSection()"
+        />
         <b-row class="mb-3">
           <b-col md="12">
             <b-row>
@@ -165,15 +165,19 @@
                   </b-dropdown-item>
                 </b-dropdown>
               </template>
-              <template v-slot:row-details="data">
-                <b-overlay :show="data.item.isLoading" rounded="sm">
+              <template v-slot:row-details="{ item }">
+                <b-overlay :show="item.isLoading" rounded="sm">
                   <b-card>
-                    <Schedule
-                      :isEntry="false"
-                      class="mt-2"
-                      :isShown="true"
-                      :subjects="options.subjects.items"
-                      :scheduleItems="data.item.schedules"/>
+                    <h5 class="text-center">
+                      {{item.name}}<br>
+                      <span>{{item.level.name}} - {{item.schoolYear.name}}</span><br>
+                      <span v-if="item.course">{{item.course.name}} - {{ item.semester.name}}</span>
+                    </h5><br>
+                    <ScheduleViewer
+                      v-if="item.schedules"
+                      :selectedItems="item.schedules"
+                      :showExtendedTime="false"
+                    />
                   </b-card>
                 </b-overlay>
               </template>
@@ -373,14 +377,47 @@
                     </b-row>
                   </b-tab>
                   <b-tab title="Schedule">
-                    <Schedule
+                    <!-- <b-row>
+                      <b-col md=8>
+                      </b-col>
+                      <b-col md=4>
+                        <b-button
+                          variant="outline-primary"
+                          class="float-right"
+                          @click="setAddSchedule(null)">
+                          <v-icon name="plus-circle" /> ADD SCHEDULE
+                        </b-button>
+                      </b-col>
+                    </b-row> -->
+                    <!-- <Schedule
                       class="mt-2"
                       :isEntry="true"
                       :isShown="showEntry"
                       :details="scheduleDetails"
                       :subjects="options.subjects.items"
                       :scheduleItems="forms.section.fields.schedules"
-                      :scheduleStates="forms.section.states.schedules"/>
+                      :scheduleStates="forms.section.states.schedules"/> -->
+                      <h5 class="pt-2 text-center">
+                        {{forms.section.fields.name}}<br>
+                        <span>{{getOptionName(forms.section.fields.levelId, 'levels')}} - {{getOptionName(forms.section.fields.schoolYearId, 'schoolYears')}}</span><br>
+                        <span v-if="forms.section.fields.courseId">{{getOptionName(forms.section.fields.courseId, 'courses')}} -
+                          <span v-if="forms.section.fields.semesterId">{{ options.semesters.getEnum(forms.section.fields.semesterId).name}}</span>
+                        </span>
+                      </h5><br>
+                      <ScheduleViewer
+                        v-if="showEntry"
+                        @onMultipleCellSelect="setAddSchedule"
+                        :selectedItems="forms.section.fields.schedules"
+                        :showExtendedTime="false"
+                        :options="[{
+                          label: 'Edit Schedule',
+                          callback: onEditSchedule
+                        },
+                        {
+                          label: 'Delete Schedule',
+                          callback: onDeleteSchedule
+                        }]"
+                      />
                   </b-tab>
                 </b-tabs>
               </b-card-body>
@@ -409,59 +446,6 @@
         </b-row>
       </b-overlay>
     </div>
-    <!-- Modal Entry -->
-    <!-- <b-modal
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    > -->
-      <!-- <div slot="modal-title"> -->
-        <!-- modal title -->
-        <!-- Sections - {{ entryMode }} -->
-      <!-- </div> -->
-      <!-- modal title -->
-      <!-- modal body -->
-      <!-- <b-row>
-        <b-col md="12">
-
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="12">
-
-
-
-        </b-col>
-      </b-row> -->
-
-      <!-- end modal body -->
-      <!-- <div slot="modal-footer" class="w-100"> -->
-        <!-- modal footer buttons -->
-        <!-- <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.section.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onSectionEntry()"
-        >
-          <v-icon
-            v-if="forms.section.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div> -->
-      <!-- modal footer buttons -->
-    <!-- </b-modal> -->
-    <!-- End Modal Entry -->
 
     <!-- Modal Confirmation -->
     <b-modal
@@ -498,6 +482,130 @@
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
+    <!-- Modal Add Schedule -->
+    <b-modal
+			v-model="showModalSchedule"
+			:noCloseOnEsc="true"
+			:noCloseOnBackdrop="true">
+			<div slot="modal-title"> <!-- modal title -->
+				Schedule - {{ selectedSchedule ? 'Edit' : 'Add' }}
+			</div> <!-- modal title -->
+      <!-- modal body -->
+      <b-overlay :show="forms.schedule.isLoading" rounded="sm">
+        <b-row>
+          <b-col md="12">
+            <b-form-group >
+              <label class="required">Day</label>
+              <v-select
+                v-model="forms.schedule.fields.dayIds"
+                :reduce="item => item.id"
+                multiple
+                label="name"
+                :options="$options.Days.values" />
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="6">
+            <b-form-group>
+              <label class="required">Start</label>
+              <b-form-input
+                type="time"
+                v-model="forms.schedule.fields.start" />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group >
+              <label class="required">End</label>
+              <b-form-input
+                type="time"
+                v-model="forms.schedule.fields.end" />
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label class="required">Subject</label>
+              <b-form-select
+                v-model="forms.schedule.fields.subjectId" >
+                <template v-slot:first>
+                  <b-form-select-option :value="null">-- Select Subject --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="subject in options.subjects.items"
+                  :key="subject.id"
+                  :value="subject.id">
+                  {{ subject.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label class="required">Instructor</label>
+              <b-form-select
+                v-model="forms.schedule.fields.personnelId" >
+                <template v-slot:first>
+                  <b-form-select-option :value="null">-- Select Instructor --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="instructor in options.instructors.items"
+                  :key="instructor.id"
+                  :value="instructor.id">
+                  {{ instructor.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <b-form-checkbox
+                v-model="forms.schedule.fields.isLab"
+                :value="1"
+                :unchecked-value="0">
+                Laboratory
+              </b-form-checkbox>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label>Remarks</label>
+              <b-form-textarea
+                v-model="forms.schedule.fields.remarks"
+                rows=2 />
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-overlay>
+      <!-- end modal body -->
+			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+				<b-button
+          variant="outline-danger"
+          class="float-left btn-close"
+          @click="showModalSchedule=false">
+          Close
+        </b-button>
+        <b-button
+          :disabled="forms.schedule.isProcessing"
+          variant="outline-primary"
+          class="float-right btn-save"
+          @click="addSchedule()">
+          <v-icon
+            v-if="forms.schedule.isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />
+          Save
+        </b-button>
+			</div> <!-- modal footer buttons -->
+		</b-modal>
   </div>
 </template>
 <script>
@@ -512,28 +620,42 @@ const sectionFields = {
   semesterId: null,
   schedules: null
 };
+const scheduleFields= {
+  dayIds: null,
+  start: null,
+  end: null,
+  subjectId: null,
+  personnelId: null,
+  isLab: null,
+  remarks: null
+}
 
-import { SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, CurriculumApi } from "../../mixins/api";
+import { SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, CurriculumApi, PersonnelApi } from "../../mixins/api";
 import { validate, reset, clearFields, showNotification, } from "../../helpers/forms";
 import { copyValue } from "../../helpers/extractor";
-import { SchoolCategories, Semesters, SectionAndSchedulePermissions } from '../../helpers/enum'
+import { SchoolCategories, Semesters, SectionAndSchedulePermissions, Days, UserGroups } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 import SchoolYear from '../../mixins/api/SchoolYear';
 import Schedule from '../components/Schedule'
+import ScheduleViewer from '../components/ScheduleViewer'
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 import Access from '../../mixins/utils/Access';
 export default {
   name: "ClassSection",
-  mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, Tables, Access],
+  mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, Tables, PersonnelApi, Access],
   components: {
     Schedule,
+    ScheduleViewer,
     SchoolCategoryTabs
   },
   SectionAndSchedulePermissions,
+  Days,
+  UserGroups,
   data() {
     return {
       entryTabIndex: 0,
       showModalEntry: false,
+      showModalSchedule: false,
       showEntry: false,
       showModalConfirmation: false,
       entryMode: "",
@@ -547,6 +669,11 @@ export default {
           states: { ...sectionFields },
           errors: { ...sectionFields },
         },
+        schedule: {
+          isProcessing: false,
+          isLoading: false,
+          fields: { ...scheduleFields },
+        }
       },
       tables: {
         sections: {
@@ -640,10 +767,14 @@ export default {
         subjects: {
           items: []
         },
+        instructors: {
+          items: []
+        },
         semesters: Semesters,
         schoolCategories: SchoolCategories
       },
-      scheduleDetails: ''
+      scheduleDetails: '',
+      selectedSchedule: null
     };
   },
   created() {
@@ -651,6 +782,7 @@ export default {
     this.loadSchoolYears();
     this.loadCourses();
     this.loadLevels();
+    this.loadPersonnel();
   },
   methods: {
     loadSections() {
@@ -711,8 +843,15 @@ export default {
       const { sections } = this.tables;
 
       const newSchedules = schedules.map(s => {
-        const{ personnel, subject, ...schedule } = s
-        return schedule
+        return {
+          dayId: Number(s.dayIndex) + 1,
+          subjectId: s.subjectId,
+          personnelId: s.personnelId,
+          startTime: s.start,
+          endTime: s.end,
+          isLab: s.isLab,
+          remarks: s.remarks
+        }
       })
 
       // console.log(newSchedules)
@@ -810,6 +949,7 @@ export default {
         section,
         section: { fields },
       } = this.forms;
+      fields.schedules = []
       section.isLoading = true
       this.getSection(row.item.id)
       .then( async ({ data }) => {
@@ -824,7 +964,23 @@ export default {
         fields.courseId = data.courseId
         fields.semesterId = data.semesterId
         await this.loadSubjectsOfCurriculum()
-        fields.schedules = data.schedules
+        fields.schedules = data.schedules.map(s => {
+          const { subjects, instructors } = this.options
+          return {
+            dayIndex: s.dayId - 1,
+            start: s.startTime,
+            end: s.endTime,
+            subjectId: s.subjectId,
+            personnelId: s.personnelId,
+            isLab: s.isLab,
+            remarks: s.remarks,
+            data: {
+              id: s.subjectId,
+              title: `${s.subject?.name}`,
+              description: `${s.personnel?.name} | ${data.name} ${s.isLab ? '| Laboratory' : ''} ${s.remarks ? `| ${s.remarks}` : ''}`
+            }
+          }
+        })
         reset(section);
         this.entryMode = "Edit";
         section.isLoading = false
@@ -892,7 +1048,24 @@ export default {
       if (!row.detailsShowing) {
         this.getSection(row.item.id)
         .then(({ data }) => {
-          this.$set(row.item, 'schedules', data.schedules)
+          const schedules = data.schedules.map(s => {
+            const { subjects, instructors } = this.options
+            return {
+              dayIndex: s.dayId - 1,
+              start: s.startTime,
+              end: s.endTime,
+              subjectId: s.subjectId,
+              personnelId: s.personnelId,
+              isLab: s.isLab,
+              remarks: s.remarks,
+              data: {
+                id: s.subjectId,
+                title: `${s.subject?.name}`,
+                description: `${s.personnel?.name} | ${data.name} ${s.isLab ? '| Laboratory' : ''} ${s.remarks ? `| ${s.remarks}` : ''}`
+              }
+            }
+          })
+          this.$set(row.item, 'schedules', schedules)
           row.item.isLoading = false
         })
       }
@@ -927,6 +1100,131 @@ export default {
       )
       paginate.totalRows = sections.filteredItems.length;
       this.recordDetails(paginate);
+    },
+    addSchedule() {
+      const { schedule: { fields }, section: { fields: { schedules, name } } } = this.forms
+      const { subjects, instructors } = this.options
+      const subject = subjects.items.find(subject => subject.id === fields.subjectId)
+      const instructor = instructors.items.find(instructor => instructor.id === fields.personnelId)
+
+      // check if there is overlapping schedule
+      if (!this.checkSchedule()) {
+        return
+      }
+
+      if (this.selectedSchedule) {
+        this.onDeleteSchedule(this.selectedSchedule)
+        this.selectedSchedule = null
+      }
+
+      fields.dayIds.forEach(day => {
+        schedules.push({
+          dayIndex: Number(day) - 1,
+          start: fields.start,
+          end: fields.end,
+          subjectId: fields.subjectId,
+          personnelId: fields.personnelId,
+          isLab: fields.isLab,
+          remarks: fields.remarks,
+          data: {
+            id: fields.subjectId,
+            title: `${subject?.name}`,
+            description: `${instructor?.name} | ${name} ${fields.isLab ? '| Laboratory' : ''} ${fields.remarks ? `| ${fields.remarks}` : ''}`
+          }
+        })
+      })
+      this.showModalSchedule = false
+    },
+    computeTimeByHour(time, num) {
+      const newTime = time.split(':')
+      const condition = num < 0 ? [0, 23] : [23, 0]
+      const hour = String(Number(newTime[0]) === condition[0] ? condition[1] : Number(newTime[0]) + Number(num))
+      const minute = String(newTime[1])
+      return `${hour.length === 1 ? `0${hour}` : hour}:${minute.length === 1 ? `0${minute}` : minute}`
+    },
+    loadPersonnel() {
+      const params = { paginate: false, userGroupId: this.$options.UserGroups.INSTRUCTOR.id }
+      const { instructors } = this.options
+      this.getPersonnelList(params)
+      .then(({ data }) => {
+        instructors.items = data
+      })
+    },
+    setAddSchedule(dayTime) {
+      // console.log(dayTime)
+      const { fields } = this.forms.schedule
+      clearFields(fields)
+      fields.subjectId = null
+      fields.personnelId = null
+      if (dayTime) {
+        dayTime.startTime = dayTime.startTime.length === 4 ? `0${dayTime.startTime}` : dayTime.startTime
+        dayTime.endTime = dayTime.endTime.length === 4 ? `0${dayTime.endTime}` : dayTime.endTime
+        fields.start = dayTime.startTime
+        fields.end = dayTime.endTime
+        fields.dayIds = [Number(dayTime.dayIndex) + 1]
+      }
+      this.showModalSchedule = true
+    },
+    onEditSchedule(item) {
+      const { fields } = this.forms.schedule
+      fields.dayIds = [Number(item.dayIndex) + 1]
+      fields.start = item.start
+      fields.end = item.end
+      fields.subjectId = item.subjectId
+      fields.personnelId = item.personnelId
+      fields.isLab = item.isLab
+      fields.remarks = item.remarks
+      this.selectedSchedule = item
+      this.showModalSchedule = true
+    },
+    onDeleteSchedule(item) {
+      const { schedules } = this.forms.section.fields
+        const index = schedules.findIndex(s =>
+          s.dayIndex === item.dayIndex &&
+          s.start === item.start &&
+          s.end === item.end &&
+          s.subjectId === item.subjectId &&
+          s.personnelId === item.personnelId &&
+          s.isLab === item.isLab &&
+          s.remarks === item.remarks
+        )
+        schedules.splice(index, 1)
+    },
+    getOptionName(id, optionName) {
+      const option = this.options[optionName].items.find(i => i.id === id)
+      return option?.name
+    },
+    formatTo4digit24hr(time){
+      const newTime = time.split(':')
+      return `${newTime[0]}:${newTime[1]}`
+    },
+    checkSchedule() {
+      const { schedule: { fields }, section: { fields: { schedules } } } = this.forms
+      const sched = schedules.find(s =>
+        fields.dayIds.includes(Number(s.dayIndex) + 1) &&
+        (
+          (this.formatTo4digit24hr(s.start) < this.formatTo4digit24hr(fields.start) &&
+          this.formatTo4digit24hr(s.end) > this.formatTo4digit24hr(fields.start)) ||
+          (this.formatTo4digit24hr(s.start) < this.formatTo4digit24hr(fields.end) &&
+          this.formatTo4digit24hr(s.end) > this.formatTo4digit24hr(fields.end))
+        )
+      )
+      if (sched) {
+        showNotification(this, 'danger', 'There is a conflict in your schedule, please remove or update the schedules.')
+        return false
+      }
+
+      if (!fields.subjectId) {
+        showNotification(this, 'danger', 'Please select a Subject before continuing.')
+        return false
+      }
+
+      if (!fields.personnelId) {
+        showNotification(this, 'danger', 'Please select an Instructor before continuing.')
+        return false
+      }
+
+      return true
     }
   },
 };

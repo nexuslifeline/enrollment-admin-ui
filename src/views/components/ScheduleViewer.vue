@@ -259,9 +259,10 @@ export default {
         const endIdx = this.highlightedItems[this.highlightedItems.length - 1]?.split('-')[1];
         const start = this.times[startIdx];
         const end = this.times[endIdx];
+        const startDayIndex = this.highlightedItems[0]?.split('-')[0]
 
         this.$emit('onMultipleCellSelect', {
-          dayIndex,
+          dayIndex: startDayIndex,
           startTime: `${start?.h}:${start?.m}`,
           endTime: `${end?.h}:${end?.m}`
         });
