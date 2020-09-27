@@ -21,74 +21,74 @@
           v-for="(time, idx) in times"
           v-if="showExtendedTime || (!showExtendedTime && idx < $options.constants.EXTENDED_TIME_START_INDEX)">
           <template v-for="dayTimeKey in [`${dayIndex}-${idx}`]">
-            <template v-if="hasTimeGroup(dayIndex, time)">
-              <template v-for="timeGroup in [...getCurrentTimeGroup(dayIndex, time) || {}]">
-                <template v-if="!!timeGroup.data">
-                  <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
-                    <div v-if="isFirstSelected(dayIndex, time, timeGroup)"
-                      :key="idx"
-                      :style="{
-                        height: `${computeHeight(timeGroup)}px`,
-                        backgroundColor: `${factory.light}`,
-                        borderLeft: `4px solid ${factory.bg}`,
-                        color: `${factory.bg}`
-                      }"
-                      class="schedule-view__cell-item selected">
-                      <div class="time-group__details">
-                        <p class="time-group__title">
-                          {{timeGroup.data.title}}
-                        </p>
-                        <p class="time-group__description">
-                          {{timeGroup.data.description}}
-                        </p>
-                      </div>
-                      <p class="time-group__time">
-                        <v-icon name="clock" scale=".8" class="mr-2" />
-                        {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
-                      </p>
-                      <button
-                        v-if="!!options && !!options.length"
-                        @click.stop="toggleDropdown(dayTimeKey)"
+            <template v-for="formattedTime in [`${time.h}:${time.m}`]">
+              <template v-if="hasTimeGroup(dayIndex, time)">
+                <template v-for="timeGroup in [...getCurrentTimeGroup(dayIndex, time) || {}]">
+                  <template v-if="!!timeGroup.data">
+                    <template v-for="factory in [$options.colorFactory(timeGroup.data.id % $options.constants.COLOR_FACTORY_LENGTH)]">
+                      <div v-if="isFirstSelected(dayIndex, time, timeGroup)"
+                        :key="idx"
                         :style="{
+                          height: `${computeHeight(timeGroup)}px`,
+                          backgroundColor: `${factory.light}`,
+                          borderLeft: `4px solid ${factory.bg}`,
                           color: `${factory.bg}`
                         }"
-                        class="time-group__options">
-                        <span class="time-group__option-items">
-                          <v-icon name="ellipsis-v" scale=".8" />
-                          <div v-if="openItems.includes(dayTimeKey)" class="time-group__option-dropdown-area">
-                            <ul class="time-group__option-dropdown">
-                              <li
-                                v-for="(option, optIdx) in options"
-                                @click="option.callback(timeGroup)"
-                                :key="optIdx"
-                                class="time-group__option-dropdown-item">
-                                {{option.label}}
-                              </li>
-                            </ul>
-                          </div>
-                        </span>
-                      </button>
-                    </div>
-                    <template v-for="formattedTime in [`${time.h}:${time.m}`]">
-                      <div
-                        v-if="isLastSelected(dayIndex, time, timeGroup) && !hasSelectedWithStartTime(dayIndex, time)"
-                        :key="idx"
-                        class="schedule-view__cell-item"
-                        :class="{ highlighted: highlightedItems.includes(dayTimeKey) }"
-                        @click="$emit('onCellItemClick', { dayIndex, time: formattedTime })"
-                        @dblclick="$emit('onCellItemDblClick', { dayIndex, time: formattedTime })"
-                        @mousedown="onCellMousedown(dayIndex, idx)"
-                        @mouseup="onCellMouseup(dayIndex, idx)"
-                        @mouseover="onCellMouseover(dayIndex, idx)"
-                        :style="{ height: `${cellHeight / 2}px` }"
-                      />
+                        class="schedule-view__cell-item selected">
+                        <div class="time-group__details">
+                          <p class="time-group__title">
+                            {{timeGroup.data.title}}
+                          </p>
+                          <p class="time-group__description">
+                            {{timeGroup.data.description}}
+                          </p>
+                        </div>
+                        <p class="time-group__time">
+                          <v-icon name="clock" scale=".8" class="mr-2" />
+                          {{formatTo12hr(timeGroup.start)}} - {{formatTo12hr(timeGroup.end)}}
+                        </p>
+                        <button
+                          v-if="!!options && !!options.length"
+                          @click.stop="toggleDropdown(dayTimeKey)"
+                          :style="{
+                            color: `${factory.bg}`
+                          }"
+                          class="time-group__options">
+                          <span class="time-group__option-items">
+                            <v-icon name="ellipsis-v" scale=".8" />
+                            <div v-if="openItems.includes(dayTimeKey)" class="time-group__option-dropdown-area">
+                              <ul class="time-group__option-dropdown">
+                                <li
+                                  v-for="(option, optIdx) in options"
+                                  @click="option.callback(timeGroup)"
+                                  :key="optIdx"
+                                  class="time-group__option-dropdown-item">
+                                  {{option.label}}
+                                </li>
+                              </ul>
+                            </div>
+                          </span>
+                        </button>
+                      </div>
+                      <template v-else>
+                        <div
+                          v-if="isLastSelected(dayIndex, time, timeGroup) && !hasSelectedWithStartTime(dayIndex, time)"
+                          :key="idx"
+                          class="schedule-view__cell-item"
+                          :class="{ highlighted: highlightedItems.includes(dayTimeKey) }"
+                          @click="$emit('onCellItemClick', { dayIndex, time: formattedTime })"
+                          @dblclick="$emit('onCellItemDblClick', { dayIndex, time: formattedTime })"
+                          @mousedown="onCellMousedown(dayIndex, idx)"
+                          @mouseup="onCellMouseup(dayIndex, idx)"
+                          @mouseover="onCellMouseover(dayIndex, idx)"
+                          :style="{ height: `${cellHeight / 2}px` }"
+                        />
+                      </template>
                     </template>
                   </template>
                 </template>
               </template>
-            </template>
-            <template v-else>
-              <template v-for="formattedTime in [`${time.h}:${time.m}`]">
+              <template v-else>
                 <div
                   :key="idx"
                   class="schedule-view__cell-item"
@@ -214,7 +214,9 @@ export default {
       );
     },
     isFirstOnHalfCell(timeGroup) {
-      return this.selectedItems.some(v => v.dayIndex === timeGroup.dayIndex && this.convertToTimeInt(v.end) === this.convertToTimeInt(timeGroup.start))
+      return this.selectedItems.some(v =>
+        v.dayIndex === timeGroup.dayIndex && this.convertToTimeInt(v.end) === this.convertToTimeInt(timeGroup.start)
+      );
     },
     convertToTimeInt(v) {
       return parseInt(v?.replace(':', '')?.trim());
@@ -244,7 +246,7 @@ export default {
     },
     onCellMousedown(dayIndex, timeIdx) {
       this.isMousedown = true;
-      this.activeSelectiondayIndex = dayIndex;
+      this.activeSelectionDayIndex = dayIndex;
       const key = `${dayIndex}-${timeIdx}`;
       if (!!this.highlightedItems.length) {
         this.highlightedItems = [key];
@@ -269,7 +271,7 @@ export default {
       }
     },
     onCellMouseover(dayIndex, timeIdx) {
-      if (this.isMousedown && this.activeSelectiondayIndex === dayIndex) {
+      if (this.isMousedown && this.activeSelectionDayIndex === dayIndex) {
         this.highlightedItems.push(`${dayIndex}-${timeIdx}`);
       }
     }
@@ -331,6 +333,7 @@ export default {
     border-right: 1px solid $light-gray-10;
     display: flex;
     flex-direction: column;
+    max-width: calc((100% - 80px) / 6);
 
     &:last-child {
       border: 0;
@@ -373,18 +376,29 @@ export default {
   .time-group__details {
     padding: 5px;
     flex: 1;
+    max-width: 100%;
   }
 
   .time-group__title {
     margin: 0;
     font-weight: 500;
     font-size: 13px;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 8px;
   }
 
   .time-group__description {
     margin: 0;
     font-weight: normal;
     font-size: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .time-group__time {
