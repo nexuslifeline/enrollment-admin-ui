@@ -4,16 +4,11 @@
         <div class="page-content__title-container">
           <h4 class="page-content__title">Rate Sheet Management</h4>
         </div>
-        <b-tabs class="c-tab-pills" pills>
-					<b-tab
-						v-for="schoolCategory in options.schoolCategories.values"
-						:key="schoolCategory.id"
-						:disabled="userGroupId ? false : schoolCategoryId !== schoolCategory.id"
-						:active="schoolCategoryId === schoolCategory.id"
-						@click="loadLevelsOfSchoolCategoryList(schoolCategory.id)"
-						:title="schoolCategory.name"
-          />
-        </b-tabs>
+        <SchoolCategoryTabs
+          :showAll="false"
+          @loadSchoolCategoryId="loadLevelsOfSchoolCategoryList($event)"
+          @click="loadLevelsOfSchoolCategoryList($event)"
+        />
         <div>
           <b-overlay :show="isLoaded" rounded="sm">
             <b-card>
@@ -244,11 +239,13 @@
 import { RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi } from "../../mixins/api"
 import { SchoolCategories, Semesters, UserGroups, Fees, RateSheetPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber } from '../../helpers/forms'
+import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 import Tables from '../../helpers/tables'
 import Access from '../../mixins/utils/Access'
 export default {
 	name: "RateSheet",
   mixins: [ RateSheetApi, SchoolCategoryApi, LevelApi, CourseApi, SchoolFeeApi, SemesterApi, Tables, Access ],
+  components: { SchoolCategoryTabs },
   RateSheetPermissions,
 	data() {
 		return {
@@ -373,7 +370,7 @@ export default {
 	},
 	created(){
     //this.loadRateSheetList()
-    this.checkRights()
+    // this.checkRights()
     this.loadFees()
   },
   computed: {

@@ -7,9 +7,9 @@
       <div v-show="!showEntry">
          <SchoolCategoryTabs
           :showAll="true"
-          :schoolCategoryId="null"
-          @clickAll="filters.section.schoolCategoryId = null, filterSection()"
-          @click="filters.section.schoolCategoryId = $event, filterSection()"
+          @loadSchoolCategoryId="filters.section.schoolCategoryId = $event, loadSections()"
+          @clickAll="filters.section.schoolCategoryId = null, loadSections()"
+          @click="filters.section.schoolCategoryId = $event, loadSections()"
         />
         <b-row class="mb-3">
           <b-col md="12">
@@ -24,7 +24,7 @@
               </b-col>
               <b-col md="3">
                 <b-form-select
-                  @input="filterSection()"
+                  @input="loadSections()"
                   v-model="filters.section.courseId"
                   class="float-right">
                   <template v-slot:first>
@@ -43,7 +43,7 @@
                 <b-row>
                   <b-col md="4">
                     <b-form-select
-                      @input="filterSection()"
+                      @input="loadSections()"
                       v-model="filters.section.semesterId"
                       class="float-right">
                       <template v-slot:first>
@@ -60,7 +60,7 @@
                   </b-col>
                   <b-col md="4">
                     <b-form-select
-                      @input="filterSection()"
+                      @input="loadSections()"
                       v-model="filters.section.levelId"
                       class="float-right">
                       <template v-slot:first>
@@ -77,7 +77,7 @@
                   </b-col>
                   <b-col md="4">
                     <b-form-select
-                      @input="filterSection()"
+                      @input="loadSections()"
                       v-model="filters.section.schoolYearId"
                       class="float-right">
                       <template v-slot:first>
@@ -97,10 +97,10 @@
               <b-col md="2">
                 <b-form-input
                   v-model="filters.section.criteria"
-                  type="text"
-                  placeholder="Search"
                   debounce="500"
-                />
+                  @update="loadSections()"
+                  type="text"
+                  placeholder="Search" />
               </b-col>
             </b-row>
           </b-col>
@@ -116,12 +116,12 @@
               show-empty
               :fields="tables.sections.fields"
               :busy="tables.sections.isBusy"
-              :items="tables.sections.filteredItems"
-              :current-page="paginations.section.page"
+              :items="tables.sections.items"
+            >
+                          <!-- :current-page="paginations.section.page"
               :per-page="paginations.section.perPage"
               :filter="filters.section.criteria"
-              @filtered="onFiltered($event, paginations.section)"
-            >
+              @filtered="onFiltered($event, paginations.section)" -->
               <template v-slot:table-busy>
                 <div class="text-center my-2">
                   <v-icon name="spinner" spin class="mr-2" />
@@ -188,14 +188,14 @@
                 {{ paginations.section.to }} of
                 {{ paginations.section.totalRows }} records.
               </b-col>
-              <b-col md="6">
+              <b-col md=6>
                 <b-pagination
                   v-model="paginations.section.page"
                   :total-rows="paginations.section.totalRows"
                   :per-page="paginations.section.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.section)"
+                  @input="loadSections()"
                 />
               </b-col>
             </b-row>
@@ -779,7 +779,7 @@ export default {
     };
   },
   created() {
-    this.loadSections();
+    // this.loadSections();
     this.loadSchoolYears();
     this.loadCourses();
     this.loadLevels();
@@ -788,16 +788,27 @@ export default {
   methods: {
     loadSections() {
       const { sections } = this.tables;
-      const { section } = this.paginations;
+      const { section, section: { perPage, page } } = this.paginations
       sections.isBusy = true;
-
-      let params = { paginate: false };
-      this.getSectionList(params).then(({ data }) => {
-        sections.items = data;
-        sections.filteredItems = data;
-        section.totalRows = data.length;
-        this.recordDetails(section);
-        sections.isBusy = false;
+      const { schoolCategoryId, courseId, levelId, semesterId, schoolYearId, criteria } = this.filters.section
+      let params = {
+        paginate: true,
+        perPage,
+        page,
+        schoolCategoryId,
+        courseId,
+        levelId,
+        semesterId,
+        schoolYearId,
+        criteria
+      };
+      this.getSectionList(params)
+      .then(({ data }) => {
+        sections.items = data.data
+        section.from = data.meta.from
+        section.to = data.meta.to
+        section.totalRows = data.meta.total
+        sections.isBusy = false
       });
     },
     loadSchoolYears() {
@@ -1088,20 +1099,20 @@ export default {
         levels.fixItems = data
       })
     },
-    filterSection() {
-      const { sections } = this.tables
-      const { section: filter } = this.filters
-      const { section: paginate } = this.paginations
-      sections.filteredItems = sections.items.filter(s =>
-        (filter.schoolCategoryId ? s.schoolCategoryId === filter.schoolCategoryId : true) &&
-        (filter.courseId ? s.courseId === filter.courseId : true) &&
-        (filter.levelId ? s.levelId === filter.levelId : true) &&
-        (filter.semesterId ? s.semesterId === filter.semesterId : true) &&
-        (filter.schoolYearId ? s.schoolYearId === filter.schoolYearId : true)
-      )
-      paginate.totalRows = sections.filteredItems.length;
-      this.recordDetails(paginate);
-    },
+    // loadSections() {
+    //   const { sections } = this.tables
+    //   const { section: filter } = this.filters
+    //   const { section: paginate } = this.paginations
+    //   sections.filteredItems = sections.items.filter(s =>
+    //     (filter.schoolCategoryId ? s.schoolCategoryId === filter.schoolCategoryId : true) &&
+    //     (filter.courseId ? s.courseId === filter.courseId : true) &&
+    //     (filter.levelId ? s.levelId === filter.levelId : true) &&
+    //     (filter.semesterId ? s.semesterId === filter.semesterId : true) &&
+    //     (filter.schoolYearId ? s.schoolYearId === filter.schoolYearId : true)
+    //   )
+    //   paginate.totalRows = sections.filteredItems.length;
+    //   this.recordDetails(paginate);
+    // },
     addSchedule() {
       const { schedule: { fields }, section: { fields: { schedules, name } } } = this.forms
       const { subjects, instructors } = this.options

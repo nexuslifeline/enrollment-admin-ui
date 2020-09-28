@@ -6,7 +6,7 @@
       </div>
       <SchoolCategoryTabs
         :showAll="true"
-        :schoolCategoryId="schoolCategoryId"
+        @loadSchoolCategoryId="filters.curriculum.schoolCategoryId = $event, loadCurriculums()"
         @clickAll="filters.curriculum.schoolCategoryId = null, loadCurriculums()"
         @click="filters.curriculum.schoolCategoryId = $event, loadCurriculums()"
       />
@@ -1058,7 +1058,7 @@ export default {
 	},
 	created(){
     this.loadLevelList()
-    this.checkRights()
+    // this.checkRights()
     // this.loadDepartments()
 	},
 	methods: {
