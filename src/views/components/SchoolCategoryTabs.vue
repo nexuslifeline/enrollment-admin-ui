@@ -29,10 +29,14 @@ export default {
     }
   },
   created() {
-    if (!this.checkIfSuperUser() && !this.checkIfAllowedAll()) {
+    if ((!this.checkIfSuperUser() && !this.checkIfAllowedAll()) || !this.showAll) {
       const { user } = this.$store.state
       const schoolCategories = user?.userGroup?.schoolCategories;
       this.activeSchoolCategoryId = schoolCategories[0]?.id
+    }
+
+    if (this.checkIfSuperUser() && !this.showAll) {
+      this.activeSchoolCategoryId = SchoolCategories.PRE_SCHOOL.id
     }
     this.$emit('loadSchoolCategoryId', this.activeSchoolCategoryId)
   },
