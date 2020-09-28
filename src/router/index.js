@@ -8,6 +8,10 @@ const TheContainer = () => import('@/containers/TheContainer')
 
 // Views
 const Dashboard = () => import('@/views/Dashboard')
+const Setting = () => import('@/views/pages/settings/Setting')
+const OrganizationSetting = () => import('@/views/pages/settings/OrganizationSetting')
+const GeneralSetting = () => import('@/views/pages/settings/GeneralSetting')
+const TermsSetting = () => import('@/views/pages/settings/TermsSetting')
 
 
 // Views - Pages
@@ -291,7 +295,6 @@ function configRoutes () {
             },
             {
               path: 'student',
-              // name: 'Student',
               component: { render(c) { return c('router-view') } },
               children: [
                 {
@@ -387,6 +390,32 @@ function configRoutes () {
               name: 'MyActivity',
               component: MyActivity,
               meta: { requiresAuth: true }
+            },
+            {
+              path: 'settings',
+              name: 'Settings',
+              component: Setting,
+              redirect: { name: 'GeneralSetting' },
+              children: [
+                {
+                  path: 'general-setting',
+                  name: 'GeneralSetting',
+                  component: GeneralSetting,
+                  meta: { requiresAuth: true }
+                },
+                {
+                  path: 'organization-setting',
+                  name: 'OrganizationSetting',
+                  component: OrganizationSetting,
+                  meta: { requiresAuth: true }
+                },
+                {
+                  path: 'terms-setting',
+                  name: 'TermsSetting',
+                  component: TermsSetting,
+                  meta: { requiresAuth: true }
+                },
+              ]
             }
           ]
         },

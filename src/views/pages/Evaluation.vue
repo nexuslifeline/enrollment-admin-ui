@@ -714,6 +714,7 @@ import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import { copyValue } from '../../helpers/extractor'
 import FileViewer from '../components/FileViewer'
 import Access from '../../mixins/utils/Access'
+import { format } from "date-fns";
 
 const evaluationFields = {
   evaluationStatusId: null,
@@ -787,7 +788,13 @@ export default {
 							key: "submittedDate",
 							label: "Date Submitted",
 							tdClass: "align-middle",
-              thStyle: { width: "10%"}
+              thStyle: { width: "10%"},
+              formatter: (value, key, item) => {
+                if(!value)
+                return ''
+
+                return format(new Date(value), 'MM/dd/yyyy')
+              }
             },
             {
               key: "studentCategory.name",
