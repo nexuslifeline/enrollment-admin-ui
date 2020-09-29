@@ -7,15 +7,15 @@
       <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="filters.curriculum.schoolCategoryId = $event, loadCurriculums()"
-        @clickAll="filters.curriculum.schoolCategoryId = null, loadCurriculums()"
-        @click="filters.curriculum.schoolCategoryId = $event, loadCurriculums()"
+        @clickAll="filters.curriculum.schoolCategoryId = null, loadCurriculums(), loadLevelList(), loadCourseList()"
+        @click="filters.curriculum.schoolCategoryId = $event, loadCurriculums(), loadLevelList(), loadCourseList()"
       />
       <div>
         <div v-show="!showEntry">
 			    <b-row class="mb-3">
             <b-col md=12>
               <b-row>
-                <b-col md=6 class="bottom-space">
+                <b-col md=3 class="bottom-space">
                   <b-button
                     v-if="isAccessible($options.CurriculumPermissions.ADD.id)"
                     variant="primary"
@@ -25,6 +25,36 @@
                 </b-col>
                 <b-col md=3>
                   <b-form-select
+                    :disabled="![
+                      options.schoolCategories.COLLEGE.id,
+                      options.schoolCategories.SENIOR_HIGH_SCHOOL.id,
+                      options.schoolCategories.VOCATIONAL.id,
+                      options.schoolCategories.GRADUATE_SCHOOL.id
+                    ].includes(filters.curriculum.schoolCategoryId)"
+                    @change="loadCurriculums()"
+                    v-model="filters.curriculum.courseId"
+                    class="float-right">
+                    <template v-slot:first>
+                      <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                    </template>
+                    <b-form-select-option :value="null">None</b-form-select-option>
+                    <b-form-select-option
+                      v-for="course in options.courses.fixItems"
+                      :key="course.id"
+                      :value="course.id">
+                      {{course.name}}
+                    </b-form-select-option>
+                  </b-form-select>
+                </b-col>
+                <b-col md=3>
+                  <b-form-select
+                    :disabled="![
+                      options.schoolCategories.PRE_SCHOOL.id,
+                      options.schoolCategories.PRIMARY_SCHOOL.id,
+                      options.schoolCategories.JUNIOR_HIGH_SCHOOL.id,
+                      options.schoolCategories.VOCATIONAL.id,
+                      options.schoolCategories.GRADUATE_SCHOOL.id
+                    ].includes(filters.curriculum.schoolCategoryId) && filters.curriculum.schoolCategoryId !== null"
                     @change="loadCurriculums()"
                     v-model="filters.curriculum.levelId"
                     class="float-right">
@@ -1030,7 +1060,8 @@ export default {
 				curriculum: {
           criteria: null,
           schoolCategoryId: null,
-          levelId: null
+          levelId: null,
+          courseId: null
 				}
       },
 			options: {
@@ -1042,7 +1073,8 @@ export default {
 				},
 				courses: {
           isLoading: false,
-					items: []
+          items: [],
+          fixItems: []
 				},
         semesters: Semesters,
         departments: {
@@ -1058,6 +1090,7 @@ export default {
 	},
 	created(){
     this.loadLevelList()
+    this.loadCourseList()
     // this.checkRights()
     // this.loadDepartments()
 	},
@@ -1065,10 +1098,10 @@ export default {
     loadCurriculums() {
       const { curriculums } = this.tables
       const { curriculum } = this.paginations
-      const { schoolCategoryId, levelId } = this.filters.curriculum
+      const { schoolCategoryId, levelId, courseId } = this.filters.curriculum
       curriculums.isBusy = true
 
-			let params = { paginate: false, schoolCategoryId, levelId}
+			let params = { paginate: false, schoolCategoryId, levelId, courseId}
       this.getCurriculumList(params)
       .then(({ data }) => {
         curriculums.items = data
@@ -1079,12 +1112,38 @@ export default {
     },
     loadLevelList() {
       const { levels } = this.options
-
-			let params = { paginate: false }
-      this.getLevelList(params)
-      .then(({ data }) => {
-        levels.fixItems = data
-      })
+      const { curriculum, curriculum: { schoolCategoryId } } = this.filters
+      curriculum.levelId = null
+      if (schoolCategoryId) {
+        let params = { paginate: false }
+        this.getLevelsOfSchoolCategoryList(schoolCategoryId, params)
+        .then(({ data }) => {
+          levels.fixItems = data
+        })
+      } else {
+        let params = { paginate: false, schoolCategoryId }
+        this.getLevelList(params)
+        .then(({ data }) => {
+          levels.fixItems = data
+        })
+      }
+    },
+    loadCourseList() {
+      const { courses } = this.options
+      const { curriculum, curriculum: { schoolCategoryId } } = this.filters
+      curriculum.courseId = null
+      if ([
+        SchoolCategories.COLLEGE.id,
+        SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+        SchoolCategories.GRADUATE_SCHOOL.id,
+        SchoolCategories.VOCATIONAL.id
+      ].includes(schoolCategoryId)) {
+        let params = { paginate: false }
+        this.getCoursesOfSchoolCategoryList(schoolCategoryId, params)
+        .then(({ data }) => {
+          courses.fixItems = data
+        })
+      }
     },
 		loadLevelsOfSchoolCategoryList(getSelectedLevel = false) {
 			this.loadSubjects()
