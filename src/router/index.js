@@ -73,15 +73,15 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  // check current user type, super user = 0, registrar = 1, finance = 2
-  if (to.matched.some(route => route.meta.userType)) {
-    const userGroupId = localStorage.getItem('userGroupId')
-    const userGroup = UserGroups.getEnum(Number(userGroupId))
-    if (to.meta.userType !== userGroup.userType && userGroup.userType !== 0) {
-      next({ name: from.name })
-      return
-    }
-  }
+  // // check current user type, super user = 0, registrar = 1, finance = 2
+  // if (to.matched.some(route => route.meta.userType)) {
+  //   const userGroupId = localStorage.getItem('userGroupId')
+  //   const userGroup = UserGroups.getEnum(Number(userGroupId))
+  //   if (to.meta.userType !== userGroup.userType && userGroup.userType !== 0) {
+  //     next({ name: from.name })
+  //     return
+  //   }
+  // }
 
 // if logged in redirect to prev route
   if(to.path === '/login' && store.state.isLoggedIn) {

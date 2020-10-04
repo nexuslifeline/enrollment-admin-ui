@@ -542,8 +542,9 @@ export const SectionAndSchedulePermissions = new Enum({
 
 export const SubjectPermissions = new Enum({
   ADD: { id: 211, name: 'Add' },
-  EDIT: { id: 212, name: 'Edit' },
-  DELETE: { id: 213, name: 'Delete' }
+  EDIT: { id: 212, name: 'Edit Details' },
+  DELETE: { id: 213, name: 'Delete' },
+  EDIT_PRICE: { id: 272, name: 'Edit Price' }
 });
 
 export const CoursePermissions = new Enum({

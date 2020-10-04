@@ -68,6 +68,7 @@
               <b-dropdown
                 v-if="isAccessible([
                   $options.SubjectPermissions.EDIT.id,
+                  $options.SubjectPermissions.EDIT_PRICE.id,
                   $options.SubjectPermissions.DELETE.id
                 ])"
                 right
@@ -78,7 +79,10 @@
                   <v-icon name="ellipsis-v" />
                 </template>
                 <b-dropdown-item
-                  v-if="isAccessible($options.SubjectPermissions.EDIT.id)"
+                  v-if="isAccessible([
+                    $options.SubjectPermissions.EDIT.id,
+                    $options.SubjectPermissions.EDIT_PRICE.id
+                  ])"
                   @click="setSubjectUpdate(row)"
                   :disabled="showModalEntry">
                   Edit
@@ -127,6 +131,10 @@
                 <b-form-group >
                   <label class="required">Subject Code</label>
                   <b-form-input
+                    :disabled="!isAccessible([
+                      $options.SubjectPermissions.ADD.id,
+                      $options.SubjectPermissions.EDIT.id
+                    ])"
                     ref="name"
                     v-model="forms.subject.fields.name"
                     :state="forms.subject.states.name" />
@@ -141,6 +149,10 @@
                 <b-form-group>
                   <label class="required">Description</label>
                   <b-form-textarea
+                    :disabled="!isAccessible([
+                      $options.SubjectPermissions.ADD.id,
+                      $options.SubjectPermissions.EDIT.id
+                    ])"
                     ref="description"
                     v-model="forms.subject.fields.description"
                     :state="forms.subject.states.description" />
@@ -155,6 +167,10 @@
                 <b-form-group >
                   <label class="required">School Category</label>
                   <b-form-select
+                    :disabled="!isAccessible([
+                      $options.SubjectPermissions.ADD.id,
+                      $options.SubjectPermissions.EDIT.id
+                    ])"
                     v-model="forms.subject.fields.schoolCategoryId"
                     :state="forms.subject.states.schoolCategoryId"
                     @change="loadSubjectPrerequisite()">
@@ -228,7 +244,10 @@
                   <vue-autonumeric
                     @input="computeTotalAmount()"
                     ref="units"
-                    :disabled="checkRights(1)"
+                    :disabled="!isAccessible([
+                      $options.SubjectPermissions.ADD.id,
+                      $options.SubjectPermissions.EDIT.id
+                    ])"
                     v-model='forms.subject.fields.units'
                     :class="'form-control text-right'"
                     :options="[{
@@ -244,7 +263,7 @@
                   <vue-autonumeric
                     @input="computeTotalAmount()"
                     ref="amountPerUnit"
-                    :disabled="checkRights(2)"
+                    :disabled="!isAccessible($options.SubjectPermissions.EDIT_PRICE.id)"
                     v-model='forms.subject.fields.amountPerUnit'
                     :class="'form-control text-right'"
                     :options="[{
@@ -261,7 +280,10 @@
                   <vue-autonumeric
                     @input="computeTotalAmount()"
                     ref="labs"
-                    :disabled="checkRights(1)"
+                    :disabled="!isAccessible([
+                      $options.SubjectPermissions.ADD.id,
+                      $options.SubjectPermissions.EDIT.id
+                    ])"
                     v-model='forms.subject.fields.labs'
                     :class="'form-control text-right'"
                     :options="[{
@@ -277,7 +299,7 @@
                   <vue-autonumeric
                     @input="computeTotalAmount()"
                     ref="amountPerLab"
-                    :disabled="checkRights(2)"
+                    :disabled="!isAccessible($options.SubjectPermissions.EDIT_PRICE.id)"
                     v-model='forms.subject.fields.amountPerLab'
                     :class="'form-control text-right'"
                     :options="[{
