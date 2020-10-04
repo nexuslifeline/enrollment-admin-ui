@@ -56,6 +56,19 @@ import { TabsPlugin } from 'bootstrap-vue'
 //import { TimePlugin } from 'bootstrap-vue'
 import { ToastPlugin } from 'bootstrap-vue'
 //import { TooltipPlugin } from 'bootstrap-vue'
+import {
+  BIconFolderSymlink,
+  BIconFolder2Open,
+  BIconAlarm,
+  BIconArrowRightCircle,
+  BIconArrowLeftCircle
+} from 'bootstrap-vue'
+Vue.component('BIconFolderSymlink', BIconFolderSymlink);
+Vue.component('BIconFolder2Open', BIconFolder2Open);
+Vue.component('BIconAlarm', BIconAlarm);
+Vue.component('BIconArrowRightCircle', BIconArrowRightCircle);
+Vue.component('BIconArrowLeftCircle', BIconArrowLeftCircle);
+
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'
 import 'vue-awesome/icons/sync'
@@ -85,6 +98,8 @@ import 'vue-awesome/icons/times'
 import 'vue-awesome/icons/compress'
 import 'vue-awesome/icons/ellipsis-v'
 import 'vue-awesome/icons/clock'
+import 'vue-awesome/icons/folder'
+import 'vue-awesome/icons/folder-open'
 import Icon from 'vue-awesome/components/Icon'
 // import vSelect from 'vue-select'
 

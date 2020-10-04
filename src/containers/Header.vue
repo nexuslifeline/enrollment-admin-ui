@@ -234,7 +234,7 @@ export default {
     height: 33px;
     //width: 100%;
     flex: 1;
-    margin-left: 230px;
+    margin-left: 235px;
     //padding: 0 230px;
     //background-color: $brand-primary;
     z-index: 1;
@@ -348,7 +348,7 @@ export default {
   }
 
   .header__account-photo-container {
-    width: 230px;
+    width: 235px;
 
     @include for-size(tablet-portrait-down) {
       padding: 15px;
@@ -380,7 +380,7 @@ export default {
     width: 150px;
     object-fit: cover;
     position: absolute;
-    left: 60px;
+    left: 40px;
     top: 22%;
     border: 5px solid $white;
     font-size: 70px;

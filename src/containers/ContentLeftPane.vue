@@ -2,9 +2,9 @@
   @import "../assets/scss/shared.scss";
 
   .main-content__left-panel {
-    width: 270px;
+    width: 235px;
     height: 100%;
-    padding: 55px 20px 20px 40px;
+    padding: 55px 20px 20px 25px;
 
     @include for-size(tablet-landscape-down) {
       display: none;
