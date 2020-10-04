@@ -390,6 +390,7 @@ import FileItem from "../components/FileItem"
 import { copyValue } from '../../helpers/extractor'
 import FileViewer from '../components/FileViewer'
 import Access from '../../mixins/utils/Access'
+import { format } from "date-fns";
 
 export default {
 	name: "Payment",
@@ -502,7 +503,13 @@ export default {
 							label: "Date Submitted",
               tdClass: "align-middle text-center",
               thClass: "text-center",
-              thStyle: { width: "10%"}
+              thStyle: { width: "10%"},
+              formatter: (value, key, item) => {
+                if(!value)
+                return ''
+
+                return format(new Date(value), 'MM/dd/yyyy')
+              }
 						},
             {
 							key: "paymentStatusId",

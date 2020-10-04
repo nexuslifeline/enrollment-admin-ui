@@ -34,6 +34,10 @@ export default [
         label: 'Activity',
         to: '/dashboard/activity'
       },
+      {
+        label: 'Settings',
+        to: '/dashboard/settings',
+      },
     ]
   },
   {
@@ -194,5 +198,5 @@ export default [
         permissionIds: UserGroupPermissions.getIds()
       },
     ]
-  }
+  },
 ]
