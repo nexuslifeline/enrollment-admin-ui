@@ -1,6 +1,10 @@
 <template>
   <transition name="slide-fade" appear>
     <div class="login__container">
+      <AttachmentList
+        @onAttachmentItemDownload="onAttachmentItemDownload"
+        @onAttachmentItemView="onAttachmentItemView"
+      />
       <Toggle v-model="isEnable" />
       <p>Checked: {{isEnable}}</p>
       <h1 class="text-center">Schedule Viewer Sample Usage</h1>
@@ -28,11 +32,15 @@
 <script>
 import Toggle from '../components/Form/Toggle'
 import ScheduleViewer from '../components/ScheduleViewer'
+import AttachmentList from '../components/Attachment/AttachmentList'
+
+
 export default {
   name: 'Login',
   components: {
     Toggle,
-    ScheduleViewer
+    ScheduleViewer,
+    AttachmentList
   },
   data() {
     return {
@@ -102,6 +110,12 @@ export default {
     }
   },
   methods: {
+    onAttachmentItemDownload(data) {
+      console.log(data)
+    },
+    onAttachmentItemView(data) {
+      console.log(data)
+    },
     onCellItemClick(item) {
       console.log('onCellItemClick', item)
     },

@@ -133,7 +133,7 @@
             </button>
           </template>
           <template v-slot:row-details="data">
-            <ActiveDetailsViewer backTitle="Go back to list" @onBack="data.toggleDetails()">
+            <ActiveDetailsViewer :isBusy="data.item.isLoading" backTitle="Go back to list" @onBack="data.toggleDetails()">
               <template v-slot:header>
                 <div class="active-view__header-details-container">
                   <b-avatar
@@ -400,18 +400,17 @@
                   </b-table>
                 </div>
 
-                <div class="active-view__headline-container">
-                  <div class="active-view__headline-highlight">
-                    <div class="active-view__headline-number">
-                      4
-                    </div>
-                    <div class="active-view__headline-text">
-                      Evaluate Student Grade
+                <div>
+                  <div class="active-view__headline-container">
+                    <div class="active-view__headline-highlight">
+                      <div class="active-view__headline-number">
+                        4
+                      </div>
+                      <div class="active-view__headline-text">
+                        Evaluate Student Grade
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div class="p-4">
                   <b-row class="mb-3 text-center">
                     <b-col md=12>
                       <h5>Evaluation Form</h5>
@@ -503,7 +502,7 @@
                           </template>
                           <template v-slot:custom-foot>
                             <b-tr>
-                              <b-td colspan=6 class="text-right">
+                              <b-td colspan=5 class="text-right">
                                 <span class="text-danger">Total Units </span>
                               </b-td>
                               <b-td class="text-center">
@@ -533,7 +532,7 @@
                       <b-col md=12>
                         <b-list-group>
                           <b-list-group-item
-                            v-for="level in data.item.levels"
+                            v-for="(level, idx) in data.item.levels"
                             :key="level.id">
                             <div v-b-toggle="'level' + level.id" class="d-flex justify-content-between align-items-center">
                               <h5>{{ level.name }}</h5>
@@ -544,11 +543,11 @@
                                 <v-icon name="caret-left" />
                               </span>
                             </div>
-                            <b-collapse :id="'level' + level.id" class="mt-2" role="tabpanel">
+                            <b-collapse :id="'level' + level.id" class="mt-2" role="tabpanel" active>
                               <b-form-checkbox class="mb-2" @input="getSemesters(level, $event)">
                                 Show All Semesters
                               </b-form-checkbox>
-                              <b-card
+                              <div
                                 v-for="semester in filterSemester(data, level)"
                                 :key="semester.id">
                                 <b-row>
@@ -596,7 +595,7 @@
                                       </template>
                                       <template v-slot:custom-foot>
                                         <b-tr>
-                                          <b-td colspan=6 class="text-right">
+                                          <b-td colspan=5 class="text-right">
                                             <span class="text-danger">Total Units </span>
                                           </b-td>
                                           <b-td class="text-center">
@@ -637,7 +636,7 @@
                                     </b-table>
                                   </b-col>
                                 </b-row>
-                              </b-card>
+                              </div>
                             </b-collapse>
                           </b-list-group-item>
                         </b-list-group>
@@ -1036,21 +1035,24 @@ export default {
 						},
 						{
 							key: "name",
-							label: "Subject Code",
+							label: "Subject",
 							tdClass: "align-middle",
-							thStyle: {width: "12%"}
+              thStyle: { width: "auto" },
+              formatter: (value, key, item) => {
+                return `${value} - ${item.description}`;
+              }
 						},
-						{
-							key: "description",
-							label: "Description",
-							tdClass: "align-middle",
-							thStyle: {width: "auto"}
-            },
+						// {
+						// 	key: "description",
+						// 	label: "Description",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "auto"}
+            // },
             {
 							key: "prerequisites",
 							label: "Prerequisites",
 							tdClass: "align-middle",
-              thStyle: {width: "15%"},
+              thStyle: { width: "15%" },
               formatter: (value, key, item) => {
                 if (value.length > 0) {
                    return value.map(subject => { return subject.name; }).join(", ");
@@ -1060,14 +1062,14 @@ export default {
             },
 						{
 							key: "units",
-							label: "Lec Units",
+							label: "Lec",
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
 							thStyle: {width: "6%"}
             },
 						{
 							key: "labs",
-							label: "Lab Units",
+							label: "Lab",
 							tdClass: "align-middle text-center",
 							thClass: "text-right",
 							thStyle: {width: "6%"}
