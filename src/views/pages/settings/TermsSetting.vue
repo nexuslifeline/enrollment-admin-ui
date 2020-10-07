@@ -1,80 +1,85 @@
 <template>
   <div class="terms_main-container">
-    <div class="title-container">
-      <h5>TERMS SETTING - SCHOOL YEAR : 2020 - 2021</h5>
-      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias ipsum ab qui vitae laborum dolorum, accusantium autem quisquam. Aliquid vitae explicabo rerum, esse molestiae rem cumque doloremque dolores! Perferendis, pariatur.</p>
-    </div>
-    <div class="tabs-container">
-      <SchoolCategoryTabs
-          :showAll="false"
-          @loadSchoolCategoryId="filters.term.schoolCategoryId = $event, loadTerms()"
-          @click="onSchoolCategoryChange"
-        />
-        <!-- @loadSchoolCategoryId="filters.section.schoolCategoryId = $event, loadSections()"
-          @click="filters.section.schoolCategoryId = $event, loadSections()" -->
-    </div>
-    <div class="table-container">
-      <div class="button-container">
-        <div class="details__semester-button-container">
-          <div class="semester__container">
-            <label
-              v-if="filters.term.schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
-              filters.term.schoolCategoryId === SchoolCategories.COLLEGE.id ||
-              filters.term.schoolCategoryId === SchoolCategories.GRADUATE_SCHOOL.id">Semester</label>
-            <b-form-select
-              class="semester-select"
-              v-model="filters.term.semesterId"
-              v-if="filters.term.schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
-              filters.term.schoolCategoryId === SchoolCategories.COLLEGE.id ||
-              filters.term.schoolCategoryId === SchoolCategories.GRADUATE_SCHOOL.id"
-              @input="loadTerms()">
-              <template v-slot:first>
-                <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
-              </template>
-              <b-form-select-option
-                v-for="semester in options.semesters"
-                :key="semester.id"
-                :value="semester.id">
-                {{ semester.name }}
-              </b-form-select-option>
-            </b-form-select>
+    <b-overlay :show="isLoading" rounded="sm">
+      <div class="no-active-sy-message" v-if="activeSchoolYear === null">
+        <h5>No Active School Year is set.</h5>
+      </div>
+      <div v-if="activeSchoolYear">
+        <div class="title-container">
+          <h4>TERMS SETTING - {{ activeSchoolYear.name }}</h4>
+          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias ipsum ab qui vitae laborum dolorum, accusantium autem quisquam. Aliquid vitae explicabo rerum, esse molestiae rem cumque doloremque dolores! Perferendis, pariatur.</p>
+        </div>
+        <div class="tabs-container">
+          <SchoolCategoryTabs
+              :showAll="false"
+              @loadSchoolCategoryId="filters.term.schoolCategoryId = $event, loadTerms()"
+              @click="onSchoolCategoryChange"
+            />
+            <!-- @loadSchoolCategoryId="filters.section.schoolCategoryId = $event, loadSections()"
+              @click="filters.section.schoolCategoryId = $event, loadSections()" -->
+        </div>
+        <div class="table-container">
+          <div class="button-container">
+            <div class="details__semester-button-container">
+              <div class="semester__container">
+                <label
+                  v-if="filters.term.schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
+                  filters.term.schoolCategoryId === SchoolCategories.COLLEGE.id">Semester</label>
+                <b-form-select
+                  class="semester-select"
+                  v-model="filters.term.semesterId"
+                  v-if="filters.term.schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
+                  filters.term.schoolCategoryId === SchoolCategories.COLLEGE.id"
+                  @input="loadTerms()">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- Semester --</b-form-select-option>
+                  </template>
+                  <b-form-select-option
+                    v-for="semester in options.semesters"
+                    :key="semester.id"
+                    :value="semester.id">
+                    {{ semester.name }}
+                  </b-form-select-option>
+                </b-form-select>
+              </div>
+              <button class="btn btn-outline-primary add-row-button float-right" @click="onAddTerm">
+                <v-icon name="plus-circle" /> ADD TERM
+              </button>
+            </div>
           </div>
-          <button class="btn btn-outline-primary add-row-button float-right" @click="onAddTerm">
-            <v-icon name="plus-circle" /> ADD TERM
-          </button>
+          <b-table
+            small hover outlined show-empty
+            :fields="tables.terms.fields"
+            :busy="tables.terms.isBusy"
+            :items="tables.terms.items"
+            :current-page="paginations.term.page"
+            :per-page="paginations.term.perPage">
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon
+                  name="spinner"
+                  spin
+                  class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
+            <template v-slot:cell(name)="data">
+              <b-form-input v-model="data.item.name"></b-form-input>
+            </template>
+            <template v-slot:cell(action)="data">
+              <b-button variant="outline-danger" @click="onDeletingTerm(data)"><v-icon name="trash" /></b-button>
+            </template>
+          </b-table>
+        </div>
+        <div class="footer-container">
+          <b-button variant="outline-primary" class="float-right" @click="onSaveChanges"><v-icon
+            v-if="isProcessing"
+            name="sync"
+            spin
+            class="mr-2" />SAVE CHANGES</b-button>
         </div>
       </div>
-       <b-table
-        small hover outlined show-empty
-        :fields="tables.terms.fields"
-        :busy="tables.terms.isBusy"
-        :items="tables.terms.items"
-        :current-page="paginations.term.page"
-        :per-page="paginations.term.perPage">
-        <template v-slot:table-busy>
-          <div class="text-center my-2">
-            <v-icon
-              name="spinner"
-              spin
-              class="mr-2" />
-            <strong>Loading...</strong>
-          </div>
-        </template>
-        <template v-slot:cell(name)="data">
-          <b-form-input v-model="data.item.name"></b-form-input>
-        </template>
-        <template v-slot:cell(action)="data">
-          <b-button variant="outline-danger" @click="onDeletingTerm(data)"><v-icon name="trash" /></b-button>
-        </template>
-      </b-table>
-    </div>
-    <div class="footer-container">
-      <b-button variant="outline-primary" class="float-right" @click="onSaveChanges"><v-icon
-        v-if="isProcessing"
-        name="sync"
-        spin
-        class="mr-2" />SAVE CHANGES</b-button>
-    </div>
+    </b-overlay>
     <b-modal
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
@@ -111,21 +116,23 @@
 
 import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
 import { Semesters, SchoolCategories } from "../../../helpers/enum";
-import { TermApi } from '../../../mixins/api';
+import { TermApi, SchoolYearApi } from '../../../mixins/api';
 import { showNotification } from '../../../helpers/forms';
 
 export default {
   components: {
     SchoolCategoryTabs
   },
-  mixins: [ TermApi ],
+  mixins: [ TermApi, SchoolYearApi ],
   data() {
     return {
+      isLoading: false,
       isProcessing: false,
       SchoolCategories: SchoolCategories,
       showModalConfirmation: false,
       isDeleting: false,
       selectedRow: null,
+      activeSchoolYear: null,
       tables: {
         terms: {
           isBusy: false,
@@ -168,9 +175,7 @@ export default {
     }
   },
   created() {
-    //load terms on selected school cat
-    // this.filters.schoolCategoryId = SchoolCategories.PRE_SCHOOL.id
-    // this.loadTerms()
+    this.getActiveSchoolYear()
   },
   methods: {
     onAddTerm() {
@@ -178,7 +183,7 @@ export default {
       terms.items.push({ id: null, name: '' })
     },
     loadTerms() {
-      const schoolYearId = 1
+      const schoolYearId = this.activeSchoolYear.id
       const { schoolCategoryId, semesterId } = this.filters.term
       const { terms } = this.tables
       terms.isBusy = true
@@ -202,7 +207,7 @@ export default {
     onSaveChanges() {
       const { terms } = this.tables
       const { schoolCategoryId, semesterId } = this.filters.term
-      const schoolYearId = 1
+      const schoolYearId = this.activeSchoolYear.id
 
       this.isProcessing = true
       if(this.validateRows()) {
@@ -260,6 +265,16 @@ export default {
         this.isDeleting = false
         this.showModalConfirmation = false
       })
+    },
+    getActiveSchoolYear() {
+      this.isLoading = true
+      const params = { paginate: false, isActive: 1 }
+      this.getSchoolYearList(params).then(({ data }) => {
+        if (data.length > 0) {
+          this.activeSchoolYear = data[0]
+        }
+        this.isLoading = false
+      })
     }
   }
 }
@@ -274,6 +289,12 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
+
+    .title-container {
+      p {
+        margin-bottom: 40px;
+      }
+    }
 
     .tabs-container {
       margin: 10px 0;
@@ -329,6 +350,13 @@ export default {
       }
 
     }
+  }
+
+  .no-active-sy-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
 
 </style>
