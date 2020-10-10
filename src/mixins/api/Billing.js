@@ -16,6 +16,9 @@ export default {
     },
     deleteBilling(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/billings/${id}`);
-    }
+    },
+    batchSoaBilling(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/batch-soa`, data);
+    },
   }
 }

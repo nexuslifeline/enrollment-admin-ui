@@ -54,6 +54,7 @@ const SchoolCategories = () => import('@/views/pages/user-group-permissions/Scho
 const BankAccount = () => import('@/views/pages/BankAccount')
 const PeraPadalaAccount = () => import('@/views/pages/PeraPadalaAccount')
 const EWalletAccount = () => import('@/views/pages/EWalletAccount')
+const Soa = () => import('@/views/pages/Soa');
 
 Vue.use(Router)
 
@@ -192,6 +193,12 @@ function configRoutes () {
               path: 'school-fee',
               name: 'School Fee',
               component: SchoolFee,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'soa',
+              name: 'Soa',
+              component: Soa,
               meta: { requiresAuth: true, userType: 2 }
             },
           ]
