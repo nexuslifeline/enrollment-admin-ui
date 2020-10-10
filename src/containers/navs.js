@@ -132,6 +132,10 @@ export default [
         label: 'School Fee',
         to: '/finance/school-fee',
         permissionIds: SchoolFeePermissions.getIds()
+      },
+      {
+        label: 'SOA',
+        to: '/finance/soa'
       }
     ]
   },
