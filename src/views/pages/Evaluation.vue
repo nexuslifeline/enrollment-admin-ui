@@ -133,7 +133,7 @@
             </button>
           </template>
           <template v-slot:row-details="data">
-            <ActiveDetailsViewer :isBusy="data.item.isLoading" backTitle="Go back to list" @onBack="data.toggleDetails()">
+            <ActiveRowViewer :isBusy="data.item.isLoading" backTitle="Go back to list" @onBack="data.toggleDetails()">
               <template v-slot:header>
                 <div class="active-view__header-details-container">
                   <b-avatar
@@ -162,74 +162,51 @@
               </template>
 
               <template v-slot:navigation>
-                <div class="active-view__quick-links-container">
-                  <ul class="active-view__quick-links">
-                    <li class="active-view__quick-links-item active">
-                      Student Information
-                      <BIconArrowRightCircle scale="1.3" class="ml-auto" />
-                    </li>
-                    <li class="active-view__quick-links-item">
-                      Educational Background
-                      <BIconArrowRightCircle scale="1.3" class="ml-auto" />
-                    </li>
-                    <li class="active-view__quick-links-item">
-                      Application
-                      <BIconArrowRightCircle scale="1.3" class="ml-auto" />
-                    </li>
-                    <li class="active-view__quick-links-item">
-                      Evaluation
-                      <BIconArrowRightCircle scale="1.3" class="ml-auto" />
-                    </li>
-                  </ul>
-                </div>
+                <ActiveViewLinks
+                  :items="[
+                    { text: 'Student Information', target: 'header-student-information'},
+                    { text: 'Educational Background', target: 'header-educational-background'},
+                    { text: 'Application', target: 'header-current-application'},
+                    { text: 'Evaluation', target: 'header-evaluation-student'}
+                  ]"
+                 />
               </template>
 
               <template v-slot:content>
                 <div>
-                  <div class="active-view__headline-container">
-                    <div class="active-view__headline-highlight">
-                      <div class="active-view__headline-number">
-                        1
-                      </div>
-                      <div class="active-view__headline-text">
-                        Review Student Information
-                      </div>
-                    </div>
-                  </div>
+                  <ActiveViewHeader
+                    id="header-student-information"
+                    title="Review Student Information"
+                    circleText="1"
+                  />
 
-                  <div class="active-view__detail-item-container">
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Student Number:</div>
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Student Number:">
                       <p>
-                      {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}
+                        {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Name:</div>
-                      <p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Name:">
+                       <p>
                       {{ data.item.student.name }}
                       </p>
-                    </div>
-                    <div v-if="!!data.item.student.email" class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Email:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem v-if="!!data.item.student.email"  label="Email:">
                       <p>
                       {{ data.item.student.email }}
                       </p>
-                    </div>
-                    <div v-if="!!data.item.student.mobileNo" class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Mobile Number:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem v-if="!!data.item.student.mobileNo"  label="Mobile Number:">
                       <p>
                       {{ data.item.student.mobileNo }}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Address:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Address:">
                       <p>
                       {{ data.item.student.currentAddress || data.item.student.address.currentCompleteAddress }}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Category:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Category:">
                       <p>
                         <b-badge
                           :variant="data.item.studentCategoryId === studentCategories.NEW.id
@@ -238,139 +215,116 @@
                           {{ data.item.studentCategory.name }}
                         </b-badge>
                       </p>
-                    </div>
-                  </div>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
                 </div>
 
                 <div>
-                  <div class="active-view__headline-container">
-                    <div class="active-view__headline-highlight">
-                      <div class="active-view__headline-number">
-                        2
-                      </div>
-                      <div class="active-view__headline-text">
-                        Review Previous Educational Background
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="active-view__detail-item-container">
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Last School Attended:</div>
+                  <ActiveViewHeader
+                    id="header-educational-background"
+                    title="Review Previous Educational Background"
+                    circleText="2"
+                  />
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Last School Attended:">
                       <p>
-                      {{ data.item.lastSchoolAttended }}
+                        {{ data.item.lastSchoolAttended }}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Last School Level:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Last School Level:">
                       <p>
-                      {{ data.item.lastSchoolLevel ? data.item.lastSchoolLevel.name : 'N/A'}}
+                        {{ data.item.lastSchoolLevel ? data.item.lastSchoolLevel.name : 'N/A'}}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Attended Period:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Attended Period:">
                       <p>
-                        {{ data.item.lastSchoolYearFrom }}-{{data.item.lastSchoolYearTo}}
+                         {{ data.item.lastSchoolYearFrom }}-{{data.item.lastSchoolYearTo}}
                       </p>
-                    </div>
-                  </div>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
                 </div>
 
                 <div>
-                  <div class="active-view__headline-container">
-                    <div class="active-view__headline-highlight">
-                      <div class="active-view__headline-number">
-                        3
-                      </div>
-                      <div class="active-view__headline-text">
-                        Review Application for current Academic Year
-                      </div>
-                    </div>
-                  </div>
+                  <ActiveViewHeader
+                    id="header-current-application"
+                    title="Review Application for current Academic Year"
+                    circleText="3"
+                  />
 
-                  <div class="active-view__detail-item-container">
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Curriculum:</div>
-                      <p>
-                        <div v-if="!data.item.studentCurriculumEdit">
-                          <span :class="`font-weight-bold ${!data.item.studentCurriculum ? 'text-danger' : ''}`">
-                            {{ data.item.studentCurriculum ? data.item.studentCurriculum.name : 'Nothing is Set' }}
-                          </span>&nbsp;
-                          <b-link
-                            v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
-                            @click="data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit">
-                            [Set Curriculum]
-                          </b-link>
-                        </div>
-                        <div v-else class="w-75 ml-2">
-                          <b-form-select
-                            @change="loadStudentCurriculum($event, data), data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit"
-                            v-model="data.item.studentCurriculumId">
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
-                            </template>
-                            <b-form-select-option
-                              v-for="curriculum in data.item.curriculums"
-                              :key="curriculum.id"
-                              :value="curriculum.id">
-                              {{ curriculum.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                        </div>
-                      </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Course:</div>
-                      <p>
-                        <div v-if="!data.item.studentCourseEdit">
-                          <span>
-                            {{ data.item.course.description }} {{ data.item.course.major ? ' - ' + data.item.course.major  : '' }}
-                          </span>&nbsp;&nbsp;
-                          <b-link
-                            v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
-                            @click="data.item.studentCourseEdit = !data.item.studentCourseEdit">
-                            [Change Course]
-                          </b-link>
-                        </div>
-                        <div v-else class="w-75 ml-2">
-                          <b-form-select
-                            @change="onChangeCourse(data)"
-                            v-model="data.item.courseId"
-                            class="float-right">
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
-                            </template>
-                            <b-form-select-option :value="null">None</b-form-select-option>
-                            <b-form-select-option
-                              v-for="course in options.courses.items"
-                              :key="course.id"
-                              :value="course.id">
-                              {{course.description}} {{course.major ? `(${course.major})` : ''}}
-                            </b-form-select-option>
-                          </b-form-select>
-                        </div>
-                      </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Level:</div>
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Curriculum:">
+                      <div v-if="!data.item.studentCurriculumEdit" class="mb-3">
+                        <span :class="`font-weight-bold ${!data.item.studentCurriculum ? 'text-danger' : ''}`">
+                          {{ data.item.studentCurriculum ? data.item.studentCurriculum.name : 'Nothing is Set' }}
+                        </span>&nbsp;
+                        <b-link
+                          v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
+                          @click="data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit">
+                          [Set Curriculum]
+                        </b-link>
+                      </div>
+                      <div v-else class="w-75 ml-2 mb-3">
+                        <b-form-select
+                          @change="loadStudentCurriculum($event, data), data.item.studentCurriculumEdit = !data.item.studentCurriculumEdit"
+                          v-model="data.item.studentCurriculumId">
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled>-- Curriculum --</b-form-select-option>
+                          </template>
+                          <b-form-select-option
+                            v-for="curriculum in data.item.curriculums"
+                            :key="curriculum.id"
+                            :value="curriculum.id">
+                            {{ curriculum.name }}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Course:">
+                      <div v-if="!data.item.studentCourseEdit" class="mb-3">
+                        <span>
+                          {{ data.item.course.description }} {{ data.item.course.major ? ' - ' + data.item.course.major  : '' }}
+                        </span>&nbsp;&nbsp;
+                        <b-link
+                          v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
+                          @click="data.item.studentCourseEdit = !data.item.studentCourseEdit">
+                          [Change Course]
+                        </b-link>
+                      </div>
+                      <div v-else class="w-75 ml-2 mb-3">
+                        <b-form-select
+                          @change="onChangeCourse(data)"
+                          v-model="data.item.courseId"
+                          class="float-right">
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                          </template>
+                          <b-form-select-option :value="null">None</b-form-select-option>
+                          <b-form-select-option
+                            v-for="course in options.courses.items"
+                            :key="course.id"
+                            :value="course.id">
+                            {{course.description}} {{course.major ? `(${course.major})` : ''}}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Level:">
                       <p>
                       {{ getName(data.item, 'level') }}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Semester:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Semester:">
                       <p>
                       {{ semesters.getEnum(data.item.semesterId).name }}
                       </p>
-                    </div>
-                    <div class="active-view__detail-item">
-                      <div class="mr-2 font-weight-bold">Date Submitted:</div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Date Submitted:">
                       <p>
                       {{ data.item.submittedDate }}
                       </p>
-                    </div>
-                  </div>
-                  <div class="p-4">
+                    </ActiveViewItem>
+                  </ActiveViewItems>
+                  <div class="p-4 mb-4">
                     <h5>Attachments</h5>
                     <AttachmentList
                       :items="data.item.files"
@@ -381,8 +335,8 @@
                   </div>
                 </div>
 
-                <div class="p-4" v-if="data.item.files">
-                  <!-- <b-table
+                <!-- <div class="p-4" v-if="data.item.files">
+                  <b-table
                     outlined responsive show-empty
                     :fields="tables.files.fields"
                     :items="data.item.files"
@@ -404,20 +358,16 @@
                         <strong>Loading...</strong>
                       </div>
                     </template>
-                  </b-table> -->
-                </div>
+                  </b-table>
+                </div> -->
 
                 <div>
-                  <div class="active-view__headline-container">
-                    <div class="active-view__headline-highlight">
-                      <div class="active-view__headline-number">
-                        4
-                      </div>
-                      <div class="active-view__headline-text">
-                        Evaluate Student Grade
-                      </div>
-                    </div>
-                  </div>
+                  <ActiveViewHeader
+                    id="header-evaluation-student"
+                    title="Evaluate Student Grade"
+                    circleText="4"
+                  />
+
                   <b-row class="mb-3 text-center">
                     <b-col md=12>
                       <h5>Evaluation Form</h5>
@@ -773,7 +723,7 @@
                   class="float-right m-2"
                   variant="outline-primary">Approve</b-button>
               </div>
-            </ActiveDetailsViewer>
+            </ActiveRowViewer>
           </template>
         </b-table>
         <b-row>
@@ -899,7 +849,11 @@ import FileViewer from '../components/FileViewer'
 import Access from '../../mixins/utils/Access'
 import { format } from "date-fns";
 import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
-import ActiveDetailsViewer from "../components/ActiveDetailsViewer"
+import ActiveRowViewer from "../components/ActiveRowViewer/ActiveRowViewer"
+import ActiveViewHeader from "../components/ActiveRowViewer/ActiveViewHeader"
+import ActiveViewItems from "../components/ActiveRowViewer/ActiveViewItems"
+import ActiveViewItem from "../components/ActiveRowViewer/ActiveViewItem"
+import ActiveViewLinks from "../components/ActiveRowViewer/ActiveViewLinks"
 import AttachmentList from "../components/Attachment/AttachmentList"
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
@@ -920,8 +874,12 @@ export default {
   components: {
     SchoolCategoryTabs,
     FileViewer,
-    ActiveDetailsViewer,
-    AttachmentList
+    ActiveRowViewer,
+    ActiveViewHeader,
+    AttachmentList,
+    ActiveViewItems,
+    ActiveViewItem,
+    ActiveViewLinks
   },
   EvaluationAndAdmissionPermissions,
 	data() {
