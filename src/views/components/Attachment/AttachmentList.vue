@@ -1,11 +1,15 @@
 <template>
   <div class="attachment-list-container">
     <AttachmentItem
-      v-for="(v, k) in Array.from({ length: 5 })"
-      :data="{ title: 'Statement of Account.pdf', description: '114 KB', id: k}"
-      @onDownload="onAttachmentItemDownload"
-      @onView="onAttachmentItemView"
+      v-for="(item, idx) in items"
+      :data="item"
+      :key="idx"
+      :titleKey="titleKey"
+      :descriptionKey="descriptionKey"
+      @onDownload="(v) => onAttachmentItemDownload(idx, v)"
+      @onView="(v) => onAttachmentItemView(idx, v)"
     />
+    <slot></slot>
   </div>
 </template>
 
@@ -19,14 +23,25 @@ export default {
     isBusy: {
       type: [Boolean],
       default: false
-    }
+    },
+    items: {
+      type: [Array]
+    },
+    titleKey: {
+      type: [String],
+      default: 'title'
+    },
+    descriptionKey: {
+      type: [String],
+      default: 'description'
+    },
   },
   methods: {
-    onAttachmentItemDownload(data) {
-      this.$emit('onAttachmentItemDownload', data);
+    onAttachmentItemDownload(index, item) {
+      this.$emit('onAttachmentItemDownload', { index, item });
     },
-    onAttachmentItemView(data) {
-      this.$emit('onAttachmentItemView', data);
+    onAttachmentItemView(index, item) {
+      this.$emit('onAttachmentItemView', { index, item });
     }
   }
 }

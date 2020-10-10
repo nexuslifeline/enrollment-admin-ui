@@ -3,9 +3,9 @@
     <div class="attachment-item__icon-container">
       <BIconPaperclip scale="1.6" rotate="40" class="attachment-item__icon" />
     </div>
-    <div class="attachment-item__details">
-      <div class="attachment-item__title">{{data.title}}</div>
-      <div class="attachment-item__size">{{data.description}}</div>
+    <div class="attachment-item__details" @click="$emit('onView', data)">
+      <div class="attachment-item__title">{{data[titleKey]}}</div>
+      <div class="attachment-item__size">{{data[descriptionKey]}}</div>
     </div>
     <div class="attachment-item__actions">
       <button @click="$emit('onDownload', data)" class="attachment-item__action">
@@ -21,7 +21,15 @@
 <script>
 export default {
   props: {
-    data: [Object]
+    data: [Object],
+    titleKey: {
+      type: [String],
+      default: 'title'
+    },
+    descriptionKey: {
+      type: [String],
+      default: 'description'
+    },
   }
 }
 </script>
@@ -32,7 +40,7 @@ export default {
     flex: 50%;
     max-width: calc(50% - 15px);
     height: 50px;
-    margin: 7.5px;
+    margin: 7.5px 7.5px 7.5px 0;
     padding: 3px;
     background-color: $light-blue-100;
     border-radius: 4px;
@@ -94,7 +102,7 @@ export default {
     outline: 0;
     border: 0;
     margin: 0 4px;
-    color: $dark-gray-200;
+    color: $dark-gray-500;
   }
 
 </style>

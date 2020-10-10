@@ -369,13 +369,20 @@
                       {{ data.item.submittedDate }}
                       </p>
                     </div>
-
+                  </div>
+                  <div class="p-4">
+                    <h5>Attachments</h5>
+                    <AttachmentList
+                      :items="data.item.files"
+                      titleKey="name"
+                      descriptionKey="notes"
+                      @onAttachmentItemView="(file) => previewFile(file, data)"
+                    />
                   </div>
                 </div>
 
                 <div class="p-4" v-if="data.item.files">
-                  <h5>Files</h5>
-                  <b-table
+                  <!-- <b-table
                     outlined responsive show-empty
                     :fields="tables.files.fields"
                     :items="data.item.files"
@@ -397,7 +404,7 @@
                         <strong>Loading...</strong>
                       </div>
                     </template>
-                  </b-table>
+                  </b-table> -->
                 </div>
 
                 <div>
@@ -893,6 +900,7 @@ import Access from '../../mixins/utils/Access'
 import { format } from "date-fns";
 import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
 import ActiveDetailsViewer from "../components/ActiveDetailsViewer"
+import AttachmentList from "../components/Attachment/AttachmentList"
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -912,7 +920,8 @@ export default {
   components: {
     SchoolCategoryTabs,
     FileViewer,
-    ActiveDetailsViewer
+    ActiveDetailsViewer,
+    AttachmentList
   },
   EvaluationAndAdmissionPermissions,
 	data() {

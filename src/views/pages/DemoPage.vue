@@ -2,6 +2,7 @@
   <transition name="slide-fade" appear>
     <div class="login__container">
       <AttachmentList
+        :data="attachments"
         @onAttachmentItemDownload="onAttachmentItemDownload"
         @onAttachmentItemView="onAttachmentItemView"
       />
@@ -45,6 +46,16 @@ export default {
   data() {
     return {
       isEnable: true,
+      attachments: [{
+        id: 1,
+        title: "Statement of Account.pdf",
+        description: "414 KB"
+      },
+      {
+        id: 2,
+        title: "Bill 012.pdf",
+        description: "415 KB"
+      }],
       selectedSchedules: [
         {
           dayIndex: 0,
