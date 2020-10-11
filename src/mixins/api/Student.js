@@ -41,5 +41,8 @@ export default {
     getStudentFeesOfStudent(studentId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/student-fees`, { params: params });
     },
+    getBillingsOfStudent(studentId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/billings`);
+    },
   }
 }

@@ -590,3 +590,11 @@ export const PeraPadalaAccountPermissions = new Enum({
   EDIT: { id: 270, name: 'Edit' },
   DELETE: { id: 271, name: 'Delete' }
 });
+
+export const PaymentModes = new Enum({
+  BANK_DEPOSIT_TRANSFER: { id: 1, name: 'Bank Deposit/Transfer' },
+  SEVENT_ELEVEN: { id: 2, name: '7-Eleven' },
+  OTHERS: { id: 3, name: 'Others' },
+  E_WALLET: { id: 4, name: 'E-Wallet (GCash, Paymaya, PayPal, Coins.ph)' },
+  PERA_PADALA: { id: 5, name: 'Pera Padala' },
+});

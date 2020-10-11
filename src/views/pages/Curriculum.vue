@@ -158,7 +158,6 @@
                       </b-row>
                       <b-row v-if="data.item.subjects && data.item.levels">
                         <b-col md=12>
-
                           <div
                             v-for="level in data.item.levels"
                             :key="`${level.id} - ${(level.semesterId ? level.semesterId : '')}`">
