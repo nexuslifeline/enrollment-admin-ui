@@ -55,6 +55,8 @@ const BankAccount = () => import('@/views/pages/BankAccount')
 const PeraPadalaAccount = () => import('@/views/pages/PeraPadalaAccount')
 const EWalletAccount = () => import('@/views/pages/EWalletAccount')
 const Soa = () => import('@/views/pages/Soa');
+const PaymentList = () => import('@/views/pages/payment/PaymentList')
+const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
 
 Vue.use(Router)
 
@@ -200,6 +202,25 @@ function configRoutes () {
               name: 'Soa',
               component: Soa,
               meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'payment',
+              component: { render(c) { return c('router-view') } },
+              meta: { requiresAuth: true, userType: 2 },
+              children: [
+                {
+                  path: '/',
+                  name: 'PaymentList',
+                  component: PaymentList,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+                {
+                  path: 'add',
+                  name: 'Payment Add',
+                  component: PaymentEntry,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+              ]
             },
           ]
         },

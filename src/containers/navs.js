@@ -134,6 +134,12 @@ export default [
         permissionIds: SchoolFeePermissions.getIds()
       },
       {
+        label: 'Payment List',
+        to: '/finance/payment',
+        //todo: set payment permissions
+        //permissionIds: SchoolFeePermissions.getIds()
+      },
+      {
         label: 'SOA',
         to: '/finance/soa'
       }
