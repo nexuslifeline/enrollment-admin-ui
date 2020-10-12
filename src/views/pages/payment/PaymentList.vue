@@ -3,19 +3,18 @@
     <div class="page-content__title-container">
       <h4 class="page-content__title">Payment List</h4>
     </div>
-    <b-row>
+    <!-- <b-row>
       <b-col md=12>
         <b-row>
           <b-col md=8>
-            <!-- todo: set button permisson -->
             <b-button
+              class="add-button"
               variant="primary"
               :to="`/finance/payment/add`">
               <v-icon name="plus-circle" /> ADD NEW PAYMENT
             </b-button>
           </b-col>
           <b-col md=4>
-            <!-- v-model="filters.schoolFee.criteria" -->
             <b-form-input
               type="text"
               placeholder="Search"
@@ -26,7 +25,36 @@
           </b-col>
         </b-row>
       </b-col>
-    </b-row>
+    </b-row> -->
+    <div class="search-filter-container">
+      <b-button
+        variant="primary"
+        :to="`/finance/payment/add`">
+        <v-icon name="plus-circle" /> ADD NEW PAYMENT
+      </b-button>
+      <div class="date-filter-cotainer">
+        <span>FROM</span>
+        <b-form-datepicker
+          :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+          class="date-pickers"
+          v-model="filters.payment.dateFrom"
+          @input="loadPayments"/>
+        <span>TO</span>
+        <b-form-datepicker
+          :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+          class="date-pickers"
+          v-model="filters.payment.dateTo"
+          @input="loadPayments" />
+      </div>
+       <b-form-input
+          type="text"
+          placeholder="Search"
+          debounce="500"
+          class="search-input"
+          v-model="filters.payment.criteria"
+          @update="loadPayments()">
+        </b-form-input>
+    </div>
     <b-row class="mt-3">
       <b-col md=12>
         <b-table
@@ -198,7 +226,7 @@
 <script>
 
 import { StudentApi, PaymentApi } from "../../../mixins/api"
-import { format } from 'date-fns'
+import { format, startOfMonth, endOfMonth } from 'date-fns'
 import { showNotification, formatNumber } from '../../../helpers/forms'
 
 export default {
@@ -275,7 +303,9 @@ export default {
       },
       filters: {
         payment: {
-          criteria: null
+          criteria: null,
+          dateFrom: null,
+          dateTo: null
         }
       }
     }
@@ -286,9 +316,9 @@ export default {
     },
     loadPayments() {
       const { payments } = this.tables
-      const { criteria } = this.filters.payment
+      const { criteria, dateFrom, dateTo } = this.filters.payment
       const { payment, payment: { perPage, page } } = this.paginations
-      const params = { paginate: true, perPage, page, criteria }
+      const params = { paginate: true, perPage, page, criteria, dateFrom, dateTo }
 
       payments.isBusy = true
 
@@ -318,15 +348,73 @@ export default {
     },
   },
   created() {
+    const { payment, payment: { dateFrom, dateTo } } = this.filters
+
+    payment.dateFrom = startOfMonth(new Date());
+    payment.dateTo = endOfMonth(new Date());
+
     this.loadPayments();
   },
 }
 </script>
 
 <style lang="scss">
+
+  @import '../../../assets/scss/_shared.scss';
+
   .payment-list__main-container {
     width: 100%;
     height: 100%;
+  }
+
+  .search-filter-container {
+    display:  flex;
+    width: 100%;
+
+    .search-input {
+      width: 300px;
+    }
+
+    .date-filter-cotainer {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      span {
+        margin: 0 10px;
+        font-weight: bold;
+      }
+
+      .date-pickers {
+        width: 200px;
+      }
+
+    }
+
+    @include for-size(phone-only) {
+      flex-direction: column;
+
+      .date-filter-cotainer {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        span {
+          margin: 10px 0;
+        }
+
+        .date-pickers {
+          width: 100%;
+        }
+
+      }
+      .search-input {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+    }
   }
 
 </style>
