@@ -32,12 +32,12 @@
           <b-col md="8">
             <b-button variant="primary"
               @click="setCreateSoa()">
-              <v-icon name="plus-circle" /> Create Soa
+              <v-icon name="plus-circle" /> Generate Soa
             </b-button>
             <b-button variant="primary"
               class="ml-2"
               @click="setCreateBatchSoa()">
-              <v-icon name="plus-circle" /> Batch Create Soa
+              <v-icon name="plus-circle" /> Batch Generate Soa
             </b-button>
           </b-col>
           <b-col md="4">
@@ -115,7 +115,7 @@
 			:noCloseOnBackdrop="true"
       size="lg">
 			<div slot="modal-title">
-        Create SOA
+        Generate SOA
 			</div>
       <b-row>
         <b-col md="6">
@@ -186,7 +186,7 @@
                 :key="term.id"
                 :disabled="term.pivot ? term.pivot.isBilled === 1 : false"
                 :value="term.id">
-                {{ `${term.name} ${term.pivot ? term.pivot.isBilled === 1 : false ? '- Billed' : ''}` }}
+                {{ `${term.name} ${term.pivot ? term.pivot.isBilled === 1 ? '- Billed' : '' : ''}` }}
               </b-form-select-option>
             </b-form-select>
             <b-form-invalid-feedback>
@@ -213,8 +213,7 @@
           </b-form-group>
           <b-form-group>
             <label class="required">Due Date</label>
-            <b-form-input
-              type="date"
+            <b-form-datepicker
               :state="forms.billing.states.dueDate"
               v-model="forms.billing.fields.dueDate" />
             <b-form-invalid-feedback>
@@ -250,7 +249,7 @@
 			:noCloseOnEsc="true"
 			:noCloseOnBackdrop="true">
 			<div slot="modal-title">
-        Create Batch SOA
+        Generate Batch SOA
 			</div>
       <b-form-group>
         <label class="required">School Category</label>
@@ -537,7 +536,7 @@ export default {
         perPage,
         page,
         billingStatusId,
-        billingTypeId: BillingTypes.BILLING.id,
+        billingTypeId: BillingTypes.SOA.id,
         orderBy,
         sort
       }
@@ -642,7 +641,7 @@ export default {
         ...fields,
         schoolYearId: this.activeSchoolYear.id,
         billingStatusId: BillingStatuses.UNPAID.id,
-        billingTypeId: BillingTypes.BILLING.id
+        billingTypeId: BillingTypes.SOA.id
       }
       reset(billing)
       this.addBilling(data)

@@ -55,6 +55,7 @@ const BankAccount = () => import('@/views/pages/BankAccount')
 const PeraPadalaAccount = () => import('@/views/pages/PeraPadalaAccount')
 const EWalletAccount = () => import('@/views/pages/EWalletAccount')
 const Soa = () => import('@/views/pages/Soa');
+const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
 
@@ -201,6 +202,12 @@ function configRoutes () {
               path: 'soa',
               name: 'Soa',
               component: Soa,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'other-billing',
+              name: 'Other Billing',
+              component: OtherBilling,
               meta: { requiresAuth: true, userType: 2 }
             },
             {

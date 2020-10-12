@@ -142,6 +142,10 @@ export default [
       {
         label: 'SOA',
         to: '/finance/soa'
+      },
+      {
+        label: 'Other Billing',
+        to: '/finance/other-billing'
       }
     ]
   },
