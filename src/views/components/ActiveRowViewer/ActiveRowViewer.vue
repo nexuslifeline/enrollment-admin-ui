@@ -9,6 +9,16 @@
           </button>
         </div>
         <slot name="header"></slot>
+        <div class="active-view__header-right-actions">
+          <button class="active-view__right-action">
+            Save
+            <BIconCheckCircle />
+          </button>
+          <button class="active-view__right-action">
+            Back
+            <BIconArrowLeftCircle  />
+          </button>
+        </div>
       </div>
       <div class="active-view__body">
         <div class="active-view__side-nav">
@@ -83,6 +93,10 @@
     padding-left: 20px;
     //border-right: 1px solid $brand-border-color;
     height: 100%;
+
+    @include for-size(tablet-landscape-down) {
+      display: none;
+    }
   }
 
   .active-view__header-action-back {
@@ -120,7 +134,7 @@
     //border-right: 1px solid $brand-border-color;
     //background-color: $light-gray-50;
 
-    @include for-size(tablet-portrait-down) {
+    @include for-size(tablet-landscape-down) {
       display: none;
     }
   }
@@ -130,6 +144,24 @@
     padding: 40px;
     border-left: 1px solid $brand-border-color;
     background-color: $light-gray;
+  }
+
+  .active-view__right-action {
+    border: 0;
+    background-color: none;
+    outline: 0;
+    padding: 2px;
+    color: $dark-gray;
+  }
+
+  .active-view__header-right-actions {
+    flex: 0;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 150px;
+    margin-right: 10px;
   }
 
 </style>

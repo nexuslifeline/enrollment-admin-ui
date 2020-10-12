@@ -63,7 +63,8 @@ import {
   BIconArrowRightCircle,
   BIconArrowLeftCircle,
   BIconPaperclip,
-  BIconCloudDownload
+  BIconCloudDownload,
+  BIconCheckCircle
 } from 'bootstrap-vue'
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
@@ -72,6 +73,7 @@ Vue.component('BIconArrowRightCircle', BIconArrowRightCircle);
 Vue.component('BIconArrowLeftCircle', BIconArrowLeftCircle);
 Vue.component('BIconPaperclip', BIconPaperclip);
 Vue.component('BIconCloudDownload', BIconCloudDownload);
+Vue.component('BIconCheckCircle', BIconCheckCircle);
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'

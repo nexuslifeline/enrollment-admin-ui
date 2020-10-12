@@ -46,6 +46,11 @@ export default {
     border-radius: 4px;
     display: flex;
     flex-direction: row;
+
+    @include for-size(tablet-portrait-down) {
+      flex: 100%;
+      max-width: 100%;
+    }
   }
 
   .attachment-item__icon-container {

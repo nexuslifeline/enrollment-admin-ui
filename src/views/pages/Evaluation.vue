@@ -78,19 +78,11 @@
           <template v-slot:cell(name)="data">
             <b-media>
               <template v-slot:aside>
-                <b-avatar
-                  blank
-                  size="48"
-                  :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                <AvatarMaker
+                  :avatarId="data.item.student.id"
+                  :size="48"
+                  :text="`${data.item.student.firstName.charAt(0)}${data.item.student.lastName.charAt(0)}`"
                   :src="avatar(data.item.student)"
-                  :style="{
-                    backgroundColor: $options.colorFactory(
-                      data.item.studentId % $options.constants.COLOR_FACTORY_LENGTH
-                    ).bg,
-                    color: $options.colorFactory(
-                      data.item.studentId % $options.constants.COLOR_FACTORY_LENGTH
-                    ).font
-                  }"
                 />
               </template>
               <div><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></div>
@@ -136,27 +128,19 @@
             <ActiveRowViewer :isBusy="data.item.isLoading" backTitle="Go back to list" @onBack="data.toggleDetails()">
               <template v-slot:header>
                 <div class="active-view__header-details-container">
-                  <b-avatar
-                    blank
-                    size="54"
-                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                  <AvatarMaker
+                    :avatarId="data.item.student.id"
+                    :size="54"
+                    :text="`${data.item.student.firstName.charAt(0)}${data.item.student.lastName.charAt(0)}`"
                     :src="avatar(data.item.student)"
-                    :style="{
-                      backgroundColor: $options.colorFactory(
-                        data.item.studentId % $options.constants.COLOR_FACTORY_LENGTH
-                      ).bg,
-                      color: $options.colorFactory(
-                        data.item.studentId % $options.constants.COLOR_FACTORY_LENGTH
-                      ).font
-                    }"
                   />
                   <div class="active-view__header-details">
-                    <p class="active-view__header-name">Paul Christian Rueda</p>
-                    <p class="active-view__header-email">chrisrueda14@yahoo.com</p>
+                    <p class="active-view__header-name">{{ data.item.student.name }}</p>
+                    <p class="active-view__header-email">{{ data.item.student.email }}</p>
                   </div>
                   <p class="active-view__header-date">
                     <BIconAlarm />
-                    January 21, 2018 10:20:00 AM
+                    {{ $options.format(new Date(data.item.submittedDate), 'MMMM dd, yyyy') }}
                   </p>
                 </div>
               </template>
@@ -320,7 +304,7 @@
                     </ActiveViewItem>
                     <ActiveViewItem label="Date Submitted:">
                       <p>
-                      {{ data.item.submittedDate }}
+                      {{ $options.format(new Date(data.item.submittedDate), 'MMMM dd, yyyy') }}
                       </p>
                     </ActiveViewItem>
                   </ActiveViewItems>
@@ -855,6 +839,7 @@ import ActiveViewItems from "../components/ActiveRowViewer/ActiveViewItems"
 import ActiveViewItem from "../components/ActiveRowViewer/ActiveViewItem"
 import ActiveViewLinks from "../components/ActiveRowViewer/ActiveViewLinks"
 import AttachmentList from "../components/Attachment/AttachmentList"
+import AvatarMaker from '../components/AvatarMaker'
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -870,6 +855,7 @@ export default {
     COLOR_FACTORY_LENGTH
   },
   colorFactory,
+  format,
   mixins: [EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi, Tables, Access],
   components: {
     SchoolCategoryTabs,
@@ -879,7 +865,8 @@ export default {
     AttachmentList,
     ActiveViewItems,
     ActiveViewItem,
-    ActiveViewLinks
+    ActiveViewLinks,
+    AvatarMaker
   },
   EvaluationAndAdmissionPermissions,
 	data() {
