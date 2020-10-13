@@ -176,7 +176,7 @@
             <template v-slot:row-details="data">
               <b-overlay :show="data.item.isLoading" rounded="sm">
                 <div class="row-details-container">
-                  <div v-if="data.item.termBillings.length > 0">
+                  <div v-if="data.item.termBillings && data.item.termBillings.length > 0">
                      <b-table
                         small hover outlined show-empty
                         :fields="tables.soaBillings.fields"
@@ -193,7 +193,7 @@
                         </template>
                      </b-table>
                   </div>
-                  <div v-if="data.item.otherBillings.length > 0">
+                  <div v-if="data.item.otherBillings && data.item.otherBillings.length > 0">
                     <b-table
                         small hover outlined show-empty
                         :fields="tables.otherBillings.fields"
@@ -397,6 +397,9 @@ export default {
               thClass: "text-right",
               thStyle: {width: "15%"},
               formatter: (value) => {
+                if(Math.sign(value) < 0) {
+                  return `(${Math.abs(value)})`
+                }
                 return formatNumber(value)
               }
             },
@@ -407,6 +410,9 @@ export default {
               thClass: "text-right",
               thStyle: {width: "15%"},
               formatter: (value) => {
+                if(Math.sign(value) < 0) {
+                  return `(${formatNumber(Math.abs(value))})`
+                }
                 return formatNumber(value)
               }
             },
@@ -418,6 +424,9 @@ export default {
               thStyle: {width: "15%"},
               formatter: (value, key, item) => {
                 const total = parseFloat(item.previousBalance) + parseFloat(item.totalAmount)
+                if(Math.sign(total) < 0) {
+                  return `(${formatNumber(Math.abs(total))})`
+                }
                 return formatNumber(total)
               }
             },
@@ -428,6 +437,9 @@ export default {
               thClass: "text-right",
               thStyle: {width: "15%"},
               formatter: (value) => {
+                if(Math.sign(value) < 0) {
+                  return `(${formatNumber(Math.abs(value))})`
+                }
                 return formatNumber(value)
               }
             },
@@ -439,6 +451,9 @@ export default {
               thStyle: {width: "15%"},
               formatter: (value, key, item) => {
                 const remBalance = parseFloat(item.previousBalance) + parseFloat(item.totalAmount) - item.totalPaid
+                if(Math.sign(remBalance) < 0) {
+                  return `(${formatNumber(Math.abs(remBalance))})`
+                }
                 return formatNumber(remBalance)
               }
             },
@@ -614,7 +629,6 @@ export default {
     },
     onRowSelected(row) {
       if(row.length > 0) {
-        console.log(row)
         const { payment } = this.forms
         const remainingBalance = parseFloat(row[0].previousBalance) + parseFloat(row[0].totalAmount) - parseFloat(row[0].totalPaid)
         payment.fields.billingId = row.length ? row[0].id :  null
@@ -652,9 +666,9 @@ export default {
       })
     },
     loadDetails(row) {
+      const { item } = row
+      this.$set(item, 'isLoading', true)
       if (!row.detailsShowing) {
-        const { item } = row
-        this.$set(item, 'isLoading', true)
         this.getBillingItemsOfBilling(item.id).then(({ data }) => {
           this.$set(item, 'termBillings', data.filter(e => e.termId !== null))
           this.$set(item, 'otherBillings', data.filter(e => e.termId === null))
@@ -674,7 +688,6 @@ export default {
       return formatNumber(sum, 2);
     },
     getTotalTerms(items) {
-      console.log(items)
       var sum = items.reduce((sum, current)=>{
         return sum + parseFloat(current.amount);
       }, 0);
