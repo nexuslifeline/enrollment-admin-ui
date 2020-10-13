@@ -4,6 +4,22 @@
       <div class="page-content__title-container">
         <h4 class="page-content__title">Payment Entry</h4>
       </div>
+      <div class="search-container">
+        <!-- <b-form-input :value="selectedStudent ? selectedStudent.studentNo : ''"/> -->
+        <vue-bootstrap-typeahead
+          v-model="studentQuery"
+          :serializer="s => { return `${s.studentNo ? s.studentNo : 'N/A'} - ${s.name}` }"
+          :data="options.students.items"
+          placeholder="Search student name or student number"
+          @hit="getStudentInfo($event)"
+          class="search-typeahead"
+        >
+          <template slot="suggestion" slot-scope="{ data }">
+            <div>{{ data.studentNo ? data.studentNo : "N/A" }}</div>
+            <div>{{ data.name }}</div>
+          </template>
+        </vue-bootstrap-typeahead>
+      </div>
       <div class="payment-entry__body">
         <div class="payment-entry__top-pane">
           <div class="payment-details">
@@ -13,22 +29,9 @@
                 label="Student No"
                 class="student-no"
                 label-class="required">
-                <!-- <b-form-input :value="selectedStudent ? selectedStudent.studentNo : ''"/> -->
-                <vue-bootstrap-typeahead
-                  v-model="studentQuery"
-                  :serializer="s => { return `${s.studentNo ? s.studentNo : 'N/A'}` }"
-                  :data="options.students.items"
-                  placeholder="Input student number"
-                  @hit="getStudentInfo($event)"
-                >
-                  <template slot="suggestion" slot-scope="{ data }">
-                    <!-- <span>{{ `${data.studentNo ? data.studentNo : "N/A"} - ${data.name}` }}</span> -->
-                    <div>{{ data.studentNo ? data.studentNo : "N/A" }}</div>
-                    <div>{{ data.name }}</div>
-                  </template>
-                </vue-bootstrap-typeahead>
+                <b-form-input disabled :value="selectedStudent ? selectedStudent.studentNo : ''"/>
               </b-form-group>
-              <b-button class="student-browse" variant="outline-primary" @click="onShowModalStudent">...</b-button>
+              <!-- <b-button class="student-browse" variant="outline-primary" @click="onShowModalStudent">...</b-button> -->
             </div>
             <b-form-group
               label="Student">
@@ -41,11 +44,21 @@
             </b-form-group>
             <b-form-group
               label="Address">
-              <b-form-textarea rows="2" disabled :value="selectedStudent ? selectedStudent.currentAddress : ''"/>
+              <b-form-textarea rows="3" disabled :value="selectedStudent ? selectedStudent.currentAddress : ''"/>
             </b-form-group>
           </div>
           <div class="payment-details">
             <!-- <h5>PAYMENT DETAILS</h5> -->
+            <b-form-group
+              label="Transaction No"
+              label-class="required" >
+              <b-form-input
+                v-model="forms.payment.fields.transactionNo"
+                :state="forms.payment.states.transactionNo"/>
+              <b-form-invalid-feedback>
+                {{ forms.payment.errors.transactionNo }}
+              </b-form-invalid-feedback>
+            </b-form-group>
             <b-form-group
               label="Reference No"
               label-class="required" >
@@ -89,7 +102,7 @@
           </div>
           <div class="payment-details">
             <b-form-group
-              label="Paid Amount"
+              label="Amount Tendered"
               label-class="required">
               <vue-autonumeric
                 ref="totalAmount"
@@ -108,7 +121,7 @@
             </b-form-group>
             <b-form-group
               label="Notes">
-              <b-form-textarea rows="2"
+              <b-form-textarea rows="3"
                 v-model="forms.payment.fields.notes"
                 :state="forms.payment.states.notes"/>
               <b-form-invalid-feedback>
@@ -126,6 +139,7 @@
             </small>
           </p>
           <b-table
+            ref="billings"
             class="billings-table"
             small hover outlined show-empty
             selectable
@@ -149,6 +163,55 @@
                   class="mr-2" />
                 <strong>Loading...</strong>
               </div>
+            </template>
+            <template v-slot:cell(action)="row">
+              <button type="button" class="btn-invisible">
+                <v-icon
+                  :name="row.detailsShowing ? 'chevron-down' : 'chevron-left'"
+                  @click="loadDetails(row)"
+                  scale="1"
+                />
+              </button>
+            </template>
+            <template v-slot:row-details="data">
+              <b-overlay :show="data.item.isLoading" rounded="sm">
+                <div class="row-details-container">
+                  <div v-if="data.item.termBillings.length > 0">
+                     <b-table
+                        small hover outlined show-empty
+                        :fields="tables.soaBillings.fields"
+                        :busy="tables.soaBillings.isBusy"
+                        :items="data.item.termBillings">
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
+                     </b-table>
+                  </div>
+                  <div v-if="data.item.otherBillings.length > 0">
+                    <b-table
+                        small hover outlined show-empty
+                        :fields="tables.otherBillings.fields"
+                        :busy="tables.otherBillings.isBusy"
+                        :items="data.item.otherBillings">
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
+                     </b-table>
+                  </div>
+                </div>
+              </b-overlay>
             </template>
           </b-table>
           <div class="total-container">
@@ -269,7 +332,7 @@
 </template>
 
 <script>
-import { StudentApi, PaymentApi } from "../../../mixins/api"
+import { StudentApi, PaymentApi, BillingApi } from "../../../mixins/api"
 import { PaymentModes, PaymentStatuses } from "../../../helpers/enum"
 import { showNotification, formatNumber, clearFields, validate, reset, } from "../../../helpers/forms"
 import { format } from 'date-fns'
@@ -279,6 +342,7 @@ import _ from 'lodash'
 const paymentFields = {
   id: null,
   referenceNo: null,
+  transactionNo: null,
   billingId: null,
   studentId: null,
   amount: null,
@@ -289,7 +353,7 @@ const paymentFields = {
 }
 
 export default {
-  mixins: [ StudentApi, PaymentApi ],
+  mixins: [ StudentApi, PaymentApi, BillingApi ],
   components: { VueBootstrapTypeahead },
   data() {
     return {
@@ -325,9 +389,6 @@ export default {
 							label: "Due Date",
 							tdClass: "align-middle",
               thStyle: {width: "12%"},
-              // formatter: (value) => {
-              //   return format(value, 'MM/dd/yyyy')
-              // }
             },
             {
 							key: "previousBalance",
@@ -381,6 +442,13 @@ export default {
                 return formatNumber(remBalance)
               }
             },
+            {
+							key: "action",
+							label: "",
+              tdClass: "align-middle",
+              thClass: "text-center",
+              thStyle: {width: "30px"}
+            },
           ],
           items: []
         },
@@ -407,7 +475,63 @@ export default {
 						},
 					],
 					items: []
-				}
+        },
+        soaBillings: {
+          isBusy: false,
+          fields: [
+            {
+							key: "term.name",
+							label: "Term",
+							tdClass: "align-middle",
+              thStyle: {width: "35%"},
+            },
+            {
+							key: "term.schoolYear.name",
+							label: "School Year",
+							tdClass: "align-middle",
+              thStyle: {width: "30%"},
+            },
+            {
+							key: "term.semester.name",
+							label: "Semester",
+							tdClass: "align-middle",
+              thStyle: {width: "20%"},
+            },
+            {
+							key: "amount",
+							label: "Amount",
+              tdClass: "align-middle text-right",
+              thClass: "text-right",
+              thStyle: {width: "15%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
+            },
+          ],
+          items: []
+        },
+        otherBillings: {
+          isBusy: false,
+          fields: [
+            {
+							key: "schoolFee.name",
+							label: "Fees",
+							tdClass: "align-middle",
+              thStyle: {width: "85%"},
+            },
+            {
+							key: "amount",
+							label: "Amount",
+              tdClass: "align-middle text-right",
+              thClass: "text-right",
+              thStyle: {width: "15%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
+            },
+          ],
+          items: []
+        }
       },
       paginations: {
 				student: {
@@ -436,6 +560,7 @@ export default {
   },
   created() {
     this.forms.payment.fields.amount = 0
+    this.forms.payment.fields.datePaid = format(new Date(), 'yyyy-MM-dd')
   },
   methods: {
     loadStudents() {
@@ -474,20 +599,27 @@ export default {
       this.studentQuery =  row.item.studentNo
       this.loadBillings(row.item.id)
     },
-    loadBillings(studentId) {
+    async loadBillings(studentId) {
       const { billings } = this.tables
       billings.isBusy = true
-      this.getBillingsOfStudent(studentId).then(({ data }) => {
+      await this.getBillingsOfStudent(studentId).then(({ data }) => {
         billings.items = data
         billings.isBusy = false
       })
+
+
+      if (billings.items.length > 0)
+        this.$refs.billings.selectRow(0)
+
     },
     onRowSelected(row) {
-      const { payment } = this.forms
-      // if (row) {
-      //   payment.fields.billingId = row.id
-      // }
-      payment.fields.billingId = row.length ? row[0].id :  null
+      if(row.length > 0) {
+        console.log(row)
+        const { payment } = this.forms
+        const remainingBalance = parseFloat(row[0].previousBalance) + parseFloat(row[0].totalAmount) - parseFloat(row[0].totalPaid)
+        payment.fields.billingId = row.length ? row[0].id :  null
+        payment.fields.amount = remainingBalance > 0 ? remainingBalance : 0
+      }
     },
     onSavePayment() {
       this.isProcessing = true
@@ -519,12 +651,32 @@ export default {
         students.items = data
       })
     },
+    loadDetails(row) {
+      if (!row.detailsShowing) {
+        const { item } = row
+        this.$set(item, 'isLoading', true)
+        this.getBillingItemsOfBilling(item.id).then(({ data }) => {
+          this.$set(item, 'termBillings', data.filter(e => e.termId !== null))
+          this.$set(item, 'otherBillings', data.filter(e => e.termId === null))
+          this.$set(item, 'isLoading', false)
+        })
+      }
+      row.toggleDetails()
+    }
   },
   computed: {
     getTotalBilling() {
       const { billings } = this.tables
       var sum = billings.items.reduce((sum, current)=>{
         return sum + (parseFloat(current.totalAmount) + parseFloat(current.previousBalance) - parseFloat(current.totalPaid));
+      }, 0);
+
+      return formatNumber(sum, 2);
+    },
+    getTotalTerms(items) {
+      console.log(items)
+      var sum = items.reduce((sum, current)=>{
+        return sum + parseFloat(current.amount);
       }, 0);
 
       return formatNumber(sum, 2);
@@ -615,8 +767,30 @@ export default {
     }
   }
 
+  .search-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .search-typeahead {
+      width: 300px;
+      margin-bottom: 15px;
+
+      @include for-size(phone-only) {
+        width: 100%;
+      }
+    }
+  }
+
+
   .action-container {
     margin: 20px 0;
     height: 50px;
+  }
+
+  .row-details-container {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
   }
 </style>
