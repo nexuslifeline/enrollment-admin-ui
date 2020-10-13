@@ -20,5 +20,8 @@ export default {
     batchSoaBilling(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/batch-soa`, data);
     },
+    getBillingItemsOfBilling(id) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/billings/${id}/billing-items`);
+    },
   }
 }
