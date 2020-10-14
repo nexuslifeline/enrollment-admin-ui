@@ -125,18 +125,28 @@
             </button>
           </template>
           <template v-slot:row-details="data">
-            <ActiveRowViewer 
+            <ActiveRowViewer
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
+              :showOptions="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
               :options="[
-                { label: 'Approve', callback: () => false }
+                {
+                  label: 'Approve',
+                  callback: () => setApproval(data),
+                  isAllowed: isAccessible($options.EvaluationAndAdmissionPermissions.APPROVAL.id)
+                },
+                {
+                  label: 'Reject',
+                  callback: () => setDisapproval(data),
+                  isAllowed: isAccessible($options.EvaluationAndAdmissionPermissions.DISAPPROVAL.id)
+                }
               ]">
               <template v-slot:header>
                 <div class="active-view__header-details-container">
                   <AvatarMaker
                     :avatarId="data.item.student.id"
-                    :size="54"
+                    :size="50"
                     :text="`${data.item.student.firstName.charAt(0)}${data.item.student.lastName.charAt(0)}`"
                     :src="avatar(data.item.student)"
                   />

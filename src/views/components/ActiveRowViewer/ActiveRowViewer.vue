@@ -9,15 +9,21 @@
           </button>
         </div>
         <slot name="header"></slot>
-        <div class="active-view__header-right-actions">
+        <div v-if="showOptions" class="active-view__header-right-actions">
           <button @click.stop="showDropdown = !showDropdown" class="active-view__right-action">
             <v-icon name="ellipsis-h" scale="1" />
           </button>
           <div v-if="showDropdown" class="active-view__header-dropdown-container">
             <ul class="active-view__header-dropdown">
-              <li v-for="(option, idx) in options" @click="option.callback" :key="idx" class="active-view__header-dropdown-item">
-                {{option.label}}
-              </li>
+              <template v-for="(option, idx) in options">
+                <template v-if="option.isAllowed">
+                  <li @click="option.callback"
+                    :key="idx"
+                    class="active-view__header-dropdown-item">
+                    {{option.label}}
+                  </li>
+                </template>
+              </template>
             </ul>
           </div>
         </div>
@@ -45,6 +51,10 @@
       isBusy: {
         type: [Boolean],
         default: false
+      },
+      showOptions: {
+        type: [Boolean],
+        default: true
       },
       backTitle: {
         type: [String],
