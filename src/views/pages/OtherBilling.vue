@@ -253,6 +253,166 @@
           </b-col>
         </b-row>
       </div>
+      <div v-if="showBatchEntry">
+        <b-row>
+          <b-col md="6">
+            <b-form-group>
+              <label class="required">School Category</label>
+              <b-form-select
+                @input="forms.batchBilling.fields.levelId = null"
+                v-model="forms.batchBilling.fields.schoolCategoryId" >
+                <template v-slot:first>
+                  <b-form-select-option :value="null">-- Select School Category --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="schoolCategory in $options.SchoolCategories.values"
+                  :key="schoolCategory.id"
+                  :value="schoolCategory.id">
+                  {{ schoolCategory.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Level</label>
+              <b-form-select
+                v-model="forms.batchBilling.fields.levelId" >
+                <template v-slot:first>
+                  <b-form-select-option :value="null">-- ALL --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="level in options.levels.items.filter(l => l.schoolCategoryId === forms.batchBilling.fields.schoolCategoryId)"
+                  :key="level.id"
+                  :value="level.id">
+                  {{ level.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Due Date</label>
+              <b-form-datepicker
+                :state="forms.batchBilling.states.dueDate"
+                v-model="forms.batchBilling.fields.dueDate" />
+              <b-form-invalid-feedback>
+                {{ forms.batchBilling.errors.dueDate }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+              v-if="[
+                $options.SchoolCategories.COLLEGE.id,
+                $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+                $options.SchoolCategories.VOCATIONAL.id
+              ].includes(forms.batchBilling.fields.schoolCategoryId)">
+              <label class="required">Course</label>
+              <b-form-select
+                v-model="forms.batchBilling.fields.courseId" >
+                <template v-slot:first>
+                  <b-form-select-option :value="null">-- ALL --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="course in options.courses.items"
+                  :key="course.id"
+                  :value="course.id">
+                  {{ `${course.description} ${course.major ? `- ${course.major}` : ''}` }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+            <b-form-group
+              v-if="[
+                $options.SchoolCategories.COLLEGE.id,
+                $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+                $options.SchoolCategories.VOCATIONAL.id
+              ].includes(forms.batchBilling.fields.schoolCategoryId)">
+              <label class="required">Semester</label>
+              <b-form-select
+                v-model="forms.batchBilling.fields.semesterId" >
+                <template v-slot:first>
+                  <b-form-select-option :value="null">-- Select Semester --</b-form-select-option>
+                </template>
+                <b-form-select-option
+                  v-for="semester in $options.Semesters.values"
+                  :key="semester.id"
+                  :value="semester.id">
+                  {{ semester.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row class="mb-3">
+          <b-col md=4>
+            <h5 class="pt-2">OTHER FEES</h5>
+          </b-col>
+          <b-col md=4>
+          </b-col>
+          <b-col md=4>
+            <b-button
+              @click="showModalFees = true"
+              variant="outline-primary"
+              class="float-right">
+              <v-icon name="plus-circle" /> New Item
+            </b-button>
+          </b-col>
+        </b-row>
+        <b-table
+          details-td-class="table-secondary"
+          hover outlined small show-empty
+          :fields="tables.billingItems.fields"
+          :items="forms.batchBilling.fields.billingItems"
+          :busy="tables.billingItems.isBusy">
+          <template v-slot:cell(action)="row">
+            <b-button
+              @click="removeFee(row)"
+              size="sm" variant="danger">
+              <v-icon name="trash" />
+            </b-button>
+          </template>
+          <template v-slot:cell(amount)="row">
+            <vue-autonumeric
+              v-model="row.item.amount"
+              class="form-control text-right"
+              :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
+            </vue-autonumeric>
+          </template>
+          <template v-slot:custom-foot>
+          <b-tr>
+            <b-td colspan=2 class="text-right">
+              <span class="text-danger font-weight-bold">Total Amount </span>
+            </b-td>
+            <b-td class="text-right">
+              <span class="text-danger font-weight-bold">
+                  {{ batchTotalAmount }}
+              </span>
+            </b-td>
+            <b-td></b-td>
+          </b-tr>
+        </template>
+        </b-table>
+        <hr>
+        <b-row>
+          <b-col md="12">
+            <b-button
+              class="float-right btn-save ml-2"
+              @click="showBatchEntry = false"
+              variant="outline-danger">
+              Close
+            </b-button>
+            <b-button
+              :disabled="forms.batchBilling.isProcessing"
+              class="float-right btn-save"
+              @click="onBatchCreateBilling()"
+              variant="outline-primary">
+              <v-icon
+                v-if="forms.batchBilling.isProcessing"
+                name="sync"
+                spin
+                class="mr-2" />
+              Save
+            </b-button>
+          </b-col>
+        </b-row>
+      </div>
     </div>
     <b-modal
 			v-model="showModalFees"
@@ -330,7 +490,7 @@
 <script>
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 import { SchoolCategories, Semesters, BillingStatuses, BillingTypes } from '../../helpers/enum'
-import { TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi, SchoolFeeApi } from '../../mixins/api'
+import { TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi, SchoolFeeApi, CourseApi } from '../../mixins/api'
 import { clearFields, formatNumber, reset, showNotification, validate } from '../../helpers/forms'
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 import _ from 'lodash'
@@ -355,12 +515,14 @@ const batchBillingFields = {
   schoolCategoryId: null,
   semesterId: null,
   dueDate: null,
-  levelId: null
+  levelId: null,
+  courseId: null,
+  billingItems: null
 }
 
 export default {
   components: { SchoolCategoryTabs, VueBootstrapTypeahead },
-  mixins: [ TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi, SchoolFeeApi, tables ],
+  mixins: [ TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi, SchoolFeeApi, CourseApi, tables ],
   SchoolCategories,
   Semesters,
   BillingStatuses,
@@ -521,11 +683,10 @@ export default {
         }
       },
       options: {
-        terms: {
-          isLoading: false,
+        levels: {
           items: []
         },
-        levels: {
+        courses: {
           items: []
         },
         students: {
@@ -541,6 +702,7 @@ export default {
     this.loadLevels()
     this.loadActiveSchoolYear()
     this.loadFees()
+    this.loadCourses()
   },
   methods: {
     loadBillings() {
@@ -578,26 +740,11 @@ export default {
         levels.items = data
       })
     },
-    loadTerms() {
-      const { schoolCategoryId, semesterId } = this.forms.batchBilling.fields
-      const { COLLEGE, SENIOR_HIGH_SCHOOL, VOCATIONAL } = this.$options.SchoolCategories
-      if ([COLLEGE.id,
-        SENIOR_HIGH_SCHOOL.id,
-        VOCATIONAL.id].includes(schoolCategoryId) && !semesterId) {
-        return
-      }
-      const { terms } = this.options
-      const params = {
-        paginate: false,
-        schoolCategoryId,
-        semesterId,
-        activeSchoolYear: true
-      }
-      terms.isLoading = true
-      this.getTermList(params)
-      .then(({ data }) => {
-        terms.items = data
-        terms.isLoading = false
+    loadCourses() {
+      const { courses } = this.options
+      this.getCourseList({ paginate: false })
+      .then(({ data}) => {
+        courses.items = data
       })
     },
     loadStudents() {
@@ -624,30 +771,29 @@ export default {
         }
       })
     },
-    loadStudentFeeTerms() {
-      const { studentId, semesterId } = this.forms.billing.fields
-      const { terms } = this.options
-      const params = {
-        schoolYearId: this.activeSchoolYear.id,
-        semesterId,
-        paginate: false
-      }
-      terms.isLoading = true
-      this.getStudentFeeTermsOfStudent(studentId, params)
-      .then(({ data }) => {
-        terms.items = data
-        terms.isLoading = false
-      })
-    },
-    onBatchCreateSoa() {
-      const { batchBilling, batchBilling: { fields, fields: { dueDate, termId, levelId }  } } = this.forms
+    onBatchCreateBilling() {
+      const { batchBilling, batchBilling: { fields: { student, billingItems: items, ...fields } } } = this.forms
       batchBilling.isProcessing = true
+      const billingItems = items.map(i => {
+        return {
+          schoolFeeId: i.schoolFeeId,
+          amount: i.amount
+        }
+      })
+      const data = {
+        ...fields,
+        billingItems,
+        schoolYearId: this.activeSchoolYear.id,
+        billingStatusId: BillingStatuses.UNPAID.id,
+        billingTypeId: BillingTypes.BILLING.id
+      }
       reset(batchBilling)
-      this.batchSoaBilling({ termId, dueDate, levelId })
+      this.batchOtherBilling(data)
       .then(({ data }) => {
         batchBilling.isProcessing = false
         this.loadBillings()
-        this.showModalBatch = false
+        showNotification(this, 'success', 'Batch Other Billing successfully created.')
+        this.showBatchEntry = false
       }).catch(error => {
         const errors = error.response.data.errors
         batchBilling.isProcessing = false
@@ -675,6 +821,7 @@ export default {
       .then(({ data }) => {
         billing.isProcessing = false
         this.loadBillings()
+        showNotification(this, 'success', 'Other Billing successfully created.')
         this.showEntry = false
       }).catch(error => {
         const errors = error.response.data.errors
@@ -696,7 +843,6 @@ export default {
       fields.student.name = student.name
       fields.semesterId = student.latestAcademicRecord?.semesterId
       billing.studentQuery = null
-      this.loadStudentFeeTerms()
       if (student.latestAcademicRecord) {
         this.getAcademicRecord(student.latestAcademicRecord.id)
         .then(({ data }) => {
@@ -704,16 +850,6 @@ export default {
           fields.student.courseName = data.course.name
           fields.student.semesterName = data.semester.name
         })
-      }
-    },
-    getTermInfo() {
-      const { fields, fields: { termId } } = this.forms.billing
-      const { terms } = this.options
-      const term = terms.items.find(t => t.id === termId)
-      if (term) {
-        fields.previousBalance = term.previousBalance
-        fields.totalAmount = term.pivot.amount
-        fields.studentFeeId = term.pivot.studentFeeId
       }
     },
     setCreateOtherFee() {
@@ -730,9 +866,10 @@ export default {
       clearFields(fields)
       fields.semesterId = null
       fields.levelId = null
+      fields.courseId = null
       fields.schoolCategoryId = null
-      fields.termId = null
-      this.showModalBatch = true
+      fields.billingItems = []
+      this.showBatchEntry = true
     },
     loadFees(){
       const { fees } = this.tables
@@ -749,7 +886,11 @@ export default {
     },
     addFee(row) {
       const { item } = row
-      const { billingItems } = this.forms.billing.fields
+      let form = 'billing'
+      if (this.showBatchEntry) {
+        form = 'batchBilling'
+      }
+      const { billingItems } = this.forms[form].fields
       const result = billingItems.find(fee => fee.id === item.id)
 
       if (result) {
@@ -770,6 +911,12 @@ export default {
   computed: {
     totalAmount() {
       const { fields, fields: { billingItems } } = this.forms.billing
+      fields.totalAmount = 0
+      billingItems.map(i => fields.totalAmount += i.amount)
+      return formatNumber(fields.totalAmount)
+    },
+    batchTotalAmount() {
+      const { fields, fields: { billingItems } } = this.forms.batchBilling
       fields.totalAmount = 0
       billingItems.map(i => fields.totalAmount += i.amount)
       return formatNumber(fields.totalAmount)
