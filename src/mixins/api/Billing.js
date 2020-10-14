@@ -23,5 +23,8 @@ export default {
     getBillingItemsOfBilling(id) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/billings/${id}/billing-items`);
     },
+    batchOtherBilling(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/batch-other-billing`, data);
+    },
   }
 }
