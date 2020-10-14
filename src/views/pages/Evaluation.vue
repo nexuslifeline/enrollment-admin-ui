@@ -125,7 +125,13 @@
             </button>
           </template>
           <template v-slot:row-details="data">
-            <ActiveRowViewer :isBusy="data.item.isLoading" backTitle="Go back to list" @onBack="data.toggleDetails()">
+            <ActiveRowViewer 
+              :isBusy="data.item.isLoading"
+              backTitle="Go back to list"
+              @onBack="data.toggleDetails()"
+              :options="[
+                { label: 'Approve', callback: () => false }
+              ]">
               <template v-slot:header>
                 <div class="active-view__header-details-container">
                   <AvatarMaker

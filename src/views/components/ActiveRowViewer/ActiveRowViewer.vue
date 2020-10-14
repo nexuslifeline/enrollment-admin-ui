@@ -10,14 +10,16 @@
         </div>
         <slot name="header"></slot>
         <div class="active-view__header-right-actions">
-          <button class="active-view__right-action">
-            Save
-            <BIconCheckCircle />
+          <button @click.stop="showDropdown = !showDropdown" class="active-view__right-action">
+            <v-icon name="ellipsis-h" scale="1" />
           </button>
-          <button class="active-view__right-action">
-            Back
-            <BIconArrowLeftCircle  />
-          </button>
+          <div v-if="showDropdown" class="active-view__header-dropdown-container">
+            <ul class="active-view__header-dropdown">
+              <li v-for="(option, idx) in options" @click="option.callback" :key="idx" class="active-view__header-dropdown-item">
+                {{option.label}}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="active-view__body">
@@ -34,6 +36,11 @@
 
 <script>
   export default {
+    data() {
+      return {
+        showDropdown: false
+      }
+    },
     props: {
       isBusy: {
         type: [Boolean],
@@ -42,6 +49,9 @@
       backTitle: {
         type: [String],
         default: 'Back'
+      },
+      options: {
+        type: [Array],
       }
     },
     mounted() {
@@ -49,13 +59,20 @@
       if (body) {
         body.style.overflow = 'hidden';
       }
+      window.addEventListener('click', this.closeDropdown);
     },
     beforeDestroy() {
       const body = document.querySelector('body');
       if (body) {
         body.style.overflow = 'auto';
       }
+      window.removeEventListener('click', this.closeDropdown)
     },
+    methods: {
+      closeDropdown() {
+        this.showDropdown = false;
+      }
+    }
   }
 </script>
 <style lang="scss" scoped>
@@ -160,8 +177,34 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-width: 150px;
     margin-right: 10px;
+    position: relative;
+  }
+
+  .active-view__header-dropdown-container {
+    position: absolute;
+    top: 40px;
+    width: 150px;
+    background-color: $white;
+    border: 1px solid $gray;
+    border-radius: 3px;
+    padding: 5px 0;
+    right: 15px;
+  }
+
+  .active-view__header-dropdown {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .active-view__header-dropdown-item {
+    padding: 5px 15px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $light-gray-100;
+    }
   }
 
 </style>
