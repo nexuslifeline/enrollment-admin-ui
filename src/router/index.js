@@ -59,6 +59,8 @@ const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
 
+const Collection = () => import('@/views/pages/reports/Collection')
+
 Vue.use(Router)
 
 const router = new Router({
@@ -454,6 +456,20 @@ function configRoutes () {
             }
           ]
         },
+        {
+          path: 'report',
+          name: 'Report',
+          redirect: { name: 'Collections' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'collection',
+              name: 'Collections',
+              component: Collection,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+          ]
+        }
         // {
         //   path: 'evaluation',
         //   name: 'Evaluation & Admission',

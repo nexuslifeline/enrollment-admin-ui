@@ -26,12 +26,16 @@
         </b-row>
       </b-col>
     </b-row> -->
+    <div>
+    </div>
     <div class="search-filter-container">
       <b-button
+        v-if="showAddButton"
         variant="primary"
         :to="`/finance/payment/add`">
         <v-icon name="plus-circle" /> ADD NEW PAYMENT
       </b-button>
+      <b-button v-if="showPrintPreviewButton" class="print-preview" variant="outline-primary" @click="previewCollection()"><v-icon name="print" /> PRINT PREVIEW</b-button>
       <div class="date-filter-cotainer">
         <span>FROM</span>
         <b-form-datepicker
@@ -46,14 +50,14 @@
           v-model="filters.payment.dateTo"
           @input="loadPayments" />
       </div>
-       <b-form-input
+      <b-form-input
           type="text"
           placeholder="Search"
           debounce="500"
           class="search-input"
           v-model="filters.payment.criteria"
           @update="loadPayments()">
-        </b-form-input>
+      </b-form-input>
     </div>
     <b-row class="mt-3">
       <b-col md=12>
@@ -90,6 +94,7 @@
           </template>
           <template v-slot:cell(action)="row">
             <b-dropdown
+              v-if="showRowActionButton"
               right variant="link"
               toggle-class="text-decoration-none"
               no-caret>
@@ -220,25 +225,59 @@
         </b-button>
 			</div>
     </b-modal> -->
+    <FileViewer
+      :show="showModalPreview"
+      :file="file"
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="showModalPreview = false"
+    />
   </div>
 </template>
 
 <script>
 
-import { StudentApi, PaymentApi } from "../../../mixins/api"
+import { StudentApi, PaymentApi, ReportApi } from "../../../mixins/api"
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 import { showNotification, formatNumber } from '../../../helpers/forms'
+import  FileViewer from '../../components/FileViewer'
+import { PaymentStatuses } from '../../../helpers/enum'
 
 export default {
-  mixins: [ PaymentApi ],
+  mixins: [ PaymentApi, ReportApi ],
+  props: {
+    showAddButton: {
+      type: Boolean,
+      default: true
+    },
+    showRowActionButton: {
+      type: Boolean,
+      default: true
+    },
+    showPrintPreviewButton: {
+      type: Boolean,
+      default: true
+    }
+  },
+  components: {
+    FileViewer
+  },
   data() {
     return {
+      showModalPreview: false,
       isLoading: false,
       showModalEntry: false,
       showModalConfirmation: false,
       isProcessing: false,
       entryMode: "",
       selectedPaymentId: null,
+      file: {
+        type: null,
+        src: null,
+        name: null,
+        notes: null,
+        isLoading: false
+      },
       tables: {
         payments: {
           fields: [
@@ -318,7 +357,7 @@ export default {
       const { payments } = this.tables
       const { criteria, dateFrom, dateTo } = this.filters.payment
       const { payment, payment: { perPage, page } } = this.paginations
-      const params = { paginate: true, perPage, page, criteria, dateFrom, dateTo }
+      const params = { paginate: true, perPage, page, criteria, dateFrom, dateTo, paymentStatusId: PaymentStatuses.APPROVED.id }
 
       payments.isBusy = true
 
@@ -346,6 +385,26 @@ export default {
         this.loadPayments();
       })
     },
+    previewCollection() {
+      this.file.type = null
+      this.file.src = null
+      this.file.notes = null
+      this.file.isLoading = true
+      this.file.owner = null;
+      this.file.name = 'Collection Report'
+
+      this.showModalPreview = true
+      const { dateFrom, dateTo, criteria } = this.filters.payment
+      const params = { dateFrom, dateTo, criteria, paymentStatusId: PaymentStatuses.APPROVED.id }
+      this.previewCollectionReport(params).then(response => {
+          this.file.type = response.headers.contentType
+          const file = new Blob([response.data], { type: "application/pdf" } )
+          const reader = new FileReader();
+          reader.onload = e => this.file.src = e.target.result
+          reader.readAsDataURL(file);
+          this.file.isLoading = false
+      })
+    }
   },
   created() {
     const { payment, payment: { dateFrom, dateTo } } = this.filters
@@ -369,10 +428,16 @@ export default {
 
   .search-filter-container {
     display:  flex;
+    align-items: center;
     width: 100%;
 
+
+    .print-preview {
+      margin-left: 10px;
+    }
+
     .search-input {
-      width: 300px;
+      width: 250px;
     }
 
     .date-filter-cotainer {
@@ -409,8 +474,14 @@ export default {
         }
 
       }
+
       .search-input {
         width: 100%;
+        margin-top: 10px;
+      }
+
+      .print-preview {
+        margin-left: 0;
         margin-top: 10px;
       }
 

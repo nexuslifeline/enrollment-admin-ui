@@ -213,4 +213,16 @@ export default [
       },
     ]
   },
+  {
+    label: 'Reports',
+    to: '/report',
+    children: [
+      {
+        label: 'Collections',
+        to: '/report/collection',
+        permissionIds: BankAccountPermissions.getIds()
+      }
+    ]
+  }
+
 ]

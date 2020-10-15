@@ -244,6 +244,20 @@
           </div>
         </b-col>
       </b-row>
+      <b-row class="mt-3">
+        <b-col md=6 >
+          <b-form-group
+              label="Reference No"
+              label-class="required" >
+              <b-form-input
+                v-model="forms.payment.fields.referenceNo"
+                :state="forms.payment.states.referenceNo"/>
+              <b-form-invalid-feedback>
+                {{ forms.payment.errors.referenceNo }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+        </b-col>
+      </b-row>
       <b-row>
 				<b-col md=12>
 					<label>Notes</label>
@@ -371,6 +385,7 @@
 <script>
 
 const paymentFields = {
+  referenceNo: null,
   approvalNotes: null,
   disapprovalNotes: null
 }
@@ -623,6 +638,7 @@ export default {
     },
     setApproval(row) {
       clearFields(this.forms.payment)
+      reset(this.forms.payment)
       const params = { paginate: false }
       this.row = row.item
       this.getPaymentReceiptFiles(row.item.id, params)
@@ -634,9 +650,10 @@ export default {
     onApproval() {
       this.isProcessing = true
       const { id } = this.row
-      const { approvalNotes } = this.forms.payment.fields
+      const { approvalNotes, referenceNo } = this.forms.payment.fields
       const data = {
         approvalNotes,
+        referenceNo,
         paymentStatusId: PaymentStatuses.APPROVED.id
       }
       this.updatePayment(data, id)
@@ -645,8 +662,10 @@ export default {
           this.isProcessing = false
           this.showModalApproval = false
           showNotification(this, "success", "Approved Successfully.")
-        }).catch((error) => {
-          this.isProcessing = false;
+        }).catch(error => {
+          const errors = error.response.data.errors
+          this.isProcessing = false
+          validate(this.forms.payment, errors)
         });
     },
     setDisapproval(row){
