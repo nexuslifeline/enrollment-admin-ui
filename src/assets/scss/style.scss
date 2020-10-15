@@ -410,6 +410,11 @@ legend.required:before {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: auto;
+  margin-left: 224px;
+
+  @include for-size(tablet-landscape-down) {
+    margin-left: 0;
+  }
 }
 
 .c-page-content {
@@ -536,23 +541,27 @@ legend.required:before {
   }
 }
 
-.c-card {
-  border: 1px solid $brand-border-color;
-  padding: 0;
-  border-radius: 3px;
-  margin-bottom: 30px;
-}
+.c-pagination {
+  .page-item {
+    margin: 3px;
+  }
 
-.c-card__header {
-  border-bottom: 1px solid $brand-border-color;
-  padding: 15px;
-}
+  .page-link {
+    height: 25px;
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px !important;
+    border-color: $brand-border-color !important;
+  }
 
-.c-card__body {
-  padding: 20px;
-}
+  span.page-link {
+    font-size: 16px;
+    font-weight: 500;
+  }
 
-.c-card__header-title {
-  margin: 0;
-  font-size: 21px;
+  button.page-link {
+    font-size: 12px;
+  }
 }

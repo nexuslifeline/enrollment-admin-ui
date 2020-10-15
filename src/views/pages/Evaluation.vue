@@ -12,7 +12,7 @@
           <b-row class="mb-2"> <!-- row button and search input -->
               <b-col md="6">
                 <b-form-radio-group @input="loadEvaluation()" v-model="filters.student.evaluationStatusId">
-                  <b-form-radio :value="null">Show All</b-form-radio>
+                  <b-form-radio :value="null">All</b-form-radio>
                   <b-form-radio
                     v-for="status in evaluationStatuses.values"
                     :value="status.id"
@@ -733,6 +733,7 @@
             </b-col>
             <b-col md=6>
               <b-pagination
+                class="c-pagination"
                 v-model="paginations.student.page"
                 :total-rows="paginations.student.totalRows"
                 :per-page="paginations.student.perPage"

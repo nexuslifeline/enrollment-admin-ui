@@ -62,7 +62,7 @@ export default {
 .main-content {
   display: flex;
   padding: 0;
-  margin: 0;
+  margin: 175px 0 0 0;
 }
 
 .full-overlay-container {

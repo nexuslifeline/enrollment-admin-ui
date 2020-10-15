@@ -64,7 +64,11 @@ import {
   BIconArrowLeftCircle,
   BIconPaperclip,
   BIconCloudDownload,
-  BIconCheckCircle
+  BIconCheckCircle,
+  BIconEnvelope,
+  BIconPersonBadge,
+  BIconGeoAlt,
+  BIconCalendar2Week
 } from 'bootstrap-vue'
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
@@ -74,6 +78,10 @@ Vue.component('BIconArrowLeftCircle', BIconArrowLeftCircle);
 Vue.component('BIconPaperclip', BIconPaperclip);
 Vue.component('BIconCloudDownload', BIconCloudDownload);
 Vue.component('BIconCheckCircle', BIconCheckCircle);
+Vue.component('BIconEnvelope', BIconEnvelope);
+Vue.component('BIconPersonBadge', BIconPersonBadge);
+Vue.component('BIconGeoAlt', BIconGeoAlt);
+Vue.component('BIconCalendar2Week', BIconCalendar2Week);
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'
@@ -90,11 +98,11 @@ import 'vue-awesome/icons/file-pdf'
 import 'vue-awesome/icons/file-image'
 import 'vue-awesome/icons/times-circle'
 import 'vue-awesome/icons/paperclip'
-import 'vue-awesome/icons/envelope'
+//import 'vue-awesome/icons/envelope'
 import 'vue-awesome/icons/paper-plane'
-import 'vue-awesome/icons/map-marker-alt'
+//import 'vue-awesome/icons/map-marker-alt'
 import 'vue-awesome/icons/calendar-alt'
-import 'vue-awesome/icons/address-card'
+//import 'vue-awesome/icons/address-card'
 import 'vue-awesome/icons/cogs'
 import 'vue-awesome/icons/caret-down'
 import 'vue-awesome/icons/chevron-down'

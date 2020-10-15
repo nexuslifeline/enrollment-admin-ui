@@ -216,7 +216,9 @@ export default {
   }
 
   .header {
-    position: relative;
+    position: fixed;
+    width: 100%;
+    z-index: 2;
   }
 
   .header__menus-container {
