@@ -115,6 +115,7 @@ import 'vue-awesome/icons/ellipsis-h'
 import 'vue-awesome/icons/clock'
 import 'vue-awesome/icons/folder'
 import 'vue-awesome/icons/folder-open'
+import 'vue-awesome/icons/print'
 import Icon from 'vue-awesome/components/Icon'
 // import vSelect from 'vue-select'
 

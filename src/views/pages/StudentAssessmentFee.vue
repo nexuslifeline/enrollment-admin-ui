@@ -218,6 +218,15 @@
                         data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
                         data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id" />
                   </template>
+                  <template v-slot:cell(pivot.isInitialFee)="row">
+                    <b-form-checkbox
+                      :disabled="data.item.application ?
+                        data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
+                        data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id"
+                      value="1"
+                      unchecked-value="0"
+                      v-model="row.item.pivot.isInitialFee" />
+                  </template>
                   <template v-slot:cell(pivot.amount)="row">
                     <vue-autonumeric
                       :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || (data.item.application ?
@@ -249,11 +258,13 @@
                         label-class="font-weight-bold"
                         label-cols="4">
                         <vue-autonumeric
+                          disabled
                           class="form-control text-right"
-                          v-model="data.item.enrollmentFee"
+                          :value="initialFeeTotal(data)"
                           :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
                         </vue-autonumeric>
                       </b-form-group>
+                      <!-- <div v-show="false">{{initialFeeTotal(data)}}</div> -->
                     </b-col>
                     <b-col md=4>
                       <b-form-group
@@ -572,14 +583,27 @@ export default {
 							key: "name",
 							label: "NAME",
 							tdClass: "align-middle",
-							thStyle: { width: "30%"}
+							thStyle: { width: "25%"}
+            },
+            {
+							key: "schoolFeeCategory.name",
+							label: "CATEGORY",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
 						},
 						{
 							key: "pivot.notes",
 							label: "NOTES",
 							tdClass: "align-middle",
-							thStyle: { width: "50%"}
-						},
+							thStyle: { width: "25%"}
+            },
+            {
+							key: "pivot.isInitialFee",
+							label: "INITIAL FEE",
+							tdClass: "align-middle text-center",
+							thClass: "text-center",
+							thStyle: {width: "10%"}
+            },
 						{
 							key: "pivot.amount",
 							label: "AMOUNT",
@@ -610,13 +634,19 @@ export default {
 							label: "Description",
 							tdClass: "align-middle",
 							thStyle: {width: "40%"}
+            },
+            {
+							key: "schoolFeeCategory.name",
+							label: "Category",
+							tdClass: "align-middle",
+							thStyle: {width: "auto"}
 						},
 						{
 							key: "action",
 							label: "",
 							tdClass: "align-middle text-right",
 							thClass: "text-right",
-							thStyle: {width: "30%"}
+							thStyle: {width: "150px"}
 						}
           ],
           items: []
@@ -705,7 +735,8 @@ export default {
 				fees.push({
           schoolFeeId: fee.id,
           amount: fee.pivot.amount,
-          notes: fee.pivot.notes
+          notes: fee.pivot.notes,
+          isInitialFee: fee.pivot.isInitialFee
         })
         totalAmount += Number(fee.pivot.amount)
       })
@@ -887,6 +918,7 @@ export default {
         id: row.item.id,
         name : row.item.name,
         isIntegrated: row.item.isIntegrated,
+        schoolFeeCategory: { name: row.item.schoolFeeCategory.name },
         description: row.item.description,
         pivot:{ schoolFeeId: row.item.id, amount: 0.00, notes: "" }
       })
@@ -923,7 +955,18 @@ export default {
         src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
       }
       return src
-    }
+    },
+    // initialFeeTotal(data) {
+    //   let total = 0
+    //   const { item, item: { fees } } = data
+    //   fees.forEach(fee => {
+    //     if (fee.isInitialFee) {
+    //       total += Number(fee.pivot.amount)
+    //     }
+    //   })
+    //   item.enrollmentFee = total
+    //   return total
+    // },
   },
   computed: {
     subjectsTotalAmount() {
@@ -942,6 +985,28 @@ export default {
           amount += Number(fee.pivot.amount)
         })
         return formatNumber(amount)
+      }
+    },
+    initialFeeTotal: {
+      get: function () {
+        return data => {
+          let total = 0
+          const { item, item: { fees } } = data
+          fees.forEach(fee => {
+            if (fee.pivot.isInitialFee) {
+              total += Number(fee.pivot.amount)
+            }
+          })
+        item.enrollmentFee = total
+        return total
+        }
+      },
+      set: function (newValue) {
+        return data => {
+          const { item } = data
+          item.enrollmentFee = newValue
+          return newValue
+        }
       }
     },
   }

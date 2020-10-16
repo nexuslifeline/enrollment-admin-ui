@@ -215,7 +215,7 @@
             </template>
           </b-table>
           <div class="total-container">
-            <strong>TOTAL REMANINING BALANCE :</strong>
+            <strong>TOTAL REMAINING BALANCE :</strong>
             <vue-autonumeric
               :disabled="true"
               ref="totalAmount"
@@ -382,13 +382,13 @@ export default {
 							key: "billingNo",
 							label: "Billing No",
 							tdClass: "align-middle",
-							thStyle: {width: "15%"}
+							thStyle: {width: "17%"}
             },
             {
 							key: "dueDate",
 							label: "Due Date",
 							tdClass: "align-middle",
-              thStyle: {width: "12%"},
+              thStyle: {width: "10%"},
             },
             {
 							key: "previousBalance",
@@ -640,6 +640,7 @@ export default {
       const { payment, payment: { fields } } = this.forms
       reset(payment)
       this.addPayment(fields).then(({ data }) => {
+        console.log(data);
         this.isProcessing = false
         this.$router.push('/finance/payment')
       }).catch(error => {
@@ -744,6 +745,7 @@ export default {
     }
     .payment-entry__bottom-pane {
       margin-top: 20px;
+
       .total-container {
         height: 55px;
         display: flex;
@@ -794,8 +796,6 @@ export default {
       }
     }
   }
-
-
   .action-container {
     margin: 20px 0;
     height: 50px;
@@ -804,6 +804,6 @@ export default {
   .row-details-container {
     width: 100%;
     height: 100%;
-    padding: 10px;
+    padding: 10px 45px;
   }
 </style>

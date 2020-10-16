@@ -84,10 +84,12 @@
                           <strong>Loading...</strong>
                         </div>
                       </template>
-                      <template v-slot:cell(isInitialFee)="row">
+                      <template v-slot:cell(pivot.isInitialFee)="row">
                         <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                         <b-form-checkbox
-                          v-model="row.item.isInitialFee" />
+                          value="1"
+                          unchecked-value="0"
+                          v-model="row.item.pivot.isInitialFee" />
                       </template>
                       <template v-slot:cell(isComputedByUnits)="row">
                         <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
@@ -283,7 +285,7 @@ export default {
 							thStyle: {width: "25%"}
             },
             {
-							key: "isInitialFee",
+							key: "pivot.isInitialFee",
 							label: "INITIAL FEE",
 							tdClass: "align-middle text-center",
 							thClass: "text-center",
@@ -379,7 +381,7 @@ export default {
         let total = 0
         const { fields, fields: { fees } } = this.forms.rateSheet
         fees.forEach(fee => {
-          if (fee.isInitialFee) {
+          if (fee.pivot.isInitialFee) {
             total += Number(fee.pivot.amount)
           }
         })
@@ -532,7 +534,7 @@ export default {
         name : item.name,
         isIntegrated: item.isIntegrated,
         description: item.description,
-        pivot:{ schoolFeeId: item.id, amount: 0.00, notes: "" }
+        pivot:{ schoolFeeId: item.id, amount: 0.00, notes: "", isInitialFee: 0 }
       })
     },
 		removeFee(row){
@@ -551,7 +553,8 @@ export default {
           rateSheetId: rs.pivot.rateSheetId,
           schoolFeeId: rs.pivot.schoolFeeId,
           amount: rs.pivot.amount,
-          notes: rs.pivot.notes
+          notes: rs.pivot.notes,
+          isInitialFee: rs.pivot.isInitialFee
         })
       })
 
