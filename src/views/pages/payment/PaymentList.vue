@@ -31,6 +31,53 @@
             v-model="filters.payment.criteria"
             @update="loadPayments()">
         </b-form-input>
+    <div class="page-content__title-container">
+      <h4 class="page-content__title">Payment List</h4>
+    </div>
+    <!-- <b-row>
+      <b-col md=12>
+        <b-row>
+          <b-col md=8>
+            <b-button
+              class="add-button"
+              variant="primary"
+              :to="`/finance/payment/add`">
+              <v-icon name="plus-circle" /> ADD NEW PAYMENT
+            </b-button>
+          </b-col>
+          <b-col md=4>
+            <b-form-input
+              type="text"
+              placeholder="Search"
+              debounce="500"
+              v-model="filters.payment.criteria"
+              @update="loadPayments()">
+            </b-form-input>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row> -->
+    <div class="search-filter-container">
+      <b-button
+        v-if="showAddButton"
+        variant="primary"
+        :to="`/finance/payment/add`">
+        <v-icon name="plus-circle" /> ADD NEW PAYMENT
+      </b-button>
+      <b-button v-if="showPrintPreviewButton" class="print-preview" variant="outline-primary" @click="previewCollection()"><v-icon name="print" /> PRINT PREVIEW</b-button>
+      <div class="date-filter-cotainer">
+        <span>FROM</span>
+        <b-form-datepicker
+          :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+          class="date-pickers"
+          v-model="filters.payment.dateFrom"
+          @input="loadPayments"/>
+        <span>TO</span>
+        <b-form-datepicker
+          :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+          class="date-pickers"
+          v-model="filters.payment.dateTo"
+          @input="loadPayments" />
       </div>
       <b-row class="mt-3">
         <b-col md=12>

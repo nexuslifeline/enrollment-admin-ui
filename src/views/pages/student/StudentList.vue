@@ -104,6 +104,11 @@
                     :disabled="showModalConfirmation">
                     Delete
                   </b-dropdown-item>
+                  <!-- TODO: SET USER ACCESS OF PREVIEW LEDGER BUTTON -->
+                  <b-dropdown-item
+                    @click="onShowLedgerModal(row.item.id)">
+                    Preview Ledger
+                  </b-dropdown-item>
                 </b-dropdown>
               </template>
             </b-table>
@@ -220,6 +225,63 @@
         </b-button>
       </div>
     </b-modal>
+
+    <b-modal
+      v-model="showModalPreview"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+      size="sm" >
+      <div slot="modal-title">
+          Preview Student Ledger
+      </div>
+      <b-row>
+        <b-col md=12>
+          <b-form-group>
+            <label class="required">School Year</label>
+            <b-form-select
+              v-model="filters.ledger.schoolYearId">
+              <b-form-select-option v-for='schoolYear in options.schoolYears.items' :key='schoolYear.id' :value='schoolYear.id'>
+                {{ schoolYear.name }}
+              </b-form-select-option>
+            </b-form-select>
+          </b-form-group>
+          <b-form-group>
+            <label class="required">As Of Date</label>
+            <b-form-datepicker
+              :date-format-options="{ year: 'numeric', month: 'long', day: '2-digit', weekday: 'short' }"
+              class="date-pickers"
+              v-model="filters.ledger.asOfDate"/>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <div slot="modal-footer">
+        <b-button
+          variant="outline-primary"
+          class="mr-2 btn-save"
+          @click="previewLedger(selectedStudentId)">
+          <v-icon
+            v-if="isUserSaving"
+            name="sync"
+            spin
+            class="mr-2" />
+          Preview
+        </b-button>
+        <b-button
+          variant="outline-danger"
+          class="btn-close"
+          @click="showModalPreview=false">
+          close
+        </b-button>
+      </div>
+    </b-modal>
+
+    <FileViewer
+      :show="showModalFileViewer"
+      :file="file"
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="showModalFileViewer = false"
+    />
   </div>
 </template>
 <script>
@@ -353,6 +415,19 @@ const userErrorFields = {
   userPassword: null,
 }
 
+import { StudentApi, UserGroupApi, ReportApi, SchoolYearApi } from "../../../mixins/api"
+import { validate, reset, showNotification, clearFields } from '../../../helpers/forms'
+import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/enum"
+import Tables from "../../../helpers/tables"
+import PhotoViewer from '../../components/PhotoViewer'
+import FileViewer from '../../components/FileViewer'
+import { copyValue } from '../../../helpers/extractor'
+import Access from '../../../mixins/utils/Access'
+export default {
+	name: "StudentList",
+  mixins: [StudentApi, Tables, Access, ReportApi, SchoolYearApi],
+  components: {
+    FileViewer
 export default {
 	name: "StudentList",
   mixins: [
@@ -367,6 +442,9 @@ export default {
   StudentPermissions,
 	data() {
 		return {
+      selectedStudentId: null,
+      showModalPreview: false,
+      showModalFileViewer: false,
       showStudentEntry: false,
       showModalUpdateUser: false,
       showModalConfirmation: false,
@@ -380,6 +458,13 @@ export default {
       entryMode: "",
       activeTabIndex: 0,
       isLoading: false,
+      file: {
+        type: null,
+        src: null,
+        name: null,
+        notes: null,
+        isLoading: false
+      },
       forms: {
         student: {
           fields: { ...studentFields },
@@ -457,6 +542,10 @@ export default {
       filters: {
         student: {
           criteria: null
+        },
+        ledger: {
+          schoolYearId: null,
+          asOfDate: null,
         }
       },
       options: {
@@ -466,11 +555,15 @@ export default {
         countries: {
           items: Countries
         },
+        schoolYears: {
+          items: []
+        }
       }
 		}
 	},
 	created() {
     this.loadStudents()
+    this.loadSchoolYears()
 	},
 	methods: {
 		loadStudents() {
@@ -605,8 +698,53 @@ export default {
         errorList
       )
       showNotification(this, "danger", vNodesMsg, 4000)
+    },
+    previewLedger(studentId) {
+      this.file.type = null
+      this.file.src = null
+      this.file.notes = null
+      this.file.isLoading = true
+      this.file.owner = null;
+      this.file.name = 'Student Ledger'
+
+      const { schoolYearId, asOfDate } = this.filters.ledger
+
+      this.showModalFileViewer = true
+      const params = { schoolYearId, asOfDate }
+      this.previewStudentLedger(studentId, params).then(response => {
+          this.file.type = response.headers.contentType
+          const file = new Blob([response.data], { type: "application/pdf" } )
+          const reader = new FileReader();
+          reader.onload = e => this.file.src = e.target.result
+          reader.readAsDataURL(file);
+          this.file.isLoading = false
+      })
+    },
+    loadSchoolYears() {
+      const params = { paginate: false }
+      const { schoolYears } = this.options
+      this.getSchoolYearList(params).then(( { data }) => {
+        schoolYears.items = data
+      })
+    },
+    onShowLedgerModal(studentId) {
+      this.selectedStudentId = studentId
+      this.showModalPreview = true
+      this.filters.ledger.schoolYearId = this.getActiveSchoolYearId
+      this.filters.ledger.asOfDate = new Date()
     }
-	}
+  },
+  computed: {
+    getActiveSchoolYearId() {
+      const { items } = this.options.schoolYears
+      const schoolYear = items.find(sy => sy.isActive === 1)
+
+      if(!schoolYear)
+        return null
+
+      return schoolYear?.id
+    }
+  }
 }
 </script>
 <style lang="scss" scoped >

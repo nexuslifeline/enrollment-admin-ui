@@ -13,5 +13,11 @@ export default {
         responseType: 'blob'
       });
     },
+    previewStudentLedger(studentId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/student-ledger/${studentId}`, {
+        params: params,
+        responseType: 'blob'
+      });
+    }
   }
 }

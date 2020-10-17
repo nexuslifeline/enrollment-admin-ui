@@ -332,7 +332,7 @@
 </template>
 
 <script>
-import { StudentApi, PaymentApi, BillingApi } from "../../../mixins/api"
+import { StudentApi, PaymentApi, BillingApi, SchoolYearApi } from "../../../mixins/api"
 import { PaymentModes, PaymentStatuses } from "../../../helpers/enum"
 import { showNotification, formatNumber, clearFields, validate, reset, } from "../../../helpers/forms"
 import { format } from 'date-fns'
@@ -350,13 +350,15 @@ const paymentFields = {
   paymentModeId: null,
   notes: null,
   paymentStatusId: PaymentStatuses.APPROVED.id,
+  schoolYearId: null,
 }
 
 export default {
-  mixins: [ StudentApi, PaymentApi, BillingApi ],
+  mixins: [ StudentApi, PaymentApi, BillingApi, SchoolYearApi ],
   components: { VueBootstrapTypeahead },
   data() {
     return {
+      activeSchoolYear: null,
       showModalStudent: false,
       isLoading: false,
       isProcessing: false,
@@ -574,6 +576,7 @@ export default {
     }
   },
   created() {
+    this.getActiveSchoolYear()
     this.forms.payment.fields.amount = 0
     this.forms.payment.fields.datePaid = format(new Date(), 'yyyy-MM-dd')
   },
@@ -638,6 +641,7 @@ export default {
     onSavePayment() {
       this.isProcessing = true
       const { payment, payment: { fields } } = this.forms
+      fields.schoolYearId = this.activeSchoolYear.id;
       reset(payment)
       this.addPayment(fields).then(({ data }) => {
         console.log(data);
@@ -677,6 +681,16 @@ export default {
         })
       }
       row.toggleDetails()
+    },
+    getActiveSchoolYear() {
+      this.isLoading = true
+      const params = { paginate: false, isActive: 1 }
+      this.getSchoolYearList(params).then(({ data }) => {
+        if (data.length > 0) {
+          this.activeSchoolYear = data[0]
+        }
+        this.isLoading = false
+      })
     }
   },
   computed: {
