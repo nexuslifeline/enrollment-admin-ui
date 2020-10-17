@@ -337,7 +337,7 @@ import { PaymentModes, PaymentStatuses } from "../../../helpers/enum"
 import { showNotification, formatNumber, clearFields, validate, reset, } from "../../../helpers/forms"
 import { format } from 'date-fns'
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
-import _ from 'lodash'
+import { debounce } from 'lodash'
 
 const paymentFields = {
   id: null,
@@ -697,7 +697,7 @@ export default {
     }
   },
   watch: {
-    'studentQuery': _.debounce(function() { this.loadStudentsTypeAhead() }, 500)
+    'studentQuery': debounce(function() { this.loadStudentsTypeAhead() }, 500)
   }
 
 }
