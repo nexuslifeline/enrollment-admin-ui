@@ -29,12 +29,12 @@
           <b-col md="8">
             <b-button variant="primary"
               @click="setCreateSoa()">
-              <v-icon name="plus-circle" /> Generate Soa
+              <v-icon name="plus-circle" /> Generate SOA
             </b-button>
             <b-button variant="primary"
               class="ml-2"
               @click="setCreateBatchSoa()">
-              <v-icon name="plus-circle" /> Batch Generate Soa
+              <v-icon name="plus-circle" /> Batch Generate SOA
             </b-button>
           </b-col>
           <b-col md="4">
@@ -87,6 +87,15 @@
                 {{ $options.BillingStatuses.getEnum(value).name }}
               </b-badge>
             </template>
+            <template v-slot:cell(action)="{ item: { id } }">
+              <b-btn
+                size="sm"
+                variant="outline-primary"
+                @click="previewBilling(id)">
+                <v-icon
+                  name='file-pdf'/>
+              </b-btn>
+            </template>
         </b-table>
         <b-row>
           <b-col md=6>
@@ -126,7 +135,8 @@
               @hit="getStudentInfo($event)"
             >
               <template slot="suggestion" slot-scope="{ data }">
-                <span>{{ `${data.studentNo ? data.studentNo : "N/A"} - ${data.name}` }}</span>
+                <div>{{ data.studentNo ? data.studentNo : "N/A" }}</div>
+                <div>{{ data.name }}</div>
               </template>
             </vue-bootstrap-typeahead>
           </b-form-group>
@@ -357,12 +367,20 @@
         </b-button>
 			</div> <!-- modal footer buttons -->
 		</b-modal>
+    <FileViewer
+      :show="fileViewer.show"
+      :file="file"
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="fileViewer.show = false"
+    />
   </div>
 </template>
 <script>
+import FileViewer from '../components/FileViewer'
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 import { SchoolCategories, Semesters, BillingStatuses, BillingTypes } from '../../helpers/enum'
-import { TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi } from '../../mixins/api'
+import { TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi, ReportApi } from '../../mixins/api'
 import { clearFields, formatNumber, reset, showNotification, validate } from '../../helpers/forms'
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 import Card from '../components/Card'
@@ -397,7 +415,8 @@ export default {
   components: {
     SchoolCategoryTabs,
     VueBootstrapTypeahead,
-    Card
+    Card,
+    FileViewer
   },
   mixins: [
     TermApi,
@@ -405,13 +424,27 @@ export default {
     LevelApi,
     StudentApi,
     SchoolYearApi,
-    AcademicRecordApi
+    AcademicRecordApi,
+    ReportApi
   ],
   SchoolCategories,
   Semesters,
   BillingStatuses,
   data() {
     return {
+      fileViewer: {
+        isActiveNavEnabled: false,
+        activeNavCount: 0,
+        activeNavIndex: 0,
+        show: false,
+      },
+      file: {
+        type: null,
+        src: null,
+        name: null,
+        notes: null,
+        isLoading: false
+      },
       showModalBatch: false,
       showModalEntry: false,
       tables: {
@@ -683,6 +716,7 @@ export default {
       if (student.latestAcademicRecord) {
         this.getAcademicRecord(student.latestAcademicRecord.id)
         .then(({ data }) => {
+          console.log(data)
           fields.student.levelName = data.level.name
           fields.student.courseName = data.course.name
           fields.student.semesterName = data.semester.name
@@ -715,7 +749,24 @@ export default {
       fields.schoolCategoryId = null
       fields.termId = null
       this.showModalBatch = true
-    }
+    },
+    previewBilling(id) {
+      this.file.type = null
+      this.file.src = null
+      this.fileViewer.show = true
+      this.file.isLoading = true
+      this.file.name = 'Statement of Account'
+
+      this.previewStatementOfAccount(id)
+        .then(response => {
+          this.file.type = response.headers.contentType
+          const file = new Blob([response.data], { type: "application/pdf" } )
+          const reader = new FileReader();
+          reader.onload = e => this.file.src = e.target.result
+          reader.readAsDataURL(file);
+          this.file.isLoading = false
+        })
+    },
   },
   watch: {
     'forms.billing.studentQuery': debounce(function() { this.loadStudents() }, 500)

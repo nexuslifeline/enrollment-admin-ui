@@ -7,6 +7,11 @@ export default {
         params: params,
         responseType: 'blob'
       });
-    }
+    },
+    previewStatementOfAccount(billingId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/statement-of-account/${billingId}`, {
+        responseType: 'blob'
+      });
+    },
   }
 }
