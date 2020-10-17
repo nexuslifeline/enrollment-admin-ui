@@ -535,7 +535,7 @@ export default {
     AcademicRecordApi,
     SchoolFeeApi,
     CourseApi,
-    table
+    tables
   ],
   SchoolCategories,
   Semesters,

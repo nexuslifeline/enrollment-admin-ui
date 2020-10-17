@@ -286,11 +286,13 @@
 </template>
 <script>
 
-import { StudentApi, UserGroupApi } from "../../../mixins/api"
+
+import { StudentApi, UserGroupApi, ReportApi, SchoolYearApi } from "../../../mixins/api"
 import { validate, reset, showNotification, clearFields } from '../../../helpers/forms'
 import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/enum"
 import Tables from "../../../helpers/tables"
 import PhotoViewer from '../../components/PhotoViewer'
+import FileViewer from '../../components/FileViewer'
 import { copyValue } from '../../../helpers/extractor'
 import Access from '../../../mixins/utils/Access'
 import Card from '../../components/Card'
@@ -415,28 +417,19 @@ const userErrorFields = {
   userPassword: null,
 }
 
-import { StudentApi, UserGroupApi, ReportApi, SchoolYearApi } from "../../../mixins/api"
-import { validate, reset, showNotification, clearFields } from '../../../helpers/forms'
-import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/enum"
-import Tables from "../../../helpers/tables"
-import PhotoViewer from '../../components/PhotoViewer'
-import FileViewer from '../../components/FileViewer'
-import { copyValue } from '../../../helpers/extractor'
-import Access from '../../../mixins/utils/Access'
-export default {
-	name: "StudentList",
-  mixins: [StudentApi, Tables, Access, ReportApi, SchoolYearApi],
-  components: {
-    FileViewer
 export default {
 	name: "StudentList",
   mixins: [
     StudentApi,
     Tables,
-    Access
+    Access,
+    UserGroupApi,
+    ReportApi,
+    SchoolYearApi
   ],
   components: {
     PhotoViewer,
+    FileViewer,
     Card
   },
   StudentPermissions,
