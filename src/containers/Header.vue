@@ -227,9 +227,9 @@ export default {
       if (w >= BIG_DESKTOP) {
         return 6;
       } else if (w >= DESKTOP) {
-        return 6;
-      } else if (w >= TABLET_LANDSCAPE + 150) {
         return 5;
+      } else if (w >= TABLET_LANDSCAPE + 150) {
+        return 4;
       } else if (w >= TABLET_PORTRAIT + 150) {
         return 3;
       } else if (w >= PHONE) {
@@ -582,7 +582,7 @@ export default {
     top: 33px;
     left: 0;
 
-    @include for-size(phone-only) {
+    @include for-size(tablet-landscape-down) {
       top: 30px;
       left: auto;
       right: 0;
