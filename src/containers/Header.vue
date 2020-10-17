@@ -2,7 +2,7 @@
   <div class="header">
     <div class="header__menus-container">
       <ul class="header__menus">
-        <li v-for="(nav, idx) in $options.navItems"
+        <li v-for="(nav, idx) in $options.navItems.filter((v, i) => i < mainNavLimit)"
           v-if="isAccessible(nav.permissionIds)"
           :key="idx"
           class="header__menu-item"
@@ -11,6 +11,33 @@
             {{nav.label}}
           </a>
         </li>
+        <template v-if="$options.navItems.length > mainNavLimit">
+          <li
+            class="header__menu-item header__menu-item-more"
+            :class="{ active: isMainNavActive }">
+            <a @click.prevent.stop="onMainNavViewMore(activeIndex)" class="header__menu-link">
+              More
+              <BIconCaretUpFill v-if="mainNavOpen.includes(activeIndex)" scale=".8" class="ml-2" />
+              <BIconCaretDownFill v-else scale=".8" class="ml-2" />
+            </a>
+            <div v-if="mainNavOpen.includes(activeIndex)"  class="header__main-nav-dropdown-container">
+              <ul class="header__main-nav-dropdown">
+                <template v-for="(nav, idx) in moreMainNavItems">
+                  <template v-if="isAccessible(nav.permissionIds)">
+                    <li
+                      @click="mainNavOpen = []"
+                      class="header__main-nav-dropdown-item"
+                      :class="{ active: $route.path.startsWith(nav.to) }">
+                      <a :href="`#${redirectTo(nav)}`" class="header__menu-link">
+                        {{nav.label}}
+                      </a>
+                    </li>
+                  </template>
+                </template>
+              </ul>
+            </div>
+          </li>
+        </template>
       </ul>
     </div>
     <div class="header__account-details">
@@ -36,7 +63,7 @@
           <button @click.stop="showDropdown = !showDropdown" type="button" class="account-action__settings">
             <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
             <v-icon name="caret-down" class="account-action__icon" scale=".85" />
-            <div v-show="showDropdown" class="account-action__dropdown">
+            <div v-if="showDropdown" class="account-action__dropdown">
               <ul class="account-action__dropdown-items">
                 <li class="account-action__dropdown-item">
                   <a href="#"
@@ -64,15 +91,45 @@
       </div>
       <div class="header__sub-menus-container">
         <ul class="header__sub-menus">
-          <li v-for="(subNav, idx) in $options.navItems[activeIndex].children"
-            v-if="isAccessible(subNav.permissionIds)"
-            :key="idx"
-            class="header__sub-menu-item"
-            :class="{ active: $route.path === subNav.to }">
-            <a :href="`#${subNav.to}`" class="header__menu-link">
-              {{subNav.label}}
-            </a>
-          </li>
+          <template v-for="(subNav, idx) in $options.navItems[activeIndex].children.filter((v, i) => i < subNavLimit)">
+            <template v-if="isAccessible(subNav.permissionIds)">
+              <li :key="idx"
+                class="header__sub-menu-item"
+                :class="{ active: $route.path === subNav.to }">
+                <a :href="`#${subNav.to}`" class="header__menu-link">
+                  {{subNav.label}}
+                </a>
+              </li>
+            </template>
+          </template>
+          <template v-if="$options.navItems[activeIndex].children.length > subNavLimit">
+            <li
+              class="header__sub-menu-item header__menu-link-more"
+              :class="{ active: isSubNavActive }">
+              <a
+                @click.prevent.stop="onSubNavViewMore(activeIndex)"
+                class="header__menu-link">
+                More
+                <BIconCaretUpFill v-if="subNavOpen.includes(activeIndex)" scale=".8" class="ml-2" />
+                <BIconCaretDownFill v-else scale=".8" class="ml-2" />
+              </a>
+              <div v-if="subNavOpen.includes(activeIndex)" class="header__sub-navs-dropdown-container">
+                <ul class="header__sub-navs-dropdown">
+                  <template v-for="(subNav, idx) in moreSubNavItems">
+                    <template v-if="isAccessible(subNav.permissionIds)">
+                      <li @click="subNavOpen = []" :key="idx"
+                        class="header__sub-navs-dropdown-item"
+                        :class="{ active: $route.path === subNav.to }">
+                        <a :href="`#${subNav.to}`" class="header__menu-link">
+                          {{subNav.label}}
+                        </a>
+                      </li>
+                    </template>
+                  </template>
+                </ul>
+              </div>
+            </li>
+          </template>
         </ul>
       </div>
     </div>
@@ -86,6 +143,17 @@ import { AuthApi } from '../mixins/api';
 import WaveBackground from '../views/components/WaveMaker';
 import Access from '../mixins/utils/Access';
 
+const BIG_DESKTOP = 1800;
+const DESKTOP = 1200;
+const TABLET_LANDSCAPE = 900;
+const TABLET_PORTRAIT = 600;
+const PHONE = 599;
+const MEDIUM_PHONE = 380;
+const SMALL_PHONE = 320;
+
+const MAIN_NAV_LIMIT = 8;
+const SUB_NAV_LIMIT = 6;
+
 export default {
   name: 'TheHeader',
   components: {
@@ -97,7 +165,11 @@ export default {
   data() {
     return {
       showDropdown: false,
-      isLoading: false
+      isLoading: false,
+      subNavLimit: SUB_NAV_LIMIT,
+      mainNavLimit: MAIN_NAV_LIMIT,
+      subNavOpen: [],
+      mainNavOpen: []
     }
   },
   computed: {
@@ -116,17 +188,79 @@ export default {
       const userGroup = this.user && this.user.userGroup;
       const name = userGroup && userGroup.name || 'System Administrator';
       return name;
+    },
+    moreSubNavItems() {
+      return this.$options.navItems[this.activeIndex].children.filter(
+        (v, i) => i >= this.subNavLimit
+      )
+    },
+    moreMainNavItems() {
+      return this.$options.navItems.filter(
+        (v, i) => i >= this.mainNavLimit
+      )
+    },
+    isSubNavActive() {
+      return this.subNavOpen.includes(this.activeIndex) ||
+        this.moreSubNavItems.map(v => v.to).includes(this.$route.path);
+    },
+    isMainNavActive() {
+      return this.mainNavOpen.includes(this.activeIndex) ||
+        !!this.moreMainNavItems.map(v => v.to).filter(v => this.$route.path.startsWith(v))?.length;
     }
   },
   mounted() {
+    this.calculateNavLimit();
+    window.addEventListener('resize', this.calculateNavLimit)
     window.addEventListener('click', this.hideDropdownItems)
   },
   beforeDestroy() {
+    window.removeEventListener('resize', this.calculateNavLimit)
     window.removeEventListener('click', this.hideDropdownItems)
   },
   methods: {
+    calculateNavLimit() {
+      let w = window.innerWidth;
+      this.subNavLimit = this.getSubNavLimit(w);
+      this.mainNavLimit = this.getMainNavLimit(w);
+    },
+    getSubNavLimit(w) {
+      if (w >= BIG_DESKTOP) {
+        return 6;
+      } else if (w >= DESKTOP) {
+        return 6;
+      } else if (w >= TABLET_LANDSCAPE + 150) {
+        return 5;
+      } else if (w >= TABLET_PORTRAIT + 150) {
+        return 3;
+      } else if (w >= PHONE) {
+        return 2;
+      } else if (w >= MEDIUM_PHONE) {
+        return 2;
+      } else {
+        return 1;
+      }
+    },
+    getMainNavLimit(w) {
+      if (w >= BIG_DESKTOP) {
+        return 8;
+      } else if (w >= DESKTOP) {
+        return 7;
+      } else if (w >= TABLET_LANDSCAPE + 150) {
+        return 6;
+      } else if (w >= TABLET_PORTRAIT + 150) {
+        return 4;
+      } else if (w >= PHONE) {
+        return 4;
+      } else if (w >= MEDIUM_PHONE) {
+        return 3;
+      } else {
+        return 1;
+      }
+    },
     hideDropdownItems() {
       this.showDropdown = false;
+      this.subNavOpen = [];
+      this.mainNavOpen = [];
     },
     redirectTo(nav) {
       const { children } = nav
@@ -152,6 +286,12 @@ export default {
           this.isLoading = false;
         });
       }
+    },
+    onSubNavViewMore(idx) {
+      this.subNavOpen = !!this.subNavOpen?.length ? [] : [idx];
+    },
+    onMainNavViewMore(idx) {
+      this.mainNavOpen = !!this.mainNavOpen?.length ? [] : [idx];
     }
   }
 }
@@ -243,6 +383,7 @@ export default {
 
     @include for-size(tablet-portrait-down) {
       padding: 0 20px;
+      margin-left: 0;
     }
   }
 
@@ -287,7 +428,7 @@ export default {
     }
 
     @include for-size(tablet-landscape-down) {
-      margin-right: 30px;
+      margin-right: 45px;
     }
   }
 
@@ -329,7 +470,7 @@ export default {
     padding: 0 18px;
     color: $white;
 
-    &.active {
+    &.active, &:hover {
       font-weight: 600;
       color: $dark-gray-500;
       background-color: $white;
@@ -414,8 +555,83 @@ export default {
 
   .header__menu-link {
     color: inherit;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+
     &:hover {
       text-decoration: none;
+      cursor: pointer;
+    }
+  }
+
+  .header__menu-link-more {
+    position: relative;
+  }
+
+  .header__sub-navs-dropdown-container {
+    position: absolute;
+    background-color: $white;
+    min-width: 175px;
+    border: 1px solid $brand-border-color;
+    border-top: 0;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding: 7px 0;
+    top: 33px;
+    left: 0;
+
+    @include for-size(phone-only) {
+      top: 30px;
+      left: auto;
+      right: 0;
+    }
+  }
+
+  .header__sub-navs-dropdown {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .header__sub-navs-dropdown-item {
+    color: $dark-gray-500;
+    padding: 8px 15px;
+    font-weight: normal;
+
+    &:hover, &.active {
+      background-color: $light-gray-100;
+    }
+  }
+
+  .header__menu-item-more {
+    position: relative;
+  }
+
+  .header__main-nav-dropdown-container {
+    position: absolute;
+    padding: 12px 0 6px 0;
+    border: 1px solid $dark-gray-500;
+    background-color: $dark-gray-500;
+    top: 33px;
+    left: -15px;
+    z-index: 3;
+    min-width: 175px;
+  }
+
+  .header__main-nav-dropdown {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .header__main-nav-dropdown-item {
+    padding: 7px 15px;
+
+    &:hover, &.active {
+      background-color: $dark-gray-600;
+      color: $white;
     }
   }
 

@@ -120,10 +120,24 @@
                 <span>{{ data.item.filesCount }} </span>  <v-icon name="paperclip" class="ml-2"  />
                 </template>
             <template v-slot:cell(action)="row">
-              <button type="button" @click="loadDetails(row)" class="btn-invisible">
+              <!-- <button type="button" @click="loadDetails(row)" class="btn-invisible">
                 <BIconFolder2Open v-if="row.detailsShowing " />
                 <BIconFolderSymlink v-else scale="1.2" />
-              </button>
+              </button> -->
+              <b-dropdown
+                right
+                variant="link"
+                toggle-class="text-decoration-none"
+                no-caret>
+                <template v-slot:button-content>
+                  <v-icon name="ellipsis-v" />
+                </template>
+                <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+                <b-dropdown-item
+                  @click.prevent="loadDetails(row)" >
+                  {{ row.item.evaluationStatusId === evaluationStatuses.APPROVED.id ? 'View Details' : 'Review Record' }}
+                </b-dropdown-item>
+              </b-dropdown>
             </template>
             <template v-slot:row-details="data">
               <ActiveRowViewer

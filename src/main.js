@@ -68,7 +68,9 @@ import {
   BIconEnvelope,
   BIconPersonBadge,
   BIconGeoAlt,
-  BIconCalendar2Week
+  BIconCalendar2Week,
+  BIconCaretDownFill,
+  BIconCaretUpFill
 } from 'bootstrap-vue'
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
@@ -82,6 +84,8 @@ Vue.component('BIconEnvelope', BIconEnvelope);
 Vue.component('BIconPersonBadge', BIconPersonBadge);
 Vue.component('BIconGeoAlt', BIconGeoAlt);
 Vue.component('BIconCalendar2Week', BIconCalendar2Week);
+Vue.component('BIconCaretDownFill', BIconCaretDownFill);
+Vue.component('BIconCaretUpFill', BIconCaretUpFill);
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'
