@@ -1,9 +1,6 @@
 <template>
 	<div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Curriculum Management</h4>
-      </div>
+    <Card title="Curriculum Management">
       <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="filters.curriculum.schoolCategoryId = $event, loadCurriculums()"
@@ -85,6 +82,7 @@
           <b-row >
             <b-col md=12>
               <b-table
+                class="c-table"
                 small hover outlined show-empty
                 :responsive="tables.curriculums.items.length > 3"
                 :fields="tables.curriculums.fields"
@@ -224,6 +222,7 @@
                 </b-col>
                 <b-col md=6>
                   <b-pagination
+                    class="c-pagination"
                     v-model="paginations.curriculum.page"
                     :total-rows="paginations.curriculum.totalRows"
                     :per-page="paginations.curriculum.perPage"
@@ -236,7 +235,7 @@
           </b-row>
 		    </div>
       </div>
-    </div>
+    </Card>
 
 		<div v-show="showEntry">
       <div>
@@ -755,6 +754,7 @@ import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
 
 const curriculumFields = {
   id: null,
@@ -771,9 +771,21 @@ const curriculumFields = {
 
 export default {
 	name: "Curriculum",
-	mixins: [ SchoolCategoryApi, LevelApi, SemesterApi, CourseApi,
-    SubjectApi, DepartmentApi, CurriculumApi, Tables, Access ],
-  components: { SchoolCategoryTabs },
+	mixins: [
+    SchoolCategoryApi,
+    LevelApi,
+    SemesterApi,
+    CourseApi,
+    SubjectApi,
+    DepartmentApi,
+    CurriculumApi,
+    Tables,
+    Access
+  ],
+  components: {
+    SchoolCategoryTabs,
+    Card
+  },
   CurriculumPermissions,
 	data() {
 		return {
@@ -799,7 +811,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: {width: "auto"}
+							thStyle: { width: "auto" }
             },
             // {
             //   key: "description",
@@ -809,21 +821,21 @@ export default {
             // },
             {
 							key: "effectiveYear",
-							label: "Effective Year",
+							label: "Effective",
 							tdClass: "align-middle",
-							thStyle: {width: "10%"}
+							thStyle: { width: "10%" }
 						},
 						{
 							key: "schoolCategory.name",
-							label: "School Category",
+							label: "School",
 							tdClass: "align-middle",
-							thStyle: {width: "10%"}
+							thStyle: { width: "15%" }
 						},
 						{
 							key: "course.name",
 							label: "Course",
 							tdClass: "align-middle",
-              thStyle: {width: "10%"},
+              thStyle: { width: "10%" },
               formatter: (value) => {
                 if (value) {
                   return value
@@ -832,12 +844,12 @@ export default {
                 }
               }
             },
-            {
-							key: "course.major",
-							label: "Major",
-							tdClass: "align-middle",
-							thStyle: {width: "10%"}
-            },
+            // {
+						// 	key: "course.major",
+						// 	label: "Major",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "10%"}
+            // },
             {
 							key: "level.name",
 							label: "Level",
@@ -851,12 +863,12 @@ export default {
                 }
               }
 						},
-						{
-							key: "notes",
-							label: "Notes",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
-            },
+						// {
+						// 	key: "notes",
+						// 	label: "Notes",
+						// 	tdClass: "align-middle",
+						// 	thStyle: {width: "15%"}
+            // },
             {
 							key: "active",
 							label: "Status",

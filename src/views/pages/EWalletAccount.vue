@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">E-Wallet Account Management</h4>
-      </div>
+    <Card title="E-Wallet Account Management">
       <div>
         <b-row class="mb-3">
           <b-col md=12>
@@ -30,6 +27,7 @@
         <b-row >
           <b-col md=12>
             <b-table
+              class="c-table"
               small hover outlined show-empty
               :fields="tables.eWalletAccounts.fields"
               :busy="tables.eWalletAccounts.isBusy"
@@ -72,6 +70,7 @@
                 </b-col>
               <b-col md=6>
                 <b-pagination
+                  class="c-pagination"
                   v-model="paginations.eWalletAccount.page"
                   :total-rows="paginations.eWalletAccount.totalRows"
                   :per-page="paginations.eWalletAccount.perPage"
@@ -84,7 +83,7 @@
         </b-row>
           <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -206,9 +205,17 @@ import { EWalletAccountApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
+import Card from '../components/Card'
+
 export default {
 	name: "eWalletAccount",
-	mixins: [ EWalletAccountApi, Tables ],
+	mixins: [
+    EWalletAccountApi,
+    Tables
+  ],
+  components: {
+    Card
+  },
 	data() {
 		return {
       showModalEntry: false,

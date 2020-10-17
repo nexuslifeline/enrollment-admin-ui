@@ -57,12 +57,12 @@ export default [
         permissionIds: EvaluationAndAdmissionPermissions.getIds()
       },
       {
-        label: 'Subjects',
+        label: 'Enlistment',
         to: '/approval/student-subject-enlisment',
         permissionIds: StudentSubjectPermissions.getIds()
       },
       {
-        label: 'Assessment Fee',
+        label: 'Assessment',
         to: '/approval/student-assessment-fee',
         permissionIds: StudentFeePermissions.getIds()
       },
@@ -134,7 +134,7 @@ export default [
         permissionIds: SchoolFeePermissions.getIds()
       },
       {
-        label: 'Payment List',
+        label: 'Payment',
         to: '/finance/payment',
         //todo: set payment permissions
         //permissionIds: SchoolFeePermissions.getIds()
@@ -192,6 +192,11 @@ export default [
         to: '/maintenance/school-category'
       },
       {
+        label: 'User Group',
+        to: '/maintenance/user-group',
+        permissionIds: UserGroupPermissions.getIds()
+      },
+      {
         label: 'Bank Account',
         to: '/maintenance/bank-account',
         permissionIds: BankAccountPermissions.getIds()
@@ -205,11 +210,6 @@ export default [
         label: 'E Wallet Account',
         to: '/maintenance/e-wallet-account',
         permissionIds: EWalletAccountPermissions.getIds()
-      },
-      {
-        label: 'User Group',
-        to: '/maintenance/user-group',
-        permissionIds: UserGroupPermissions.getIds()
       },
     ]
   },

@@ -1,130 +1,106 @@
 <template>
   <div class="c-page-content">
-    <div class="page-content__title-container">
-      <h4 class="page-content__title">Payment List</h4>
-    </div>
-    <!-- <b-row>
-      <b-col md=12>
-        <b-row>
-          <b-col md=8>
-            <b-button
-              class="add-button"
-              variant="primary"
-              :to="`/finance/payment/add`">
-              <v-icon name="plus-circle" /> ADD NEW PAYMENT
-            </b-button>
-          </b-col>
-          <b-col md=4>
-            <b-form-input
-              type="text"
-              placeholder="Search"
-              debounce="500"
-              v-model="filters.payment.criteria"
-              @update="loadPayments()">
-            </b-form-input>
-          </b-col>
-        </b-row>
-      </b-col>
-    </b-row> -->
-    <div>
-    </div>
-    <div class="search-filter-container">
-      <b-button
-        v-if="showAddButton"
-        variant="primary"
-        :to="`/finance/payment/add`">
-        <v-icon name="plus-circle" /> ADD NEW PAYMENT
-      </b-button>
-      <b-button v-if="showPrintPreviewButton" class="print-preview" variant="outline-primary" @click="previewCollection()"><v-icon name="print" /> PRINT PREVIEW</b-button>
-      <div class="date-filter-cotainer">
-        <span>FROM</span>
-        <b-form-datepicker
-          :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
-          class="date-pickers"
-          v-model="filters.payment.dateFrom"
-          @input="loadPayments"/>
-        <span>TO</span>
-        <b-form-datepicker
-          :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
-          class="date-pickers"
-          v-model="filters.payment.dateTo"
-          @input="loadPayments" />
+    <Card title="Payment Transactions">
+      <div class="search-filter-container">
+        <b-button
+          v-if="showAddButton"
+          variant="primary"
+          :to="`/finance/payment/add`">
+          <v-icon name="plus-circle" /> ADD NEW PAYMENT
+        </b-button>
+        <b-button v-if="showPrintPreviewButton" class="print-preview" variant="outline-primary" @click="previewCollection()"><v-icon name="print" /> PRINT PREVIEW</b-button>
+        <div class="date-filter-cotainer">
+          <span>FROM</span>
+          <b-form-datepicker
+            :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+            class="date-pickers"
+            v-model="filters.payment.dateFrom"
+            @input="loadPayments"/>
+          <span>TO</span>
+          <b-form-datepicker
+            :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+            class="date-pickers"
+            v-model="filters.payment.dateTo"
+            @input="loadPayments" />
+        </div>
+        <b-form-input
+            type="text"
+            placeholder="Search"
+            debounce="500"
+            class="search-input"
+            v-model="filters.payment.criteria"
+            @update="loadPayments()">
+        </b-form-input>
       </div>
-      <b-form-input
-          type="text"
-          placeholder="Search"
-          debounce="500"
-          class="search-input"
-          v-model="filters.payment.criteria"
-          @update="loadPayments()">
-      </b-form-input>
-    </div>
-    <b-row class="mt-3">
-      <b-col md=12>
-        <b-table
-          small hover outlined show-empty
-          :fields="tables.payments.fields"
-          :busy="tables.payments.isBusy"
-          :items="tables.payments.items">
-          <!-- :filter="filters.schoolFee.criteria> -->
-          <template v-slot:table-busy>
-            <div class="text-center my-2">
-              <v-icon
-                name="spinner"
-                spin
-                class="mr-2" />
-              <strong>Loading...</strong>
-            </div>
-          </template>
-          <template v-slot:cell(student)="data">
-            <b-media>
-              <template v-slot:aside>
-                <b-avatar
-                  rounded
-                  blank
-                  size="64"
-                  :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
-                  :src="avatar(data.item)" />
-              </template>
-              <span>{{ data.item.student.name }}</span><br>
-              <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-              <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }}
-              </small>
-            </b-media>
-          </template>
-          <template v-slot:cell(action)="row">
-            <b-dropdown
-              v-if="showRowActionButton"
-              right variant="link"
-              toggle-class="text-decoration-none"
-              no-caret>
-              <template v-slot:button-content>
-                <v-icon name="ellipsis-v" />
-              </template>
-              <b-dropdown-item
-                @click="selectedPaymentId = row.item.id, showModalConfirmation = true"
-                :disabled="showModalConfirmation">
-                Cancel Payment
-              </b-dropdown-item>
-            </b-dropdown>
-          </template>
-        </b-table>
-        <b-row>
-          <b-col md=6>
-            Showing {{ paginations.payment.from }} to {{ paginations.payment.to }} of {{ paginations.payment.totalRows }} records.
+      <b-row class="mt-3">
+        <b-col md=12>
+          <b-table
+            class="c-table"
+            small hover outlined show-empty
+            :fields="tables.payments.fields"
+            :busy="tables.payments.isBusy"
+            :items="tables.payments.items">
+            <!-- :filter="filters.schoolFee.criteria> -->
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon
+                  name="spinner"
+                  spin
+                  class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
+            <template v-slot:cell(student)="data">
+              <b-media>
+                <template v-slot:aside>
+                  <b-avatar
+                    rounded
+                    blank
+                    size="64"
+                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                    :src="avatar(data.item)" />
+                </template>
+                <span>{{ data.item.student.name }}</span><br>
+                <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+                <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }}
+                </small>
+              </b-media>
+            </template>
+            <template v-slot:cell(action)="row">
+              <b-dropdown
+                v-if="showRowActionButton"
+                right variant="link"
+                toggle-class="text-decoration-none"
+                no-caret>
+                <template v-slot:button-content>
+                  <v-icon name="ellipsis-v" />
+                </template>
+                <b-dropdown-item
+                  @click="selectedPaymentId = row.item.id, showModalConfirmation = true"
+                  :disabled="showModalConfirmation">
+                  Cancel Payment
+                </b-dropdown-item>
+              </b-dropdown>
+            </template>
+          </b-table>
+          <b-row>
+            <b-col md=6>
+              Showing {{ paginations.payment.from }} to {{ paginations.payment.to }} of {{ paginations.payment.totalRows }} records.
+              </b-col>
+            <b-col md=6>
+              <b-pagination
+                class="c-pagination"
+                v-model="paginations.payment.page"
+                :total-rows="paginations.payment.totalRows"
+                :per-page="paginations.payment.perPage"
+                size="sm"
+                align="end"
+                @input="loadPayments()"/>
             </b-col>
-          <b-col md=6>
-            <b-pagination
-              v-model="paginations.payment.page"
-              :total-rows="paginations.payment.totalRows"
-              :per-page="paginations.payment.perPage"
-              size="sm"
-              align="end"
-              @input="loadPayments()"/>
-          </b-col>
-        </b-row>
-      </b-col>
-    </b-row>
+          </b-row>
+        </b-col>
+      </b-row>
+    </Card>
     <b-modal
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
@@ -154,77 +130,6 @@
         </b-button>
       </div>
     </b-modal>
-    <!-- <b-modal v-model="showModalEntry"
-      size="lg"
-      :noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-      <div slot="modal-title"> 
-					Payment - {{ entryMode }}
-			</div> 
-      <b-overlay :show="forms.payment.isLoading" rounded="sm">
-        <div class="payment-entry__body">
-          <div class="payment-entry__left-pane">
-            <h5>STUDENT DETAILS</h5>
-            <b-form-group
-              label="Student No">
-              <b-form-input/>
-            </b-form-group>
-            <b-form-group
-              label="Student">
-              <b-form-input/>
-            </b-form-group>
-            <b-form-group
-              label="Address">
-              <b-form-textarea rows="2"/>
-            </b-form-group>
-            <h5>PAYMENT DETAILS</h5>
-            <b-form-group
-              label="Student No">
-              <b-form-input/>
-            </b-form-group>
-            <b-form-group
-              label="Student No">
-              <b-form-input/>
-            </b-form-group>
-            <b-form-group
-              label="Student No">
-              <b-form-input/>
-            </b-form-group>
-            <b-form-group
-              label="Student No">
-              <b-form-input/>
-            </b-form-group>
-            <b-form-group
-              label="Address">
-              <b-form-textarea rows="2"/>
-            </b-form-group>
-          </div>
-          <div class="payment-entry__right-pane">
-
-          </div>
-        </div>
-      </b-overlay>
-      <div slot="modal-footer" class="w-100">
-				<b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry=false">
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.payment.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onSchoolFeeEntry()">
-          <v-icon
-            v-if="forms.payment.isProcessing"
-            name="sync"
-            spin
-            class="mr-2" />
-          Save
-        </b-button>
-			</div>
-    </b-modal> -->
     <FileViewer
       :show="showModalPreview"
       :file="file"
@@ -242,9 +147,14 @@ import { format, startOfMonth, endOfMonth } from 'date-fns'
 import { showNotification, formatNumber } from '../../../helpers/forms'
 import  FileViewer from '../../components/FileViewer'
 import { PaymentStatuses } from '../../../helpers/enum'
+import Card from '../../components/Card'
 
 export default {
   mixins: [ PaymentApi, ReportApi ],
+  components: {
+    FileViewer,
+    Card
+  },
   props: {
     showAddButton: {
       type: Boolean,
@@ -258,9 +168,6 @@ export default {
       type: Boolean,
       default: true
     }
-  },
-  components: {
-    FileViewer
   },
   data() {
     return {

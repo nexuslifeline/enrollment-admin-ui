@@ -1,102 +1,101 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Course Management</h4>
-      </div>
+    <Card title="Course Management">
       <div>
-      <!-- add button and search -->
-      <b-row class="mb-3">
-        <b-col md=12>
-          <b-row>
-            <b-col md=8>
-              <b-button
-                v-if="isAccessible($options.CoursePermissions.ADD.id)"
-                class="bottom-space"
-                variant="primary"
-                @click="setCreate()">
-                <v-icon name="plus-circle" /> ADD NEW COURSE
-              </b-button>
-            </b-col>
-            <b-col md=4>
-              <b-form-input
-                v-model="filters.course.criteria"
-                type="text"
-                placeholder="Search">
-              </b-form-input>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <!-- end add button and search -->
-      <!-- table -->
-      <b-row >
-        <b-col md=12>
-          <b-table
-            small hover outlined show-empty
-            :fields="tables.courses.fields"
-            :busy="tables.courses.isBusy"
-            :items="tables.courses.items"
-            :current-page="paginations.course.page"
-            :per-page="paginations.course.perPage"
-            :filter="filters.course.criteria"
-            @filtered="onFiltered($event, paginations.course)">
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="isAccessible([
-                  $options.CoursePermissions.EDIT.id,
-                  $options.CoursePermissions.DELETE.id
-                ])"
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret>
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  v-if="isAccessible($options.CoursePermissions.EDIT.id)"
-                  @click="setUpdate(row)"
-                  :disabled="showModalEntry">
-                  Edit
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.CoursePermissions.DELETE.id)"
-                  @click="forms.course.fields.id = row.item.id, showModalConfirmation = true"
-                  :disabled="showModalConfirmation">
-                  Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{ paginations.course.from }} to {{ paginations.course.to }} of {{ paginations.course.totalRows }} records.
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=8>
+                <b-button
+                  v-if="isAccessible($options.CoursePermissions.ADD.id)"
+                  class="bottom-space"
+                  variant="primary"
+                  @click="setCreate()">
+                  <v-icon name="plus-circle" /> ADD NEW COURSE
+                </b-button>
               </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.course.page"
-                :total-rows="paginations.course.totalRows"
-                :per-page="paginations.course.perPage"
-                @input="recordDetails(paginations.course)"
-                size="sm"
-                align="end" />
+              <b-col md=4>
+                <b-form-input
+                  v-model="filters.course.criteria"
+                  type="text"
+                  placeholder="Search">
+                </b-form-input>
               </b-col>
             </b-row>
-        </b-col>
-      </b-row>
-      <!-- end table -->
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              class="c-table"
+              small hover outlined show-empty
+              :fields="tables.courses.fields"
+              :busy="tables.courses.isBusy"
+              :items="tables.courses.items"
+              :current-page="paginations.course.page"
+              :per-page="paginations.course.perPage"
+              :filter="filters.course.criteria"
+              @filtered="onFiltered($event, paginations.course)">
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.CoursePermissions.EDIT.id,
+                    $options.CoursePermissions.DELETE.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.CoursePermissions.EDIT.id)"
+                    @click="setUpdate(row)"
+                    :disabled="showModalEntry">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.CoursePermissions.DELETE.id)"
+                    @click="forms.course.fields.id = row.item.id, showModalConfirmation = true"
+                    :disabled="showModalConfirmation">
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.course.from }} to {{ paginations.course.to }} of {{ paginations.course.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  class="c-pagination"
+                  v-model="paginations.course.page"
+                  :total-rows="paginations.course.totalRows"
+                  :per-page="paginations.course.perPage"
+                  @input="recordDetails(paginations.course)"
+                  size="sm"
+                  align="end" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -234,9 +233,18 @@ import { copyValue } from '../../helpers/extractor'
 import { DegreeTypes, CoursePermissions } from '../../helpers/enum'
 import Tables from '../../helpers/tables'
 import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
+
 export default {
 	name: "Course",
-  mixins: [ CourseApi, Tables, Access ],
+  mixins: [
+    CourseApi,
+    Tables,
+    Access
+  ],
+  components: {
+    Card
+  },
   CoursePermissions,
 	data() {
 		return {

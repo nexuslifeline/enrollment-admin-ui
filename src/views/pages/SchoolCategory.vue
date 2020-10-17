@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">School Category Management</h4>
-      </div>
+    <Card title="School Category Management">
       <div>
         <!-- add button and search -->
         <b-row class="mb-3">
@@ -24,6 +21,7 @@
         <b-row >
           <b-col md=12>
             <b-table
+              class="c-table"
               hover outlined show-empty
               :fields="tables.schoolCategories.fields"
               :busy="tables.schoolCategories.isBusy"
@@ -48,6 +46,7 @@
                 </b-col>
               <b-col md=6>
                 <b-pagination
+                  class="c-pagination"
                   v-model="paginations.schoolCategory.page"
                   :total-rows="paginations.schoolCategory.totalRows"
                   :per-page="paginations.schoolCategory.perPage"
@@ -60,17 +59,24 @@
         </b-row>
         <!-- end table -->
       </div>
-    </div>
+    </Card>
   </div>
 </template>
 
 <script>
 import { SchoolCategoryApi } from "../../mixins/api"
 import Tables from '../../helpers/tables'
+import Card from '../components/Card'
 
 export default {
   name: "schoolCategory",
-  mixins: [ Tables, SchoolCategoryApi ],
+  mixins: [
+    Tables,
+    SchoolCategoryApi
+  ],
+  components: {
+    Card
+  },
   data() {
     return {
       tables: {

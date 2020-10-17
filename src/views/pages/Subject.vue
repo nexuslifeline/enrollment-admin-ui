@@ -1,119 +1,118 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Subject Management</h4>
-      </div>
+    <Card title="Subject Management">
       <div>
-      <!-- add button and search -->
-      <b-row class="mb-3">
-        <b-col md=12>
-          <b-row>
-            <b-col md=6 class="bottom-space">
-              <b-button
-                v-if="isAccessible($options.SubjectPermissions.ADD.id)"
-                variant="primary"
-                @click="onCreate()">
-                <v-icon name="plus-circle" /> ADD NEW SUBJECT
-              </b-button>
-            </b-col>
-            <b-col md=3>
-              <b-form-select
-                @input="loadSubjects()"
-                v-model="filters.subject.schoolCategoryId"
-                class="float-right">
-                <template v-slot:first>
-                  <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
-                </template>
-                <b-form-select-option :value="null">None</b-form-select-option>
-                <b-form-select-option
-                  v-for="category in options.schoolCategories.values"
-                  :key="category.id"
-                  :value="category.id">
-                  {{category.name}}
-                </b-form-select-option>
-              </b-form-select>
-            </b-col>
-            <b-col md=3>
-              <b-form-input
-                v-model="filters.subject.criteria"
-                type="text"
-                placeholder="Search"
-                @update="loadSubjects()"
-                debounce="500">
-              </b-form-input>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <!-- end add button and search -->
-      <!-- table -->
-      <b-row >
-        <b-col md=12>
-          <b-table
-            small hover outlined show-empty responsive
-            :fields="tables.subjects.fields"
-            :busy="tables.subjects.isBusy"
-            :items="tables.subjects.items">
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="isAccessible([
-                  $options.SubjectPermissions.EDIT.id,
-                  $options.SubjectPermissions.EDIT_PRICE.id,
-                  $options.SubjectPermissions.DELETE.id
-                ])"
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret>
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  v-if="isAccessible([
-                    $options.SubjectPermissions.EDIT.id,
-                    $options.SubjectPermissions.EDIT_PRICE.id
-                  ])"
-                  @click="setSubjectUpdate(row)"
-                  :disabled="showModalEntry">
-                  Edit
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.SubjectPermissions.DELETE.id)"
-                  @click="forms.subject.fields.id = row.item.id, showModalConfirmation = true"
-                  :disabled="showModalConfirmation">
-                  Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{ paginations.subject.from }} to {{ paginations.subject.to }} of {{ paginations.subject.totalRows }} records.
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=6 class="bottom-space">
+                <b-button
+                  v-if="isAccessible($options.SubjectPermissions.ADD.id)"
+                  variant="primary"
+                  @click="onCreate()">
+                  <v-icon name="plus-circle" /> ADD NEW SUBJECT
+                </b-button>
               </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.subject.page"
-                :total-rows="paginations.subject.totalRows"
-                :per-page="paginations.subject.perPage"
-                size="sm"
-                align="end"
-                @input="loadSubjects()" />
+              <b-col md=3>
+                <b-form-select
+                  @input="loadSubjects()"
+                  v-model="filters.subject.schoolCategoryId"
+                  class="float-right">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled>-- School Category --</b-form-select-option>
+                  </template>
+                  <b-form-select-option :value="null">None</b-form-select-option>
+                  <b-form-select-option
+                    v-for="category in options.schoolCategories.values"
+                    :key="category.id"
+                    :value="category.id">
+                    {{category.name}}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-col>
+              <b-col md=3>
+                <b-form-input
+                  v-model="filters.subject.criteria"
+                  type="text"
+                  placeholder="Search"
+                  @update="loadSubjects()"
+                  debounce="500">
+                </b-form-input>
               </b-col>
             </b-row>
-        </b-col>
-      </b-row>
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              class="c-table"
+              small hover outlined show-empty responsive
+              :fields="tables.subjects.fields"
+              :busy="tables.subjects.isBusy"
+              :items="tables.subjects.items">
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.SubjectPermissions.EDIT.id,
+                    $options.SubjectPermissions.EDIT_PRICE.id,
+                    $options.SubjectPermissions.DELETE.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item
+                    v-if="isAccessible([
+                      $options.SubjectPermissions.EDIT.id,
+                      $options.SubjectPermissions.EDIT_PRICE.id
+                    ])"
+                    @click="setSubjectUpdate(row)"
+                    :disabled="showModalEntry">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.SubjectPermissions.DELETE.id)"
+                    @click="forms.subject.fields.id = row.item.id, showModalConfirmation = true"
+                    :disabled="showModalConfirmation">
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.subject.from }} to {{ paginations.subject.to }} of {{ paginations.subject.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  class="c-pagination"
+                  v-model="paginations.subject.page"
+                  :total-rows="paginations.subject.totalRows"
+                  :per-page="paginations.subject.perPage"
+                  size="sm"
+                  align="end"
+                  @input="loadSubjects()" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -423,8 +422,13 @@ import { UserGroups, SchoolCategories, SubjectPermissions } from '../../helpers/
 // import Select2 from '../components/Select2'
 import Tables from '../../helpers/tables'
 import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
+
 export default {
-	name: "Subject",
+  name: "Subject",
+  components: {
+    Card
+  },
   mixins: [ SubjectApi, DepartmentApi, Tables, Access ],
   // components: { Select2 },
   SubjectPermissions,
@@ -474,7 +478,7 @@ export default {
 							key: "schoolCategory.name",
 							label: "SCHOOL CATEGORY",
 							tdClass: "align-middle",
-							thStyle: {width: "10%"}
+							thStyle: {width: "20%"}
             },
             // {
 						// 	key: "prerequisites",
@@ -495,16 +499,16 @@ export default {
 							thClass: "text-center",
 							thStyle: {width: "7%"}
             },
-            {
-							key: "amountPerUnit",
-							label: "AMT PER LEC",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-              thStyle: {width: "10%"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
-						},
+            // {
+						// 	key: "amountPerUnit",
+						// 	label: "AMT PER LEC",
+						// 	tdClass: "align-middle text-right",
+						// 	thClass: "text-right",
+            //   thStyle: {width: "10%"},
+            //   formatter: (value) => {
+            //     return formatNumber(value)
+            //   }
+						// },
 						{
 							key: "labs",
 							label: "LAB UNITS",
@@ -512,26 +516,26 @@ export default {
 							thClass: "text-center",
 							thStyle: {width: "7%"}
             },
-            {
-							key: "amountPerLab",
-							label: "AMT PER LAB",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-              thStyle: {width: "10%"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
-            },
-            {
-							key: "totalAmount",
-							label: "TOTAL AMT",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-              thStyle: {width: "10%"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
-            },
+            // {
+						// 	key: "amountPerLab",
+						// 	label: "AMT PER LAB",
+						// 	tdClass: "align-middle text-right",
+						// 	thClass: "text-right",
+            //   thStyle: {width: "10%"},
+            //   formatter: (value) => {
+            //     return formatNumber(value)
+            //   }
+            // },
+            // {
+						// 	key: "totalAmount",
+						// 	label: "TOTAL AMT",
+						// 	tdClass: "align-middle text-right",
+						// 	thClass: "text-right",
+            //   thStyle: {width: "10%"},
+            //   formatter: (value) => {
+            //     return formatNumber(value)
+            //   }
+            // },
             {
               key: "action",
 							label: "",

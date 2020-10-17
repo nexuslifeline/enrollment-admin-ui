@@ -1,120 +1,119 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Personnel Management</h4>
-      </div>
+    <Card title="Personnel Management">
       <div>
-      <!-- add button and search -->
-      <b-row class="mb-3">
-        <b-col md=12>
-          <b-row>
-            <b-col md=8>
-              <b-button
-                v-if="isAccessible($options.PersonnelPermissions.ADD.id)"
-                variant="primary"
-                @click="setCreate()">
-                <v-icon name="plus-circle" /> ADD NEW USER
-              </b-button>
-            </b-col>
-            <b-col md=4>
-              <b-form-input
-                v-model="filters.user.criteria"
-                type="text"
-                placeholder="Search"
-                debounce="500">
-              </b-form-input>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <!-- end add button and search -->
-      <!-- table -->
-      <b-row >
-        <b-col md=12>
-          <b-table
-            small hover outlined show-empty
-            :fields="tables.users.fields"
-            :busy="tables.users.isBusy"
-            :items="tables.users.items"
-            :current-page="paginations.user.page"
-            :per-page="paginations.user.perPage"
-            :filter="filters.user.criteria"
-            @filtered="onFiltered($event, paginations.user)">
-            <template v-slot:cell(photo)="data">
-              <b-media>
-                <template v-slot:aside>
-                  <b-avatar
-                    rounded
-                    blank
-                    size="64"
-                    :text="data.item.firstName.charAt(0) + '' + data.item.lastName.charAt(0)"
-                    :src="avatar(data.item)" />
-                </template>
-              </b-media>
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="isAccessible([
-                  $options.PersonnelPermissions.EDIT.id,
-                  $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id,
-                  $options.PersonnelPermissions.DELETE.id
-                ])"
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret>
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
-                  @click="setUpdatePersonnel(row)"
-                  :disabled="showModalEntry">
-                  Edit Personnel Info
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id)"
-                  @click="setUpdateUser(row)"
-                  :disabled="showModalConfirmation">
-                  Edit Account Info
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
-                  @click="forms.user.fields.id = row.item.id, showModalConfirmation = true">
-                  Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{ paginations.user.from }} to {{ paginations.user.to }} of {{ paginations.user.totalRows }} records.
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=8>
+                <b-button
+                  v-if="isAccessible($options.PersonnelPermissions.ADD.id)"
+                  variant="primary"
+                  @click="setCreate()">
+                  <v-icon name="plus-circle" /> ADD NEW USER
+                </b-button>
               </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.user.page"
-                :total-rows="paginations.user.totalRows"
-                :per-page="paginations.user.perPage"
-                size="sm"
-                align="end"
-                @input="recordDetails(paginations.user)" />
+              <b-col md=4>
+                <b-form-input
+                  v-model="filters.user.criteria"
+                  type="text"
+                  placeholder="Search"
+                  debounce="500">
+                </b-form-input>
               </b-col>
             </b-row>
-        </b-col>
-      </b-row>
-      <!-- end table -->
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              class="c-table"
+              small hover outlined show-empty
+              :fields="tables.users.fields"
+              :busy="tables.users.isBusy"
+              :items="tables.users.items"
+              :current-page="paginations.user.page"
+              :per-page="paginations.user.perPage"
+              :filter="filters.user.criteria"
+              @filtered="onFiltered($event, paginations.user)">
+              <template v-slot:cell(photo)="data">
+                <b-media>
+                  <template v-slot:aside>
+                    <b-avatar
+                      rounded
+                      blank
+                      size="64"
+                      :text="data.item.firstName.charAt(0) + '' + data.item.lastName.charAt(0)"
+                      :src="avatar(data.item)" />
+                  </template>
+                </b-media>
+              </template>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.PersonnelPermissions.EDIT.id,
+                    $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id,
+                    $options.PersonnelPermissions.DELETE.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
+                    @click="setUpdatePersonnel(row)"
+                    :disabled="showModalEntry">
+                    Edit Personnel Info
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id)"
+                    @click="setUpdateUser(row)"
+                    :disabled="showModalConfirmation">
+                    Edit Account Info
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
+                    @click="forms.user.fields.id = row.item.id, showModalConfirmation = true">
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.user.from }} to {{ paginations.user.to }} of {{ paginations.user.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  class="c-pagination"
+                  v-model="paginations.user.page"
+                  :total-rows="paginations.user.totalRows"
+                  :per-page="paginations.user.perPage"
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.user)" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry Add -->
     <b-modal
       @shown="$refs.username.focus()"
@@ -554,11 +553,19 @@ import Tables from '../../helpers/tables'
 import Personnel from '../../mixins/api/Personnel'
 import Access from '../../mixins/utils/Access'
 import { PersonnelPermissions } from '../../helpers/enum'
+import Card from '../components/Card'
+
 export default {
 	name: "Personnel",
-  mixins: [ PersonnelApi, UserGroupApi, Tables, Access ],
+  mixins: [
+    PersonnelApi,
+    UserGroupApi,
+    Tables,
+    Access
+  ],
   components: {
     PhotoViewer,
+    Card
   },
   PersonnelPermissions,
 	data() {

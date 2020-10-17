@@ -1,9 +1,6 @@
 <template>
 	<div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Student Assessment Fee</h4>
-      </div>
+    <Card title="Student Assessment Fee">
       <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="filters.student.schoolCategoryId = $event, loadAcademicRecord()"
@@ -56,7 +53,7 @@
           </b-col>
         </b-row> <!-- row button and search input -->
         <b-table
-          details-td-class="table-secondary"
+          class="c-table"
           hover outlined small responsive show-empty
           :fields="tables.students.fields"
           :items="tables.students.items"
@@ -317,6 +314,7 @@
           </b-col>
           <b-col md=6>
             <b-pagination
+              class="c-pagination"
               v-model="paginations.student.page"
               :total-rows="paginations.student.totalRows"
               :per-page="paginations.student.perPage"
@@ -327,7 +325,7 @@
           </b-col>
         </b-row>
       </div>
-    </div>
+    </Card>
     <!-- MODAL FEES -->
 		<b-modal
 			v-model="showModalFees"
@@ -449,11 +447,22 @@ import { showNotification, formatNumber } from "../../helpers/forms"
 import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
 import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
+
 export default {
 	name: "StudentFee",
-  mixins: [StudentApi, CourseApi, AcademicRecordApi, RateSheetApi, SchoolFeeApi, Tables, Access],
+  mixins: [
+    StudentApi,
+    CourseApi,
+    AcademicRecordApi,
+    RateSheetApi,
+    SchoolFeeApi,
+    Tables,
+    Access
+  ],
   components: {
-    SchoolCategoryTabs
+    SchoolCategoryTabs,
+    Card
   },
   StudentFeePermissions,
 	data() {
@@ -482,19 +491,19 @@ export default {
             },
             {
 							key: "contact",
-							label: "Contact Info",
+							label: "Contact",
 							tdClass: "align-middle",
 							thStyle: { width: "30%" },
 						},
 						{
 							key: "education",
-							label: "Education Level",
+							label: "Education",
 							tdClass: "align-middle",
 							thStyle: { width: "25%"}
             },
             {
 							key: "status",
-							label: "Assessment Status",
+							label: "Status",
               tdClass: "align-middle text-center",
               thClass: "text-center",
 							thStyle: { width: "12%"}

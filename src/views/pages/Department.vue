@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Department Management</h4>
-      </div>
+    <Card title="Department Management">
       <div>
         <!-- add button and search -->
         <b-row class="mb-3">
@@ -32,6 +29,7 @@
         <b-row >
           <b-col md=12>
             <b-table
+              class="c-table"
               hover outlined show-empty
               :fields="tables.departments.fields"
               :busy="tables.departments.isBusy"
@@ -84,6 +82,7 @@
                 </b-col>
               <b-col md=6>
                 <b-pagination
+                  class="c-pagination"
                   v-model="paginations.department.page"
                   :total-rows="paginations.department.totalRows"
                   :per-page="paginations.department.perPage"
@@ -96,7 +95,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -207,10 +206,18 @@ import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 import { DepartmentPermissions } from '../../helpers/enum'
 import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
 
 export default {
 	name: "department",
-  mixins: [ DepartmentApi, Tables, Access ],
+  mixins: [
+    DepartmentApi,
+    Tables,
+    Access
+  ],
+  components: {
+    Card
+  },
   DepartmentPermissions,
 	data() {
 		return {

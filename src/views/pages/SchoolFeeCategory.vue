@@ -1,103 +1,102 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">School Fee Category Management</h4>
-      </div>
+    <Card title="School Fee Category Management">
       <div>
-      <!-- add button and search -->
-      <b-row class="mb-3">
-        <b-col md=12>
-          <b-row>
-            <b-col md=8>
-              <b-button
-                v-if="isAccessible($options.FeeCategoryPermissions.ADD.id)"
-                variant="primary"
-                @click="setCreate()">
-                <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE CATEGORY
-              </b-button>
-            </b-col>
-            <b-col md=4>
-              <b-form-input
-                v-model="filters.schoolFeeCategory.criteria"
-                type="text"
-                placeholder="Search"
-                debounce="500">
-              </b-form-input>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <!-- end add button and search -->
-      <!-- table -->
-      <b-row >
-        <b-col md=12>
-          <b-table
-            small hover outlined show-empty
-            :fields="tables.schoolFeeCategories.fields"
-            :busy="tables.schoolFeeCategories.isBusy"
-            :items="tables.schoolFeeCategories.items"
-            :current-page="paginations.schoolFeeCategory.page"
-            :per-page="paginations.schoolFeeCategory.perPage"
-            :filter="filters.schoolFeeCategory.criteria"
-            @filtered="onFiltered($event, paginations.schoolFeeCategory)">
-            <!-- :filter="filters.schoolFeeCategory.criteria> -->
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="isAccessible([
-                  $options.FeeCategoryPermissions.EDIT.id,
-                  $options.FeeCategoryPermissions.DELETE.id
-                ])"
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret>
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  v-if="isAccessible($options.FeeCategoryPermissions.EDIT.id)"
-                  @click="setUpdate(row)"
-                  :disabled="showModalEntry">
-                  Edit
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.FeeCategoryPermissions.DELETE.id)"
-                  @click="forms.schoolFeeCategory.fields.id = row.item.id, showModalConfirmation = true"
-                  :disabled="showModalConfirmation">
-                  Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{ paginations.schoolFeeCategory.from }} to {{ paginations.schoolFeeCategory.to }} of {{ paginations.schoolFeeCategory.totalRows }} records.
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=8>
+                <b-button
+                  v-if="isAccessible($options.FeeCategoryPermissions.ADD.id)"
+                  variant="primary"
+                  @click="setCreate()">
+                  <v-icon name="plus-circle" /> ADD NEW SCHOOL FEE CATEGORY
+                </b-button>
               </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.schoolFeeCategory.page"
-                :total-rows="paginations.schoolFeeCategory.totalRows"
-                :per-page="paginations.schoolFeeCategory.perPage"
-                size="sm"
-                align="end"
-                @input="recordDetails(paginations.schoolFeeCategory)" />
+              <b-col md=4>
+                <b-form-input
+                  v-model="filters.schoolFeeCategory.criteria"
+                  type="text"
+                  placeholder="Search"
+                  debounce="500">
+                </b-form-input>
               </b-col>
             </b-row>
-        </b-col>
-      </b-row>
-      <!-- end table -->
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              class="c-table"
+              small hover outlined show-empty
+              :fields="tables.schoolFeeCategories.fields"
+              :busy="tables.schoolFeeCategories.isBusy"
+              :items="tables.schoolFeeCategories.items"
+              :current-page="paginations.schoolFeeCategory.page"
+              :per-page="paginations.schoolFeeCategory.perPage"
+              :filter="filters.schoolFeeCategory.criteria"
+              @filtered="onFiltered($event, paginations.schoolFeeCategory)">
+              <!-- :filter="filters.schoolFeeCategory.criteria> -->
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.FeeCategoryPermissions.EDIT.id,
+                    $options.FeeCategoryPermissions.DELETE.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.FeeCategoryPermissions.EDIT.id)"
+                    @click="setUpdate(row)"
+                    :disabled="showModalEntry">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.FeeCategoryPermissions.DELETE.id)"
+                    @click="forms.schoolFeeCategory.fields.id = row.item.id, showModalConfirmation = true"
+                    :disabled="showModalConfirmation">
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.schoolFeeCategory.from }} to {{ paginations.schoolFeeCategory.to }} of {{ paginations.schoolFeeCategory.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  class="c-pagination"
+                  v-model="paginations.schoolFeeCategory.page"
+                  :total-rows="paginations.schoolFeeCategory.totalRows"
+                  :per-page="paginations.schoolFeeCategory.perPage"
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.schoolFeeCategory)" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -208,9 +207,18 @@ import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 import Access from '../../mixins/utils/Access'
 import { FeeCategoryPermissions } from '../../helpers/enum'
+import Card from '../components/Card'
+
 export default {
 	name: "schoolFeeCategory",
-  mixins: [ SchoolFeeCategoryApi, Tables, Access ],
+  mixins: [
+    SchoolFeeCategoryApi,
+    Tables,
+    Access
+  ],
+  components: {
+    Card
+  },
   FeeCategoryPermissions,
 	data() {
 		return {

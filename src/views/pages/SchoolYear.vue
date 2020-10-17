@@ -1,105 +1,104 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">School Year Management</h4>
-      </div>
+    <Card title="School Year Management">
       <div>
-      <!-- add button and search -->
-      <b-row class="mb-3">
-        <b-col md=12>
-          <b-row>
-            <b-col md=8>
-              <b-button
-                v-if="isAccessible($options.SchoolYearPermissions.ADD.id)"
-                variant="outline-primary"
-                @click="setCreate()">
-                <v-icon name="plus-circle" /> ADD NEW SCHOOL YEAR
-              </b-button>
-            </b-col>
-            <b-col md=4>
-              <b-form-input
-                v-model="filters.schoolYear.criteria"
-                type="text"
-                placeholder="Search">
-              </b-form-input>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <!-- end add button and search -->
-      <!-- table -->
-      <b-row >
-        <b-col md=12>
-          <b-table
-            small hover outlined show-empty
-            :fields="tables.schoolYears.fields"
-            :busy="tables.schoolYears.isBusy"
-            :items.sync="tables.schoolYears.items"
-            :current-page="paginations.schoolYear.page"
-            :per-page="paginations.schoolYear.perPage"
-            :filter="filters.schoolYear.criteria">
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(isActive)="row">
-              <b-badge :variant="row.item.isActive ? 'success' : 'danger'">
-                {{row.item.isActive ? 'Active' : 'Inactive'}}
-              </b-badge>
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="isAccessible([
-                  $options.SchoolYearPermissions.EDIT.id,
-                  $options.SchoolYearPermissions.DELETE.id
-                ])"
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret>
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  v-if="isAccessible($options.SchoolYearPermissions.EDIT.id)"
-                  @click="setUpdate(row)"
-                  :disabled="showModalEntry" >
-                  Edit
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.SchoolYearPermissions.DELETE.id)"
-                  @click="forms.schoolYear.fields.id = row.item.id, showModalConfirmation = true"
-                  :disabled="showModalConfirmation">
-                  Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{ paginations.schoolYear.from }} to {{ paginations.schoolYear.to }} of {{ paginations.schoolYear.totalRows }} records.
+        <!-- add button and search -->
+        <b-row class="mb-3">
+          <b-col md=12>
+            <b-row>
+              <b-col md=8>
+                <b-button
+                  v-if="isAccessible($options.SchoolYearPermissions.ADD.id)"
+                  variant="outline-primary"
+                  @click="setCreate()">
+                  <v-icon name="plus-circle" /> ADD NEW SCHOOL YEAR
+                </b-button>
               </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.schoolYear.page"
-                :total-rows="paginations.schoolYear.totalRows"
-                :per-page="paginations.schoolYear.perPage"
-                size="sm"
-                align="end"
-                @input="recordDetails(paginations.schoolYear)" />
+              <b-col md=4>
+                <b-form-input
+                  v-model="filters.schoolYear.criteria"
+                  type="text"
+                  placeholder="Search">
+                </b-form-input>
               </b-col>
             </b-row>
-        </b-col>
-      </b-row>
-      <!-- end table -->
+          </b-col>
+        </b-row>
+        <!-- end add button and search -->
+        <!-- table -->
+        <b-row >
+          <b-col md=12>
+            <b-table
+              class="c-table"
+              small hover outlined show-empty
+              :fields="tables.schoolYears.fields"
+              :busy="tables.schoolYears.isBusy"
+              :items.sync="tables.schoolYears.items"
+              :current-page="paginations.schoolYear.page"
+              :per-page="paginations.schoolYear.perPage"
+              :filter="filters.schoolYear.criteria">
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon
+                    name="spinner"
+                    spin
+                    class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+              <template v-slot:cell(isActive)="row">
+                <b-badge :variant="row.item.isActive ? 'success' : 'danger'">
+                  {{row.item.isActive ? 'Active' : 'Inactive'}}
+                </b-badge>
+              </template>
+              <template v-slot:cell(action)="row">
+                <b-dropdown
+                  v-if="isAccessible([
+                    $options.SchoolYearPermissions.EDIT.id,
+                    $options.SchoolYearPermissions.DELETE.id
+                  ])"
+                  right
+                  variant="link"
+                  toggle-class="text-decoration-none"
+                  no-caret>
+                  <template v-slot:button-content>
+                    <v-icon name="ellipsis-v" />
+                  </template>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.SchoolYearPermissions.EDIT.id)"
+                    @click="setUpdate(row)"
+                    :disabled="showModalEntry" >
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.SchoolYearPermissions.DELETE.id)"
+                    @click="forms.schoolYear.fields.id = row.item.id, showModalConfirmation = true"
+                    :disabled="showModalConfirmation">
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md=6>
+                Showing {{ paginations.schoolYear.from }} to {{ paginations.schoolYear.to }} of {{ paginations.schoolYear.totalRows }} records.
+                </b-col>
+              <b-col md=6>
+                <b-pagination
+                  class="c-pagination"
+                  v-model="paginations.schoolYear.page"
+                  :total-rows="paginations.schoolYear.totalRows"
+                  :per-page="paginations.schoolYear.perPage"
+                  size="sm"
+                  align="end"
+                  @input="recordDetails(paginations.schoolYear)" />
+                </b-col>
+              </b-row>
+          </b-col>
+        </b-row>
+        <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -208,6 +207,14 @@
 </template>
 
 <script>
+import { SchoolYearApi } from "../../mixins/api"
+import Tables from '../../helpers/tables'
+import { clearFields, reset, validate, showNotification } from '../../helpers/forms'
+import { copyValue } from '../../helpers/extractor'
+import { SchoolYearPermissions } from '../../helpers/enum'
+import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
+
 const schoolYearFields = {
   id: null,
   name: null,
@@ -215,16 +222,17 @@ const schoolYearFields = {
   isActive: null,
   startDate: null
 }
-import { SchoolYearApi } from "../../mixins/api"
-import Tables from '../../helpers/tables'
-import { clearFields, reset, validate, showNotification } from '../../helpers/forms'
-import { copyValue } from '../../helpers/extractor'
-import { SchoolYearPermissions } from '../../helpers/enum'
-import Access from '../../mixins/utils/Access'
 
 export default {
   name: "schoolYear",
-  mixins: [ Tables, SchoolYearApi, Access ],
+  mixins: [
+    Tables,
+    SchoolYearApi,
+    Access
+  ],
+  components: {
+    Card
+  },
   SchoolYearPermissions,
   data() {
     return {

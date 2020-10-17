@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Student Management</h4>
-      </div>
+    <Card title="Student Management">
       <div v-show="!showStudentEntry">
         <!-- add button and search -->
         <b-row class="mb-3">
@@ -128,7 +125,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </div>
+    </Card>
     <b-row>
       <b-col md=12 v-show="showStudentEntry">
         <b-overlay :show="isLoading" rounded="sm">
@@ -987,6 +984,15 @@
 </template>
 <script>
 
+import { StudentApi, UserGroupApi } from "../../mixins/api"
+import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
+import { Countries, CivilStatuses, StudentPermissions } from "../../helpers/enum"
+import Tables from "../../helpers/tables"
+import PhotoViewer from '../components/PhotoViewer'
+import { copyValue } from '../../helpers/extractor'
+import Access from '../../mixins/utils/Access'
+import Card from '../components/Card'
+
 const studentFields = {
   id: null,
   //studentNo: null,
@@ -1107,18 +1113,16 @@ const userErrorFields = {
   userPassword: null,
 }
 
-import { StudentApi, UserGroupApi } from "../../mixins/api"
-import { validate, reset, showNotification, clearFields } from '../../helpers/forms'
-import { Countries, CivilStatuses, StudentPermissions } from "../../helpers/enum"
-import Tables from "../../helpers/tables"
-import PhotoViewer from '../components/PhotoViewer'
-import { copyValue } from '../../helpers/extractor'
-import Access from '../../mixins/utils/Access'
 export default {
 	name: "Student",
-  mixins: [StudentApi, Tables, Access],
+  mixins: [
+    StudentApi,
+    Tables,
+    Access
+  ],
   components: {
     PhotoViewer,
+    Card
   },
   StudentPermissions,
 	data() {

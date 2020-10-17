@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Bank Account Management</h4>
-      </div>
+    <Card title="Bank Account Management">
       <div>
         <b-row class="mb-3">
           <b-col md=12>
@@ -84,7 +81,7 @@
         </b-row>
           <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
 			v-model="showModalEntry"
@@ -206,9 +203,17 @@ import { BankAccountApi } from "../../mixins/api"
 import { validate, reset, clearFields, showNotification } from '../../helpers/forms'
 import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
+import Card from '../components/Card'
+
 export default {
 	name: "BankAccount",
-	mixins: [ BankAccountApi, Tables ],
+	mixins: [
+    BankAccountApi,
+    Tables
+  ],
+  components: {
+    Card
+  },
 	data() {
 		return {
       showModalEntry: false,

@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">User Group Management</h4>
-      </div>
+    <Card title="User Group Management">
       <div>
         <!-- add button and search -->
         <b-row class="mb-3">
@@ -33,6 +30,7 @@
         <b-row >
           <b-col md=12>
             <b-table
+              class="c-table"
               hover outlined show-empty
               :fields="tables.userGroups.fields"
               :busy="tables.userGroups.isBusy"
@@ -91,6 +89,7 @@
                 </b-col>
               <b-col md=6>
                 <b-pagination
+                  class="c-pagination"
                   v-model="paginations.userGroup.page"
                   :total-rows="paginations.userGroup.totalRows"
                   :per-page="paginations.userGroup.perPage"
@@ -103,7 +102,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </div>
+    </Card>
     <!-- Modal Entry -->
     <b-modal
       @shown="$refs.code.focus()"
@@ -227,9 +226,18 @@ import { copyValue } from '../../helpers/extractor'
 import Tables from '../../helpers/tables'
 import Access from '../../mixins/utils/Access'
 import { UserGroupPermissions } from '../../helpers/enum'
+import Card from '../components/Card'
+
 export default {
 	name: "UserGroup",
-  mixins: [ UserGroupApi, Tables, Access ],
+  mixins: [
+    UserGroupApi,
+    Tables,
+    Access
+  ],
+  components: {
+    Card
+  },
   UserGroupPermissions,
 	data() {
 		return {

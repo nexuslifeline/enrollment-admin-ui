@@ -1,178 +1,175 @@
 <template>
 	<div class="c-app">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Payment Transactions</h4>
-      </div>
+    <Card title="Payment Transactions">
       <div>
         <b-row class="mb-2"> <!-- row button and search input -->
-            <b-col md="8">
-              <b-form-radio-group @input="loadPaymentList()" v-model="filters.payment.paymentStatusId">
-                <b-form-radio :value="null">Show All</b-form-radio>
-                <b-form-radio
-                  v-for="status in paymentStatuses.values"
-                  :value="status.id"
-                  :key="status.id">
-                {{ status.name }}
-                </b-form-radio>
-              </b-form-radio-group>
-            </b-col>
-            <b-col md="4">
-              <b-form-input
-                v-model="filters.payment.criteria"
-                debounce="500"
-                @update="loadPaymentList()"
-                type="text"
-                placeholder="Search">
-              </b-form-input>
-            </b-col>
-          </b-row> <!-- row button and search input -->
-          <b-table
-            details-td-class="table-secondary"
-            hover outlined small show-empty
-            :fields="tables.payments.fields"
-            :items="tables.payments.items"
-            :busy="tables.payments.isBusy">
-             <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(name)="data">
-              <b-media>
-                <template v-slot:aside>
-                  <b-avatar
-                    rounded
-                    blank
-                    size="64"
-                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
-                    :src="avatar(data.item.student)" />
-                </template>
-                <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
-                <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-                <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
-              </b-media>
-            </template>
-            <template v-slot:cell(contact)="data">
-              Email : {{ data.item.student.email }} <br>
-              <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
-              <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
-            </template>
-            <template v-slot:cell(action)="row">
-              <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
-            </template>
-            <template v-slot:cell(paymentStatusId)="data">
-              <b-badge
-                :variant="data.item.paymentStatusId === paymentStatuses.APPROVED.id
-                  ? 'primary'
-                  : data.item.paymentStatusId === paymentStatuses.SUBMITTED.id ? 'warning' : 'danger'">
-                {{ paymentStatuses.getEnum(data.item.paymentStatusId).name }}
-              </b-badge>
-            </template>
-            <template v-slot:row-details="data">
-              <b-overlay :show="data.item.isLoading" rounded="sm">
-                <b-card>
-                  <b-row class="justify-content-md-center">
-                    <b-col md=8>
-                      <div v-if="data.item.billing">
-                        <h5>{{ data.item.billing.student.firstName }} {{ data.item.billing.student.middleName ? data.item.billing.student.middleName : '' }} {{ data.item.billing.student.lastName }}</h5>
-                        <b-row class="mb-2">
-                          <b-col md=6>
-                            Reference No. : <b>{{ data.item.referenceNo }}</b><br>
-                            Billing No. : {{ data.item.billing.billingNo }}<br>
-                            Due Date. : {{ data.item.billing.dueDate }}
-                          </b-col>
-                          <b-col md=6>
-                            Paid Amount : <b>{{ formatNumber(data.item.amount) }}</b><br>
-                            Total Amount : {{ formatNumber(data.item.billing.totalAmount) }}<br>
-                            Billing Type : {{ data.item.billing.billingType.name }}
-                          </b-col>
-                        </b-row>
-                        <b-table
-                          class="mb-4"
-                          hover outlined small responsive show-empty
-                          :fields="tables.billingItems.fields"
-                          :items="data.item.billing.billingItems"
-                          :busy="tables.billingItems.isBusy">
-                           <template v-slot:table-busy>
-                            <div class="text-center my-2">
-                              <v-icon
-                                name="spinner"
-                                spin
-                                class="mr-2" />
-                              <strong>Loading...</strong>
-                            </div>
-                          </template>
-                        </b-table>
-                      </div>
-                      <div v-if="data.item.files">
-                        <h5>Files</h5>
-                        <b-table
-                          v-if="data.item.files"
-                          hover outlined small responsive show-empty
-                          :fields="tables.files.fields"
-                          :items="data.item.files"
-                          :busy="tables.files.isBusy">
-                          <template v-slot:cell(action)="row">
-                            <b-button
-                              @click="previewFile(row, data)"
-                              size="sm" variant="secondary">
-                              <v-icon
-                                name="search" />
-                            </b-button>
-                          </template>
-                          <template v-slot:table-busy>
-                            <div class="text-center my-2">
-                              <v-icon
-                                name="spinner"
-                                spin
-                                class="mr-2" />
-                              <strong>Loading...</strong>
-                            </div>
-                          </template>
-                        </b-table>
-                      </div>
-                      <b-row v-if="data.item.paymentStatusId === paymentStatuses.SUBMITTED.id">
-                        <b-col md=12>
-                          <b-button
-                            v-if="isAccessible($options.StudentPaymentPermissions.DISAPPROVAL.id)"
-                            @click="setDisapproval(data)"
-                            class="float-right my-2"
-                            variant="outline-danger">Reject</b-button>
-                          <b-button
-                            v-if="isAccessible($options.StudentPaymentPermissions.APPROVAL.id)"
-                            @click="setApproval(data)"
-                            class="float-right my-2 mr-2"
-                            variant="outline-primary">Approve</b-button>
+          <b-col md="8">
+            <b-form-radio-group @input="loadPaymentList()" v-model="filters.payment.paymentStatusId">
+              <b-form-radio :value="null">Show All</b-form-radio>
+              <b-form-radio
+                v-for="status in paymentStatuses.values"
+                :value="status.id"
+                :key="status.id">
+              {{ status.name }}
+              </b-form-radio>
+            </b-form-radio-group>
+          </b-col>
+          <b-col md="4">
+            <b-form-input
+              v-model="filters.payment.criteria"
+              debounce="500"
+              @update="loadPaymentList()"
+              type="text"
+              placeholder="Search">
+            </b-form-input>
+          </b-col>
+        </b-row> <!-- row button and search input -->
+        <b-table
+          class="c-table"
+          hover outlined small show-empty
+          :fields="tables.payments.fields"
+          :items="tables.payments.items"
+          :busy="tables.payments.isBusy">
+            <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon
+                name="spinner"
+                spin
+                class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="data">
+            <b-media>
+              <template v-slot:aside>
+                <b-avatar
+                  rounded
+                  blank
+                  size="64"
+                  :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
+                  :src="avatar(data.item.student)" />
+              </template>
+              <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
+              <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
+              <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
+            </b-media>
+          </template>
+          <template v-slot:cell(contact)="data">
+            Email : {{ data.item.student.email }} <br>
+            <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
+            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+          </template>
+          <template v-slot:cell(action)="row">
+            <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
+          </template>
+          <template v-slot:cell(paymentStatusId)="data">
+            <b-badge
+              :variant="data.item.paymentStatusId === paymentStatuses.APPROVED.id
+                ? 'primary'
+                : data.item.paymentStatusId === paymentStatuses.SUBMITTED.id ? 'warning' : 'danger'">
+              {{ paymentStatuses.getEnum(data.item.paymentStatusId).name }}
+            </b-badge>
+          </template>
+          <template v-slot:row-details="data">
+            <b-overlay :show="data.item.isLoading" rounded="sm">
+              <b-card>
+                <b-row class="justify-content-md-center">
+                  <b-col md=8>
+                    <div v-if="data.item.billing">
+                      <h5>{{ data.item.billing.student.firstName }} {{ data.item.billing.student.middleName ? data.item.billing.student.middleName : '' }} {{ data.item.billing.student.lastName }}</h5>
+                      <b-row class="mb-2">
+                        <b-col md=6>
+                          Reference No. : <b>{{ data.item.referenceNo }}</b><br>
+                          Billing No. : {{ data.item.billing.billingNo }}<br>
+                          Due Date. : {{ data.item.billing.dueDate }}
+                        </b-col>
+                        <b-col md=6>
+                          Paid Amount : <b>{{ formatNumber(data.item.amount) }}</b><br>
+                          Total Amount : {{ formatNumber(data.item.billing.totalAmount) }}<br>
+                          Billing Type : {{ data.item.billing.billingType.name }}
                         </b-col>
                       </b-row>
-                    </b-col>
-                  </b-row>
-                </b-card>
-              </b-overlay>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md=6>
-              Showing {{paginations.payment.from}} to {{paginations.payment.to}} of {{paginations.payment.totalRows}} records.
-            </b-col>
-            <b-col md=6>
-              <b-pagination
-                v-model="paginations.payment.page"
-                :total-rows="paginations.payment.totalRows"
-                :per-page="paginations.payment.perPage"
-                size="sm"
-                align="end"
-                @input="loadPaymentList()"
-              />
-            </b-col>
-          </b-row>
+                      <b-table
+                        class="mb-4"
+                        hover outlined small responsive show-empty
+                        :fields="tables.billingItems.fields"
+                        :items="data.item.billing.billingItems"
+                        :busy="tables.billingItems.isBusy">
+                          <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
+                      </b-table>
+                    </div>
+                    <div v-if="data.item.files">
+                      <h5>Files</h5>
+                      <b-table
+                        v-if="data.item.files"
+                        hover outlined small responsive show-empty
+                        :fields="tables.files.fields"
+                        :items="data.item.files"
+                        :busy="tables.files.isBusy">
+                        <template v-slot:cell(action)="row">
+                          <b-button
+                            @click="previewFile(row, data)"
+                            size="sm" variant="secondary">
+                            <v-icon
+                              name="search" />
+                          </b-button>
+                        </template>
+                        <template v-slot:table-busy>
+                          <div class="text-center my-2">
+                            <v-icon
+                              name="spinner"
+                              spin
+                              class="mr-2" />
+                            <strong>Loading...</strong>
+                          </div>
+                        </template>
+                      </b-table>
+                    </div>
+                    <b-row v-if="data.item.paymentStatusId === paymentStatuses.SUBMITTED.id">
+                      <b-col md=12>
+                        <b-button
+                          v-if="isAccessible($options.StudentPaymentPermissions.DISAPPROVAL.id)"
+                          @click="setDisapproval(data)"
+                          class="float-right my-2"
+                          variant="outline-danger">Reject</b-button>
+                        <b-button
+                          v-if="isAccessible($options.StudentPaymentPermissions.APPROVAL.id)"
+                          @click="setApproval(data)"
+                          class="float-right my-2 mr-2"
+                          variant="outline-primary">Approve</b-button>
+                      </b-col>
+                    </b-row>
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-overlay>
+          </template>
+        </b-table>
+        <b-row>
+          <b-col md=6>
+            Showing {{paginations.payment.from}} to {{paginations.payment.to}} of {{paginations.payment.totalRows}} records.
+          </b-col>
+          <b-col md=6>
+            <b-pagination
+              v-model="paginations.payment.page"
+              :total-rows="paginations.payment.totalRows"
+              :per-page="paginations.payment.perPage"
+              size="sm"
+              align="end"
+              @input="loadPaymentList()"
+            />
+          </b-col>
+        </b-row>
       </div>
-    </div>
+    </Card>
     <!-- Modal Preview -->
     <FileViewer
       :show="fileViewer.paymentFile.show"
@@ -406,14 +403,23 @@ import { copyValue } from '../../helpers/extractor'
 import FileViewer from '../components/FileViewer'
 import Access from '../../mixins/utils/Access'
 import { format } from "date-fns";
+import Card from '../components/Card'
 
 export default {
 	name: "Payment",
-  mixins: [PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi, Tables, Access],
+  mixins: [
+    PaymentApi,
+    PaymentFileApi,
+    BillingApi,
+    PaymentReceiptFileApi,
+    Tables,
+    Access
+  ],
   components: {
     FileUploader,
     FileItem,
-    FileViewer
+    FileViewer,
+    Card
   },
   StudentPaymentPermissions,
 	data() {
@@ -472,7 +478,7 @@ export default {
 							key: "name",
 							label: "Student",
 							tdClass: "align-middle",
-              thStyle: { width: "20%"},
+              thStyle: { width: "auto" },
               // formatter: (value, key, item) => {
               //   item.student.middleName = item.student.middleName ? item.student.middleName : ''
               //   item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
@@ -481,43 +487,14 @@ export default {
             },
             {
 							key: "contact",
-							label: "Contact Info",
+							label: "Contact",
 							tdClass: "align-middle",
-							thStyle: { width: "15%" },
+							thStyle: { width: "auto" },
 						},
             {
 							key: "datePaid",
 							label: "Date Paid",
 							tdClass: "align-middle",
-              thStyle: { width: "10%"}
-						},
-						{
-							key: "referenceNo",
-							label: "Ref No.",
-							tdClass: "align-middle",
-							thStyle: { width: "12%"}
-            },
-            {
-							key: "paymentMode.name",
-							label: "Payment Mode",
-							tdClass: "align-middle",
-              thStyle: { width: "18%"}
-						},
-						{
-							key: "amount",
-							label: "Amount",
-              tdClass: "align-middle text-right",
-              thClass: "text-right",
-              thStyle: { width: "auto"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
-            },
-            {
-							key: "submittedDate",
-							label: "Date Submitted",
-              tdClass: "align-middle text-center",
-              thClass: "text-center",
               thStyle: { width: "10%"},
               formatter: (value, key, item) => {
                 if(!value)
@@ -526,6 +503,41 @@ export default {
                 return format(new Date(value), 'MM/dd/yyyy')
               }
 						},
+						// {
+						// 	key: "referenceNo",
+						// 	label: "Ref No.",
+						// 	tdClass: "align-middle",
+						// 	thStyle: { width: "12%"}
+            // },
+            // {
+						// 	key: "paymentMode.name",
+						// 	label: "Payment Mode",
+						// 	tdClass: "align-middle",
+            //   thStyle: { width: "18%"}
+						// },
+						{
+							key: "amount",
+							label: "Amount",
+              tdClass: "align-middle text-right",
+              thClass: "text-right",
+              thStyle: { width: "10%"},
+              formatter: (value) => {
+                return formatNumber(value)
+              }
+            },
+            // {
+						// 	key: "submittedDate",
+						// 	label: "Submitted",
+            //   tdClass: "align-middle text-center",
+            //   thClass: "text-center",
+            //   thStyle: { width: "10%"},
+            //   formatter: (value, key, item) => {
+            //     if(!value)
+            //     return ''
+
+            //     return format(new Date(value), 'MM/dd/yyyy')
+            //   }
+						// },
             {
 							key: "paymentStatusId",
 							label: "Status",

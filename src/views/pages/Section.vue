@@ -1,11 +1,8 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Section and Schedule Management</h4>
-      </div>
+    <Card title="Section and Schedule Management">
       <div v-show="!showEntry">
-         <SchoolCategoryTabs
+        <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="filters.section.schoolCategoryId = $event, loadSections()"
           @clickAll="filters.section.schoolCategoryId = null, loadSections()"
@@ -110,6 +107,7 @@
         <b-row>
           <b-col md="12">
             <b-table
+              class="c-table"
               small
               hover
               outlined
@@ -190,6 +188,7 @@
               </b-col>
               <b-col md=6>
                 <b-pagination
+                  class="c-pagination"
                   v-model="paginations.section.page"
                   :total-rows="paginations.section.totalRows"
                   :per-page="paginations.section.perPage"
@@ -203,7 +202,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </div>
+    </Card>
 
     <div v-show="showEntry">
       <b-overlay :show="forms.section.isLoading" rounded="sm">
@@ -641,13 +640,16 @@ import Schedule from '../components/Schedule'
 import ScheduleViewer from '../components/ScheduleViewer'
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs'
 import Access from '../../mixins/utils/Access';
+import Card from '../components/Card'
+
 export default {
   name: "ClassSection",
   mixins: [SectionApi, SchoolYearApi, SchoolCategoryApi, LevelApi, CourseApi, Tables, PersonnelApi, Access],
   components: {
     Schedule,
     ScheduleViewer,
-    SchoolCategoryTabs
+    SchoolCategoryTabs,
+    Card
   },
   SectionAndSchedulePermissions,
   Days,
@@ -686,12 +688,12 @@ export default {
               tdClass: "align-middle",
               thStyle: { width: "20%" },
             },
-            {
-              key: "description",
-              label: "DESCRIPTION",
-              tdClass: "align-middle",
-              thStyle: { width: "auto" },
-            },
+            // {
+            //   key: "description",
+            //   label: "DESCRIPTION",
+            //   tdClass: "align-middle",
+            //   thStyle: { width: "auto" },
+            // },
             {
               key: "schoolYear.name",
               label: "School Year",

@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Student Management</h4>
-      </div>
+    <Card title="Student Management">
       <div>
         <!-- add button and search -->
         <b-row class="mb-3">
@@ -34,6 +31,7 @@
         <b-row >
           <b-col md=12>
             <b-table
+              class="c-table"
               small hover outlined show-empty
               :fields="tables.students.fields"
               :busy="tables.students.isBusy"
@@ -115,6 +113,7 @@
               </b-col>
               <b-col md=6>
                 <b-pagination
+                  class="c-pagination"
                   v-model="paginations.student.page"
                   :total-rows="paginations.student.totalRows"
                   :per-page="paginations.student.perPage"
@@ -127,7 +126,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </div>
+    </Card>
     <b-modal
       @shown="$refs.username.focus()"
 			v-model="showModalUpdateUser"
@@ -224,6 +223,15 @@
   </div>
 </template>
 <script>
+
+import { StudentApi, UserGroupApi } from "../../../mixins/api"
+import { validate, reset, showNotification, clearFields } from '../../../helpers/forms'
+import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/enum"
+import Tables from "../../../helpers/tables"
+import PhotoViewer from '../../components/PhotoViewer'
+import { copyValue } from '../../../helpers/extractor'
+import Access from '../../../mixins/utils/Access'
+import Card from '../../components/Card'
 
 const studentFields = {
   id: null,
@@ -345,18 +353,16 @@ const userErrorFields = {
   userPassword: null,
 }
 
-import { StudentApi, UserGroupApi } from "../../../mixins/api"
-import { validate, reset, showNotification, clearFields } from '../../../helpers/forms'
-import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/enum"
-import Tables from "../../../helpers/tables"
-import PhotoViewer from '../../components/PhotoViewer'
-import { copyValue } from '../../../helpers/extractor'
-import Access from '../../../mixins/utils/Access'
 export default {
 	name: "StudentList",
-  mixins: [StudentApi, Tables, Access],
+  mixins: [
+    StudentApi,
+    Tables,
+    Access
+  ],
   components: {
     PhotoViewer,
+    Card
   },
   StudentPermissions,
 	data() {

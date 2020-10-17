@@ -1,9 +1,6 @@
 <template>
   <div class="c-page-content">
-    <div>
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Statement of Account</h4>
-      </div>
+    <Card title="Statement of Account">
       <div>
          <SchoolCategoryTabs
           :showAll="true"
@@ -107,7 +104,7 @@
           </b-col>
         </b-row>
       </div>
-    </div>
+    </Card>
     <!-- MODAL ENTRY -->
     <b-modal
 			v-model="showModalEntry"
@@ -368,7 +365,8 @@ import { SchoolCategories, Semesters, BillingStatuses, BillingTypes } from '../.
 import { TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi } from '../../mixins/api'
 import { clearFields, formatNumber, reset, showNotification, validate } from '../../helpers/forms'
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
-import _ from 'lodash'
+import Card from '../components/Card'
+import { debounce } from 'lodash'
 
 const billingFields = {
   student: {
@@ -396,8 +394,19 @@ const batchBillingFields = {
 }
 
 export default {
-  components: { SchoolCategoryTabs, VueBootstrapTypeahead },
-  mixins: [ TermApi, BillingApi, LevelApi, StudentApi, SchoolYearApi, AcademicRecordApi ],
+  components: {
+    SchoolCategoryTabs,
+    VueBootstrapTypeahead,
+    Card
+  },
+  mixins: [
+    TermApi,
+    BillingApi,
+    LevelApi,
+    StudentApi,
+    SchoolYearApi,
+    AcademicRecordApi
+  ],
   SchoolCategories,
   Semesters,
   BillingStatuses,
@@ -709,7 +718,7 @@ export default {
     }
   },
   watch: {
-    'forms.billing.studentQuery': _.debounce(function() { this.loadStudents() }, 500)
+    'forms.billing.studentQuery': debounce(function() { this.loadStudents() }, 500)
   }
 }
 </script>
