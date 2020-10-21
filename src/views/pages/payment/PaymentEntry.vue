@@ -49,7 +49,7 @@
           </div>
           <div class="payment-details">
             <!-- <h5>PAYMENT DETAILS</h5> -->
-            <b-form-group
+            <!-- <b-form-group
               label="Transaction No"
               label-class="required" >
               <b-form-input
@@ -58,7 +58,7 @@
               <b-form-invalid-feedback>
                 {{ forms.payment.errors.transactionNo }}
               </b-form-invalid-feedback>
-            </b-form-group>
+            </b-form-group> -->
             <b-form-group
               label="Reference No"
               label-class="required" >
@@ -342,7 +342,7 @@ import { debounce } from 'lodash'
 const paymentFields = {
   id: null,
   referenceNo: null,
-  transactionNo: null,
+  // transactionNo: null,
   billingId: null,
   studentId: null,
   amount: null,

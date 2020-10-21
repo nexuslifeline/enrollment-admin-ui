@@ -221,6 +221,11 @@ export default [
         label: 'Collections',
         to: '/report/collection',
         permissionIds: BankAccountPermissions.getIds()
+      },
+      {
+        label: 'Student Ledger',
+        to: '/report/student-ledger',
+        permissionIds: BankAccountPermissions.getIds()
       }
     ]
   }

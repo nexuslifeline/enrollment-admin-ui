@@ -60,6 +60,7 @@ const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
 
 const Collection = () => import('@/views/pages/reports/Collection')
+const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
 
 Vue.use(Router)
 
@@ -466,6 +467,12 @@ function configRoutes () {
               path: 'collection',
               name: 'Collections',
               component: Collection,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'student-ledger',
+              name: 'Ledger',
+              component: StudentLedger,
               meta: { requiresAuth: true, userType: 0 }
             },
           ]

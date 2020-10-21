@@ -8,7 +8,7 @@
             <b-row>
               <b-col md=8>
                 <b-button
-                  v-if="isAccessible($options.StudentPermissions.ADD.id)"
+                  v-if="isAccessible($options.StudentPermissions.ADD.id) && showAddButton"
                   variant="primary"
                   :to="`/master-files/student/add`">
                   <v-icon name="plus-circle" /> ADD NEW STUDENT
@@ -83,29 +83,31 @@
                     <v-icon name="ellipsis-v" />
                   </template>
                   <b-dropdown-item
+                    v-if="showRowActionButton"
                     :to="`/master-files/student/${row.item.id}/school-records`" >
                     Update School Records
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="isAccessible($options.StudentPermissions.EDIT.id)"
+                    v-if="isAccessible($options.StudentPermissions.EDIT.id) && showRowActionButton"
                     :to="`/master-files/student/${row.item.id}`"
                     :disabled="showStudentEntry">
                     Edit Student Info
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="isAccessible($options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id)"
+                    v-if="isAccessible($options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id) & showRowActionButton"
                     @click="setUpdateUser(row)"
                     :disabled="showModalUpdateUser" >
                     Edit Account
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="isAccessible($options.StudentPermissions.DELETE.id)"
+                    v-if="isAccessible($options.StudentPermissions.DELETE.id) && showRowActionButton"
                     @click="forms.user.fields.id = row.item.id, showModalConfirmation = true"
                     :disabled="showModalConfirmation">
                     Delete
                   </b-dropdown-item>
                   <!-- TODO: SET USER ACCESS OF PREVIEW LEDGER BUTTON -->
                   <b-dropdown-item
+                    v-if="showPreviewLedgerButton"
                     @click="onShowLedgerModal(row.item.id)">
                     Preview Ledger
                   </b-dropdown-item>
@@ -270,7 +272,7 @@
           variant="outline-danger"
           class="btn-close"
           @click="showModalPreview=false">
-          close
+          Close
         </b-button>
       </div>
     </b-modal>
@@ -431,6 +433,21 @@ export default {
     PhotoViewer,
     FileViewer,
     Card
+  },
+  props: {
+     showAddButton: {
+      type: Boolean,
+      default: true
+    },
+    showRowActionButton: {
+      //add edit delete button
+      type: Boolean,
+      default: true
+    },
+    showPreviewLedgerButton: {
+      type: Boolean,
+      default: true
+    }
   },
   StudentPermissions,
 	data() {
