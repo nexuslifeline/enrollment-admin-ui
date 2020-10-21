@@ -128,13 +128,30 @@
             </b-badge>
           </template>
           <template v-slot:cell(action)="{ item: { id } }">
-            <b-btn
-              size="sm"
-              variant="outline-primary"
-              @click="previewBilling(id)"
+            <b-dropdown
+              boundary="window"
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
             >
-              <v-icon name="file-pdf" />
-            </b-btn>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <b-dropdown-item @click="previewBilling(id)">
+                <v-icon name="file-pdf" /> Preview
+              </b-dropdown-item>
+              <b-dropdown-item @click="setUpdateSoa(id)">
+                <v-icon name="pen" /> Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                @click="
+                  (forms.billing.fields.id = id), (showModalConfirmation = true)
+                "
+              >
+                <v-icon name="trash" /> Delete
+              </b-dropdown-item>
+            </b-dropdown>
           </template>
         </b-table>
         <b-row>
@@ -157,115 +174,189 @@
       </div>
     </Card>
     <!-- SINGLE ENTRY -->
-    <Card v-if="showEntry" title="Statement of Account - Generate">
-      <b-row>
-        <b-col md="6">
-          <b-form-group>
-            <label class="required">Student</label>
-            <vue-bootstrap-typeahead
-              v-model="forms.billing.studentQuery"
-              :serializer="
-                (s) => {
-                  return `${s.studentNo ? s.studentNo : 'N/A'} - ${s.name}`;
-                }
-              "
-              :data="options.students.items"
-              placeholder="Input student number or name"
-              ref="studentQuery"
-              @hit="
-                getStudentInfo($event), ($refs.studentQuery.inputValue = '')
-              "
-            >
-              <template slot="suggestion" slot-scope="{ data }">
-                <span>{{
-                  `${data.studentNo ? data.studentNo : 'N/A'} - ${data.name}`
-                }}</span>
-              </template>
-            </vue-bootstrap-typeahead>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="6">
-          <b-form-group>
-            <label>Student No.</label>
-            <b-form-input
-              disabled
-              v-model="forms.billing.fields.student.studentNo"
-            />
-          </b-form-group>
-          <b-form-group>
-            <label>Name</label>
-            <b-form-input
-              disabled
-              v-model="forms.billing.fields.student.name"
-            />
-          </b-form-group>
-          <b-form-group>
-            <label>Level</label>
-            <b-form-input
-              disabled
-              v-model="forms.billing.fields.student.levelName"
-            />
-          </b-form-group>
-          <b-form-group v-if="forms.billing.fields.student.courseName">
-            <label>Course</label>
-            <b-form-input
-              disabled
-              v-model="forms.billing.fields.student.courseName"
-            />
-          </b-form-group>
-          <b-form-group v-if="forms.billing.fields.student.semesterName">
-            <label>Semester</label>
-            <b-form-input
-              disabled
-              v-model="forms.billing.fields.student.semesterName"
-            />
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label class="required">
-              Terms
-              <v-icon v-if="options.terms.isLoading" name="spinner" spin />
-            </label>
-            <b-form-select
-              @input="getTermInfo()"
-              :disabled="options.terms.isLoading"
-              :state="forms.billing.states.termId"
-              v-model="forms.billing.fields.termId"
-            >
-              <template v-slot:first>
-                <b-form-select-option :value="null"
-                  >-- Select Term --</b-form-select-option
-                >
-              </template>
-              <b-form-select-option
-                v-for="term in options.terms.items"
-                :key="term.id"
-                :disabled="term.pivot ? term.pivot.isBilled === 1 : false"
-                :value="term.id"
+    <Card
+      v-if="showEntry"
+      :title="`Statement of Account - Generate (${entryMode})`"
+    >
+      <b-overlay :show="forms.billing.isLoading">
+        <b-row v-if="entryMode !== 'Edit'">
+          <b-col md="6">
+            <b-form-group>
+              <label class="required">Student</label>
+              <vue-bootstrap-typeahead
+                v-model="forms.billing.studentQuery"
+                :serializer="
+                  (s) => {
+                    return `${s.studentNo ? s.studentNo : 'N/A'} - ${s.name}`;
+                  }
+                "
+                :data="options.students.items"
+                placeholder="Input student number or name"
+                ref="studentQuery"
+                @hit="
+                  getStudentInfo($event), ($refs.studentQuery.inputValue = '')
+                "
               >
-                {{
-                  `${term.name} ${
-                    term.pivot
-                      ? term.pivot.isBilled === 1
-                        ? '- Billed'
+                <template slot="suggestion" slot-scope="{ data }">
+                  <span>{{
+                    `${data.studentNo ? data.studentNo : 'N/A'} - ${data.name}`
+                  }}</span>
+                </template>
+              </vue-bootstrap-typeahead>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="6">
+            <b-form-group>
+              <label>Student No.</label>
+              <b-form-input
+                disabled
+                v-model="forms.billing.fields.student.studentNo"
+              />
+            </b-form-group>
+            <b-form-group>
+              <label>Name</label>
+              <b-form-input
+                disabled
+                v-model="forms.billing.fields.student.name"
+              />
+            </b-form-group>
+            <b-form-group>
+              <label>Level</label>
+              <b-form-input
+                disabled
+                v-model="forms.billing.fields.student.levelName"
+              />
+            </b-form-group>
+            <b-form-group v-if="forms.billing.fields.student.courseName">
+              <label>Course</label>
+              <b-form-input
+                disabled
+                v-model="forms.billing.fields.student.courseName"
+              />
+            </b-form-group>
+            <b-form-group v-if="forms.billing.fields.student.semesterName">
+              <label>Semester</label>
+              <b-form-input
+                disabled
+                v-model="forms.billing.fields.student.semesterName"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group>
+              <label class="required">
+                Terms
+                <v-icon v-if="options.terms.isLoading" name="spinner" spin />
+              </label>
+              <b-form-select
+                @input="getTermInfo()"
+                :disabled="options.terms.isLoading || entryMode === 'Edit'"
+                :state="forms.billing.states.termId"
+                v-model="forms.billing.fields.termId"
+              >
+                <template v-slot:first>
+                  <b-form-select-option :value="null"
+                    >-- Select Term --</b-form-select-option
+                  >
+                </template>
+                <b-form-select-option
+                  v-for="term in options.terms.items"
+                  :key="term.id"
+                  :disabled="term.pivot ? term.pivot.isBilled === 1 : false"
+                  :value="term.id"
+                >
+                  {{
+                    `${term.name} ${
+                      term.pivot
+                        ? term.pivot.isBilled === 1
+                          ? '- Billed'
+                          : ''
                         : ''
-                      : ''
-                  }`
-                }}
-              </b-form-select-option>
-            </b-form-select>
-            <b-form-invalid-feedback>
-              {{ forms.billing.errors.termId }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group>
-            <label>Previous Balance</label>
+                    }`
+                  }}
+                </b-form-select-option>
+              </b-form-select>
+              <b-form-invalid-feedback>
+                {{ forms.billing.errors.termId }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group>
+              <label>Previous Balance</label>
+              <vue-autonumeric
+                disabled
+                v-model="forms.billing.fields.previousBalance"
+                class="form-control text-right"
+                :options="[
+                  {
+                    modifyValueOnWheel: false,
+                    emptyInputBehavior: 0,
+                  },
+                ]"
+              >
+              </vue-autonumeric>
+            </b-form-group>
+            <b-form-group>
+              <label>Amount</label>
+              <vue-autonumeric
+                disabled
+                v-model="forms.billing.fields.amount"
+                class="form-control text-right"
+                :options="[
+                  {
+                    modifyValueOnWheel: false,
+                    emptyInputBehavior: 0,
+                  },
+                ]"
+              >
+              </vue-autonumeric>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Due Date</label>
+              <b-form-datepicker
+                :state="forms.billing.states.dueDate"
+                v-model="forms.billing.fields.dueDate"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.billing.errors.dueDate }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row class="mb-3">
+          <b-col md="4">
+            <h5 class="pt-2">OTHER FEES</h5>
+          </b-col>
+          <b-col md="4"> </b-col>
+          <b-col md="4">
+            <b-button
+              @click="showModalFees = true"
+              variant="outline-primary"
+              class="float-right"
+            >
+              <v-icon name="plus-circle" /> New Item
+            </b-button>
+          </b-col>
+        </b-row>
+        <b-table
+          details-td-class="table-secondary"
+          hover
+          outlined
+          small
+          show-empty
+          :fields="tables.billingItems.fields"
+          :items="forms.billing.fields.billingItems"
+          :busy="tables.billingItems.isBusy"
+        >
+          <template v-slot:cell(action)="row">
+            <b-button @click="removeFee(row)" size="sm" variant="danger">
+              <v-icon name="trash" />
+            </b-button>
+          </template>
+          <template v-slot:cell(amount)="row">
             <vue-autonumeric
-              disabled
-              v-model="forms.billing.fields.previousBalance"
+              v-model="row.item.amount"
               class="form-control text-right"
               :options="[
                 {
@@ -275,141 +366,71 @@
               ]"
             >
             </vue-autonumeric>
-          </b-form-group>
-          <b-form-group>
-            <label>Amount</label>
-            <vue-autonumeric
-              disabled
-              v-model="forms.billing.fields.amount"
-              class="form-control text-right"
-              :options="[
-                {
-                  modifyValueOnWheel: false,
-                  emptyInputBehavior: 0,
-                },
-              ]"
+          </template>
+          <template v-slot:custom-foot>
+            <b-tr>
+              <b-td colspan="2" class="text-right">
+                <span class="text-danger font-weight-bold">Total Amount </span>
+              </b-td>
+              <b-td class="text-right">
+                <span class="text-danger font-weight-bold">
+                  {{ totalAmount }}
+                </span>
+              </b-td>
+              <b-td></b-td>
+            </b-tr>
+          </template>
+        </b-table>
+        <b-row>
+          <b-col md="6" offset-md="6">
+            <b-form-group
+              label-cols="6"
+              label="Total Amount Due :"
+              label-class="text-right font-weight-bold"
             >
-            </vue-autonumeric>
-          </b-form-group>
-          <b-form-group>
-            <label class="required">Due Date</label>
-            <b-form-datepicker
-              :state="forms.billing.states.dueDate"
-              v-model="forms.billing.fields.dueDate"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.billing.errors.dueDate }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row class="mb-3">
-        <b-col md="4">
-          <h5 class="pt-2">OTHER FEES</h5>
-        </b-col>
-        <b-col md="4"> </b-col>
-        <b-col md="4">
-          <b-button
-            @click="showModalFees = true"
-            variant="outline-primary"
-            class="float-right"
-          >
-            <v-icon name="plus-circle" /> New Item
-          </b-button>
-        </b-col>
-      </b-row>
-      <b-table
-        details-td-class="table-secondary"
-        hover
-        outlined
-        small
-        show-empty
-        :fields="tables.billingItems.fields"
-        :items="forms.billing.fields.billingItems"
-        :busy="tables.billingItems.isBusy"
-      >
-        <template v-slot:cell(action)="row">
-          <b-button @click="removeFee(row)" size="sm" variant="danger">
-            <v-icon name="trash" />
-          </b-button>
-        </template>
-        <template v-slot:cell(amount)="row">
-          <vue-autonumeric
-            v-model="row.item.amount"
-            class="form-control text-right"
-            :options="[
-              {
-                minimumValue: 0,
-                modifyValueOnWheel: false,
-                emptyInputBehavior: 0,
-              },
-            ]"
-          >
-          </vue-autonumeric>
-        </template>
-        <template v-slot:custom-foot>
-          <b-tr>
-            <b-td colspan="2" class="text-right">
-              <span class="text-danger font-weight-bold">Total Amount </span>
-            </b-td>
-            <b-td class="text-right">
-              <span class="text-danger font-weight-bold">
-                {{ totalAmount }}
-              </span>
-            </b-td>
-            <b-td></b-td>
-          </b-tr>
-        </template>
-      </b-table>
-      <b-row>
-        <b-col md="6" offset-md="6">
-          <b-form-group
-            label-cols="6"
-            label="Total Amount Due :"
-            label-class="text-right font-weight-bold"
-          >
-            <!-- <label>Total Amount Due :</label> -->
-            <vue-autonumeric
-              v-model="forms.billing.fields.totalAmount"
-              disabled
-              class="form-control text-right"
-              :options="[
-                {
-                  modifyValueOnWheel: false,
-                  emptyInputBehavior: 0,
-                },
-              ]"
+              <!-- <label>Total Amount Due :</label> -->
+              <vue-autonumeric
+                v-model="forms.billing.fields.totalAmount"
+                disabled
+                class="form-control text-right"
+                :options="[
+                  {
+                    modifyValueOnWheel: false,
+                    emptyInputBehavior: 0,
+                  },
+                ]"
+              >
+              </vue-autonumeric>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <hr />
+        <b-row>
+          <b-col md="12">
+            <b-button
+              class="float-right btn-save ml-2"
+              @click="showEntry = false"
+              variant="outline-danger"
             >
-            </vue-autonumeric>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <hr />
-      <b-row>
-        <b-col md="12">
-          <b-button
-            class="float-right btn-save ml-2"
-            @click="showEntry = false"
-            variant="outline-danger"
-          >
-            Close
-          </b-button>
-          <b-button
-            :disabled="forms.billing.isProcessing"
-            class="float-right btn-save"
-            @click="onCreateSoa()"
-            variant="outline-primary"
-          >
-            <v-icon
-              v-if="forms.billing.isProcessing"
-              name="sync"
-              spin
-              class="mr-2"
-            />
-            Save
-          </b-button>
-        </b-col>
-      </b-row>
+              Close
+            </b-button>
+            <b-button
+              :disabled="forms.billing.isProcessing"
+              class="float-right btn-save"
+              @click="onSaveSoa()"
+              variant="outline-primary"
+            >
+              <v-icon
+                v-if="forms.billing.isProcessing"
+                name="sync"
+                spin
+                class="mr-2"
+              />
+              Save
+            </b-button>
+          </b-col>
+        </b-row>
+      </b-overlay>
     </Card>
     <Card v-if="showBatchEntry" title="Statement of Account - Batch Generate">
       <b-row>
@@ -561,7 +582,6 @@
             class="form-control text-right"
             :options="[
               {
-                minimumValue: 0,
                 modifyValueOnWheel: false,
                 emptyInputBehavior: 0,
               },
@@ -684,6 +704,39 @@
         </b-button>
       </div>
     </b-modal>
+    <b-modal
+      v-model="showModalConfirmation"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+    >
+      <div slot="modal-title">
+        Delete School Fee
+      </div>
+      Are you sure you want to delete this SOA?
+      <div slot="modal-footer">
+        <b-button
+          :disabled="forms.billing.isProcessing"
+          variant="outline-primary"
+          class="mr-2 btn-save"
+          @click="onDeleteSoa()"
+        >
+          <v-icon
+            v-if="forms.billing.isProcessing"
+            name="sync"
+            spin
+            class="mr-2"
+          />
+          Yes
+        </b-button>
+        <b-button
+          variant="outline-danger"
+          class="btn-close"
+          @click="showModalConfirmation = false"
+        >
+          No
+        </b-button>
+      </div>
+    </b-modal>
     <FileViewer
       :show="fileViewer.show"
       :file="file"
@@ -723,8 +776,10 @@ import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import Card from '../components/Card';
 import { debounce } from 'lodash';
 import tables from '../../helpers/tables';
+import { copyValue } from '../../helpers/extractor';
 
 const billingFields = {
+  id: null,
   student: {
     studentNo: null,
     name: null,
@@ -792,6 +847,8 @@ export default {
       showBatchEntry: false,
       showEntry: false,
       showModalFees: false,
+      showModalConfirmation: false,
+      entryMode: 'Add',
       tables: {
         billings: {
           isBusy: false,
@@ -914,14 +971,15 @@ export default {
       },
       forms: {
         batchBilling: {
-          isProcessing: null,
+          isProcessing: false,
           fields: { ...batchBillingFields },
           states: { ...batchBillingFields },
           errors: { ...batchBillingFields },
         },
         billing: {
-          isProcessing: null,
+          isProcessing: false,
           studentQuery: null,
+          isLoading: false,
           fields: { ...billingFields },
           states: { ...billingFields },
           errors: { ...billingFields },
@@ -1117,6 +1175,7 @@ export default {
       this.getStudentFeeTermsOfStudent(studentId, params).then(({ data }) => {
         terms.items = data;
         terms.isLoading = false;
+        this.getTermInfo();
       });
     },
     onBatchCreateSoa() {
@@ -1148,7 +1207,7 @@ export default {
           validate(batchBilling, errors);
         });
     },
-    onCreateSoa() {
+    onSaveSoa() {
       const {
         billing,
         billing: {
@@ -1174,18 +1233,48 @@ export default {
         billingTypeId: BillingTypes.SOA.id,
       };
       reset(billing);
-      this.addBilling(data)
-        .then(({ data }) => {
-          billing.isProcessing = false;
-          this.loadBillings();
-          showNotification(this, 'success', 'SOA successfully created.');
-          this.showEntry = false;
-        })
-        .catch((error) => {
-          const errors = error.response.data.errors;
-          billing.isProcessing = false;
-          validate(billing, errors);
-        });
+      if (this.entryMode === 'Add') {
+        this.addBilling(data)
+          .then(({ data }) => {
+            billing.isProcessing = false;
+            this.loadBillings();
+            showNotification(this, 'success', 'SOA successfully created.');
+            this.showEntry = false;
+          })
+          .catch((error) => {
+            const errors = error.response.data.errors;
+            billing.isProcessing = false;
+            validate(billing, errors);
+          });
+      } else {
+        this.updateBilling(data, fields.id)
+          .then(({ data }) => {
+            billing.isProcessing = false;
+            this.loadBillings();
+            showNotification(this, 'success', 'SOA successfully updated.');
+            this.showEntry = false;
+          })
+          .catch((error) => {
+            const errors = error.response.data.errors;
+            billing.isProcessing = false;
+            validate(billing, errors);
+          });
+      }
+    },
+    onDeleteSoa() {
+      const {
+        billing,
+        billing: {
+          fields: { id },
+        },
+      } = this.forms;
+      billing.isProcessing = true;
+      this.deleteBilling(id).then(({ data }) => {
+        billing.isProcessing = false;
+        this.loadBillings();
+        showNotification(this, 'success', 'SOA deleted successfully.');
+        this.showModalConfirmation = false;
+      });
     },
     avatar(student) {
       let src = '';
@@ -1223,12 +1312,15 @@ export default {
       const { terms } = this.options;
       const term = terms.items.find((t) => t.id === termId);
       if (term) {
-        fields.previousBalance = term.previousBalance;
+        if (this.entryMode === 'Add') {
+          fields.previousBalance = term.previousBalance;
+        }
         fields.amount = term.pivot.amount;
         fields.studentFeeId = term.pivot.studentFeeId;
       }
     },
     setCreateSoa() {
+      this.entryMode = 'Add';
       const {
         billing,
         billing: { fields },
@@ -1237,7 +1329,30 @@ export default {
       clearFields(fields);
       fields.termId = null;
       fields.billingItems = [];
+      this.options.terms.items = [];
       this.showEntry = true;
+    },
+    setUpdateSoa(id) {
+      const {
+        billing,
+        billing: { fields },
+      } = this.forms;
+      reset(billing);
+      clearFields(fields);
+      this.showEntry = true;
+      this.entryMode = 'Edit';
+      fields.billingItems = [];
+      this.getBilling(id).then(({ data }) => {
+        fields.id = data.id;
+        fields.dueDate = data.dueDate;
+        fields.billingItems = data.billingItems.filter(
+          (b) => b.termId === null
+        );
+        fields.previousBalance = data.previousBalance;
+        this.getStudentInfo(data.student);
+        fields.termId = data.termId;
+        billing.isLoading = false;
+      });
     },
     setCreateBatchSoa() {
       const {
@@ -1282,7 +1397,7 @@ export default {
       } = this.forms.billing;
       let amount = 0;
       billingItems.map((i) => (amount += i.amount));
-      fields.totalAmount = fields.amount + amount;
+      fields.totalAmount = Number(fields.amount) + amount;
       return formatNumber(amount);
     },
     batchTotalAmount() {
