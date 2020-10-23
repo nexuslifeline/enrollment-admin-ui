@@ -710,7 +710,7 @@
       :noCloseOnBackdrop="true"
     >
       <div slot="modal-title">
-        Delete School Fee
+        Delete SOA
       </div>
       Are you sure you want to delete this SOA?
       <div slot="modal-footer">
@@ -1302,6 +1302,10 @@ export default {
             fields.student.semesterName = data.semester.name;
           }
         );
+      } else {
+        fields.student.levelName = null;
+        fields.student.courseName = null;
+        fields.student.semesterName = null;
       }
     },
     getTermInfo() {
@@ -1342,6 +1346,7 @@ export default {
       this.showEntry = true;
       this.entryMode = 'Edit';
       fields.billingItems = [];
+      billing.isLoading = true;
       this.getBilling(id).then(({ data }) => {
         fields.id = data.id;
         fields.dueDate = data.dueDate;
