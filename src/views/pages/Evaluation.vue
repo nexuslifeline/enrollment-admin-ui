@@ -294,10 +294,10 @@
                           </b-form-select>
                         </div>
                       </ActiveViewItem>
-                      <ActiveViewItem label="Course:">
+                      <ActiveViewItem v-if="data.item.course" label="Course:">
                         <div v-if="!data.item.studentCourseEdit" class="mb-3">
                           <span>
-                            {{ data.item.course.description }} {{ data.item.course.major ? ' - ' + data.item.course.major  : '' }}
+                            {{ data.item.course ? data.item.course.description : '' }} {{ data.item.course && data.item.course.major?  ' - ' + data.item.course.major  : '' }}
                           </span>&nbsp;&nbsp;
                           <b-link
                             v-if="data.item.evaluationStatusId === evaluationStatuses.SUBMITTED.id"
@@ -328,7 +328,7 @@
                         {{ getName(data.item, 'level') }}
                         </p>
                       </ActiveViewItem>
-                      <ActiveViewItem label="Semester:">
+                      <ActiveViewItem v-if="data.item.semesterId" label="Semester:">
                         <p>
                         {{ semesters.getEnum(data.item.semesterId).name }}
                         </p>

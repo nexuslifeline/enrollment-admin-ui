@@ -49,7 +49,7 @@
                   :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
                   :src="avatar(data.item.student)" />
               </template>
-              <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
+              <span><b-link @click="loadDetails(data)">{{ data.item.student? data.item.student.name : '' }}</b-link></span><br>
               <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
               <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
             </b-media>
@@ -76,7 +76,7 @@
                 <b-row class="justify-content-md-center">
                   <b-col md=8>
                     <div v-if="data.item.billing">
-                      <h5>{{ data.item.billing.student.firstName }} {{ data.item.billing.student.middleName ? data.item.billing.student.middleName : '' }} {{ data.item.billing.student.lastName }}</h5>
+                      <!-- <h5>{{ data.item.student.name }} </h5> -->
                       <b-row class="mb-2">
                         <b-col md=6>
                           Reference No. : <b>{{ data.item.referenceNo }}</b><br>
@@ -86,7 +86,7 @@
                         <b-col md=6>
                           Paid Amount : <b>{{ formatNumber(data.item.amount) }}</b><br>
                           Total Amount : {{ formatNumber(data.item.billing.totalAmount) }}<br>
-                          Billing Type : {{ data.item.billing.billingType.name }}
+                          Billing Type : {{ data.item.billing.billingType? data.item.billing.billingType.name: '' }}
                         </b-col>
                       </b-row>
                       <b-table
