@@ -358,7 +358,7 @@ export default {
   .header {
     position: fixed;
     width: 100%;
-    z-index: 2;
+    z-index: 4;
   }
 
   .header__menus-container {
