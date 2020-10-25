@@ -40,7 +40,8 @@
             </div>
           </template>
           <template v-slot:cell(name)="data">
-            <b-media>
+            <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
+            <!-- <b-media>
               <template v-slot:aside>
                 <b-avatar
                   rounded
@@ -52,12 +53,10 @@
               <span><b-link @click="loadDetails(data)">{{ data.item.student? data.item.student.name : '' }}</b-link></span><br>
               <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
               <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
-            </b-media>
+            </b-media> -->
           </template>
           <template v-slot:cell(contact)="data">
-            Email : {{ data.item.student.email }} <br>
-            <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
-            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
+            <ContactColumn :data="data.item.student" />
           </template>
           <template v-slot:cell(action)="row">
             <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" />
@@ -159,6 +158,7 @@
           </b-col>
           <b-col md=6>
             <b-pagination
+              class="c-pagination"
               v-model="paginations.payment.page"
               :total-rows="paginations.payment.totalRows"
               :per-page="paginations.payment.perPage"
@@ -404,6 +404,10 @@ import FileViewer from '../components/FileViewer'
 import Access from '../../mixins/utils/Access'
 import { format } from "date-fns";
 import Card from '../components/Card'
+import {
+  StudentColumn,
+  ContactColumn
+} from '../components/ColumnDetails'
 
 export default {
 	name: "Payment",
@@ -419,7 +423,9 @@ export default {
     FileUploader,
     FileItem,
     FileViewer,
-    Card
+    Card,
+    StudentColumn,
+    ContactColumn
   },
   StudentPaymentPermissions,
 	data() {

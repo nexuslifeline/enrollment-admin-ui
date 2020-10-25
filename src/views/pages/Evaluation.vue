@@ -75,30 +75,10 @@
               <span>{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp; </span>  <v-icon name="paperclip"/>
             </template>
             <template v-slot:cell(name)="data">
-              <b-media>
-                <template v-slot:aside>
-                  <AvatarMaker
-                    :avatarId="data.item.student.id"
-                    :size="50"
-                    :text="`${data.item.student.firstName.charAt(0)}${data.item.student.lastName.charAt(0)}`"
-                    :src="avatar(data.item.student)"
-                  />
-                </template>
-                <div><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></div>
-                <div class="text-muted">
-                  {{ data.item.student.email }}
-                </div>
-                <div class="text-muted">
-                  {{ data.item.student.currentAddress || data.item.student.address.currentCompleteAddress }}
-                </div>
-              </b-media>
+              <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
             </template>
             <template v-slot:cell(education)="data">
-              <span>
-                {{ getName(data.item, 'level') }}<br>
-                {{ getName(data.item, 'course') }}<br>
-                <!-- {{ data.item.enrolledYear ? `Enrolled Year: ${data.item.enrolledYear}` : '' }} -->
-              </span>
+              <EducationColumn :data="data.item" />
             </template>
             <template v-slot:cell(studentCategory.name)="{ item: { studentCategory, studentCategoryId } }">
               <b-badge
@@ -874,6 +854,10 @@ import ActiveViewLinks from "../components/ActiveRowViewer/ActiveViewLinks"
 import AttachmentList from "../components/Attachment/AttachmentList"
 import AvatarMaker from '../components/AvatarMaker'
 import Card from '../components/Card'
+import {
+  StudentColumn,
+  EducationColumn
+} from '../components/ColumnDetails'
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -901,7 +885,9 @@ export default {
     ActiveViewItem,
     ActiveViewLinks,
     AvatarMaker,
-    Card
+    Card,
+    StudentColumn,
+    EducationColumn
   },
   EvaluationAndAdmissionPermissions,
 	data() {
@@ -952,12 +938,12 @@ export default {
 							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							// }
 						},
-						// {
-						// 	key: "education",
-						// 	label: "Education",
-						// 	tdClass: "align-middle",
-            //   thStyle: { width: "20%"}
-            // },
+						{
+							key: "education",
+							label: "Education",
+							tdClass: "align-middle",
+              thStyle: { width: "20%"}
+            },
             {
 							key: "submittedDate",
 							label: "Submitted",

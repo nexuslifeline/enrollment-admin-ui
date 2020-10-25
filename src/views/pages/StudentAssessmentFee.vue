@@ -68,7 +68,8 @@
             </div>
           </template>
           <template v-slot:cell(name)="data">
-            <b-media>
+            <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
+            <!-- <b-media>
               <template v-slot:aside>
                 <b-avatar
                   rounded
@@ -80,18 +81,15 @@
               <span><b-link @click="loadDetails(data)">{{ data.item.student.name }}</b-link></span><br>
               <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
               <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
-            </b-media>
+            </b-media> -->
           </template>
-          <template v-slot:cell(contact)="data">
+          <!-- <template v-slot:cell(contact)="data">
             Email : {{ data.item.student.email }} <br>
             <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
             <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
-          </template>
+          </template> -->
           <template v-slot:cell(education)="data">
-            <span>{{ getName(data.item, 'level') + " "
-              + getName(data.item, 'semester') + " "
-              + getName(data.item, 'studentType') }}</span><br>
-            <small v-if="data.item.course">{{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}</small>
+            <EducationColumn :data="data.item" />
           </template>
           <template v-slot:cell(status)="data">
             <b-badge
@@ -448,6 +446,10 @@ import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
 import Tables from "../../helpers/tables"
 import Access from '../../mixins/utils/Access'
 import Card from '../components/Card'
+import {
+  StudentColumn,
+  EducationColumn
+} from '../components/ColumnDetails'
 
 export default {
 	name: "StudentFee",
@@ -462,7 +464,9 @@ export default {
   ],
   components: {
     SchoolCategoryTabs,
-    Card
+    Card,
+    StudentColumn,
+    EducationColumn
   },
   StudentFeePermissions,
 	data() {
@@ -481,7 +485,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "30%"},
+							thStyle: { width: "auto"},
 							// formatter: (value, key, item) => {
 							// 	if(!item.student.middleName){
 							// 		item.student.middleName = ""
@@ -489,17 +493,17 @@ export default {
 							// 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
 							// }
             },
-            {
-							key: "contact",
-							label: "Contact",
-							tdClass: "align-middle",
-							thStyle: { width: "30%" },
-						},
+            // {
+						// 	key: "contact",
+						// 	label: "Contact",
+						// 	tdClass: "align-middle",
+						// 	thStyle: { width: "30%" },
+						// },
 						{
 							key: "education",
 							label: "Education",
 							tdClass: "align-middle",
-							thStyle: { width: "25%"}
+							thStyle: { width: "auto"}
             },
             {
 							key: "status",
