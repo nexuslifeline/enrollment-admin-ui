@@ -142,14 +142,7 @@ import ProfileMaker from '../views/components/ProfileMaker';
 import { AuthApi } from '../mixins/api';
 import WaveBackground from '../views/components/WaveMaker';
 import Access from '../mixins/utils/Access';
-
-const BIG_DESKTOP = 1800;
-const DESKTOP = 1200;
-const TABLET_LANDSCAPE = 900;
-const TABLET_PORTRAIT = 600;
-const PHONE = 599;
-const MEDIUM_PHONE = 380;
-const SMALL_PHONE = 320;
+import { createLimiter } from '../helpers/utils';
 
 const MAIN_NAV_LIMIT = 8;
 const SUB_NAV_LIMIT = 6;
@@ -162,6 +155,7 @@ export default {
   },
   mixins: [AuthApi, Access],
   navItems,
+  createLimiter,
   data() {
     return {
       showDropdown: false,
@@ -219,43 +213,14 @@ export default {
   },
   methods: {
     calculateNavLimit() {
-      let w = window.innerWidth;
-      this.subNavLimit = this.getSubNavLimit(w);
-      this.mainNavLimit = this.getMainNavLimit(w);
+      this.subNavLimit = this.getSubNavLimit();
+      this.mainNavLimit = this.getMainNavLimit();
     },
-    getSubNavLimit(w) {
-      if (w >= BIG_DESKTOP) {
-        return 6;
-      } else if (w >= DESKTOP) {
-        return 5;
-      } else if (w >= TABLET_LANDSCAPE + 150) {
-        return 4;
-      } else if (w >= TABLET_PORTRAIT + 150) {
-        return 3;
-      } else if (w >= PHONE) {
-        return 2;
-      } else if (w >= MEDIUM_PHONE) {
-        return 2;
-      } else {
-        return 1;
-      }
+    getSubNavLimit() {
+      return this.$options.createLimiter([6, 6, 5, 4, 3, 2, 2, 1])
     },
     getMainNavLimit(w) {
-      if (w >= BIG_DESKTOP) {
-        return 8;
-      } else if (w >= DESKTOP) {
-        return 7;
-      } else if (w >= TABLET_LANDSCAPE + 150) {
-        return 6;
-      } else if (w >= TABLET_PORTRAIT + 150) {
-        return 4;
-      } else if (w >= PHONE) {
-        return 4;
-      } else if (w >= MEDIUM_PHONE) {
-        return 3;
-      } else {
-        return 1;
-      }
+      return this.$options.createLimiter([8, 8, 7, 6, 4, 4, 3, 1])
     },
     hideDropdownItems() {
       this.showDropdown = false;

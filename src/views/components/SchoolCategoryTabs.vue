@@ -39,7 +39,8 @@
               ? (moreCategories.find(v => v.id === activeSchoolCategoryId) || {}).name
               : 'More'
           }}
-          <BIconCaretDownFill scale=".8" class="ml-2" />
+          <BIconCaretUpFill v-if="openMore" scale=".8" class="ml-2" />
+          <BIconCaretDownFill v-else scale=".8" class="ml-2" />
           <div v-if="openMore" class="school-category__more-items-container">
             <ul class="school-category__more-items">
               <li class="school-category__more-item"
@@ -55,18 +56,13 @@
   </div>
 </template>
 <script>
-  const BIG_DESKTOP = 1800;
-  const DESKTOP = 1200;
-  const TABLET_LANDSCAPE = 900;
-  const TABLET_PORTRAIT = 600;
-  const PHONE = 599;
-  const MEDIUM_PHONE = 380;
-  const SMALL_PHONE = 320;
-
   import { SchoolCategories } from '../../helpers/enum'
   import { UserGroups } from '../../helpers/enum';
+  import { createLimiter } from '../../helpers/utils';
   import Access from '../../mixins/utils/Access'
+
   export default {
+    createLimiter,
     props: {
       showAll: false
     },
@@ -121,27 +117,10 @@
         this.isAccessibleSchoolCategory(SchoolCategories.VOCATIONAL.id)
       },
       calculateNavLimit() {
-        let w = window.innerWidth;
-        this.tabLimit = this.getTabLimit(w);
+        this.tabLimit = this.getTabLimit();
       },
-      getTabLimit(w) {
-        if (w >= BIG_DESKTOP) {
-          return 8;
-        } else if (w >= DESKTOP + 200) {
-          return 7;
-        } else if (w >= DESKTOP) {
-          return 5;
-        } else if (w >= TABLET_LANDSCAPE + 150) {
-          return 4;
-        } else if (w >= TABLET_PORTRAIT + 150) {
-          return 3;
-        } else if (w >= PHONE) {
-          return 2;
-        } else if (w >= MEDIUM_PHONE) {
-          return 1;
-        } else {
-          return 1;
-        }
+      getTabLimit() {
+        return this.$options.createLimiter([8, 7, 5, 4, 3, 2, 1, 1]);
       },
       hideDropdownItems() {
         this.openMore = false;
