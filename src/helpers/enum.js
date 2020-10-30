@@ -51,6 +51,10 @@ export const SchoolCategories = new Enum({
   VOCATIONAL: { id: 7, name: 'Vocational' }
 });
 
+export const SchoolFeeCategories = new Enum({
+  MISCELLANEOUS_FEE: { id: 1, name: 'Miscellaneous Fee' }
+})
+
 export const AdmissionSteps = new Enum({
   PROFILE: { id: 1, name: 'Profile', description: 'Lorem ipsum dolor amet' },
   ADDRESS: { id: 2, name: 'Address', description: 'Lorem ipsum dolor amet' },
