@@ -92,8 +92,12 @@
                         class="mb-4"
                         hover outlined small responsive show-empty
                         :fields="tables.billingItems.fields"
-                        :items="data.item.billing.billingItems"
+                        :items="data.item.billingItems"
                         :busy="tables.billingItems.isBusy">
+                          <template v-slot:cell(item)="row">
+                            <span v-if="data.item.billing.billingTypeId === BillingTypes.INITIAL_FEE.id">{{ row.item.item }}</span>
+                            <span v-else>{{ row.item.term? row.item.term.name : row.item.schoolFee.name }}</span>
+                          </template>
                           <template v-slot:table-busy>
                           <div class="text-center my-2">
                             <v-icon
@@ -394,7 +398,7 @@ const paymentReceiptFileFields = {
 }
 
 import { PaymentApi, PaymentFileApi, BillingApi, PaymentReceiptFileApi } from "../../mixins/api"
-import { PaymentStatuses, StudentPaymentPermissions } from "../../helpers/enum"
+import { PaymentStatuses, StudentPaymentPermissions, BillingTypes } from "../../helpers/enum"
 import { showNotification, formatNumber, clearFields, reset, validate } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
 import FileUploader from "../components/FileUploader"
@@ -449,6 +453,7 @@ export default {
       showModalRejection: false,
 			isLoading: false,
       paymentStatuses: PaymentStatuses,
+      BillingTypes: BillingTypes,
       formatNumber: formatNumber,
       showPaymentReceiptFileModal: false,
       paymentReceiptFiles: [],
@@ -718,6 +723,11 @@ export default {
         this.getBilling(billingId)
           .then(({ data }) => {
             this.$set(row.item, 'billing', data)
+            console.log(row.item.billing)
+            this.getBillingItemsOfBilling(billingId).then(({ data }) => {
+                this.$set(row.item, 'billingItems', data)
+                console.log(row.item.billingItems)
+            })
             this.getPaymentFileList(id, params)
               .then(({ data }) => {
                 this.$set(row.item, 'files', data)
