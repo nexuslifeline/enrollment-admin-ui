@@ -91,6 +91,166 @@
               @click="loadDetails(row)" />
           </template>
           <template v-slot:row-details="data">
+            <ActiveRowViewer
+              :isBusy="data.item.isLoading"
+              backTitle="Go back to list"
+              @onBack="data.toggleDetails()"
+              :options="[
+
+              ]">
+              <template v-slot:header>
+                <div class="active-view__header-details-container">
+                  <AvatarMaker
+                    :avatarId="data.item.student.id"
+                    :size="50"
+                    :text="`${data.item.student.firstName.charAt(0)}${data.item.student.lastName.charAt(0)}`"
+                    :src="avatar(data.item.student)"
+                  />
+                  <div class="active-view__header-details">
+                    <p class="active-view__header-name">{{ data.item.student.name }}</p>
+                    <p class="active-view__header-email">{{ data.item.student.email }}</p>
+                  </div>
+                </div>
+              </template>
+              <template v-slot:content>
+                <div>
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Level: ">
+                      <p>
+                        {{ getName(data.item, 'level') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Course: ">
+                      <p>
+                        {{ getName(data.item, 'course') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem v-if="!!getName(data.item, 'course')" label="Semester: ">
+                      <p>
+                        {{ getName(data.item, 'semester') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="School Year: ">
+                      <p>
+                        {{ getName(data.item, 'schoolYear') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Section: ">
+                      <p>
+                        <template v-if="!changeSection">
+                          {{ !data.item.sectionId
+                          ? 'No Section'
+                          : data.item.sectionId }} <!---- get section value here -->
+                          <span class="ml-2">[<a href='#' @click.prevent="changeSection = true">Change</a>]</span>
+                        </template>
+                        <b-form-select v-else
+                          class="section-select"
+                          v-model="data.item.sectionId"
+                          @change="prePopulateStudentSubjects(data)"
+                          :disabled="data.item.academicRecordStatusId !== AcademicRecordStatuses.DRAFT.id"
+                          >
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
+                          </template>
+                          <b-form-select-option
+                            v-for="section in filterSection(data)"
+                            :key="section.id"
+                            :value="section.id">
+                            {{ section.name }}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </p>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
+                </div>
+                <div>
+                  <div class="details__section-button-container">
+                    <button class="btn btn-outline-primary add-subject-button"
+                      v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
+                      @click="onAddSubject(data.item)">
+                      <v-icon name="plus-circle" /> ADD SUBJECT
+                    </button>
+                  </div>
+                  <b-table
+                    class="mb-4"
+                    hover outlined small responsive show-empty
+                    :fields="tables.subjects.fields"
+                    :items="data.item.subjects"
+                    :busy="tables.subjects.isBusy">
+                    <template v-slot:cell(name)="row">
+                      <div v-if="!!row.item.name && !!row.item.name">{{ row.item.name }}</div>
+                      <div v-if="!!row.item.description">{{ row.item.description }}</div>
+                    </template>
+                    <template v-slot:cell(action)="row">
+                      <b-button
+                        v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
+                        @click="removeSubject(data.item.subjects, row)"
+                        size="sm" variant="danger">
+                        <v-icon name="trash" />
+                      </b-button>
+                    </template>
+                    <template v-slot:cell(section)="row">
+                      <span>{{ row.item.section ? row.item.section.name : '' }}</span>
+                      <b-dropdown
+                        right
+                        variant="link"
+                        toggle-class="text-decoration-none"
+                        no-caret>
+                        <template v-slot:button-content>
+                          <v-icon name="ellipsis-v" />
+                        </template>
+                        <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+                        <b-dropdown-item
+                          v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
+                          @click.prevent="onShowModalSection(row.item, data)">
+                          Change
+                        </b-dropdown-item>
+                        <b-dropdown-item @click.prevent="onSectionSubjectClear(row)">
+                          Clear
+                        </b-dropdown-item>
+                      </b-dropdown>
+                      <!-- <span v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id">
+                        <a class="float-right" href="#" @click.prevent="onShowModalSection(row.item, data)">[Change]</a>
+                        <br>
+                        <a class="float-right" href="#" @click.prevent="onSectionSubjectClear(row)">[Clear]</a>
+                      </span> -->
+                    </template>
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon
+                          name="spinner"
+                          spin
+                          class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                    <template v-slot:custom-foot>
+                      <b-tr class="font-weight-bold">
+                        <b-td colspan=2 class="text-right">
+                          <span class="text-danger">Total Units </span>
+                        </b-td>
+                        <b-td class="text-center">
+                          <span class="text-danger">
+                              {{ totalUnits(data.item.subjects, 'units') }}
+                          </span>
+                        </b-td>
+                        <b-td class="text-center">
+                          <span class="text-danger">
+                              {{ totalUnits(data.item.subjects, 'labs') }}
+                          </span>
+                        </b-td>
+                        <b-td class="text-center">
+                          <span class="text-danger">
+                              {{ totalUnits(data.item.subjects, 'totalUnits') }}
+                          </span>
+                        </b-td>
+                        <b-td colspan="2"></b-td>
+                      </b-tr>
+                    </template>
+                  </b-table>
+                </div>
+              </template>
+            </ActiveRowViewer>
             <b-overlay :show="isLoading" rounded="sm">
               <b-row class="m-2">
                 <b-col md="3">
@@ -121,37 +281,6 @@
                       <h5 class="pt-2">SUBJECTS</h5>
                     </b-col>
                   </b-row>
-                  <div class="details__section-button-container">
-                    <div class="section__container">
-                      <label >Section</label>
-                      <b-form-select
-                        class="section-select"
-                        v-model="data.item.sectionId"
-                        @change="prePopulateStudentSubjects(data)"
-                        :disabled="data.item.academicRecordStatusId !== AcademicRecordStatuses.DRAFT.id"
-                        >
-                        <template v-slot:first>
-                          <b-form-select-option :value="null" disabled>-- Section --</b-form-select-option>
-                        </template>
-                        <b-form-select-option
-                          v-for="section in filterSection(data)"
-                          :key="section.id"
-                          :value="section.id">
-                          {{ section.name }}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </div>
-                      <!-- <b-button class="add-subject-button" variant="outline-primary"
-                        @click="onAddSubject(data.item)">
-                        <v-icon name="plus-circle" /> ADD SUBJECT
-                      </b-button> -->
-
-                    <button class="btn btn-outline-primary add-subject-button"
-                      v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id"
-                      @click="onAddSubject(data.item)">
-                      <v-icon name="plus-circle" /> ADD SUBJECT
-                    </button>
-                  </div>
                   <b-table
                     class="mb-4"
                     hover outlined small responsive show-empty
@@ -167,7 +296,7 @@
                       </b-button>
                     </template>
                     <template v-slot:cell(section)="row">
-                      <span>{{ row.item.section ? row.item.section.name : '' }}</span>
+                      <span>{{ row.item.section ? row.item.section.name : '' }}</span>xxxx
                       <span v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id">
                         <a class="float-right" href="#" @click.prevent="onShowModalSection(row.item, data)">[Change]</a>
                         <br>
@@ -569,6 +698,12 @@ import Tables from "../../helpers/tables"
 import Access from '../../mixins/utils/Access'
 import Card from '../components/Card'
 import AvatarMaker from '../components/AvatarMaker'
+import ActiveRowViewer from "../components/ActiveRowViewer/ActiveRowViewer"
+import ActiveViewHeader from "../components/ActiveRowViewer/ActiveViewHeader"
+import ActiveViewItems from "../components/ActiveRowViewer/ActiveViewItems"
+import ActiveViewItem from "../components/ActiveRowViewer/ActiveViewItem"
+import ActiveViewLinks from "../components/ActiveRowViewer/ActiveViewLinks"
+import AttachmentList from "../components/Attachment/AttachmentList"
 import {
   StudentColumn,
   EducationColumn
@@ -611,7 +746,11 @@ export default {
     Card,
     AvatarMaker,
     StudentColumn,
-    EducationColumn
+    EducationColumn,
+    ActiveRowViewer,
+    ActiveViewHeader,
+    ActiveViewItems,
+    ActiveViewItem,
   },
   StudentSubjectPermissions,
 	data() {
@@ -623,6 +762,7 @@ export default {
       showModalSection: false,
 			isLoading: false,
       AcademicRecordStatuses: AcademicRecordStatuses,
+      changeSection: false,
       days: Days,
       file: {
         type: null,
@@ -694,21 +834,9 @@ export default {
         subjects: {
 					isBusy: false,
 					fields: [
-            // {
-						// 	key: "code",
-						// 	label: "Code",
-						// 	tdClass: "align-middle",
-						// 	thStyle: {width: "6%"}
-						// },
 						{
 							key: "name",
 							label: "Subject Code",
-							tdClass: "align-middle",
-							thStyle: {width: "12%"}
-						},
-						{
-							key: "description",
-							label: "Description",
 							tdClass: "align-middle",
 							thStyle: {width: "auto"}
 						},
@@ -719,13 +847,6 @@ export default {
 							thClass: "text-right text-center",
 							thStyle: {width: "8%"}
             },
-            // {
-						// 	key: "amountPerUnit",
-						// 	label: "Amount per Lec Unit",
-						// 	tdClass: "align-middle text-right",
-						// 	thClass: "text-right",
-						// 	thStyle: {width: "16%"}
-						// },
 						{
 							key: "labs",
 							label: "Lab Units",
@@ -1359,6 +1480,7 @@ export default {
       const params = { paginate: false, curriculumId }
       const { subjects } = this.tables
       subjects.isBusy = true
+      this.changeSection = false
 
       if (!sectionId) {
         subjects.subjects = []

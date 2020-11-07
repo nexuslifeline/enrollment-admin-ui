@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="active-view__body">
-        <div class="active-view__side-nav">
+        <div v-if="!!$slots.navigation" class="active-view__side-nav">
           <slot name="navigation"></slot>
         </div>
         <div class="active-view__content">
@@ -39,7 +39,6 @@
     </b-overlay>
   </div>
 </template>
-
 <script>
   export default {
     data() {
