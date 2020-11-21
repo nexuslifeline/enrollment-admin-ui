@@ -58,6 +58,7 @@ const Soa = () => import('@/views/pages/Soa');
 const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
+const AcademicRecordApplicationList = () => import('@/views/pages/academic-record-applications/AcademicRecordApplicationList')
 
 const Collection = () => import('@/views/pages/reports/Collection')
 const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
@@ -108,8 +109,8 @@ function configRoutes () {
       component: TheContainer,
       children: [
         {
-          path: 'approval',
-          name: 'Approval',
+          path: 'enrollment',
+          name: 'Enrollment',
           redirect: { name: 'Evaluation' },
           component: { render(c) { return c('router-view') } },
           children: [
@@ -117,25 +118,31 @@ function configRoutes () {
               path: 'evaluation',
               name: 'Evaluation',
               component: Evaluation,
-              meta: { requiresAuth: true, userType: 1 }
+              meta: { requiresAuth: true }
             },
             {
               path: 'student-subject-enlisment',
               name: 'Student Subject Enlistment',
               component: StudentAdmission,
-              meta: { requiresAuth: true, userType: 1 }
+              meta: { requiresAuth: true }
             },
             {
               path: 'student-assessment-fee',
               name: 'Student Assessment Fee',
               component: StudentAssessmentFee,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: { requiresAuth: true }
             },
             {
               path: 'payment',
               name: 'Payment',
               component: Payment,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'academic-record-applications',
+              name: 'Academic Record Applications',
+              component: AcademicRecordApplicationList,
+              meta: { requiresAuth: true }
             }
           ]
         },
