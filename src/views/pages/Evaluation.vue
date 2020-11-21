@@ -856,7 +856,7 @@
 	</div> <!-- main container -->
 </template>
 <script>
-import { EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi } from "../../mixins/api"
+import { EvaluationApi, StudentFileApi, CurriculumApi, CourseApi, TranscriptRecordApi } from "../../mixins/api"
 import { SchoolCategories, EvaluationStatuses, Semesters, UserGroups, StudentCategories, EvaluationAndAdmissionPermissions } from "../../helpers/enum"
 import { showNotification, formatNumber, clearFields } from "../../helpers/forms"
 import Tables from "../../helpers/tables"
@@ -890,7 +890,7 @@ export default {
   },
   colorFactory,
   format,
-  mixins: [EvaluationApi, EvaluationFileApi, CurriculumApi, CourseApi, Tables, Access],
+  mixins: [EvaluationApi, StudentFileApi, CurriculumApi, CourseApi, Tables, Access, TranscriptRecordApi],
   components: {
     SchoolCategoryTabs,
     FileViewer,
@@ -1167,7 +1167,9 @@ export default {
           id: evaluationId,
           curriculumId,
           studentCurriculumId,
-          courseId
+          courseId,
+          schoolCategoryId,
+          levelId
         }
       } = this.row
 
@@ -1192,12 +1194,27 @@ export default {
       // const curriculumId = item.curriculumId
       // const studentCurriculumId = item.studentCurriculumId
 
+      //set transcript fields value
+      const fullLevelSchoolCategory = [SchoolCategories.SENIOR_HIGH_SCHOOL.id,SchoolCategories.COLLEGE.id, SchoolCategories.GRADUATE_SCHOOL.id, SchoolCategories.VOCATIONAL.id ]
+
+      if (item.transcriptRecord) {
+        item.transcriptRecord.curriculumId = curriculumId
+        item.transcriptRecord.studentCurriculumId = studentCurriculumId
+        item.transcriptRecord.courseId = courseId
+        item.transcriptRecord.schoolCategoryId = schoolCategoryId
+        item.transcriptRecord.levelId = (fullLevelSchoolCategory.includes(schoolCategoryId) ? null : levelId )
+      }
+
+
       const data = {
         ...evaluation,
         curriculumId,
         studentCurriculumId,
         courseId,
-        subjects
+        subjects,
+        transcriptRecord: {
+          ...item.transcriptRecord
+        }
       }
 
       this.updateEvaluation(data, evaluationId)
@@ -1292,7 +1309,9 @@ export default {
             id,
             schoolCategoryId,
             levelId,
-            courseId
+            courseId,
+            transcriptRecordId,
+            studentId
           }
         } = row;
 
@@ -1309,7 +1328,7 @@ export default {
           params = { paginate: false, schoolCategoryId, courseId }
         }
         item.isLoading = true
-        this.getEvaluationFileList(id, { paginate: false })
+        this.getStudentFileList(studentId, { paginate: false })
         .then(({ data }) => {
           this.$set(row.item, 'files', data)
           if (item.evaluationStatusId === EvaluationStatuses.SUBMITTED.id) {
@@ -1340,7 +1359,7 @@ export default {
               }
             })
           } else {
-            this.loadSubjectsOfEvaluation(id, row)
+            this.loadSubjectsOfTranscriptRecord(transcriptRecordId, row)
           }
         })
 			}
@@ -1409,7 +1428,7 @@ export default {
     previewFile(row, data) {
       this.setupActiveFileViewer(row, data);
 
-      const { evaluationId, id, name, notes } = row.item;
+      const { studentId, id, name, notes } = row.item;
       this.file.type = null
       this.file.src = null
       this.file.name = name
@@ -1418,7 +1437,7 @@ export default {
       this.file.isLoading = true
       this.file.owner = data.item.student;
 
-      this.getEvaluationFilePreview(evaluationId, id)
+      this.getStudentFilePreview(studentId, id)
         .then(response => {
           this.file.type = response.headers.contentType
           this.file.isLoading = false
@@ -1454,10 +1473,10 @@ export default {
       item.isLoading = true
       this.loadCurriculum(id, row)
     },
-    loadSubjectsOfEvaluation(id, row) {
+    loadSubjectsOfTranscriptRecord(transcriptRecordId, row) {
       const { subjects } = this.tables
       subjects.isBusy = true
-      this.getSubjectsOfEvaluation(id, { paginate: false })
+      this.getSubjectsOfTranscriptRecord(transcriptRecordId, { paginate: false })
       .then(({ data }) => {
         this.$set(row.item, 'isTakenAll', false)
         this.$set(row.item, 'subjects', data)
