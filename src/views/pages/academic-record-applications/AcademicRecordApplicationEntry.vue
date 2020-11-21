@@ -2088,7 +2088,6 @@ export default {
               activeTranscriptRecord,
               ...studentData
             } = data;
-            console.log(academicRecordData);
             copyValue(studentData, student);
             copyValue(academicRecordData, academicRecord);
             copyValue(evaluationData, evaluation);
@@ -2220,7 +2219,6 @@ export default {
 
       this.selectedLevelSubject = null;
       this.selectedLevelSubject = subject;
-      console.log(this.selectedLevelSubject);
 
       const params = { paginate: false, subjectId, schoolYearId };
       sectionsOfSubjects.isBusy = true;
@@ -2392,13 +2390,14 @@ export default {
               paginate: false,
             };
             this.getEvaluationList(params).then(({ data }) => {
-              console.log(data);
               const { transcriptRecord: transcriptRecordData } = data[0];
-              console.log(transcriptRecordData);
               copyValue(data[0], evaluation);
               copyValue(transcriptRecordData, transcriptRecord);
-              this.getTranscriptRecord(transcriptRecord.id).then(({ data }) => {
-                transcriptRecord.subjects = data.subjects;
+
+              this.getSubjectsOfTranscriptRecord(transcriptRecord.id, {
+                paginate: false,
+              }).then(({ data }) => {
+                transcriptRecord.subjects = data;
                 this.loadCurriculumList();
                 this.loadLevelsOfCourse();
                 this.loadSections();
