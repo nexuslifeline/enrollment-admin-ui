@@ -2007,7 +2007,11 @@ export default {
           Object.keys(transcriptRecordFields)
         );
 
-        const { sectionId, ...academicRecordDataSet } = academicRecord;
+        const {
+          sectionId,
+          subjects: academicRecordSubjects,
+          ...academicRecordDataSet
+        } = academicRecord;
 
         const data = {
           ...student,
@@ -2064,7 +2068,11 @@ export default {
           };
         });
 
-        const { sectionId, ...academicRecordDataSet } = academicRecord;
+        const {
+          sectionId,
+          subjects: academicRecordSubjects,
+          ...academicRecordDataSet
+        } = academicRecord;
 
         const data = {
           ...student,
