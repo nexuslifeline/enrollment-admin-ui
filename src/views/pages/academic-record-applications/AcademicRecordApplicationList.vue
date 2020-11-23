@@ -298,8 +298,6 @@ const transcriptRecordFields = {
   id: null,
   levelId: null,
   schoolCategoryId: null,
-  schoolYearId: null,
-  semesterId: null,
   courseId: null,
   studentCurriculumId: null,
   curriculumId: null,
