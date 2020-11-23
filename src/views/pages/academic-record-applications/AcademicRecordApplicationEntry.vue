@@ -174,7 +174,7 @@
                   </b-col>
                 </b-row>
                 <!-- <div class="mb-2">
-                  
+
                 </div> -->
                 <div class="academic-entry__info">
                   Account Info
@@ -2013,6 +2013,11 @@ export default {
           ...academicRecordDataSet
         } = academicRecord;
 
+        const {
+          subjects: transcriptRecordSubjects,
+          ...transcriptRecordDataSet
+        } = transcriptRecord
+
         const data = {
           ...student,
           user,
@@ -2022,7 +2027,7 @@ export default {
             isManual: 1,
           },
           transcriptRecord: {
-            ...transcriptRecord,
+            ...transcriptRecordDataSet,
             transcriptRecordStatusId: TranscriptRecordStatuses.DRAFT.id,
           },
           evaluation: {
