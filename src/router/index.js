@@ -62,6 +62,7 @@ const AcademicRecordApplicationList = () => import('@/views/pages/academic-recor
 
 const Collection = () => import('@/views/pages/reports/Collection')
 const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
+const TranscriptRecord = () => import('@/views/pages/TranscriptRecord')
 
 Vue.use(Router)
 
@@ -142,6 +143,12 @@ function configRoutes () {
               path: 'academic-record-applications',
               name: 'Academic Record Applications',
               component: AcademicRecordApplicationList,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'transcript-records',
+              name: 'Transcript Records',
+              component: TranscriptRecord,
               meta: { requiresAuth: true }
             }
           ]

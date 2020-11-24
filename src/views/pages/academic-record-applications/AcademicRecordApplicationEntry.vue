@@ -2016,7 +2016,7 @@ export default {
         const {
           subjects: transcriptRecordSubjects,
           ...transcriptRecordDataSet
-        } = transcriptRecord
+        } = transcriptRecord;
 
         const data = {
           ...student,
@@ -2028,7 +2028,7 @@ export default {
           },
           transcriptRecord: {
             ...transcriptRecordDataSet,
-            transcriptRecordStatusId: TranscriptRecordStatuses.DRAFT.id,
+            transcriptRecordStatusId: TranscriptRecordStatuses.PENDING.id,
           },
           evaluation: {
             ...evaluation,
@@ -2085,7 +2085,10 @@ export default {
             ...evaluation,
             evaluationStatusId: EvaluationStatuses.APPROVED.id,
           },
-          transcriptRecord: transcriptData,
+          transcriptRecord: {
+            ...transcriptData,
+            transcriptRecordStatusId: TranscriptRecordStatuses.DRAFT.id,
+          },
           transcriptRecordSubjects: subjectData,
           academicRecord: {
             ...academicRecordDataSet,

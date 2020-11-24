@@ -76,6 +76,12 @@ export default [
         to: '/enrollment/academic-record-applications',
         // permissionIds: StudentPaymentPermissions.getIds()
         // to be added
+      },
+      {
+        label: 'Transcript Records',
+        to: '/enrollment/transcript-records',
+        // permissionIds: StudentPaymentPermissions.getIds()
+        // to be added
       }
     ]
   },
