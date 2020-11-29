@@ -1,6 +1,23 @@
 <template>
   <transition name="slide-fade" appear>
     <div class="login__container">
+      <v-select
+        :options="options"
+        :filterable="false"
+        @open="onOpen"
+        @close="onClose"
+        @search="debounceSearch"
+      >
+        <template slot="option" slot-scope="option">
+          <b-avatar variant="info" src="getPhoto(option)"></b-avatar>
+          {{ option.name }}
+      </template>
+        <template #list-footer>
+          <li ref="load" class="loader" v-show="hasNextPage">
+            Loading more options...
+          </li>
+        </template>
+      </v-select>
       <AttachmentList
         :data="attachments"
         @onAttachmentItemDownload="onAttachmentItemDownload"
@@ -34,7 +51,8 @@
 import Toggle from '../components/Form/Toggle'
 import ScheduleViewer from '../components/ScheduleViewer'
 import AttachmentList from '../components/Attachment/AttachmentList'
-
+import StudentApi from '../../mixins/api/Student';
+import { debounce } from 'lodash';
 
 export default {
   name: 'Login',
@@ -43,8 +61,14 @@ export default {
     ScheduleViewer,
     AttachmentList
   },
+  mixins: [StudentApi],
   data() {
     return {
+      hasNextPage: true,
+      options: [],
+      currentPage: 0,
+      lastPage: 1,
+      searchQuery: null,
       isEnable: true,
       attachments: [{
         id: 1,
@@ -120,7 +144,46 @@ export default {
       ]
     }
   },
+  mounted() {
+    this.observer = new IntersectionObserver(this.infiniteScroll);
+  },
   methods: {
+    async loadMore(params, clearResults = false) {
+      const { data } = await this.getStudentList(params);
+      this.currentPage = data?.meta?.currentPage;
+      this.hasNextPage = data?.meta?.currentPage < data?.meta?.lastPage;
+      this.options = clearResults ? data?.data || [] : [...this.options, ...(data?.data || [])];
+    },
+    debounceSearch: debounce(function(v) {
+      this.searchOption(v);
+    }, 500),
+    searchOption(q) {
+      this.searchQuery = q;
+      this.loadMore({ page: 1, search: q }, true);
+    },
+    getPhoto(option) {
+      return `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${option && option.photo && option.photo.hashName}`;
+    },
+    async onOpen () {
+      if (this.hasNextPage) {
+        await this.$nextTick();
+        this.observer.observe(this.$refs.load)
+      }
+    },
+    onClose () {
+      this.observer.disconnect();
+    },
+    async infiniteScroll ([{isIntersecting, target}]) {
+      if (isIntersecting) {
+        const ul = target.offsetParent;
+        const scrollTop = target.offsetParent.scrollTop;
+        const params = { page: this.currentPage + 1, ...(this.searchQuery && { search: this.searchQuery }) };
+        await this.loadMore(params);
+        //this.limit += 10;
+        await this.$nextTick();
+        ul.scrollTop = scrollTop;
+      }
+    },
     onAttachmentItemDownload(data) {
       console.log(data)
     },

@@ -72,17 +72,11 @@ export default [
         permissionIds: StudentPaymentPermissions.getIds()
       },
       {
-        label: 'Academic Record Applications',
+        label: 'Manual Enrollment',
         to: '/enrollment/academic-record-applications',
         // permissionIds: StudentPaymentPermissions.getIds()
         // to be added
       },
-      {
-        label: 'Transcript Records',
-        to: '/enrollment/transcript-records',
-        // permissionIds: StudentPaymentPermissions.getIds()
-        // to be added
-      }
     ]
   },
   {
@@ -173,6 +167,12 @@ export default [
         label: 'Student',
         to: '/master-files/student/', // added trailing slash here to satisfy the tab active check
         permissionIds: StudentPermissions.getIds()
+      },
+      {
+        label: 'Transcript Records',
+        to: '/enrollment/transcript-records',
+        // permissionIds: StudentPaymentPermissions.getIds()
+        // to be added
       },
       {
         label: 'Personnel',

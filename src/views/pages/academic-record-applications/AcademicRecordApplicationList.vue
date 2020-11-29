@@ -1,6 +1,6 @@
 <template>
   <div class="c-page-content">
-    <Card v-if="!showEntry" title="Academic Record Applications">
+    <Card v-if="!showEntry" title="Manual Enrollment">
       <div>
         <SchoolCategoryTabs
           :showAll="true"
@@ -45,7 +45,7 @@
             <!-- row button and search input -->
             <b-col md="6">
               <b-btn variant="outline-primary" @click="setCreate()"
-                >New Registration</b-btn
+                >Add New Record</b-btn
               >
             </b-col>
             <b-col md="3">

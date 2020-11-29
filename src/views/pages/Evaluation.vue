@@ -106,7 +106,8 @@
               <v-icon name="paperclip" />
             </template>
             <template v-slot:cell(name)="data">
-              <b-media>
+              <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
+              <!-- <b-media>
                 <template v-slot:aside>
                   <AvatarMaker
                     :avatarId="data.item.student.id"
@@ -135,14 +136,14 @@
                       : ''
                   }}
                 </div>
-              </b-media>
+              </b-media> -->
             </template>
             <template v-slot:cell(education)="data">
-              <span>
+              <EducationColumn :data="data.item" />
+              <!-- <span>
                 {{ getName(data.item, 'level') }}<br />
                 {{ getName(data.item, 'course') }}<br />
-                <!-- {{ data.item.enrolledYear ? `Enrolled Year: ${data.item.enrolledYear}` : '' }} -->
-              </span>
+              </span> -->
             </template>
             <template
               v-slot:cell(studentCategory.name)="{
@@ -1451,12 +1452,12 @@ export default {
               // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
               // }
             },
-            // {
-            // 	key: "education",
-            // 	label: "Education",
-            // 	tdClass: "align-middle",
-            //   thStyle: { width: "20%"}
-            // },
+            {
+            	key: "education",
+            	label: "Education",
+            	tdClass: "align-middle",
+              thStyle: { width: "20%"}
+            },
             {
               key: 'submittedDate',
               label: 'Submitted',

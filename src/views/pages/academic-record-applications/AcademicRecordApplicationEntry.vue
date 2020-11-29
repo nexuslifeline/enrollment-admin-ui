@@ -2436,7 +2436,7 @@ export default {
   width: 100vw;
   height: 100vh;
   background-color: $white;
-  z-index: 3;
+  z-index: 5;
   overflow: auto;
 }
 
