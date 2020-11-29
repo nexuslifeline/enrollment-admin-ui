@@ -97,6 +97,12 @@ export const AcademicRecordStatuses = new Enum({
   ENROLLED: { id: 3, name: 'Enrolled' }
 });
 
+export const TranscriptRecordStatuses = new Enum({
+  DRAFT: { id: 1, name: 'Draft' },
+  FINALIZED: { id: 2, name: 'Finalized' },
+  PENDING: { id: 3, name: 'Pending' }
+});
+
 export const StudentFeeStatuses = new Enum({
   DRAFT: { id: 1, name: 'Draft/Pending' },
   APPROVED: { id: 2, name: 'Approved' },
@@ -481,6 +487,13 @@ export const CivilStatuses = new Enum({
   MARRIED: { id: 2, name: 'Married', description: 'Married' },
   DIVORCED: { id: 3, name: 'Divorced', description: 'Divorced' },
   WIDOWED: { id: 4, name: 'Widowed', description: 'Widowed' }
+});
+
+export const ManualSteps = new Enum({
+  STUDENT_REGISTRATION: { id: 1, name: 'Student Registration' },
+  EVALUATION: { id: 2, name: 'Evaluation' },
+  SUBJECT_ENLISTMENT: { id: 3, name: 'Subject Enlistment' },
+  COMPLETED: { id: 4, name: 'Completed' }
 });
 
 export const DepartmentPermissions = new Enum({

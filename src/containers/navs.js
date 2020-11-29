@@ -41,9 +41,9 @@ export default [
     ]
   },
   {
-    name: 'Approval',
-    label: 'Approval',
-    to: '/approval',
+    name: 'Enrollment',
+    label: 'Enrollment',
+    to: '/enrollment',
     permissionIds: [
       ...EvaluationAndAdmissionPermissions.getIds(),
       ...StudentSubjectPermissions.getIds(),
@@ -53,23 +53,35 @@ export default [
     children: [
       {
         label: 'Evaluation',
-        to: '/approval/evaluation',
+        to: '/enrollment/evaluation',
         permissionIds: EvaluationAndAdmissionPermissions.getIds()
       },
       {
         label: 'Enlistment',
-        to: '/approval/student-subject-enlisment',
+        to: '/enrollment/student-subject-enlisment',
         permissionIds: StudentSubjectPermissions.getIds()
       },
       {
         label: 'Assessment',
-        to: '/approval/student-assessment-fee',
+        to: '/enrollment/student-assessment-fee',
         permissionIds: StudentFeePermissions.getIds()
       },
       {
         label: 'Payment',
-        to: '/approval/payment',
+        to: '/enrollment/payment',
         permissionIds: StudentPaymentPermissions.getIds()
+      },
+      {
+        label: 'Academic Record Applications',
+        to: '/enrollment/academic-record-applications',
+        // permissionIds: StudentPaymentPermissions.getIds()
+        // to be added
+      },
+      {
+        label: 'Transcript Records',
+        to: '/enrollment/transcript-records',
+        // permissionIds: StudentPaymentPermissions.getIds()
+        // to be added
       }
     ]
   },

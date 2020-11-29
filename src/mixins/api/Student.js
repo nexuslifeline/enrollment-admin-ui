@@ -44,5 +44,8 @@ export default {
     getBillingsOfStudent(studentId) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/billings`);
     },
+    manualRegisterStudent(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/manual-registration`, data);
+    },
   }
 }

@@ -1,34 +1,39 @@
 <template>
   <div class="c-page-content">
-    <Card title="Evaluation & Admission Records">
+    <Card title="Transcript Records">
       <div>
         <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="
-            (filters.student.schoolCategoryId = $event), loadEvaluation()
+            (filters.transcriptRecord.schoolCategoryId = $event), loadLevels();
+            loadTranscriptRecords();
           "
           @clickAll="
-            (filters.student.schoolCategoryId = null),
-              (filters.student.courseId = null),
-              loadEvaluation()
+            (filters.transcriptRecord.schoolCategoryId = null),
+              (filters.transcriptRecord.courseId = null),
+              loadTranscriptRecords()
           "
           @click="
-            (filters.student.schoolCategoryId = $event),
-              (filters.student.courseId = null),
-              loadEvaluation()
+            (filters.transcriptRecord.schoolCategoryId = $event),
+              (filters.transcriptRecord.courseId = null),
+              loadCourses();
+            loadTranscriptRecords();
           "
         />
         <div>
           <b-row class="mb-2">
             <!-- row button and search input -->
-            <b-col md="6">
+            <b-col md="3">
               <b-form-radio-group
-                @input="loadEvaluation()"
-                v-model="filters.student.evaluationStatusId"
+                @input="loadTranscriptRecords()"
+                v-model="filters.transcriptRecord.transcriptRecordStatusId"
               >
                 <b-form-radio :value="null">All</b-form-radio>
                 <b-form-radio
-                  v-for="status in evaluationStatuses.values"
+                  v-for="status in $options.TranscriptRecordStatuses.values"
+                  v-if="
+                    status.id !== $options.TranscriptRecordStatuses.PENDING.id
+                  "
                   :value="status.id"
                   :key="status.id"
                 >
@@ -38,17 +43,45 @@
             </b-col>
             <b-col md="3">
               <b-form-select
+                @change="loadTranscriptRecords()"
+                v-model="filters.transcriptRecord.levelId"
+              >
+                <template v-slot:first>
+                  <b-form-select-option :value="null" disabled
+                    >-- Level --</b-form-select-option
+                  >
+                </template>
+                <b-form-select-option :value="null">None</b-form-select-option>
+                <b-form-select-option
+                  v-for="level in options.levels.items.filter((l) =>
+                    filters.transcriptRecord.schoolCategoryId
+                      ? l.schoolCategoryId ===
+                        filters.transcriptRecord.schoolCategoryId
+                      : true
+                  )"
+                  :key="level.id"
+                  :value="level.id"
+                >
+                  {{ level.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-col>
+            <b-col md="3">
+              <b-form-select
                 v-if="
-                  filters.student.schoolCategoryId ===
-                    options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-                    filters.student.schoolCategoryId ===
-                      options.schoolCategories.COLLEGE.id ||
-                    filters.student.schoolCategoryId ===
-                      options.schoolCategories.GRADUATE_SCHOOL.id
+                  filters.transcriptRecord.schoolCategoryId ===
+                    $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
+                    filters.transcriptRecord.schoolCategoryId ===
+                      $options.SchoolCategories.COLLEGE.id ||
+                    filters.transcriptRecord.schoolCategoryId ===
+                      $options.SchoolCategories.GRADUATE_SCHOOL.id ||
+                    filters.transcriptRecord.schoolCategoryId ===
+                      $options.SchoolCategories.VOCATIONAL.id
                 "
-                @change="loadEvaluation()"
-                v-model="filters.student.courseId"
+                @change="loadTranscriptRecords()"
+                v-model="filters.transcriptRecord.courseId"
                 class="float-right"
+                :disabled="options.courses.isLoading"
               >
                 <template v-slot:first>
                   <b-form-select-option :value="null" disabled
@@ -68,9 +101,9 @@
             </b-col>
             <b-col md="3">
               <b-form-input
-                v-model="filters.student.criteria"
+                v-model="filters.transcriptRecord.criteria"
                 debounce="500"
-                @update="loadEvaluation()"
+                @update="loadTranscriptRecords()"
                 type="text"
                 placeholder="Search"
               >
@@ -84,26 +117,15 @@
             small
             show-empty
             responsive
-            :fields="tables.students.fields"
-            :items="tables.students.items"
-            :busy="tables.students.isBusy"
+            :fields="tables.transcriptRecords.fields"
+            :items="tables.transcriptRecords.items"
+            :busy="tables.transcriptRecords.isBusy"
           >
-            <template v-slot:head(attachments)>
-              <div class="text-center">
-                <v-icon name="paperclip" />
-              </div>
-            </template>
             <template v-slot:table-busy>
               <div class="text-center my-2">
                 <v-icon name="spinner" spin class="mr-2" />
                 <strong>Loading...</strong>
               </div>
-            </template>
-            <template v-slot:cell(attachments)="data">
-              <span
-                >{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp;
-              </span>
-              <v-icon name="paperclip" />
             </template>
             <template v-slot:cell(name)="data">
               <b-media>
@@ -137,56 +159,35 @@
                 </div>
               </b-media>
             </template>
-            <template v-slot:cell(education)="data">
+            <template v-slot:cell(curriculum)="data">
               <span>
+                {{ getName(data.item, 'curriculum') }}<br />
                 {{ getName(data.item, 'level') }}<br />
-                {{ getName(data.item, 'course') }}<br />
-                <!-- {{ data.item.enrolledYear ? `Enrolled Year: ${data.item.enrolledYear}` : '' }} -->
+                <small v-if="data.item.course"
+                  >{{ data.item.course.description }}
+                  {{
+                    data.item.course.major ? `(${data.item.course.major})` : ''
+                  }}</small
+                >
               </span>
-            </template>
-            <template
-              v-slot:cell(studentCategory.name)="{
-                item: { studentCategory, studentCategoryId },
-              }"
-            >
-              <b-badge
-                :variant="
-                  studentCategoryId === studentCategories.NEW.id
-                    ? 'success'
-                    : studentCategoryId === studentCategories.OLD.id
-                    ? 'primary'
-                    : 'warning'
-                "
-              >
-                {{ studentCategory.name }}
-              </b-badge>
             </template>
             <template v-slot:cell(status)="data">
               <b-badge
                 :variant="
-                  data.item.evaluationStatusId ===
-                  evaluationStatuses.APPROVED.id
+                  data.item.transcriptRecordStatusId ===
+                  $options.TranscriptRecordStatuses.FINALIZED.id
                     ? 'success'
-                    : data.item.evaluationStatusId ===
-                      evaluationStatuses.REJECTED.id
-                    ? 'danger'
                     : 'warning'
                 "
               >
                 {{
-                  evaluationStatuses.getEnum(data.item.evaluationStatusId).name
+                  $options.TranscriptRecordStatuses.getEnum(
+                    data.item.transcriptRecordStatusId
+                  ).name
                 }}
               </b-badge>
             </template>
-            <template v-slot:cell(attachments)="data">
-              <span>{{ data.item.filesCount }} </span>
-              <v-icon name="paperclip" class="ml-2" />
-            </template>
             <template v-slot:cell(action)="row">
-              <!-- <button type="button" @click="loadDetails(row)" class="btn-invisible">
-                <BIconFolder2Open v-if="row.detailsShowing " />
-                <BIconFolderSymlink v-else scale="1.2" />
-              </button> -->
               <b-dropdown
                 right
                 variant="link"
@@ -199,9 +200,9 @@
                 <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
                 <b-dropdown-item @click.prevent="loadDetails(row)">
                   {{
-                    row.item.evaluationStatusId ===
-                    evaluationStatuses.APPROVED.id
-                      ? 'View Details'
+                    row.item.transcriptRecordStatusId ===
+                    $options.TranscriptRecordStatuses.FINALIZED.id
+                      ? 'Print'
                       : 'Review Record'
                   }}
                 </b-dropdown-item>
@@ -213,23 +214,24 @@
                 backTitle="Go back to list"
                 @onBack="data.toggleDetails()"
                 :showOptions="
-                  data.item.evaluationStatusId ===
-                    evaluationStatuses.SUBMITTED.id
+                  data.item.transcriptRecordStatusId ===
+                    $options.TranscriptRecordStatuses.DRAFT.id
                 "
                 :options="[
                   {
-                    label: 'Approve',
-                    callback: () => setApproval(data),
-                    isAllowed: isAccessible(
-                      $options.EvaluationAndAdmissionPermissions.APPROVAL.id
-                    ),
+                    label: 'Update',
+                    callback: () => onUpdateTranscriptRecord(data),
+                    isAllowed: true,
                   },
                   {
-                    label: 'Reject',
-                    callback: () => setDisapproval(data),
-                    isAllowed: isAccessible(
-                      $options.EvaluationAndAdmissionPermissions.DISAPPROVAL.id
-                    ),
+                    label: 'Update & Finalized',
+                    callback: () => onUpdateTranscriptRecord(data, true),
+                    isAllowed: true,
+                  },
+                  {
+                    label: 'Cancel',
+                    callback: () => data.toggleDetails(),
+                    isAllowed: true,
                   },
                 ]"
               >
@@ -253,7 +255,7 @@
                         {{ data.item.student.email }}
                       </p>
                     </div>
-                    <p class="active-view__header-date">
+                    <!-- <p class="active-view__header-date">
                       <BIconAlarm />
                       {{
                         $options.format(
@@ -261,7 +263,7 @@
                           'MMMM dd, yyyy'
                         )
                       }}
-                    </p>
+                    </p> -->
                   </div>
                 </template>
 
@@ -273,16 +275,12 @@
                         target: 'header-student-information',
                       },
                       {
-                        text: 'Educational Background',
-                        target: 'header-educational-background',
+                        text: 'Transcript Information',
+                        target: 'header-transcript-information',
                       },
                       {
-                        text: 'Application',
-                        target: 'header-current-application',
-                      },
-                      {
-                        text: 'Evaluation',
-                        target: 'header-evaluation-student',
+                        text: 'Subjects Information',
+                        target: 'header-subjects-information',
                       },
                     ]"
                   />
@@ -292,7 +290,7 @@
                   <div>
                     <ActiveViewHeader
                       id="header-student-information"
-                      title="Review Student Information"
+                      title="Student Information"
                       circleText="1"
                     />
 
@@ -337,7 +335,7 @@
                           }}
                         </p>
                       </ActiveViewItem>
-                      <ActiveViewItem label="Category:">
+                      <!-- <ActiveViewItem label="Category:">
                         <p>
                           <b-badge
                             :variant="
@@ -353,54 +351,21 @@
                             {{ data.item.studentCategory.name }}
                           </b-badge>
                         </p>
-                      </ActiveViewItem>
+                      </ActiveViewItem> -->
                     </ActiveViewItems>
                   </div>
 
                   <div>
                     <ActiveViewHeader
-                      id="header-educational-background"
-                      title="Review Previous Educational Background"
+                      id="header-transcript-information"
+                      title="Transcript Information"
                       circleText="2"
-                    />
-                    <ActiveViewItems>
-                      <ActiveViewItem label="Last School Attended:">
-                        <p>
-                          {{ data.item.lastSchoolAttended }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Last School Level:">
-                        <p>
-                          {{
-                            data.item.lastSchoolLevel
-                              ? data.item.lastSchoolLevel.name
-                              : 'N/A'
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Attended Period:">
-                        <p>
-                          {{ data.item.lastSchoolYearFrom }}-{{
-                            data.item.lastSchoolYearTo
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                    </ActiveViewItems>
-                  </div>
-
-                  <div>
-                    <ActiveViewHeader
-                      id="header-current-application"
-                      title="Review Application for current Academic Year"
-                      circleText="3"
                     />
 
                     <ActiveViewItems>
                       <ActiveViewItem label="Curriculum:">
-                        <div
-                          v-if="!data.item.studentCurriculumEdit"
-                          class="mb-3"
-                        >
+                        <!-- v-if="!data.item.studentCurriculumEdit" -->
+                        <div class="mb-3">
                           <span
                             :class="
                               `font-weight-bold ${
@@ -416,10 +381,10 @@
                                 : 'Nothing is Set'
                             }} </span
                           >&nbsp;
-                          <b-link
+                          <!-- <b-link
                             v-if="
-                              data.item.evaluationStatusId ===
-                                evaluationStatuses.SUBMITTED.id
+                              data.item.transcriptRecordStatusId ===
+                                $options.TranscriptRecordStatuses.DRAFT.id
                             "
                             @click="
                               data.item.studentCurriculumEdit = !data.item
@@ -427,9 +392,9 @@
                             "
                           >
                             [Set Curriculum]
-                          </b-link>
+                          </b-link> -->
                         </div>
-                        <div v-else class="w-75 ml-2 mb-3">
+                        <!-- <div v-else class="w-75 ml-2 mb-3">
                           <b-form-select
                             @change="
                               loadStudentCurriculum($event, data),
@@ -451,10 +416,11 @@
                               {{ curriculum.name }}
                             </b-form-select-option>
                           </b-form-select>
-                        </div>
+                        </div> -->
                       </ActiveViewItem>
                       <ActiveViewItem v-if="data.item.course" label="Course:">
-                        <div v-if="!data.item.studentCourseEdit" class="mb-3">
+                        <!-- v-if="!data.item.studentCourseEdit" -->
+                        <div class="mb-3">
                           <span>
                             {{
                               data.item.course
@@ -467,10 +433,10 @@
                                 : ''
                             }} </span
                           >&nbsp;&nbsp;
-                          <b-link
+                          <!-- <b-link
                             v-if="
-                              data.item.evaluationStatusId ===
-                                evaluationStatuses.SUBMITTED.id
+                              data.item.transcriptRecordStatusId ===
+                                $options.TranscriptRecordStatuses.DRAFT.id
                             "
                             @click="
                               data.item.studentCourseEdit = !data.item
@@ -478,9 +444,9 @@
                             "
                           >
                             [Change Course]
-                          </b-link>
+                          </b-link> -->
                         </div>
-                        <div v-else class="w-75 ml-2 mb-3">
+                        <!-- <div v-else class="w-75 ml-2 mb-3">
                           <b-form-select
                             @change="onChangeCourse(data)"
                             v-model="data.item.courseId"
@@ -503,7 +469,7 @@
                               {{ course.major ? `(${course.major})` : '' }}
                             </b-form-select-option>
                           </b-form-select>
-                        </div>
+                        </div> -->
                       </ActiveViewItem>
                       <ActiveViewItem label="Level:">
                         <p>
@@ -518,7 +484,7 @@
                           {{ semesters.getEnum(data.item.semesterId).name }}
                         </p>
                       </ActiveViewItem>
-                      <ActiveViewItem label="Date Submitted:">
+                      <!-- <ActiveViewItem label="Date Submitted:">
                         <p>
                           {{
                             $options.format(
@@ -527,19 +493,8 @@
                             )
                           }}
                         </p>
-                      </ActiveViewItem>
+                      </ActiveViewItem> -->
                     </ActiveViewItems>
-                    <div class="p-4 mb-4">
-                      <h5>Attachments</h5>
-                      <AttachmentList
-                        :items="data.item.files"
-                        titleKey="name"
-                        descriptionKey="notes"
-                        @onAttachmentItemView="
-                          (file) => previewFile(file, data)
-                        "
-                      />
-                    </div>
                   </div>
 
                   <!-- <div class="p-4" v-if="data.item.files">
@@ -570,31 +525,29 @@
 
                   <div>
                     <ActiveViewHeader
-                      id="header-evaluation-student"
-                      title="Evaluate Student Grade"
-                      circleText="4"
+                      id="header-subjects-information"
+                      title="Subjects Information"
+                      circleText="3"
                     />
 
                     <b-row class="mb-3 text-center">
                       <b-col md="12">
-                        <h5>Evaluation Form</h5>
+                        <h5>Transcript of Records</h5>
+                        <!-- v-if="!data.item.curriculumEdit" -->
                         <div
-                          v-if="!data.item.curriculumEdit"
                           :class="!data.item.curriculum ? 'text-danger' : ''"
                         >
                           <b>{{
                             data.item.curriculum
                               ? data.item.curriculum.name
-                              : data.item.curriculumMsg
-                              ? `There's no active curriculum set. Please set a curriculum`
                               : 'Nothing is Set'
                           }}</b
                           >&nbsp;
-                          <b-link
+                          <!-- <b-link
                             v-if="
                               !data.item.curriculumMsg &&
-                                data.item.evaluationStatusId ===
-                                  evaluationStatuses.SUBMITTED.id
+                                data.item.transcriptRecordStatusId ===
+                                  $options.TranscriptRecordStatuses.DRAFT.id
                             "
                             @click="
                               data.item.curriculumEdit = !data.item
@@ -602,9 +555,9 @@
                             "
                           >
                             [Change]
-                          </b-link>
+                          </b-link> -->
                         </div>
-                        <b-form-select
+                        <!-- <b-form-select
                           class="w-50"
                           v-else
                           @change="
@@ -626,15 +579,24 @@
                           >
                             {{ curriculum.name }}
                           </b-form-select-option>
-                        </b-form-select>
+                        </b-form-select> -->
                       </b-col>
                     </b-row>
                     <div v-if="data.item.subjects">
                       <b-row v-if="data.item.courseId === null">
                         <b-col md="12">
                           <b-row>
-                            <b-col md="6">
+                            <b-col md="9">
                               <h5>{{ getName(data.item, 'level') }}</h5>
+                            </b-col>
+                            <b-col md="3">
+                              <b-button
+                                class="float-right mb-2"
+                                variant="outline-primary"
+                                @click="onAddSubject(data.item.level.id)"
+                              >
+                                <v-icon name="plus-circle" /> ADD NEW SUBJECT
+                              </b-button>
                             </b-col>
                           </b-row>
                           <b-table
@@ -649,22 +611,22 @@
                             <template v-slot:head(pivot.isTaken)>
                               <b-form-checkbox
                                 v-if="
-                                  data.item.evaluationStatusId ===
-                                    evaluationStatuses.SUBMITTED.id
+                                  data.item.transcriptRecordStatusId ===
+                                    $options.TranscriptRecordStatuses.DRAFT.id
                                 "
                                 @input="
                                   toggleCheckAll(data.item.subjects, $event)
                                 "
                                 v-model="data.item.isTakenAll"
                               >
-                                Credited
+                                <!-- Credited -->
                               </b-form-checkbox>
                             </template>
                             <template v-slot:cell(pivot.isTaken)="row">
                               <b-form-checkbox
                                 :disabled="
-                                  data.item.evaluationStatusId !==
-                                    evaluationStatuses.SUBMITTED.id
+                                  data.item.transcriptRecordStatusId !==
+                                    $options.TranscriptRecordStatuses.DRAFT.id
                                 "
                                 :value="1"
                                 :unchecked-value="0"
@@ -680,9 +642,9 @@
                             <template v-slot:cell(pivot.grade)="row">
                               <vue-autonumeric
                                 :disabled="
-                                  data.item.evaluationStatusId !==
-                                    evaluationStatuses.SUBMITTED.id ||
-                                    !row.item.pivot.isTaken
+                                  data.item.transcriptRecordStatusId !==
+                                    $options.TranscriptRecordStatuses.DRAFT
+                                      .id || !row.item.pivot.isTaken
                                 "
                                 v-model="row.item.pivot.grade"
                                 class="form-control text-right"
@@ -699,9 +661,9 @@
                             <template v-slot:cell(pivot.notes)="row">
                               <b-form-input
                                 :disabled="
-                                  data.item.evaluationStatusId !==
-                                    evaluationStatuses.SUBMITTED.id ||
-                                    !row.item.pivot.isTaken
+                                  data.item.transcriptRecordStatusId !==
+                                    $options.TranscriptRecordStatuses.DRAFT
+                                      .id || !row.item.pivot.isTaken
                                 "
                                 v-model="row.item.pivot.notes"
                               >
@@ -710,7 +672,7 @@
                             <template v-slot:cell(labs)="row">
                               {{
                                 data.item.schoolCategoryId ===
-                                options.schoolCategories.VOCATIONAL.id
+                                $options.SchoolCategories.VOCATIONAL.id
                                   ? 'N/A'
                                   : row.item.labs
                               }}
@@ -718,10 +680,19 @@
                             <template v-slot:cell(units)="row">
                               {{
                                 data.item.schoolCategoryId ===
-                                options.schoolCategories.VOCATIONAL.id
+                                $options.SchoolCategories.VOCATIONAL.id
                                   ? 'N/A'
                                   : row.item.units
                               }}
+                            </template>
+                            <template v-slot:cell(action)="row">
+                              <b-button
+                                @click="removeSubject(row)"
+                                size="sm"
+                                variant="danger"
+                              >
+                                <v-icon name="trash" />
+                              </b-button>
                             </template>
                             <template v-slot:custom-foot>
                               <b-tr>
@@ -732,7 +703,7 @@
                                   <span class="text-danger">
                                     {{
                                       data.item.schoolCategoryId ===
-                                      options.schoolCategories.VOCATIONAL.id
+                                      $options.SchoolCategories.VOCATIONAL.id
                                         ? 'N/A'
                                         : totalUnits(
                                             data.item.subjects,
@@ -745,7 +716,7 @@
                                   <span class="text-danger">
                                     {{
                                       data.item.schoolCategoryId ===
-                                      options.schoolCategories.VOCATIONAL.id
+                                      $options.SchoolCategories.VOCATIONAL.id
                                         ? 'N/A'
                                         : totalUnits(data.item.subjects, 'labs')
                                     }}
@@ -755,7 +726,7 @@
                                   <span class="text-danger">
                                     {{
                                       data.item.schoolCategoryId ===
-                                      options.schoolCategories.VOCATIONAL.id
+                                      $options.SchoolCategories.VOCATIONAL.id
                                         ? 'N/A'
                                         : totalUnits(
                                             data.item.subjects,
@@ -811,7 +782,18 @@
                                     <b-col md="9">
                                       <h6>{{ semester.name }}</h6>
                                     </b-col>
-                                    <b-col md="3"> </b-col>
+                                    <b-col md="3">
+                                      <b-button
+                                        class="float-right mb-2"
+                                        variant="outline-primary"
+                                        @click="
+                                          onAddSubject(level.id, semester.id)
+                                        "
+                                      >
+                                        <v-icon name="plus-circle" /> ADD NEW
+                                        SUBJECT
+                                      </b-button>
+                                    </b-col>
                                   </b-row>
                                   <b-row>
                                     <b-col md="12">
@@ -845,9 +827,12 @@
                                         >
                                           <vue-autonumeric
                                             :disabled="
-                                              data.item.evaluationStatusId !==
-                                                evaluationStatuses.SUBMITTED
-                                                  .id || !row.item.pivot.isTaken
+                                              data.item
+                                                .transcriptRecordStatusId !==
+                                                $options
+                                                  .TranscriptRecordStatuses
+                                                  .DRAFT.id ||
+                                                !row.item.pivot.isTaken
                                             "
                                             v-model="row.item.pivot.grade"
                                             class="form-control text-right"
@@ -861,14 +846,26 @@
                                           >
                                           </vue-autonumeric>
                                         </template>
+                                        <template v-slot:cell(action)="row">
+                                          <b-button
+                                            @click="removeSubject(row)"
+                                            size="sm"
+                                            variant="danger"
+                                          >
+                                            <v-icon name="trash" />
+                                          </b-button>
+                                        </template>
                                         <template
                                           v-slot:cell(pivot.notes)="row"
                                         >
                                           <b-form-input
                                             :disabled="
-                                              data.item.evaluationStatusId !==
-                                                evaluationStatuses.SUBMITTED
-                                                  .id || !row.item.pivot.isTaken
+                                              data.item
+                                                .transcriptRecordStatusId !==
+                                                $options
+                                                  .TranscriptRecordStatuses
+                                                  .DRAFT.id ||
+                                                !row.item.pivot.isTaken
                                             "
                                             v-model="row.item.pivot.notes"
                                           >
@@ -877,7 +874,7 @@
                                         <template v-slot:cell(labs)="row">
                                           {{
                                             data.item.schoolCategoryId ===
-                                            options.schoolCategories.VOCATIONAL
+                                            $options.SchoolCategories.VOCATIONAL
                                               .id
                                               ? 'N/A'
                                               : row.item.labs
@@ -886,7 +883,7 @@
                                         <template v-slot:cell(units)="row">
                                           {{
                                             data.item.schoolCategoryId ===
-                                            options.schoolCategories.VOCATIONAL
+                                            $options.SchoolCategories.VOCATIONAL
                                               .id
                                               ? 'N/A'
                                               : row.item.units
@@ -906,7 +903,7 @@
                                               <span class="text-danger">
                                                 {{
                                                   data.item.schoolCategoryId ===
-                                                  options.schoolCategories
+                                                  $options.SchoolCategories
                                                     .VOCATIONAL.id
                                                     ? 'N/A'
                                                     : totalUnits(
@@ -924,7 +921,7 @@
                                               <span class="text-danger">
                                                 {{
                                                   data.item.schoolCategoryId ===
-                                                  options.schoolCategories
+                                                  $options.SchoolCategories
                                                     .VOCATIONAL.id
                                                     ? 'N/A'
                                                     : totalUnits(
@@ -942,7 +939,7 @@
                                               <span class="text-danger">
                                                 {{
                                                   data.item.schoolCategoryId ===
-                                                  options.schoolCategories
+                                                  $options.SchoolCategories
                                                     .VOCATIONAL.id
                                                     ? 'N/A'
                                                     : totalUnits(
@@ -961,8 +958,11 @@
                                         <template v-slot:head(pivot.isTaken)>
                                           <b-form-checkbox
                                             v-if="
-                                              data.item.evaluationStatusId ===
-                                                evaluationStatuses.SUBMITTED.id
+                                              data.item
+                                                .transcriptRecordStatusId ===
+                                                $options
+                                                  .TranscriptRecordStatuses
+                                                  .DRAFT.id
                                             "
                                             @input="
                                               toggleCheckAll(
@@ -990,8 +990,11 @@
                                         >
                                           <b-form-checkbox
                                             :disabled="
-                                              data.item.evaluationStatusId !==
-                                                evaluationStatuses.SUBMITTED.id
+                                              data.item
+                                                .transcriptRecordStatusId !==
+                                                $options
+                                                  .TranscriptRecordStatuses
+                                                  .DRAFT.id
                                             "
                                             :value="1"
                                             :unchecked-value="0"
@@ -1043,8 +1046,8 @@
                                 >&nbsp;
                                 <b-link
                                   v-if="
-                                    data.item.evaluationStatusId ===
-                                      evaluationStatuses.SUBMITTED.id
+                                    data.item.transcriptRecordStatusId ===
+                                      $options.TranscriptRecordStatuses.DRAFT.id
                                   "
                                   @click="
                                     data.item.studentCurriculumEdit = !data.item
@@ -1095,8 +1098,8 @@
                                 >&nbsp;&nbsp;
                                 <b-link
                                   v-if="
-                                    data.item.evaluationStatusId ===
-                                      evaluationStatuses.SUBMITTED.id
+                                    data.item.transcriptRecordStatusId ===
+                                      $options.TranscriptRecordStatuses.DRAFT.id
                                   "
                                   @click="
                                     data.item.studentCourseEdit = !data.item
@@ -1171,28 +1174,28 @@
                 </b-tabs>
                 <div
                   v-if="
-                    data.item.evaluationStatusId ===
-                      evaluationStatuses.SUBMITTED.id
+                    data.item.transcriptRecordStatusId ===
+                      $options.TranscriptRecordStatuses.DRAFT.id
                   "
                 >
-                  <b-button
-                    v-if="
+                  <!-- v-if="
                       isAccessible(
                         $options.EvaluationAndAdmissionPermissions.DISAPPROVAL
                           .id
                       )
-                    "
+                    " -->
+                  <b-button
                     @click="setDisapproval(data)"
                     class="float-right my-2 mr-2"
                     variant="outline-danger"
                     >Reject</b-button
                   >
-                  <b-button
-                    v-if="
+                  <!-- v-if="
                       isAccessible(
                         $options.EvaluationAndAdmissionPermissions.APPROVAL.id
                       )
-                    "
+                    " -->
+                  <b-button
                     @click="setApproval(data)"
                     class="float-right m-2"
                     variant="outline-primary"
@@ -1204,140 +1207,128 @@
           </b-table>
           <b-row>
             <b-col md="6">
-              Showing {{ paginations.student.from }} to
-              {{ paginations.student.to }} of
-              {{ paginations.student.totalRows }} records.
+              Showing {{ paginations.transcriptRecord.from }} to
+              {{ paginations.transcriptRecord.to }} of
+              {{ paginations.transcriptRecord.totalRows }} records.
             </b-col>
             <b-col md="6">
               <b-pagination
                 class="c-pagination"
-                v-model="paginations.student.page"
-                :total-rows="paginations.student.totalRows"
-                :per-page="paginations.student.perPage"
+                v-model="paginations.transcriptRecord.page"
+                :total-rows="paginations.transcriptRecord.totalRows"
+                :per-page="paginations.transcriptRecord.perPage"
                 size="sm"
                 align="end"
-                @input="loadEvaluation()"
+                @input="loadTranscriptRecords()"
               />
             </b-col>
           </b-row>
         </div>
       </div>
     </Card>
-    <FileViewer
-      :show="fileViewer.show"
-      :file="file"
-      :owner="file.owner"
-      :isBusy="file.isLoading"
-      @close="fileViewer.show = false"
-      @onNavLeft="onFileNavLeft"
-      @onNavRight="onFileNavRight"
-      :navCount="fileViewer.activeNavCount"
-      :navActiveIndex="fileViewer.activeNavIndex"
-      :enableArrowNav="fileViewer.isActiveNavEnabled"
-    />
     <b-modal
-      v-model="showModalApproval"
-      centered
-      header-bg-variant="success"
-      header-text-variant="light"
+      v-model="showModalSubjects"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true"
+      size="xl"
     >
       <div slot="modal-title">
         <!-- modal title -->
-        Finalize Approval
+        Subjects
       </div>
       <!-- modal title -->
       <b-row>
         <!-- modal body -->
         <b-col md="12">
-          <label>Notes</label>
-          <b-textarea
-            v-model="forms.evaluation.fields.approvalNotes"
-            rows="7"
-          />
+          <b-row class="mb-2">
+            <b-col md="4"> </b-col>
+            <b-col offset-md="4" md="4">
+              <b-form-input
+                v-model="filters.subject.criteria"
+                type="text"
+                placeholder="Search"
+                debounce="500"
+              >
+              </b-form-input>
+            </b-col>
+          </b-row>
+          <b-table
+            small
+            hover
+            outlined
+            show-empty
+            :items.sync="tables.subjects.items"
+            :fields="tables.subjects.fields2"
+            :filter="filters.subject.criteria"
+            :busy="tables.subjects.isBusy2"
+            :current-page="paginations.subject.page"
+            :per-page="paginations.subject.perPage"
+            @filtered="onFiltered($event, paginations.subject)"
+          >
+            <template class="d-none" v-slot:cell(prerequisites)>
+              <b-tr class="d-none"> </b-tr>
+            </template>
+            <template v-slot:cell(action)="data">
+              <b-button @click="addSubject(data)" size="sm" variant="success">
+                <v-icon name="plus" />
+              </b-button>
+            </template>
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon name="spinner" spin class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
+          </b-table>
+          <b-row>
+            <b-col md="6">
+              Showing {{ paginations.subject.from }} to
+              {{ paginations.subject.to }} of
+              {{ paginations.subject.totalRows }} records.
+            </b-col>
+            <b-col md="6">
+              <b-pagination
+                v-model="paginations.subject.page"
+                :total-rows="paginations.subject.totalRows"
+                :per-page="paginations.subject.perPage"
+                size="sm"
+                align="end"
+                @input="recordDetails(paginations.subject)"
+              />
+            </b-col>
+          </b-row>
         </b-col>
       </b-row>
       <!-- modal body -->
       <div slot="modal-footer" class="w-100">
         <!-- modal footer buttons -->
-        <b-button class="float-left" @click="showModalApproval = false">
-          Cancel
-        </b-button>
         <b-button
-          @click="onApproval()"
           class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
+          variant="outline-danger"
+          @click="showModalSubjects = false"
         >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
+          Close
         </b-button>
       </div>
       <!-- modal footer buttons -->
     </b-modal>
-    <!-- Modal Approval -->
-    <!-- Modal Reject -->
-    <b-modal
-      v-model="showModalRejection"
-      centered
-      header-bg-variant="danger"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        <!-- modal title -->
-        Confirm Rejection
-      </div>
-      <!-- modal title -->
-      <b-row>
-        <!-- modal body -->
-        <b-col md="12">
-          <label>Reason</label>
-          <b-textarea
-            v-model="forms.evaluation.fields.disapprovalNotes"
-            rows="7"
-          />
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
-        <b-button class="float-left" @click="showModalRejection = false">
-          Cancel
-        </b-button>
-        <b-button
-          @click="onDisapproval()"
-          class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- Modal Reject -->
   </div>
   <!-- main container -->
 </template>
 <script>
 import {
-  EvaluationApi,
-  StudentFileApi,
-  CurriculumApi,
   CourseApi,
+  CurriculumApi,
+  LevelApi,
+  SchoolCategoryApi,
+  SubjectApi,
   TranscriptRecordApi,
 } from '../../mixins/api';
 import {
   SchoolCategories,
-  EvaluationStatuses,
-  Semesters,
-  UserGroups,
+  TranscriptRecordStatuses,
   StudentCategories,
-  EvaluationAndAdmissionPermissions,
+  Semesters,
 } from '../../helpers/enum';
 import {
   showNotification,
@@ -1347,95 +1338,54 @@ import {
 import Tables from '../../helpers/tables';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import { copyValue } from '../../helpers/extractor';
-import FileViewer from '../components/FileViewer';
-import Access from '../../mixins/utils/Access';
 import { format } from 'date-fns';
 import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
+import AvatarMaker from '../components/AvatarMaker';
+import Card from '../components/Card';
 import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
 import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
-import AvatarMaker from '../components/AvatarMaker';
-import Card from '../components/Card';
-import {
-  StudentColumn,
-  EducationColumn
-} from '../components/ColumnDetails'
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
-const evaluationFields = {
-  evaluationStatusId: null,
-  approvalNotes: null,
-  disapprovalNotes: null,
-};
-
 export default {
-  name: 'Evaluation',
+  name: 'TranscriptRecord',
   constants: {
     COLOR_FACTORY_LENGTH,
   },
   colorFactory,
   format,
   mixins: [
-    EvaluationApi,
-    StudentFileApi,
-    CurriculumApi,
-    CourseApi,
     Tables,
-    Access,
     TranscriptRecordApi,
+    SchoolCategoryApi,
+    LevelApi,
+    CourseApi,
+    CurriculumApi,
+    SubjectApi,
   ],
   components: {
     SchoolCategoryTabs,
-    FileViewer,
+    Card,
+    AvatarMaker,
     ActiveRowViewer,
     ActiveViewHeader,
     AttachmentList,
     ActiveViewItems,
     ActiveViewItem,
     ActiveViewLinks,
-    AvatarMaker,
-    Card,
-    StudentColumn,
-    EducationColumn
   },
-  EvaluationAndAdmissionPermissions,
+  TranscriptRecordStatuses,
+  SchoolCategories,
+  StudentCategories,
+  Semesters,
   data() {
     return {
-      fileViewer: {
-        isActiveNavEnabled: false,
-        activeNavCount: 0,
-        activeNavIndex: 0,
-        show: false,
-      },
-      showModalApproval: false,
-      showModalRejection: false,
-      showModalSubjects: false,
-      isLoading: false,
-      evaluationStatuses: EvaluationStatuses,
-      semesters: Semesters,
-      studentCategories: StudentCategories,
-      lastActiveEvaluation: null,
-      lastActiveFile: null,
-      file: {
-        type: null,
-        src: null,
-        name: null,
-        notes: null,
-        isLoading: false,
-      },
-      forms: {
-        evaluation: {
-          fields: { ...evaluationFields },
-          states: { ...evaluationFields },
-          errors: { ...evaluationFields },
-        },
-      },
       tables: {
-        students: {
+        transcriptRecords: {
           isBusy: false,
           filterIncludedFields: ['firstName', 'lastName'],
           fields: [
@@ -1458,22 +1408,10 @@ export default {
             //   thStyle: { width: "20%"}
             // },
             {
-              key: 'submittedDate',
-              label: 'Submitted',
+              key: 'curriculum',
+              label: 'Curriculum',
               tdClass: 'align-middle',
-              thStyle: { width: '13%' },
-              formatter: (value, key, item) => {
-                if (!value) return '';
-
-                return format(new Date(value), 'MM/dd/yyyy');
-              },
-            },
-            {
-              key: 'studentCategory.name',
-              label: 'Category',
-              tdClass: 'align-middle text-center font-weight-bold',
-              thClass: 'text-center',
-              thStyle: { width: '12%' },
+              thStyle: { width: 'auto' },
             },
             {
               key: 'status',
@@ -1482,13 +1420,6 @@ export default {
               thClass: 'text-center',
               thStyle: { width: '12%' },
             },
-            // {
-            // 	key: "attachments",
-            // 	label: "",
-            // 	tdClass: "align-middle text-center",
-            // 	thClass: "text-center",
-            // 	thStyle: { width: "8%"}
-            // },
             {
               key: 'action',
               label: '',
@@ -1572,37 +1503,66 @@ export default {
               thClass: 'text-center',
               thStyle: { width: '10%' },
             },
+            {
+              key: 'action',
+              label: '',
+              tdClass: 'align-middle text-center',
+              thStyle: { width: '5%' },
+            },
           ],
-          items: [],
-          filteredItems: [],
-        },
-        files: {
-          isBusy: false,
-          fields: [
+          fields2: [
+            // {
+            // 	key: "code",
+            // 	label: "CODE",
+            // 	tdClass: "align-middle",
+            // 	thStyle: {width: "15%"}
+            // },
             {
               key: 'name',
-              label: 'Filename',
+              label: 'SUBJECT CODE',
               tdClass: 'align-middle',
-              thStyle: { width: '40%' },
+              thStyle: { width: '18%' },
             },
             {
-              key: 'notes',
-              label: 'Notes',
+              key: 'description',
+              label: 'DESCRIPTION',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
             },
             {
+              key: 'labs',
+              label: 'LAB UNITS',
+              tdClass: 'align-middle text-center',
+              thClass: 'text-center',
+              thStyle: { width: '10%' },
+            },
+            {
+              key: 'units',
+              label: 'LEC UNITS',
+              tdClass: 'align-middle text-center',
+              thClass: 'text-center',
+              thStyle: { width: '10%' },
+            },
+            {
+              key: 'totalUnits',
+              label: 'TOTAL UNITS',
+              tdClass: 'align-middle text-center',
+              thClass: 'text-center',
+              thStyle: { width: '15%' },
+            },
+            {
               key: 'action',
               label: '',
-              tdClass: 'align-middle',
-              thStyle: { width: '35px' },
+              tdClass: 'align-middle text-center',
+              thStyle: { width: '5%' },
             },
           ],
           items: [],
+          filteredItems: [],
         },
       },
       paginations: {
-        student: {
+        transcriptRecord: {
           from: 0,
           to: 0,
           totalRows: 0,
@@ -1618,11 +1578,12 @@ export default {
         },
       },
       filters: {
-        student: {
+        transcriptRecord: {
           criteria: null,
           schoolCategoryId: null,
           courseId: null,
-          evaluationStatusId: null,
+          transcriptRecordStatusId: null,
+          levelId: null,
         },
         subject: {
           criteria: null,
@@ -1631,13 +1592,10 @@ export default {
       },
       options: {
         courses: {
+          isLoading: false,
           items: [],
         },
-        departments: {
-          items: [],
-        },
-        schoolCategories: SchoolCategories,
-        curriculums: {
+        levels: {
           isLoading: false,
           items: [],
         },
@@ -1645,288 +1603,72 @@ export default {
       isProcessing: false,
       schoolCategoryId: null,
       row: [],
+      levelId: null,
+      semesterId: null,
+      showModalSubjects: false,
     };
   },
-  created() {
-    // this.checkRights()
-    this.loadCourseList();
-  },
+  // created() {
+  //   this.loadTranscriptRecords();
+  // },
   methods: {
-    setApproval(row) {
-      this.forms.evaluation.approvalNotes = null;
-      if (row.item.curriculumMsg) {
-        showNotification(
-          this,
-          'danger',
-          'Please set a curriculum before approving.'
-        );
-        return;
-      }
-      this.row = row;
-      this.showModalApproval = true;
-    },
-    onApproval() {
-      this.isProcessing = true;
+    loadTranscriptRecords() {
       const {
-        item,
-        item: {
-          id: evaluationId,
-          curriculumId,
-          studentCurriculumId,
-          courseId,
-          schoolCategoryId,
-          levelId,
-        },
-      } = this.row;
-
-      const {
-        evaluation: { fields: evaluation },
-      } = this.forms;
-
-      let subjects = [];
-
-      item.subjects.forEach((subject) => {
-        subjects.push({
-          subjectId: subject.id,
-          levelId: subject.pivot.levelId,
-          semesterId: subject.pivot.semesterId,
-          grade: subject.pivot.grade,
-          notes: subject.pivot.notes,
-          isTaken: subject.pivot.isTaken,
-        });
-      });
-
-      evaluation.evaluationStatusId = EvaluationStatuses.APPROVED.id;
-      // const curriculumId = item.curriculumId
-      // const studentCurriculumId = item.studentCurriculumId
-
-      //set transcript fields value
-      const fullLevelSchoolCategory = [
-        SchoolCategories.SENIOR_HIGH_SCHOOL.id,
-        SchoolCategories.COLLEGE.id,
-        SchoolCategories.GRADUATE_SCHOOL.id,
-        SchoolCategories.VOCATIONAL.id,
-      ];
-
-      if (item.transcriptRecord) {
-        item.transcriptRecord.curriculumId = curriculumId;
-        item.transcriptRecord.studentCurriculumId = studentCurriculumId;
-        item.transcriptRecord.courseId = courseId;
-        item.transcriptRecord.schoolCategoryId = schoolCategoryId;
-        item.transcriptRecord.levelId = fullLevelSchoolCategory.includes(
-          schoolCategoryId
-        )
-          ? null
-          : levelId;
-      }
-
-      const data = {
-        ...evaluation,
-        curriculumId,
-        studentCurriculumId,
-        courseId,
-        subjects,
-        transcriptRecord: {
-          ...item.transcriptRecord,
-        },
-      };
-
-      this.updateEvaluation(data, evaluationId)
-        .then(({ data }) => {
-          clearFields(evaluation);
-          this.loadEvaluation();
-          this.isProcessing = false;
-          this.showModalApproval = false;
-          showNotification(this, 'success', 'Approved Successfully.');
-        })
-        .catch((error) => {
-          this.isProcessing = false;
-          const errors = error.response.data.errors;
-          this.showBulletedNotification(errors);
-        });
-    },
-    setDisapproval(row) {
-      this.forms.evaluation.disapprovalNotes = null;
-      this.row = row;
-      this.showModalRejection = true;
-    },
-    onDisapproval() {
-      this.isProcessing = true;
-      const {
-        item,
-        item: { id: evaluationId },
-      } = this.row;
-
-      const {
-        evaluation: { fields: evaluation },
-      } = this.forms;
-
-      evaluation.evaluationStatusId = EvaluationStatuses.REJECTED.id;
-
-      const data = {
-        ...evaluation,
-      };
-
-      this.updateEvaluation(data, evaluationId)
-        .then(({ data }) => {
-          clearFields(evaluation);
-          this.loadEvaluation();
-          this.isProcessing = false;
-          this.showModalRejection = false;
-          showNotification(this, 'success', 'Rejected Successfully.');
-        })
-        .catch((error) => {
-          console.log(error);
-          this.isProcessing = false;
-        });
-    },
-    loadEvaluation() {
-      const { students } = this.tables;
-      const {
-        student,
-        student: { perPage, page },
-      } = this.paginations;
-      students.isBusy = true;
-      const {
-        evaluationStatusId,
+        transcriptRecordStatusId,
         schoolCategoryId,
         courseId,
+        levelId,
         criteria,
-      } = this.filters.student;
-      const applicationStatusId = EvaluationStatuses.SUBMITTED.id;
-      const orderBy = 'submitted_date';
-      const sort = 'DESC';
+      } = this.filters.transcriptRecord;
+      const {
+        transcriptRecord,
+        transcriptRecord: { perPage, page },
+      } = this.paginations;
       let params = {
         paginate: true,
         perPage,
         page,
-        evaluationStatusId,
+        transcriptRecordStatusId,
         schoolCategoryId,
         courseId,
-        orderBy,
-        sort,
+        levelId,
         criteria,
       };
-      this.getEvaluationList(params).then((response) => {
-        const res = response.data;
-        students.items = res.data;
-        student.from = res.meta.from;
-        student.to = res.meta.to;
-        student.totalRows = res.meta.total;
-        students.isBusy = false;
+
+      const { transcriptRecords } = this.tables;
+      this.getTranscriptRecordList(params).then(({ data }) => {
+        transcriptRecords.items = data.data;
+        transcriptRecord.from = data.meta.from;
+        transcriptRecord.to = data.meta.to;
+        transcriptRecord.totalRows = data.meta.total;
+        transcriptRecords.isBusy = false;
       });
     },
-    loadCourseList() {
+    loadCourses() {
+      const { schoolCategoryId } = this.filters.transcriptRecord;
+      const { courses } = this.options;
       let params = { paginate: false };
-      this.getCourseList(params).then(({ data }) => {
-        this.options.courses.items = data;
+      courses.isLoading = true;
+      this.getCoursesOfSchoolCategoryList(schoolCategoryId, params).then(
+        ({ data }) => {
+          courses.isLoading = false;
+          courses.items = data;
+        }
+      );
+    },
+    loadLevels() {
+      const params = { paginate: false };
+      const { levels } = this.options;
+      this.getLevelList(params).then(({ data }) => {
+        levels.items = data;
       });
     },
-    loadDetails(row) {
-      if (!row.detailsShowing) {
-        const {
-          item,
-          item: {
-            id,
-            schoolCategoryId,
-            levelId,
-            courseId,
-            transcriptRecordId,
-            studentId,
-          },
-        } = row;
-
-        this.$set(item, 'isLoading', true);
-        this.$set(item, 'curriculumEdit', false);
-        this.$set(item, 'studentCurriculumEdit', false);
-        this.$set(item, 'studentCourseEdit', false);
-        this.$set(item, 'curriculums', false);
-
-        let params = { paginate: false, schoolCategoryId, levelId };
-
-        if (
-          schoolCategoryId === SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
-          schoolCategoryId === SchoolCategories.COLLEGE.id
-        ) {
-          params = { paginate: false, schoolCategoryId, courseId };
-        }
-        item.isLoading = true;
-        this.getStudentFileList(studentId, { paginate: false }).then(
-          ({ data }) => {
-            this.$set(row.item, 'files', data);
-            if (item.evaluationStatusId === EvaluationStatuses.SUBMITTED.id) {
-              // this.loadCurriculumList(params, row)
-              this.getCurriculumList(params).then(({ data }) => {
-                item.curriculums = data;
-                if (data.length > 0) {
-                  if (item.curriculumId === null) {
-                    const activeCurriculum = data.find((c) => c.active === 1);
-                    if (activeCurriculum) {
-                      item.curriculumId = activeCurriculum.id;
-                      if (item.studentCategoryId === StudentCategories.NEW.id) {
-                        item.studentCurriculumId = activeCurriculum.id;
-                        item.studentCurriculum = activeCurriculum;
-                      }
-                    } else {
-                      this.$set(item, 'curriculumMsg', true);
-                      item.isLoading = false;
-                      return;
-                    }
-                  }
-                  this.loadCurriculum(item.curriculumId, row);
-                  // item.isLoading = false
-                } else {
-                  this.$set(item, 'curriculumMsg', true);
-                  item.isLoading = false;
-                }
-              });
-            } else {
-              this.loadSubjectsOfTranscriptRecord(transcriptRecordId, row);
-            }
-          }
-        );
+    avatar(student) {
+      let src = '';
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
       }
-      row.toggleDetails();
-    },
-    onChangeCourse(row) {
-      const {
-        item,
-        item: { schoolCategoryId, courseId },
-      } = row;
-      item.isLoading = true;
-      const params = { paginate: false, schoolCategoryId, courseId };
-
-      this.getCurriculumList(params).then(({ data }) => {
-        item.curriculums = data;
-        if (data.length > 0) {
-          const activeCurriculum = data.find((c) => c.active === 1);
-          if (activeCurriculum) {
-            item.curriculumId = activeCurriculum.id;
-            if (item.studentCategoryId === StudentCategories.NEW.id) {
-              item.studentCurriculumId = activeCurriculum.id;
-              item.studentCurriculum = activeCurriculum;
-            }
-            item.curriculumMsg = false;
-            this.loadCurriculum(item.curriculumId, row);
-          } else {
-            item.curriculum = null;
-            item.studentCurriculum = null;
-            item.studentCurriculumId = null;
-            item.curriculumId = null;
-            item.subjects = null;
-            item.curriculumMsg = true;
-            return;
-          }
-        } else {
-          item.curriculum = null;
-          item.studentCurriculum = null;
-          item.studentCurriculumId = null;
-          item.curriculumId = null;
-          item.subjects = null;
-          item.curriculumMsg = true;
-          return;
-        }
-      });
+      return src;
     },
     getName(item, child) {
       if (item) {
@@ -1937,42 +1679,36 @@ export default {
       }
       return '';
     },
-    setupActiveFileViewer(row, data) {
-      this.lastActiveEvaluation = data;
-      this.lastActiveFile = row;
-      this.fileViewer.isActiveNavEnabled = !!data?.item?.files?.length;
-      this.fileViewer.activeNavCount = data?.item?.files?.length;
-      this.fileViewer.activeNavIndex = row.index;
+    loadDetails(row) {
+      if (!row.detailsShowing) {
+        const {
+          item,
+          item: { id, schoolCategoryId, levelId, courseId, studentId },
+        } = row;
+        this.$set(item, 'isLoading', true);
+        this.loadTranscriptRecord(id, row);
+        this.loadSubjects(schoolCategoryId);
+      }
+      row.toggleDetails();
     },
-    previewFile(row, data) {
-      this.setupActiveFileViewer(row, data);
-
-      const { studentId, id, name, notes } = row.item;
-      this.file.type = null;
-      this.file.src = null;
-      this.file.name = name;
-      this.file.notes = notes;
-      this.fileViewer.show = true;
-      this.file.isLoading = true;
-      this.file.owner = data.item.student;
-
-      this.getStudentFilePreview(studentId, id).then((response) => {
-        this.file.type = response.headers.contentType;
-        this.file.isLoading = false;
-        const file = new Blob([response.data], {
-          type: response.headers.contentType,
-        });
-        const reader = new FileReader();
-        reader.onload = (e) => (this.file.src = e.target.result);
-        reader.readAsDataURL(file);
+    loadSubjects(schoolCategoryId) {
+      const { subjects } = this.tables;
+      const { subject } = this.paginations;
+      subjects.isBusy2 = true;
+      let params = { paginate: false, schoolCategoryId };
+      this.getSubjectList(params).then(({ data }) => {
+        subjects.items = data;
+        // subjects.filteredItems = data
+        subject.totalRows = data.length;
+        this.recordDetails(subject);
+        subjects.isBusy2 = false;
       });
     },
-    loadCurriculum(id, row) {
+    loadTranscriptRecord(id, row) {
       const { subjects } = this.tables;
       subjects.isBusy = true;
       row.item.isLoading = true;
-      this.getCurriculum(id).then(({ data }) => {
-        row.item.curriculum = data;
+      this.getTranscriptRecord(id).then(({ data }) => {
         const newSubjects = data.subjects.map((obj) => ({
           ...obj,
           pivot: { ...obj.pivot, isTaken: 0, grade: 0, notes: '' },
@@ -1982,54 +1718,11 @@ export default {
         if (row.item.courseId) {
           this.loadLevelsOfCourse(row);
         } else {
-          row.item.isLoading = false;
         }
+        row.item.isLoading = false;
         subjects.isBusy = false;
+        this.row = row;
       });
-    },
-    loadStudentCurriculum(id, row) {
-      const {
-        item,
-        item: { curriculum, curriculums },
-      } = row;
-      const studentCurr = curriculums.find((i) => i.id === id);
-      item.curriculumId = id;
-      item.studentCurriculum = studentCurr;
-      item.isLoading = true;
-      this.loadCurriculum(id, row);
-    },
-    loadSubjectsOfTranscriptRecord(transcriptRecordId, row) {
-      const { subjects } = this.tables;
-      subjects.isBusy = true;
-      this.getSubjectsOfTranscriptRecord(transcriptRecordId, {
-        paginate: false,
-      }).then(({ data }) => {
-        this.$set(row.item, 'isTakenAll', false);
-        this.$set(row.item, 'subjects', data);
-        if (row.item.courseId) {
-          this.loadLevelsOfCourse(row);
-        } else {
-          row.item.isLoading = false;
-        }
-        subjects.isBusy = false;
-      });
-    },
-    checkRights() {
-      const userGroupId = localStorage.getItem('userGroupId');
-      const userGroup = UserGroups.getEnum(Number(userGroupId));
-      let result = false;
-      if (userGroup) {
-        this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
-        this.schoolCategoryId = userGroup.schoolCategoryId;
-      }
-      this.loadEvaluation();
-    },
-    avatar(student) {
-      let src = '';
-      if (student.photo) {
-        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
-      }
-      return src;
     },
     loadLevelsOfCourse(row) {
       let params = { paginate: false };
@@ -2039,23 +1732,10 @@ export default {
         row.item.isLoading = false;
       });
     },
-    filterSubjects(row, levelId, semesterId = null) {
-      const { subjects } = row.item;
-      let filteredSubjects = subjects.filter(
-        (subject) =>
-          subject.pivot.levelId === levelId &&
-          subject.pivot.semesterId === semesterId
-      );
-      const data = { items: filteredSubjects, isTakenAll: false };
-      return data;
-    },
-    getSemesters(level, event) {
-      this.$set(level, 'isShowAll', event);
-    },
     filterSemester(row, level) {
-      let defaultSemesters = this.semesters.values.slice(0, 2);
+      let defaultSemesters = this.$options.Semesters.values.slice(0, 2);
       if (level.isShowAll) {
-        return this.semesters.values;
+        return this.$options.Semesters.values;
       } else {
         const { subjects } = row.item;
         let filteredSubjects = subjects.filter(
@@ -2074,54 +1754,103 @@ export default {
         return defaultSemesters;
       }
     },
+    filterSubjects(row, levelId, semesterId = null) {
+      const { subjects } = row.item;
+      let filteredSubjects = subjects.filter(
+        (subject) =>
+          subject.pivot.levelId === levelId &&
+          subject.pivot.semesterId === semesterId
+      );
+      const data = { items: filteredSubjects, isTakenAll: false };
+      return data;
+    },
+    getSemesters(level, event) {
+      this.$set(level, 'isShowAll', event);
+    },
     toggleCheckAll(subjects, value) {
       subjects.forEach((subject) => {
         subject.pivot.isTaken = value ? 1 : 0;
       });
     },
-    showBulletedNotification(errors) {
-      const h = this.$createElement;
-      const errorList = [];
-      Object.keys(errors).forEach((key) => {
-        errorList.push(h('li', errors[key][0]));
+    onAddSubject(levelId, semesterId = null) {
+      this.levelId = levelId;
+      this.semesterId = semesterId;
+      this.showModalSubjects = true;
+      this.filters.subject.criteria = null;
+    },
+    addSubject(data) {
+      const { item } = data;
+      const { item: transcriptRecord } = this.row;
+      // check if subject exist in the table
+      const result = transcriptRecord.subjects.find(
+        (subject) => subject.id === item.id
+      );
+      if (result) {
+        showNotification(this, 'danger', item.name + ' is already added.');
+        return;
+      }
+      transcriptRecord.subjects.push({
+        ...item,
+        prerequisites: [],
+        pivot: {
+          grade: 0,
+          notes: '',
+          isTaken: 0,
+          levelId: this.levelId,
+          semesterId: this.semesterId,
+        },
       });
-      const vNodesMsg = h('ul', errorList);
-      showNotification(this, 'danger', vNodesMsg);
     },
-    getCurrentFiles() {
-      const { index: studentIdx } = this.lastActiveEvaluation;
-      const { files } = this.tables?.students?.items[studentIdx];
-      return files;
+    removeSubject(data) {
+      const { item } = data;
+      const { item: transcriptRecord } = this.row;
+      const index = transcriptRecord.subjects.findIndex(
+        (i) => i.id === item.id
+      );
+      transcriptRecord.subjects.splice(index, 1);
     },
-    getCurrentFileIndex() {
-      const { index } = this.lastActiveFile;
-      return index;
-    },
-    onFileNavLeft() {
-      const files = this.getCurrentFiles();
-      let currentIdx = this.getCurrentFileIndex();
-      const isFirst = currentIdx === 0;
-      currentIdx = isFirst ? files.length - 1 : currentIdx - 1;
-      const file = files[currentIdx];
-      const currentFileItem = {
-        ...this.lastActiveFile,
-        index: currentIdx,
-        item: file,
+    onUpdateTranscriptRecord(transcriptRecord, isFinalized = false) {
+      const {
+        id,
+        curriculumId,
+        studentCurriculumId,
+        studentId,
+        schoolCategoryId,
+        levelId,
+        courseId,
+        subjects,
+      } = transcriptRecord.item;
+
+      const transcriptRecordSubjects = subjects.map((subject) => {
+        return {
+          subjectId: subject.id,
+          levelId: subject.pivot.levelId,
+          semesterId: subject.pivot.semesterId,
+          grade: subject.pivot.grade,
+          notes: subject.pivot.notes,
+          isTaken: subject.pivot.isTaken,
+        };
+      });
+      const { TranscriptRecordStatuses } = this.$options;
+      const transcriptRecordStatusId = isFinalized
+        ? TranscriptRecordStatuses.FINALIZED.id
+        : TranscriptRecordStatuses.DRAFT.id;
+      const data = {
+        id,
+        curriculumId,
+        studentCurriculumId,
+        studentId,
+        schoolCategoryId,
+        levelId,
+        courseId,
+        transcriptRecordStatusId,
+        subjects: transcriptRecordSubjects,
       };
-      this.previewFile(currentFileItem, this.lastActiveEvaluation);
-    },
-    onFileNavRight() {
-      const files = this.getCurrentFiles();
-      let currentIdx = this.getCurrentFileIndex();
-      const isLast = currentIdx === files.length - 1;
-      currentIdx = isLast ? 0 : currentIdx + 1;
-      const file = files[currentIdx];
-      const currentFileItem = {
-        ...this.lastActiveFile,
-        index: currentIdx,
-        item: file,
-      };
-      this.previewFile(currentFileItem, this.lastActiveEvaluation);
+      this.updateTranscriptRecord(id, data).then(({ data }) => {
+        this.loadTranscriptRecords();
+        showNotification(this, 'success', 'Updated Successfully.');
+        transcriptRecord.toggleDetails();
+      });
     },
   },
   computed: {
@@ -2137,31 +1866,9 @@ export default {
   },
 };
 </script>
-<style scoped lang="scss">
-@import '../../assets/scss/shared.scss';
-
-.preview__modal-description {
-  z-index: 5000;
-  position: fixed;
-  height: 50px;
-  background-color: white;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0 30px;
-}
+<style lang="scss" scoped>
 .collapsed .when-open,
 .not-collapsed .when-closed {
   display: none;
-}
-.evaluation__form-details-first {
-  width: 25%;
-}
-.evaluation__form-details-second {
-  width: 30%;
 }
 </style>

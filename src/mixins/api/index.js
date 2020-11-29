@@ -30,3 +30,6 @@ export { default as PeraPadalaAccountApi } from './PeraPadalaAccount';
 export { default as OrganizationSettingApi } from './OrganizationSetting';
 export { default as TermApi } from './Term';
 export { default as ReportApi } from './Report';
+export { default as TranscriptRecordApi } from './TranscriptRecord';
+export { default as StudentFileApi } from './StudentFile';
+// export { default as StudentFileApi } from './StudentFile';
