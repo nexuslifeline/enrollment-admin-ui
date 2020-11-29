@@ -4,12 +4,13 @@
       <v-select
         :options="options"
         :filterable="false"
+        label="name"
         @open="onOpen"
         @close="onClose"
         @search="debounceSearch"
       >
         <template slot="option" slot-scope="option">
-          <b-avatar variant="info" src="getPhoto(option)"></b-avatar>
+          <b-avatar variant="info" :src="getPhoto(option)"></b-avatar>
           {{ option.name }}
       </template>
         <template #list-footer>
