@@ -23,7 +23,7 @@ import {
 
 export default [
   {
-    label: 'Home',
+    label: 'Dashboard',
     to: '/dashboard',
     children: [
       {
