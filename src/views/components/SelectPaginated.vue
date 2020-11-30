@@ -25,22 +25,22 @@ import { debounce } from 'lodash';
 export default {
   props: {
     fetchData: {
-      type: [Function]
+      type: [Function],
     },
     value: {
-      type: [Object]
+      type: [Object],
     },
     label: {
       type: [String],
-      default: 'name'
-    }
+      default: 'name',
+    },
   },
   data() {
     return {
       options: [],
       hasNextPage: true,
-      searchQuery: null
-    }
+      searchQuery: null,
+    };
   },
   mounted() {
     this.observer = new IntersectionObserver(this.infiniteScroll);
@@ -53,45 +53,50 @@ export default {
       const { data } = await this.fetchData(params);
       this.currentPage = data?.meta?.currentPage;
       this.hasNextPage = data?.meta?.currentPage < data?.meta?.lastPage;
-      this.options = clearResults ? data?.data || [] : [...this.options, ...(data?.data || [])];
+      this.options = clearResults
+        ? data?.data || []
+        : [...this.options, ...(data?.data || [])];
     },
     debounceSearch: debounce(function(v) {
       this.searchOption(v);
     }, 500),
     searchOption(q) {
       this.searchQuery = q;
-      this.loadMore({ page: 1, search: q }, true);
+      //change search to criteria
+      this.loadMore({ page: 1, criteria: q }, true);
     },
-    async onOpen () {
+    async onOpen() {
       if (this.hasNextPage) {
         await this.$nextTick();
-        this.observer.observe(this.$refs.load)
+        this.observer.observe(this.$refs.load);
       }
     },
-    onClose () {
+    onClose() {
       this.observer.disconnect();
     },
-    async infiniteScroll ([{isIntersecting, target}]) {
+    async infiniteScroll([{ isIntersecting, target }]) {
       if (isIntersecting) {
         const ul = target.offsetParent;
         const scrollTop = target.offsetParent.scrollTop;
-        const params = { page: this.currentPage + 1, ...(this.searchQuery && { search: this.searchQuery }) };
+        const params = {
+          page: this.currentPage + 1,
+          ...(this.searchQuery && { search: this.searchQuery }),
+        };
         await this.loadMore(params);
         await this.$nextTick();
         ul.scrollTop = scrollTop;
       }
     },
-  }
-}
+  },
+};
 </script>
 <style lang="scss" scoped>
-  @import "../../assets/scss/shared.scss";
+@import '../../assets/scss/shared.scss';
 
-  .loader__container {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    jusity-content: center;
-  }
-
+.loader__container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
 </style>

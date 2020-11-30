@@ -77,7 +77,7 @@
                     <b-link @click="isExisting = true"
                       ><u>Select Existing Student</u></b-link
                     >
-                    <vue-bootstrap-typeahead
+                    <!-- <vue-bootstrap-typeahead
                       v-if="isExisting"
                       v-model="studentQuery"
                       :serializer="
@@ -98,13 +98,46 @@
                         </div>
                         <div>{{ data.name }}</div>
                       </template>
-                    </vue-bootstrap-typeahead>
+                    </vue-bootstrap-typeahead> -->
+                    <SelectPaginated
+                      v-if="isExisting"
+                      class="select-paginate"
+                      @input="getStudentInfo($event)"
+                      :fetchData="getStudentList"
+                    >
+                      <template slot="option" slot-scope="data">
+                        <div class="select-option">
+                          <div class="select-option__avatar">
+                            <b-avatar
+                              variant="info"
+                              :src="getPhoto(data)"
+                            ></b-avatar>
+                          </div>
+                          <div class="select-option__info">
+                            <span>{{
+                              data.studentNo
+                                ? data.studentNo
+                                : 'Awaiting Confirmation'
+                            }}</span>
+                            <span>{{ data.name }}</span>
+                            <span>{{ data.email }}</span>
+                          </div>
+                        </div>
+                      </template>
+                      <template slot="loader">
+                        <b-spinner
+                          label="Loading..."
+                          class="loader"
+                        ></b-spinner>
+                      </template>
+                    </SelectPaginated>
                   </b-col>
                 </b-row>
                 <b-row>
                   <b-col md="3">
                     <b-form-group label="Firstname" labelClass="required">
                       <b-form-input
+                        debounce="500"
                         v-model="forms.student.fields.firstName"
                         :state="forms.student.states.firstName"
                       />
@@ -115,12 +148,16 @@
                   </b-col>
                   <b-col md="3">
                     <b-form-group label="Middlename">
-                      <b-form-input v-model="forms.student.fields.middleName" />
+                      <b-form-input
+                        debounce="500"
+                        v-model="forms.student.fields.middleName"
+                      />
                     </b-form-group>
                   </b-col>
                   <b-col md="3">
                     <b-form-group label="Lastname" labelClass="required">
                       <b-form-input
+                        debounce="500"
                         v-model="forms.student.fields.lastName"
                         :state="forms.student.states.lastName"
                       />
@@ -135,6 +172,7 @@
                     <b-form-group label="Birthdate" labelClass="required">
                       <b-form-input
                         type="date"
+                        debounce="500"
                         v-model="forms.student.fields.birthDate"
                         :state="forms.student.states.birthDate"
                       />
@@ -145,12 +183,16 @@
                   </b-col>
                   <b-col md="3">
                     <b-form-group label="Mobile No.">
-                      <b-form-input v-model="forms.student.fields.mobileNo" />
+                      <b-form-input
+                        debounce="500"
+                        v-model="forms.student.fields.mobileNo"
+                      />
                     </b-form-group>
                   </b-col>
                   <b-col md="3">
                     <b-form-group label="Civil Status" labelClass="required">
                       <b-form-select
+                        debounce="500"
                         v-model="forms.student.fields.civilStatusId"
                         :state="forms.student.states.civilStatusId"
                       >
@@ -176,13 +218,27 @@
                 <!-- <div class="mb-2">
 
                 </div> -->
-                <div class="academic-entry__info">
+                <div
+                  v-if="
+                    forms.student.fields.id === null &&
+                      forms.academicRecord.fields.manualStepId ===
+                        $options.ManualSteps.STUDENT_REGISTRATION.id
+                  "
+                  class="academic-entry__info"
+                >
                   Account Info
                 </div>
-                <b-row>
+                <b-row
+                  v-if="
+                    forms.student.fields.id === null &&
+                      forms.academicRecord.fields.manualStepId ===
+                        $options.ManualSteps.STUDENT_REGISTRATION.id
+                  "
+                >
                   <b-col md="3">
                     <b-form-group label="Email" labelClass="required">
                       <b-form-input
+                        debounce="500"
                         v-model="forms.user.fields.username"
                         :state="forms.user.states.userUsername"
                       />
@@ -195,6 +251,7 @@
                     <b-form-group label="Password" labelClass="required">
                       <b-form-input
                         type="password"
+                        debounce="500"
                         v-model="forms.user.fields.password"
                         :state="forms.user.states.userPassword"
                       />
@@ -209,6 +266,7 @@
                       labelClass="required"
                     >
                       <b-form-input
+                        debounce="500"
                         v-model="forms.user.fields.passwordConfirmation"
                         type="password"
                       />
@@ -428,6 +486,7 @@
                     labelClass="font-weight-bold"
                   >
                     <b-form-input
+                      debounce="500"
                       v-model="forms.evaluation.fields.lastSchoolAttended"
                     />
                   </b-form-group>
@@ -464,6 +523,7 @@
                 <div class="academic-entry__info-item">
                   <b-form-group label="From:" labelClass="font-weight-bold">
                     <b-form-input
+                      debounce="500"
                       v-model="forms.evaluation.fields.lastSchoolYearFrom"
                     />
                   </b-form-group>
@@ -473,6 +533,7 @@
                 <div class="academic-entry__info-item">
                   <b-form-group label="To:" labelClass="font-weight-bold">
                     <b-form-input
+                      debounce="500"
                       v-model="forms.evaluation.fields.lastSchoolYearTo"
                     />
                   </b-form-group>
@@ -555,7 +616,7 @@
               <b-col md="6">
                 <div class="academic-entry__info-item">
                   <div class="mr-2 font-weight-bold">Course :</div>
-                  <p>
+                  <div v-if="!editCourse" class="mb-3">
                     {{
                       forms.academicRecord.fields.courseId
                         ? options.courses.items.find(
@@ -563,7 +624,39 @@
                           ).description
                         : ''
                     }}
-                  </p>
+                    &nbsp;&nbsp;
+                    <b-link @click="editCourse = !editCourse">
+                      [Change Course]
+                    </b-link>
+                  </div>
+                  <div v-else>
+                    <b-form-select
+                      @change="
+                        loadCurriculumList(),
+                          (forms.transcriptRecord.fields.studentCurriculumId = null),
+                          (forms.transcriptRecord.fields.curriculumId = null)
+                      "
+                      v-model="forms.transcriptRecord.fields.courseId"
+                      class="float-right"
+                    >
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled
+                          >-- Course --</b-form-select-option
+                        >
+                      </template>
+                      <b-form-select-option :value="null"
+                        >None</b-form-select-option
+                      >
+                      <b-form-select-option
+                        v-for="course in options.courses.items"
+                        :key="course.id"
+                        :value="course.id"
+                      >
+                        {{ course.description }}
+                        {{ course.major ? `(${course.major})` : '' }}
+                      </b-form-select-option>
+                    </b-form-select>
+                  </div>
                 </div>
               </b-col>
               <b-col md="3">
@@ -677,6 +770,7 @@
                   </template>
                   <template v-slot:cell(pivot.grade)="row">
                     <vue-autonumeric
+                      debounce="500"
                       v-model="row.item.pivot.grade"
                       class="form-control text-right"
                       :options="[
@@ -690,7 +784,7 @@
                     </vue-autonumeric>
                   </template>
                   <template v-slot:cell(pivot.notes)="row">
-                    <b-form-input v-model="row.item.pivot.notes">
+                    <b-form-input debounce="500" v-model="row.item.pivot.notes">
                     </b-form-input>
                   </template>
                   <template v-slot:cell(labs)="row">
@@ -811,6 +905,7 @@
                               </template>
                               <template v-slot:cell(pivot.grade)="row">
                                 <vue-autonumeric
+                                  debounce="500"
                                   v-model="row.item.pivot.grade"
                                   class="form-control text-right"
                                   :options="[
@@ -824,7 +919,10 @@
                                 </vue-autonumeric>
                               </template>
                               <template v-slot:cell(pivot.notes)="row">
-                                <b-form-input v-model="row.item.pivot.notes">
+                                <b-form-input
+                                  debounce="500"
+                                  v-model="row.item.pivot.notes"
+                                >
                                 </b-form-input>
                               </template>
                               <template v-slot:cell(labs)="row">
@@ -1090,6 +1188,15 @@
                 <v-icon name="plus-circle" /> ADD SUBJECT
               </button>
             </div>
+            <b-form-group>
+              <b-form-input
+                :state="forms.academicRecord.states.academicRecordSubjects"
+                hidden
+              />
+              <b-form-invalid-feedback>
+                {{ forms.academicRecord.errors.academicRecordSubjects }}
+              </b-form-invalid-feedback>
+            </b-form-group>
             <b-table
               class="mb-4"
               hover
@@ -1218,6 +1325,7 @@
             </b-col>
             <b-col offset-md="4" md="4">
               <b-form-input
+                debounce="500"
                 v-model="filters.subject.criteria"
                 type="text"
                 placeholder="Search"
@@ -1401,6 +1509,7 @@ import {
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import { debounce } from 'lodash';
 import { copyValue } from '../../../helpers/extractor';
+import SelectPaginated from '../../components/SelectPaginated';
 import {
   clearFields,
   reset,
@@ -1409,7 +1518,7 @@ import {
 } from '../../../helpers/forms';
 
 export default {
-  components: { AvatarMaker, VueBootstrapTypeahead },
+  components: { AvatarMaker, VueBootstrapTypeahead, SelectPaginated },
   mixins: [
     LevelApi,
     CourseApi,
@@ -1426,7 +1535,6 @@ export default {
     showEntry: Boolean,
     entryMode: String,
     isLoading: Boolean,
-    isProcessing: Boolean,
     forms: Object,
   },
   Semesters,
@@ -1448,8 +1556,10 @@ export default {
       schoolCategoryId: null,
       editCurriculum: false,
       editStudentCurriculum: false,
+      editCourse: false,
       showModalSubjects: false,
       showModalSection: false,
+      isProcessing: false,
       tables: {
         transcriptRecordSubjects: {
           isBusy: false,
@@ -1866,7 +1976,7 @@ export default {
     },
     loadStudents() {
       const { students } = this.options;
-      const { studentQuery } = this.studentQuery;
+      const studentQuery = this.studentQuery;
       const params = {
         paginate: false,
         criteria: studentQuery,
@@ -1966,6 +2076,7 @@ export default {
       fields.schoolCategoryId = level.schoolCategoryId;
     },
     onSaveAcademicRecordApplication() {
+      this.isProcessing = true;
       const {
         student: { fields: student },
         student: studentForm,
@@ -2020,7 +2131,7 @@ export default {
 
         const data = {
           ...student,
-          user,
+          user: student.id === null ? user : null,
           academicRecord: {
             ...academicRecordDataSet,
             manualStepId: ManualSteps.EVALUATION.id,
@@ -2037,6 +2148,7 @@ export default {
         };
         this.manualRegisterStudent(data)
           .then(({ data }) => {
+            this.isProcessing = false;
             const {
               latestManualAcademicRecord: academicRecordData,
               evaluation: evaluationData,
@@ -2052,11 +2164,13 @@ export default {
             this.loadLevelsOfCourse();
           })
           .catch((error) => {
+            console.log(error);
             // academicRecord.isProcessing = false
             const errors = error.response.data.errors;
             validate(studentForm, errors);
             validate(userForm, errors);
             validate(academicRecordForm, errors);
+            this.isProcessing = false;
           });
       } else if (academicRecord.manualStepId === ManualSteps.EVALUATION.id) {
         const { subjects, ...transcriptData } = transcriptRecord;
@@ -2110,6 +2224,7 @@ export default {
             copyValue(activeTranscriptRecord, transcriptRecord);
             academicRecord.subjects = [];
             this.loadSections();
+            this.isProcessing = false;
             // this.loadCurriculumList();
             // this.loadLevelsOfCourse();
           })
@@ -2119,6 +2234,7 @@ export default {
             validate(studentForm, errors);
             validate(userForm, errors);
             validate(academicRecordForm, errors);
+            this.isProcessing = false;
           });
       } else if (
         academicRecord.manualStepId === ManualSteps.SUBJECT_ENLISTMENT.id
@@ -2160,12 +2276,14 @@ export default {
         this.manualRegisterStudent(data)
           .then(({ data }) => {
             this.$emit('onCompleted');
+            this.isProcessing = false;
           })
           .catch((error) => {
             // academicRecord.isProcessing = false
             const errors = error.response.data.errors;
             validate(studentForm, errors);
             validate(academicRecordForm, errors);
+            this.isProcessing = false;
           });
       }
     },
@@ -2342,6 +2460,10 @@ export default {
         subjects.isBusy2 = false;
       });
     },
+    getPhoto(option) {
+      const photo = (option && option.photo && option.photo.hashName) || '';
+      return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
+    },
   },
   computed: {
     totalUnits() {
@@ -2358,9 +2480,6 @@ export default {
     },
   },
   watch: {
-    studentQuery: debounce(function() {
-      this.loadStudents();
-    }, 500),
     showEntry(value) {
       if (value) {
         if (this.entryMode === 'Add') {
@@ -2768,5 +2887,26 @@ export default {
       width: 100%;
     }
   }
+}
+
+.select-option {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .select-option__avatar {
+    width: auto;
+  }
+
+  .select-option__info {
+    flex: 1;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.select-paginate {
+  margin-top: 7px;
 }
 </style>
