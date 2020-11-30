@@ -276,6 +276,7 @@ const academicRecordStatesAndErrors = {
   academicRecordSchoolYearId: null,
   academicRecordCourseId: null,
   academicRecordSemesterId: null,
+  academicRecordSubjects: null,
 };
 
 const evaluationFields = {
@@ -374,7 +375,7 @@ export default {
             },
             {
               key: 'step',
-              label: 'Status',
+              label: 'Stage',
               tdClass: 'align-middle text-center',
               thClass: 'text-center',
               thStyle: { width: '12%' },
