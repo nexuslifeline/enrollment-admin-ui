@@ -1,7 +1,19 @@
 <template>
   <transition name="slide-fade" appear>
     <div class="login__container">
-      <v-select
+      <SelectPaginated v-model="selectedStudent" :fetchData="getStudentList">
+        <template slot="option" slot-scope="data">
+          <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
+           {{ data.name }}
+        </template>
+        <template slot="loader">
+          <b-spinner label="Loading..." class="loader"></b-spinner>
+        </template>
+      </SelectPaginated>
+      <div>
+        v-model: {{ JSON.stringify(selectedStudent) }}
+      </div >
+      <!-- <v-select
         :options="options"
         :filterable="false"
         label="name"
@@ -18,7 +30,7 @@
             Loading more options...
           </li>
         </template>
-      </v-select>
+      </v-select> -->
       <AttachmentList
         :data="attachments"
         @onAttachmentItemDownload="onAttachmentItemDownload"
@@ -54,19 +66,22 @@ import ScheduleViewer from '../components/ScheduleViewer'
 import AttachmentList from '../components/Attachment/AttachmentList'
 import StudentApi from '../../mixins/api/Student';
 import { debounce } from 'lodash';
+import SelectPaginated from '../components/SelectPaginated'
 
 export default {
   name: 'Login',
   components: {
     Toggle,
     ScheduleViewer,
-    AttachmentList
+    AttachmentList,
+    SelectPaginated
   },
   mixins: [StudentApi],
   data() {
     return {
-      hasNextPage: true,
-      options: [],
+      selectedStudent: {},
+      //hasNextPage: true,
+      //options: [],
       currentPage: 0,
       lastPage: 1,
       searchQuery: null,
@@ -146,45 +161,46 @@ export default {
     }
   },
   mounted() {
-    this.observer = new IntersectionObserver(this.infiniteScroll);
+    //this.observer = new IntersectionObserver(this.infiniteScroll);
   },
   methods: {
-    async loadMore(params, clearResults = false) {
-      const { data } = await this.getStudentList(params);
-      this.currentPage = data?.meta?.currentPage;
-      this.hasNextPage = data?.meta?.currentPage < data?.meta?.lastPage;
-      this.options = clearResults ? data?.data || [] : [...this.options, ...(data?.data || [])];
-    },
-    debounceSearch: debounce(function(v) {
-      this.searchOption(v);
-    }, 500),
-    searchOption(q) {
-      this.searchQuery = q;
-      this.loadMore({ page: 1, search: q }, true);
-    },
+    // async loadMore(params, clearResults = false) {
+    //   const { data } = await this.getStudentList(params);
+    //   this.currentPage = data?.meta?.currentPage;
+    //   this.hasNextPage = data?.meta?.currentPage < data?.meta?.lastPage;
+    //   this.options = clearResults ? data?.data || [] : [...this.options, ...(data?.data || [])];
+    // },
+    // debounceSearch: debounce(function(v) {
+    //   this.searchOption(v);
+    // }, 500),
+    // searchOption(q) {
+    //   this.searchQuery = q;
+    //   this.loadMore({ page: 1, search: q }, true);
+    // },
     getPhoto(option) {
-      return `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${option && option.photo && option.photo.hashName}`;
+      const photo = option && option.photo && option.photo.hashName || '';
+      return  !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
     },
-    async onOpen () {
-      if (this.hasNextPage) {
-        await this.$nextTick();
-        this.observer.observe(this.$refs.load)
-      }
-    },
-    onClose () {
-      this.observer.disconnect();
-    },
-    async infiniteScroll ([{isIntersecting, target}]) {
-      if (isIntersecting) {
-        const ul = target.offsetParent;
-        const scrollTop = target.offsetParent.scrollTop;
-        const params = { page: this.currentPage + 1, ...(this.searchQuery && { search: this.searchQuery }) };
-        await this.loadMore(params);
-        //this.limit += 10;
-        await this.$nextTick();
-        ul.scrollTop = scrollTop;
-      }
-    },
+    // async onOpen () {
+    //   if (this.hasNextPage) {
+    //     await this.$nextTick();
+    //     this.observer.observe(this.$refs.load)
+    //   }
+    // },
+    // onClose () {
+    //   this.observer.disconnect();
+    // },
+    // async infiniteScroll ([{isIntersecting, target}]) {
+    //   if (isIntersecting) {
+    //     const ul = target.offsetParent;
+    //     const scrollTop = target.offsetParent.scrollTop;
+    //     const params = { page: this.currentPage + 1, ...(this.searchQuery && { search: this.searchQuery }) };
+    //     await this.loadMore(params);
+    //     //this.limit += 10;
+    //     await this.$nextTick();
+    //     ul.scrollTop = scrollTop;
+    //   }
+    // },
     onAttachmentItemDownload(data) {
       console.log(data)
     },
@@ -256,6 +272,11 @@ export default {
     margin: 50px auto;
     display: flex;
     flex-direction: column;
+  }
+
+  .loader {
+    height: 25px;
+    width: 25px;
   }
 
 </style>

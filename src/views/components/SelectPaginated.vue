@@ -1,0 +1,97 @@
+<template>
+  <v-select
+    :options="options"
+    :filterable="false"
+    :label="label"
+    @open="onOpen"
+    @close="onClose"
+    @search="debounceSearch"
+    :value="value"
+    @input="onInputSelect"
+  >
+    <template slot="option" slot-scope="data">
+      <slot name="option" v-bind="data"></slot>
+    </template>
+    <template #list-footer>
+      <li ref="load" class="loader__container">
+        <slot name="loader"></slot>
+      </li>
+    </template>
+  </v-select>
+</template>
+<script>
+import { debounce } from 'lodash';
+
+export default {
+  props: {
+    fetchData: {
+      type: [Function]
+    },
+    value: {
+      type: [Object]
+    },
+    label: {
+      type: [String],
+      default: 'name'
+    }
+  },
+  data() {
+    return {
+      options: [],
+      hasNextPage: true,
+      searchQuery: null
+    }
+  },
+  mounted() {
+    this.observer = new IntersectionObserver(this.infiniteScroll);
+  },
+  methods: {
+    onInputSelect(v) {
+      this.$emit('input', v);
+    },
+    async loadMore(params, clearResults = false) {
+      const { data } = await this.fetchData(params);
+      this.currentPage = data?.meta?.currentPage;
+      this.hasNextPage = data?.meta?.currentPage < data?.meta?.lastPage;
+      this.options = clearResults ? data?.data || [] : [...this.options, ...(data?.data || [])];
+    },
+    debounceSearch: debounce(function(v) {
+      this.searchOption(v);
+    }, 500),
+    searchOption(q) {
+      this.searchQuery = q;
+      this.loadMore({ page: 1, search: q }, true);
+    },
+    async onOpen () {
+      if (this.hasNextPage) {
+        await this.$nextTick();
+        this.observer.observe(this.$refs.load)
+      }
+    },
+    onClose () {
+      this.observer.disconnect();
+    },
+    async infiniteScroll ([{isIntersecting, target}]) {
+      if (isIntersecting) {
+        const ul = target.offsetParent;
+        const scrollTop = target.offsetParent.scrollTop;
+        const params = { page: this.currentPage + 1, ...(this.searchQuery && { search: this.searchQuery }) };
+        await this.loadMore(params);
+        await this.$nextTick();
+        ul.scrollTop = scrollTop;
+      }
+    },
+  }
+}
+</script>
+<style lang="scss" scoped>
+  @import "../../assets/scss/shared.scss";
+
+  .loader__container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    jusity-content: center;
+  }
+
+</style>
