@@ -4,8 +4,16 @@
       <AvatarMaker
         :avatarId="data.student.id"
         :size="50"
-        :text="`${data.student.firstName.charAt(0)}${data.student.lastName.charAt(0)}`"
-        :src="$options.getFilePath(data.student.photo && data.student.photo.hashName || '')"
+        :text="
+          `${data.student.firstName.charAt(0)}${data.student.lastName.charAt(
+            0
+          )}`
+        "
+        :src="
+          $options.getFilePath(
+            (data.student.photo && data.student.photo.hashName) || ''
+          )
+        "
       />
     </template>
     <div>
@@ -17,29 +25,33 @@
       {{ data.student.email }}
     </div>
     <div class="text-muted">
-      {{ data.student.currentAddress || data.student.address.currentCompleteAddress }}
+      {{
+        data.student.currentAddress || data.student.address
+          ? data.student.address.currentCompleteAddress
+          : ''
+      }}
     </div>
   </b-media>
 </template>
 
 <script>
-  import AvatarMaker from '../AvatarMaker'
-  import { getFilePath } from '../../../helpers/utils'
-  export default {
-    getFilePath,
-    props: {
-      data: {
-        type: [Object]
-      },
-      callback: {
-        type: [Object]
-      }
+import AvatarMaker from '../AvatarMaker';
+import { getFilePath } from '../../../helpers/utils';
+export default {
+  getFilePath,
+  props: {
+    data: {
+      type: [Object],
     },
-    components: {
-      AvatarMaker
-    }
-  }
+    callback: {
+      type: [Object],
+    },
+  },
+  components: {
+    AvatarMaker,
+  },
+};
 </script>
 <style lang="scss" scoped>
-  @import "../../../assets/scss/shared.scss";
+@import '../../../assets/scss/shared.scss';
 </style>

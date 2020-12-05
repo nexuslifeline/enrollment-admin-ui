@@ -145,12 +145,6 @@ function configRoutes () {
               component: AcademicRecordApplicationList,
               meta: { requiresAuth: true }
             },
-            {
-              path: 'transcript-records',
-              name: 'Transcript Records',
-              component: TranscriptRecord,
-              meta: { requiresAuth: true }
-            }
           ]
         },
         {
@@ -344,6 +338,12 @@ function configRoutes () {
               name: 'User',
               component: User,
               meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'transcript-records',
+              name: 'Transcript Records',
+              component: TranscriptRecord,
+              meta: { requiresAuth: true }
             },
             {
               path: 'student',

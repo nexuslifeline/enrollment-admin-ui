@@ -18,6 +18,11 @@ export default {
         params: params,
         responseType: 'blob'
       });
+    },
+    previewTranscriptRecord(transcriptRecorId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/transcript-record/${transcriptRecorId}`, {
+        responseType: 'blob'
+      });
     }
   }
 }

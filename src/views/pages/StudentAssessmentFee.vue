@@ -800,11 +800,11 @@ export default {
       const { applicationStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
       const orderBy = 'updated_at'
       const sort = 'DESC'
-			const academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id
+			const notAcademicRecordStatusId = AcademicRecordStatuses.DRAFT.id
 			let params = {
 				paginate: true,
 				perPage, page,
-				academicRecordStatusId,
+				notAcademicRecordStatusId,
 				schoolCategoryId,
 				courseId,
         applicationStatusId,

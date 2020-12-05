@@ -170,7 +170,7 @@ export default [
       },
       {
         label: 'Transcript Records',
-        to: '/enrollment/transcript-records',
+        to: '/master-files/transcript-records',
         // permissionIds: StudentPaymentPermissions.getIds()
         // to be added
       },

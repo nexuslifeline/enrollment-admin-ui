@@ -80,7 +80,7 @@ export default {
         const scrollTop = target.offsetParent.scrollTop;
         const params = {
           page: this.currentPage + 1,
-          ...(this.searchQuery && { search: this.searchQuery }),
+          ...(this.searchQuery && { criteria: this.searchQuery }),
         };
         await this.loadMore(params);
         await this.$nextTick();

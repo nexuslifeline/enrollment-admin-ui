@@ -198,7 +198,14 @@
                   <v-icon name="ellipsis-v" />
                 </template>
                 <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
-                <b-dropdown-item @click.prevent="loadDetails(row)">
+                <b-dropdown-item
+                  @click.prevent="
+                    row.item.transcriptRecordStatusId ===
+                    $options.TranscriptRecordStatuses.FINALIZED.id
+                      ? printTranscriptRecord(row.item.id)
+                      : loadDetails(row)
+                  "
+                >
                   {{
                     row.item.transcriptRecordStatusId ===
                     $options.TranscriptRecordStatuses.FINALIZED.id
@@ -1312,14 +1319,23 @@
       </div>
       <!-- modal footer buttons -->
     </b-modal>
+    <FileViewer
+      :show="fileViewer.show"
+      :file="file"
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="fileViewer.show = false"
+    />
   </div>
   <!-- main container -->
 </template>
 <script>
+import FileViewer from '../components/FileViewer';
 import {
   CourseApi,
   CurriculumApi,
   LevelApi,
+  ReportApi,
   SchoolCategoryApi,
   SubjectApi,
   TranscriptRecordApi,
@@ -1366,6 +1382,7 @@ export default {
     CourseApi,
     CurriculumApi,
     SubjectApi,
+    ReportApi,
   ],
   components: {
     SchoolCategoryTabs,
@@ -1377,6 +1394,7 @@ export default {
     ActiveViewItems,
     ActiveViewItem,
     ActiveViewLinks,
+    FileViewer,
   },
   TranscriptRecordStatuses,
   SchoolCategories,
@@ -1384,6 +1402,19 @@ export default {
   Semesters,
   data() {
     return {
+      fileViewer: {
+        isActiveNavEnabled: false,
+        activeNavCount: 0,
+        activeNavIndex: 0,
+        show: false,
+      },
+      file: {
+        type: null,
+        src: null,
+        name: null,
+        notes: null,
+        isLoading: false,
+      },
       tables: {
         transcriptRecords: {
           isBusy: false,
@@ -1850,6 +1881,22 @@ export default {
         this.loadTranscriptRecords();
         showNotification(this, 'success', 'Updated Successfully.');
         transcriptRecord.toggleDetails();
+      });
+    },
+    printTranscriptRecord(id) {
+      this.file.type = null;
+      this.file.src = null;
+      this.fileViewer.show = true;
+      this.file.isLoading = true;
+      this.file.name = 'Transcript Of Record';
+      this.previewTranscriptRecord(id).then(({ data, headers }) => {
+        console.log(data);
+        this.file.type = headers.contentType;
+        const file = new Blob([data], { type: 'application/pdf' });
+        const reader = new FileReader();
+        reader.onload = (e) => (this.file.src = e.target.result);
+        reader.readAsDataURL(file);
+        this.file.isLoading = false;
       });
     },
   },
