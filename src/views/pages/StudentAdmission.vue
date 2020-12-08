@@ -136,7 +136,25 @@
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
-              :options="[]"
+              :showOptions="
+                data.item.academicRecordStatusId ===
+                      AcademicRecordStatuses.DRAFT.id"
+              :options="[
+                  {
+                    label: 'Approve',
+                    callback: () => setApproval(data),
+                    isAllowed: isAccessible(
+                      $options.StudentSubjectPermissions.APPROVAL.id
+                    ),
+                  },
+                  {
+                    label: 'Reject',
+                    callback: () => setDisapproval(data),
+                    isAllowed: isAccessible(
+                      $options.StudentSubjectPermissions.DISAPPROVAL.id
+                    ),
+                  },
+                ]"
             >
               <template v-slot:header>
                 <div class="active-view__header-details-container">
