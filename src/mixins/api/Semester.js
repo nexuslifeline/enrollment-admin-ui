@@ -6,13 +6,13 @@ export default {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/semesters`, { params: params });
     },
     getSemester(id) {
-      return this.$http.get(`${apiPrefix}/${apiVersion}/semesters/${id}`);
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/semesters/${id}`);
     },
     addSemester(data) {
-      return this.$http.post(`${apiPrefix}/${apiVersion}/semesters`, data);
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/semesters`, data);
     },
     updateSemester(data, id) {
-      return this.$http.put(`${apiPrefix}/${apiVersion}/semesters/${id}`, data);
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/semesters/${id}`, data);
     }
   }
 }

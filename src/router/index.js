@@ -63,6 +63,7 @@ const AcademicRecordApplicationList = () => import('@/views/pages/academic-recor
 const Collection = () => import('@/views/pages/reports/Collection')
 const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
 const TranscriptRecord = () => import('@/views/pages/TranscriptRecord')
+const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentList')
 
 Vue.use(Router)
 
@@ -487,6 +488,12 @@ function configRoutes () {
               path: 'student-ledger',
               name: 'Ledger',
               component: StudentLedger,
+              meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'enrolled-list',
+              name: 'Enrolledlist',
+              component: EnrolledStudentList,
               meta: { requiresAuth: true, userType: 0 }
             },
           ]
