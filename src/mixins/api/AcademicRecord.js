@@ -17,5 +17,8 @@ export default {
     updateAcademicRecord(data, academicRecordId) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}`, data)
     },
+    getApprovalCount() {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/approval-count`)
+    }
   }
 }

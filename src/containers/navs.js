@@ -54,7 +54,7 @@ export default [
       {
         label: 'Evaluation',
         to: '/enrollment/evaluation',
-        permissionIds: EvaluationAndAdmissionPermissions.getIds()
+        permissionIds: EvaluationAndAdmissionPermissions.getIds(),
       },
       {
         label: 'Enlistment',

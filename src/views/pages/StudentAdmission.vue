@@ -1407,6 +1407,7 @@ export default {
           this.isProcessing = false;
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
+          this.$store.state.approvalCount.enlistment--;
         })
         .catch((error) => {
           const errors = error.response.data.errors;

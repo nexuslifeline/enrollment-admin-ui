@@ -106,7 +106,10 @@
               <v-icon name="paperclip" />
             </template>
             <template v-slot:cell(name)="data">
-              <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
+              <StudentColumn
+                :data="data.item"
+                :callback="{ loadDetails: () => loadDetails(data) }"
+              />
               <!-- <b-media>
                 <template v-slot:aside>
                   <AvatarMaker
@@ -1360,10 +1363,7 @@ import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
 import Card from '../components/Card';
-import {
-  StudentColumn,
-  EducationColumn
-} from '../components/ColumnDetails'
+import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1401,7 +1401,7 @@ export default {
     AvatarMaker,
     Card,
     StudentColumn,
-    EducationColumn
+    EducationColumn,
   },
   EvaluationAndAdmissionPermissions,
   data() {
@@ -1453,10 +1453,10 @@ export default {
               // }
             },
             {
-            	key: "education",
-            	label: "Education",
-            	tdClass: "align-middle",
-              thStyle: { width: "20%"}
+              key: 'education',
+              label: 'Education',
+              tdClass: 'align-middle',
+              thStyle: { width: '20%' },
             },
             {
               key: 'submittedDate',
@@ -1739,6 +1739,7 @@ export default {
           this.isProcessing = false;
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
+          this.$store.state.approvalCount.evaluation--;
         })
         .catch((error) => {
           this.isProcessing = false;

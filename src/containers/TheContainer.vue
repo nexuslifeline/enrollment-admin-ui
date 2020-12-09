@@ -3,7 +3,7 @@
     <!-- <TheSidebar/> -->
     <b-overlay :show="isLoading" class="full-overlay-container">
       <div v-if="!isLoading" class="c-wrapper">
-        <TheHeader/>
+        <TheHeader />
         <div class="main-content">
           <LeftPane />
           <div class="c-body">
@@ -21,41 +21,49 @@
 </template>
 
 <script>
-import LeftPane from './ContentLeftPane'
-import TheHeader from './Header'
-import TheFooter from './TheFooter'
-import { AuthApi } from '../mixins/api'
+import LeftPane from './ContentLeftPane';
+import TheHeader from './Header';
+import TheFooter from './TheFooter';
+import { AcademicRecordApi, AuthApi } from '../mixins/api';
 
 export default {
   name: 'TheContainer',
-  mixins: [AuthApi],
+  mixins: [AuthApi, AcademicRecordApi],
   components: {
     LeftPane,
     TheHeader,
-    TheFooter
+    TheFooter,
   },
   data() {
     return {
-      isLoading: true
-    }
+      isLoading: true,
+    };
   },
   created() {
     this.loadProfile();
+    this.loadApprovalCount();
   },
   methods: {
     loadProfile() {
       this.isLoading = true;
-      this.getAuthenticatedUser().then(({ data }) => {
-        this.isLoading = false;
-        localStorage.setItem('userGroupId', data.userGroupId); // needs to be remove once were done
-        this.$store.commit('SET_USER', data);
-      }).catch((error) => {
-        this.isLoading = false;
-        this.$router.push({ path: '/login' });
-      })
-    }
+      this.getAuthenticatedUser()
+        .then(({ data }) => {
+          this.isLoading = false;
+          localStorage.setItem('userGroupId', data.userGroupId); // needs to be remove once were done
+          this.$store.commit('SET_USER', data);
+        })
+        .catch((error) => {
+          this.isLoading = false;
+          this.$router.push({ path: '/login' });
+        });
+    },
+    loadApprovalCount() {
+      this.getApprovalCount().then(({ data }) => {
+        this.$store.commit('SET_APPROVAL_COUNT', data);
+      });
+    },
   },
-}
+};
 </script>
 
 <style scoped>

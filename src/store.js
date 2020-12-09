@@ -7,6 +7,12 @@ const state = {
   sidebarMinimize: false,
   isLoggedIn: !!localStorage.getItem('adminAccessToken') ?? false,
   user: [],
+  approvalCount: {
+    assessment: 0,
+    enlistment: 0,
+    evaluation: 0,
+    payment: 0
+  }
 }
 
 const mutations = {
@@ -30,6 +36,9 @@ const mutations = {
   SET_USER (state, user_data) {
     state.user = user_data
   },
+  SET_APPROVAL_COUNT (state, data) {
+    state.approvalCount = data
+  }
 }
 
 export default new Vuex.Store({
