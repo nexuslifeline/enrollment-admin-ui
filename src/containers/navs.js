@@ -232,12 +232,17 @@ export default [
       {
         label: 'Collections',
         to: '/report/collection',
-        permissionIds: BankAccountPermissions.getIds()
+        //permissionIds: BankAccountPermissions.getIds()
       },
       {
         label: 'Student Ledger',
         to: '/report/student-ledger',
-        permissionIds: BankAccountPermissions.getIds()
+        //permissionIds: BankAccountPermissions.getIds()
+      },
+      {
+        label: 'Enrolled List',
+        to: '/report/enrolled-list',
+        //permissionIds: BankAccountPermissions.getIds()
       }
     ]
   }
