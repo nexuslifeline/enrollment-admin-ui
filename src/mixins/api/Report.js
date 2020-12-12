@@ -23,6 +23,12 @@ export default {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/transcript-record/${transcriptRecorId}`, {
         responseType: 'blob'
       });
+    },
+    previewEnrolledList(params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/enrolled-list`, {
+        params: params,
+        responseType: 'blob'
+      });
     }
   }
 }

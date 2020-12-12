@@ -4,7 +4,10 @@
       {{ $options.getPropValue(data.level) }}
     </div>
     <div>
-      {{ $options.getPropValue(data.course) }}
+      {{ data.course ? $options.getPropValue(data.course) : '' }} {{ data.semester ? $options.getPropValue(data.semester) : '' }}
+    </div>
+    <div>
+      {{ $options.getPropValue(data.schoolYear) }}
     </div>
   </div>
 </template>
