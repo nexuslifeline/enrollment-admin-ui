@@ -98,12 +98,11 @@
                     My Profile
                   </a>
                 </li>
-                <li class="account-action__dropdown-item">
-                  <a
-                    href="#"
-                    @click.prevent.stop="logout"
-                    class="account-action__dropdown-item-link"
-                  >
+                <li
+                  @click.prevent.stop="logout"
+                  class="account-action__dropdown-item"
+                >
+                  <a href="#" class="account-action__dropdown-item-link">
                     Logout
                     <v-icon v-if="isLoading" name="spinner" spin class="ml-2" />
                   </a>
@@ -129,17 +128,21 @@
                 <a :href="`#${subNav.to}`" class="header__menu-link">
                   {{ subNav.label }}
                   <div
-                    class="ml-1 badge badge-danger"
+                    class="ml-1"
                     v-if="
                       [
                         'Evaluation',
                         'Enlistment',
                         'Assessment',
                         'Payment',
-                      ].includes(subNav.label)
+                      ].includes(subNav.label) &&
+                        $store.state.approvalCount[subNav.label.toLowerCase()] >
+                          0
                     "
                   >
-                    {{ $store.state.approvalCount[subNav.label.toLowerCase()] }}
+                    ({{
+                      $store.state.approvalCount[subNav.label.toLowerCase()]
+                    }})
                   </div>
                 </a>
               </li>

@@ -617,3 +617,30 @@ export const PaymentModes = new Enum({
   E_WALLET: { id: 4, name: 'E-Wallet (GCash, Paymaya, PayPal, Coins.ph)' },
   PERA_PADALA: { id: 5, name: 'Pera Padala' },
 });
+
+export const ManualEnrollmentPermissions = new Enum({
+  ADD: { id: 281, name: 'Add' }
+})
+
+export const PaymentPermissions = new Enum({
+  ADD: { id: 291, name: 'Add' },
+  CANCEL: { id: 292, name: 'Cancel' },
+});
+
+export const StatementOfAccountPermissions = new Enum({
+  GENERATE: { id: 301, name: 'Generate' },
+  EDIT: { id: 302, name: 'Edit' },
+  DELETE: { id: 303, name: 'Delete' },
+  PREVIEW: { id: 304, name: 'Preview' },
+});
+
+export const OtherBillingPermissions = new Enum({
+  GENERATE: { id: 311, name: 'Generate' },
+  EDIT: { id: 312, name: 'Edit' },
+  DELETE: { id: 313, name: 'Delete' },
+});
+
+export const TranscriptRecordPermissions = new Enum({
+  REVIEW: { id: 321, name: 'Review' },
+  PRINT: { id: 322, name: 'Print' },
+});

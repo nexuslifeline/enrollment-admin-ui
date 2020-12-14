@@ -4,49 +4,71 @@
       <div class="search-filter-container">
         <b-button
           v-if="showAddButton"
+          @click="isAccessible($options.PaymentPermissions.ADD.id)"
           variant="primary"
-          :to="`/finance/payment/add`">
+          :to="`/finance/payment/add`"
+        >
           <v-icon name="plus-circle" /> ADD NEW PAYMENT
         </b-button>
-        <b-button v-if="showPrintPreviewButton" class="print-preview" variant="outline-primary" @click="previewCollection()"><v-icon name="print" /> PRINT PREVIEW</b-button>
+        <b-button
+          v-if="showPrintPreviewButton"
+          class="print-preview"
+          variant="outline-primary"
+          @click="previewCollection()"
+          ><v-icon name="print" /> PRINT PREVIEW</b-button
+        >
         <div class="date-filter-cotainer">
           <span>FROM</span>
           <b-form-datepicker
-            :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+            :date-format-options="{
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+              weekday: 'short',
+            }"
             class="date-pickers"
             v-model="filters.payment.dateFrom"
-            @input="loadPayments"/>
+            @input="loadPayments"
+          />
           <span>TO</span>
           <b-form-datepicker
-            :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }"
+            :date-format-options="{
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+              weekday: 'short',
+            }"
             class="date-pickers"
             v-model="filters.payment.dateTo"
-            @input="loadPayments" />
+            @input="loadPayments"
+          />
         </div>
         <b-form-input
-            type="text"
-            placeholder="Search"
-            debounce="500"
-            class="search-input"
-            v-model="filters.payment.criteria"
-            @update="loadPayments()">
+          type="text"
+          placeholder="Search"
+          debounce="500"
+          class="search-input"
+          v-model="filters.payment.criteria"
+          @update="loadPayments()"
+        >
         </b-form-input>
       </div>
       <b-row class="mt-3">
-        <b-col md=12>
+        <b-col md="12">
           <b-table
             class="c-table"
-            small hover outlined show-empty
+            small
+            hover
+            outlined
+            show-empty
             :fields="tables.payments.fields"
             :busy="tables.payments.isBusy"
-            :items="tables.payments.items">
+            :items="tables.payments.items"
+          >
             <!-- :filter="filters.schoolFee.criteria> -->
             <template v-slot:table-busy>
               <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
+                <v-icon name="spinner" spin class="mr-2" />
                 <strong>Loading...</strong>
               </div>
             </template>
@@ -57,37 +79,69 @@
                     rounded
                     blank
                     size="64"
-                    :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
-                    :src="avatar(data.item)" />
+                    :text="
+                      data.item.student.firstName.charAt(0) +
+                        '' +
+                        data.item.student.lastName.charAt(0)
+                    "
+                    :src="avatar(data.item)"
+                  />
                 </template>
-                <span>{{ data.item.student.name }}</span><br>
-                <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-                <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }}
+                <span>{{ data.item.student.name }}</span
+                ><br />
+                <small
+                  >Student no.:
+                  {{
+                    data.item.student.studentNo
+                      ? data.item.student.studentNo
+                      : 'Awaiting Confirmation'
+                  }}</small
+                ><br />
+                <small
+                  >Address :
+                  {{
+                    data.item.student.address
+                      ? data.item.student.currentAddress
+                        ? data.item.student.currentAddress
+                        : data.item.student.address.currentCompleteAddress
+                      : ''
+                  }}
                 </small>
               </b-media>
             </template>
             <template v-slot:cell(action)="row">
               <b-dropdown
-                v-if="showRowActionButton"
-                right variant="link"
+                v-if="
+                  showRowActionButton &&
+                    isAccessible($options.PaymentPermissions.CANCEL.id)
+                "
+                right
+                variant="link"
                 toggle-class="text-decoration-none"
-                no-caret>
+                no-caret
+              >
                 <template v-slot:button-content>
                   <v-icon name="ellipsis-v" />
                 </template>
                 <b-dropdown-item
-                  @click="selectedPaymentId = row.item.id, showModalConfirmation = true"
-                  :disabled="showModalConfirmation">
+                  @click="
+                    (selectedPaymentId = row.item.id),
+                      (showModalConfirmation = true)
+                  "
+                  :disabled="showModalConfirmation"
+                >
                   Cancel Payment
                 </b-dropdown-item>
               </b-dropdown>
             </template>
           </b-table>
           <b-row>
-            <b-col md=6>
-              Showing {{ paginations.payment.from }} to {{ paginations.payment.to }} of {{ paginations.payment.totalRows }} records.
-              </b-col>
-            <b-col md=6>
+            <b-col md="6">
+              Showing {{ paginations.payment.from }} to
+              {{ paginations.payment.to }} of
+              {{ paginations.payment.totalRows }} records.
+            </b-col>
+            <b-col md="6">
               <b-pagination
                 class="c-pagination"
                 v-model="paginations.payment.page"
@@ -95,7 +149,8 @@
                 :per-page="paginations.payment.perPage"
                 size="sm"
                 align="end"
-                @input="loadPayments()"/>
+                @input="loadPayments()"
+              />
             </b-col>
           </b-row>
         </b-col>
@@ -104,9 +159,10 @@
     <b-modal
       v-model="showModalConfirmation"
       :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true" >
+      :noCloseOnBackdrop="true"
+    >
       <div slot="modal-title">
-          Cancel Payment
+        Cancel Payment
       </div>
       Are you sure you want to cancel this Payment ?
       <div slot="modal-footer">
@@ -114,18 +170,16 @@
           :disabled="isProcessing"
           variant="outline-primary"
           class="mr-2 btn-save"
-          @click="onCancelPayment()">
-          <v-icon
-            v-if="isProcessing"
-            name="sync"
-            spin
-            class="mr-2"/>
+          @click="onCancelPayment()"
+        >
+          <v-icon v-if="isProcessing" name="sync" spin class="mr-2" />
           Yes
         </b-button>
         <b-button
           variant="outline-danger"
           class="btn-close"
-          @click="showModalConfirmation=false">
+          @click="showModalConfirmation = false"
+        >
           No
         </b-button>
       </div>
@@ -141,34 +195,35 @@
 </template>
 
 <script>
-
-import { StudentApi, PaymentApi, ReportApi } from "../../../mixins/api"
-import { format, startOfMonth, endOfMonth } from 'date-fns'
-import { showNotification, formatNumber } from '../../../helpers/forms'
-import  FileViewer from '../../components/FileViewer'
-import { PaymentStatuses } from '../../../helpers/enum'
-import Card from '../../components/Card'
+import { StudentApi, PaymentApi, ReportApi } from '../../../mixins/api';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { showNotification, formatNumber } from '../../../helpers/forms';
+import FileViewer from '../../components/FileViewer';
+import { PaymentStatuses, PaymentPermissions } from '../../../helpers/enum';
+import Card from '../../components/Card';
+import Access from '../../../mixins/utils/Access';
 
 export default {
-  mixins: [ PaymentApi, ReportApi ],
+  mixins: [PaymentApi, ReportApi, Access],
   components: {
     FileViewer,
-    Card
+    Card,
   },
   props: {
     showAddButton: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showRowActionButton: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showPrintPreviewButton: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
+  PaymentPermissions,
   data() {
     return {
       showModalPreview: false,
@@ -176,223 +231,240 @@ export default {
       showModalEntry: false,
       showModalConfirmation: false,
       isProcessing: false,
-      entryMode: "",
+      entryMode: '',
       selectedPaymentId: null,
       file: {
         type: null,
         src: null,
         name: null,
         notes: null,
-        isLoading: false
+        isLoading: false,
       },
       tables: {
         payments: {
           fields: [
             {
-							key: "student",
-							label: "Student",
-							tdClass: "align-middle",
-							thStyle: {width: "28%"}
+              key: 'student',
+              label: 'Student',
+              tdClass: 'align-middle',
+              thStyle: { width: '28%' },
             },
             {
-							key: "referenceNo",
-							label: "Reference No",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
+              key: 'referenceNo',
+              label: 'Reference No',
+              tdClass: 'align-middle',
+              thStyle: { width: '15%' },
             },
             {
-							key: "paymentMode.name",
-							label: "Payment Mode",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
+              key: 'paymentMode.name',
+              label: 'Payment Mode',
+              tdClass: 'align-middle',
+              thStyle: { width: '15%' },
             },
             {
-							key: "billing.billingNo",
-							label: "Billing No",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
+              key: 'billing.billingNo',
+              label: 'Billing No',
+              tdClass: 'align-middle',
+              thStyle: { width: '15%' },
             },
             {
-							key: "datePaid",
-							label: "Date Paid",
-							tdClass: "align-middle",
-							thStyle: {width: "10%"}
+              key: 'datePaid',
+              label: 'Date Paid',
+              tdClass: 'align-middle',
+              thStyle: { width: '10%' },
             },
             {
-							key: "amount",
-							label: "Amount",
-              tdClass: "align-middle text-right",
-              thClass: "text-right",
-              thStyle: {width: "15%"},
+              key: 'amount',
+              label: 'Amount',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '15%' },
               formatter: (value) => {
-                return formatNumber(value)
-              }
+                return formatNumber(value);
+              },
             },
             {
-              key: "action",
-							label: "",
-							tdClass: "align-middle",
-							thStyle: { width: "40px"}
-            }
+              key: 'action',
+              label: '',
+              tdClass: 'align-middle',
+              thStyle: { width: '40px' },
+            },
           ],
-          items: []
-        }
+          items: [],
+        },
       },
       paginations: {
-				payment: {
-					from: 0,
-					to: 0,
-					totalRows: 0,
-					page: 1,
-					perPage: 10,
-				}
+        payment: {
+          from: 0,
+          to: 0,
+          totalRows: 0,
+          page: 1,
+          perPage: 10,
+        },
       },
       filters: {
         payment: {
           criteria: null,
           dateFrom: null,
-          dateTo: null
-        }
-      }
-    }
+          dateTo: null,
+        },
+      },
+    };
   },
   methods: {
     setCreate() {
-      this.showModalEntry = true
+      this.showModalEntry = true;
     },
     loadPayments() {
-      const { payments } = this.tables
-      const { criteria, dateFrom, dateTo } = this.filters.payment
-      const { payment, payment: { perPage, page } } = this.paginations
-      const params = { paginate: true, perPage, page, criteria, dateFrom, dateTo, paymentStatusId: PaymentStatuses.APPROVED.id }
+      const { payments } = this.tables;
+      const { criteria, dateFrom, dateTo } = this.filters.payment;
+      const {
+        payment,
+        payment: { perPage, page },
+      } = this.paginations;
+      const params = {
+        paginate: true,
+        perPage,
+        page,
+        criteria,
+        dateFrom,
+        dateTo,
+        paymentStatusId: PaymentStatuses.APPROVED.id,
+      };
 
-      payments.isBusy = true
+      payments.isBusy = true;
 
       this.getPaymentList(params).then(({ data }) => {
-        payments.items = data.data
-        payment.from = data.meta.from
-        payment.to = data.meta.to
-        payment.totalRows = data.meta.total
-        payments.isBusy = false
-      })
+        payments.items = data.data;
+        payment.from = data.meta.from;
+        payment.to = data.meta.to;
+        payment.totalRows = data.meta.total;
+        payments.isBusy = false;
+      });
     },
-    avatar(student){
-      let src = ''
+    avatar(student) {
+      let src = '';
       if (student.photo) {
-        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
       }
-      return src
+      return src;
     },
-    onCancelPayment(){
-      this.isProcessing = true
+    onCancelPayment() {
+      this.isProcessing = true;
       this.deletePayment(this.selectedPaymentId).then(({ data }) => {
-        this.isProcessing = false
-        showNotification(this, "success", "Payment has been cancelled successfully.")
-        this.showModalConfirmation = false
+        this.isProcessing = false;
+        showNotification(
+          this,
+          'success',
+          'Payment has been cancelled successfully.'
+        );
+        this.showModalConfirmation = false;
         this.loadPayments();
-      })
+      });
     },
     previewCollection() {
-      this.file.type = null
-      this.file.src = null
-      this.file.notes = null
-      this.file.isLoading = true
+      this.file.type = null;
+      this.file.src = null;
+      this.file.notes = null;
+      this.file.isLoading = true;
       this.file.owner = null;
-      this.file.name = 'Collection Report'
+      this.file.name = 'Collection Report';
 
-      this.showModalPreview = true
-      const { dateFrom, dateTo, criteria } = this.filters.payment
-      const params = { dateFrom, dateTo, criteria, paymentStatusId: PaymentStatuses.APPROVED.id }
-      this.previewCollectionReport(params).then(response => {
-          this.file.type = response.headers.contentType
-          const file = new Blob([response.data], { type: "application/pdf" } )
-          const reader = new FileReader();
-          reader.onload = e => this.file.src = e.target.result
-          reader.readAsDataURL(file);
-          this.file.isLoading = false
-      })
-    }
+      this.showModalPreview = true;
+      const { dateFrom, dateTo, criteria } = this.filters.payment;
+      const params = {
+        dateFrom,
+        dateTo,
+        criteria,
+        paymentStatusId: PaymentStatuses.APPROVED.id,
+      };
+      this.previewCollectionReport(params).then((response) => {
+        this.file.type = response.headers.contentType;
+        const file = new Blob([response.data], { type: 'application/pdf' });
+        const reader = new FileReader();
+        reader.onload = (e) => (this.file.src = e.target.result);
+        reader.readAsDataURL(file);
+        this.file.isLoading = false;
+      });
+    },
   },
   created() {
-    const { payment, payment: { dateFrom, dateTo } } = this.filters
+    const {
+      payment,
+      payment: { dateFrom, dateTo },
+    } = this.filters;
 
     payment.dateFrom = startOfMonth(new Date());
     payment.dateTo = endOfMonth(new Date());
 
     this.loadPayments();
   },
-}
+};
 </script>
 
 <style lang="scss">
+@import '../../../assets/scss/_shared.scss';
 
-  @import '../../../assets/scss/_shared.scss';
+.payment-list__main-container {
+  width: 100%;
+  height: 100%;
+}
 
-  .payment-list__main-container {
-    width: 100%;
-    height: 100%;
+.search-filter-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .print-preview {
+    margin-left: 10px;
   }
 
-  .search-filter-container {
-    display:  flex;
+  .search-input {
+    width: 250px;
+  }
+
+  .date-filter-cotainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    width: 100%;
 
-
-    .print-preview {
-      margin-left: 10px;
+    span {
+      margin: 0 10px;
+      font-weight: bold;
     }
 
-    .search-input {
-      width: 250px;
+    .date-pickers {
+      width: 200px;
     }
+  }
+
+  @include for-size(phone-only) {
+    flex-direction: column;
 
     .date-filter-cotainer {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
 
       span {
-        margin: 0 10px;
-        font-weight: bold;
+        margin: 10px 0;
       }
 
       .date-pickers {
-        width: 200px;
+        width: 100%;
       }
-
     }
 
-    @include for-size(phone-only) {
-      flex-direction: column;
+    .search-input {
+      width: 100%;
+      margin-top: 10px;
+    }
 
-      .date-filter-cotainer {
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start;
-
-        span {
-          margin: 10px 0;
-        }
-
-        .date-pickers {
-          width: 100%;
-        }
-
-      }
-
-      .search-input {
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .print-preview {
-        margin-left: 0;
-        margin-top: 10px;
-      }
-
+    .print-preview {
+      margin-left: 0;
+      margin-top: 10px;
     }
   }
-
+}
 </style>

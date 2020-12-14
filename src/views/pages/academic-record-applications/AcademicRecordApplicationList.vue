@@ -44,7 +44,10 @@
           <b-row class="mb-2">
             <!-- row button and search input -->
             <b-col md="6">
-              <b-btn variant="outline-primary" @click="setCreate()"
+              <b-btn
+                variant="outline-primary"
+                @click="setCreate()"
+                v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
                 >Add New Record</b-btn
               >
             </b-col>
@@ -183,6 +186,7 @@
                 variant="link"
                 toggle-class="text-decoration-none"
                 no-caret
+                v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
               >
                 <template v-slot:button-content>
                   <v-icon name="ellipsis-v" />
@@ -227,11 +231,16 @@
 <script>
 import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
 import AcademicRecordApplicationEntry from '../../pages/academic-record-applications/AcademicRecordApplicationEntry';
-import { ManualSteps, SchoolCategories } from '../../../helpers/enum';
+import {
+  ManualSteps,
+  SchoolCategories,
+  ManualEnrollmentPermissions,
+} from '../../../helpers/enum';
 import Card from '../../components/Card';
 import { AcademicRecordApi, CourseApi } from '../../../mixins/api';
 import { clearFields, showNotification } from '../../../helpers/forms';
 import { copyValue } from '../../../helpers/extractor';
+import Access from '../../../mixins/utils/Access';
 
 const studentFields = {
   id: null,
@@ -311,9 +320,10 @@ export default {
     AcademicRecordApplicationEntry,
     Card,
   },
-  mixins: [AcademicRecordApi, CourseApi],
+  mixins: [AcademicRecordApi, CourseApi, Access],
   ManualSteps,
   SchoolCategories,
+  ManualEnrollmentPermissions,
   data() {
     return {
       showEntry: false,
