@@ -32,7 +32,24 @@
           </b-row>
           <b-row class="mb-2">
             <b-col md="8">
-              <b-button variant="primary" @click="setCreateOtherFee()">
+              <b-dropdown
+                v-if="
+                  isAccessible($options.OtherBillingPermissions.GENERATE.id)
+                "
+                variant="primary"
+              >
+                <template v-slot:button-content>
+                  <v-icon name="plus-circle" />
+                  Generate Other Billing
+                </template>
+                <b-dropdown-item @click="setCreateOtherFee()"
+                  >Generate Other Billing</b-dropdown-item
+                >
+                <b-dropdown-item @click="setCreateBatchOtherFee()"
+                  >Batch Generate Other Billing</b-dropdown-item
+                >
+              </b-dropdown>
+              <!-- <b-button variant="primary" @click="setCreateOtherFee()">
                 <v-icon name="plus-circle" /> Generate Other Billing
               </b-button>
               <b-button
@@ -41,7 +58,7 @@
                 @click="setCreateBatchOtherFee()"
               >
                 <v-icon name="plus-circle" /> Batch Generate Other Billing
-              </b-button>
+              </b-button> -->
             </b-col>
             <b-col md="4">
               <b-form-input
@@ -143,10 +160,16 @@
                 <b-dropdown-item @click="setViewDetails(row)">
                   <v-icon name="search" /> View Details
                 </b-dropdown-item>
-                <b-dropdown-item @click="setUpdateOtherFee(row.item.id)">
+                <b-dropdown-item
+                  v-if="isAccessible($options.OtherBillingPermissions.EDIT.id)"
+                  @click="setUpdateOtherFee(row.item.id)"
+                >
                   <v-icon name="pen" /> Edit
                 </b-dropdown-item>
                 <b-dropdown-item
+                  v-if="
+                    isAccessible($options.OtherBillingPermissions.DELETE.id)
+                  "
                   @click="
                     (forms.billing.fields.id = row.item.id),
                       (showModalConfirmation = true)
@@ -686,6 +709,7 @@ import {
   Semesters,
   BillingStatuses,
   BillingTypes,
+  OtherBillingPermissions,
 } from '../../helpers/enum';
 import {
   TermApi,
@@ -709,6 +733,7 @@ import { debounce } from 'lodash';
 import tables from '../../helpers/tables';
 import Card from '../components/Card';
 import { copyValue } from '../../helpers/extractor';
+import Access from '../../mixins/utils/Access';
 
 const billingFields = {
   id: null,
@@ -751,10 +776,12 @@ export default {
     SchoolFeeApi,
     CourseApi,
     tables,
+    Access,
   ],
   SchoolCategories,
   Semesters,
   BillingStatuses,
+  OtherBillingPermissions,
   data() {
     return {
       showBatchEntry: false,

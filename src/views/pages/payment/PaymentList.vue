@@ -3,8 +3,9 @@
     <Card title="Payment Transactions">
       <div class="search-filter-container">
         <b-button
-          v-if="showAddButton"
-          @click="isAccessible($options.PaymentPermissions.ADD.id)"
+          v-if="
+            showAddButton && isAccessible($options.PaymentPermissions.ADD.id)
+          "
           variant="primary"
           :to="`/finance/payment/add`"
         >

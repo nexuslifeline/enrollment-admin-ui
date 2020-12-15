@@ -18,7 +18,12 @@ import {
   StudentPaymentPermissions, Semesters,
   BankAccountPermissions,
   EWalletAccountPermissions,
-  PeraPadalaAccountPermissions
+  PeraPadalaAccountPermissions,
+  ManualEnrollmentPermissions,
+  PaymentPermissions,
+  StatementOfAccountPermissions,
+  OtherBillingPermissions,
+  TranscriptRecordPermissions
 } from '../helpers/enum';
 
 export default [
@@ -48,7 +53,8 @@ export default [
       ...EvaluationAndAdmissionPermissions.getIds(),
       ...StudentSubjectPermissions.getIds(),
       ...StudentFeePermissions.getIds(),
-      ...StudentPaymentPermissions.getIds()
+      ...StudentPaymentPermissions.getIds(),
+      ...ManualEnrollmentPermissions.getIds()
     ],
     children: [
       {
@@ -74,7 +80,7 @@ export default [
       {
         label: 'Manual Enrollment',
         to: '/enrollment/academic-record-applications',
-        // permissionIds: StudentPaymentPermissions.getIds()
+        permissionIds: ManualEnrollmentPermissions.getIds()
         // to be added
       },
     ]
@@ -121,7 +127,10 @@ export default [
     permissionIds: [
       ...RateSheetPermissions.getIds(),
       ...FeeCategoryPermissions.getIds(),
-      ...SchoolFeePermissions.getIds()
+      ...SchoolFeePermissions.getIds(),
+      ...PaymentPermissions.getIds(),
+      ...StatementOfAccountPermissions.getIds(),
+      ...OtherBillingPermissions.getIds()
     ],
     children: [
       {
@@ -142,16 +151,17 @@ export default [
       {
         label: 'Payment',
         to: '/finance/payment',
-        //todo: set payment permissions
-        //permissionIds: SchoolFeePermissions.getIds()
+        permissionIds: PaymentPermissions.getIds()
       },
       {
         label: 'SOA',
-        to: '/finance/soa'
+        to: '/finance/soa',
+        permissionIds: StatementOfAccountPermissions.getIds()
       },
       {
         label: 'Other Billing',
-        to: '/finance/other-billing'
+        to: '/finance/other-billing',
+        permissionIds: OtherBillingPermissions.getIds()
       }
     ]
   },
@@ -160,7 +170,8 @@ export default [
     to: '/master-files',
     permissionIds: [
       ...StudentPermissions.getIds(),
-      ...PersonnelPermissions.getIds()
+      ...PersonnelPermissions.getIds(),
+      ...TranscriptRecordPermissions.getIds()
     ],
     children: [
       {
@@ -171,8 +182,7 @@ export default [
       {
         label: 'Transcript Records',
         to: '/master-files/transcript-records',
-        // permissionIds: StudentPaymentPermissions.getIds()
-        // to be added
+        permissionIds: TranscriptRecordPermissions.getIds()
       },
       {
         label: 'Personnel',

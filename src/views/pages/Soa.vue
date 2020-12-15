@@ -33,7 +33,12 @@
         </b-row>
         <b-row class="mb-2">
           <b-col md="8">
-            <b-dropdown variant="primary">
+            <b-dropdown
+              v-if="
+                isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
+              "
+              variant="primary"
+            >
               <template v-slot:button-content>
                 <v-icon name="plus-circle" />
                 Generate Soa
@@ -129,6 +134,13 @@
           </template>
           <template v-slot:cell(action)="{ item: { id } }">
             <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.StatementOfAccountPermissions.PREVIEW.id,
+                  $options.StatementOfAccountPermissions.EDIT.id,
+                  $options.StatementOfAccountPermissions.DELETE.id,
+                ])
+              "
               boundary="window"
               right
               variant="link"
@@ -138,13 +150,28 @@
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>
-              <b-dropdown-item @click="previewBilling(id)">
+              <b-dropdown-item
+                v-if="
+                  isAccessible(
+                    $options.StatementOfAccountPermissions.PREVIEW.id
+                  )
+                "
+                @click="previewBilling(id)"
+              >
                 <v-icon name="file-pdf" /> Preview
               </b-dropdown-item>
-              <b-dropdown-item @click="setUpdateSoa(id)">
+              <b-dropdown-item
+                v-if="
+                  isAccessible($options.StatementOfAccountPermissions.EDIT.id)
+                "
+                @click="setUpdateSoa(id)"
+              >
                 <v-icon name="pen" /> Edit
               </b-dropdown-item>
               <b-dropdown-item
+                v-if="
+                  isAccessible($options.StatementOfAccountPermissions.DELETE.id)
+                "
                 @click="
                   (forms.billing.fields.id = id), (showModalConfirmation = true)
                 "
@@ -754,6 +781,7 @@ import {
   Semesters,
   BillingStatuses,
   BillingTypes,
+  StatementOfAccountPermissions,
 } from '../../helpers/enum';
 import {
   TermApi,
@@ -777,6 +805,7 @@ import Card from '../components/Card';
 import { debounce } from 'lodash';
 import tables from '../../helpers/tables';
 import { copyValue } from '../../helpers/extractor';
+import Access from '../../mixins/utils/Access';
 
 const billingFields = {
   id: null,
@@ -824,10 +853,12 @@ export default {
     ReportApi,
     SchoolFeeApi,
     tables,
+    Access,
   ],
   SchoolCategories,
   Semesters,
   BillingStatuses,
+  StatementOfAccountPermissions,
   data() {
     return {
       formatNumber: formatNumber,

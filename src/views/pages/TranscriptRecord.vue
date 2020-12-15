@@ -189,6 +189,12 @@
             </template>
             <template v-slot:cell(action)="row">
               <b-dropdown
+                v-if="
+                  isAccessible([
+                    $options.TranscriptRecordPermissions.PRINT.id,
+                    $options.TranscriptRecordPermissions.REVIEW.id,
+                  ])
+                "
                 right
                 variant="link"
                 toggle-class="text-decoration-none"
@@ -199,19 +205,28 @@
                 </template>
                 <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
                 <b-dropdown-item
-                  @click.prevent="
+                  v-if="
                     row.item.transcriptRecordStatusId ===
-                    $options.TranscriptRecordStatuses.FINALIZED.id
-                      ? printTranscriptRecord(row.item.id)
-                      : loadDetails(row)
+                      $options.TranscriptRecordStatuses.FINALIZED.id &&
+                      isAccessible(
+                        $options.TranscriptRecordPermissions.PRINT.id
+                      )
                   "
+                  @click.prevent="printTranscriptRecord(row.item.id)"
                 >
-                  {{
-                    row.item.transcriptRecordStatusId ===
-                    $options.TranscriptRecordStatuses.FINALIZED.id
-                      ? 'Print'
-                      : 'Review Record'
-                  }}
+                  Print
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-if="
+                    row.item.transcriptRecordStatusId !==
+                      $options.TranscriptRecordStatuses.FINALIZED.id &&
+                      isAccessible(
+                        $options.TranscriptRecordPermissions.REVIEW.id
+                      )
+                  "
+                  @click.prevent="loadDetails(row)"
+                >
+                  Review Record
                 </b-dropdown-item>
               </b-dropdown>
             </template>
@@ -1345,6 +1360,7 @@ import {
   TranscriptRecordStatuses,
   StudentCategories,
   Semesters,
+  TranscriptRecordPermissions,
 } from '../../helpers/enum';
 import {
   showNotification,
@@ -1364,6 +1380,7 @@ import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
+import Access from '../../mixins/utils/Access';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1383,6 +1400,7 @@ export default {
     CurriculumApi,
     SubjectApi,
     ReportApi,
+    Access,
   ],
   components: {
     SchoolCategoryTabs,
@@ -1400,6 +1418,7 @@ export default {
   SchoolCategories,
   StudentCategories,
   Semesters,
+  TranscriptRecordPermissions,
   data() {
     return {
       fileViewer: {
