@@ -48,32 +48,31 @@
             </div>
           </template>
           <template v-slot:cell(name)="data">
-            <StudentColumn
-              :data="data.item"
-              :callback="{ loadDetails: () => loadDetails(data) }"
-            />
-            <!-- <b-media>
-              <template v-slot:aside>
-                <b-avatar
-                  rounded
-                  blank
-                  size="64"
-                  :text="data.item.student.firstName.charAt(0) + '' + data.item.student.lastName.charAt(0)"
-                  :src="avatar(data.item.student)" />
-              </template>
-              <span><b-link @click="loadDetails(data)">{{ data.item.student? data.item.student.name : '' }}</b-link></span><br>
-              <small>Student no.: {{ data.item.student.studentNo ? data.item.student.studentNo : 'Awaiting Confirmation' }}</small><br>
-              <small>Address : {{ data.item.student.address ? data.item.student.currentAddress ? data.item.student.currentAddress :  data.item.student.address.currentCompleteAddress : '' }} </small>
-            </b-media> -->
+            <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
           </template>
           <template v-slot:cell(contact)="data">
             <ContactColumn :data="data.item.student" />
           </template>
           <template v-slot:cell(action)="row">
-            <v-icon
-              :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
-              @click="loadDetails(row)"
-            />
+            <!-- <v-icon :name="row.detailsShowing ? 'caret-down' : 'caret-left'" @click="loadDetails(row)" /> -->
+            <b-dropdown
+                right
+                variant="link"
+                toggle-class="text-decoration-none"
+                no-caret
+              >
+                <template v-slot:button-content>
+                  <v-icon name="ellipsis-v" />
+                </template>
+                <b-dropdown-item @click.prevent="loadDetails(row)">
+                  {{
+                    row.item.paymentStatusId ===
+                    paymentStatuses.APPROVED.id
+                      ? 'View Details'
+                      : 'Review Record'
+                  }}
+                </b-dropdown-item>
+              </b-dropdown>
           </template>
           <template v-slot:cell(paymentStatusId)="data">
             <b-badge
@@ -89,12 +88,11 @@
             </b-badge>
           </template>
           <template v-slot:row-details="data">
-            <b-overlay :show="data.item.isLoading" rounded="sm">
+            <!-- <b-overlay :show="data.item.isLoading" rounded="sm">
               <b-card>
                 <b-row class="justify-content-md-center">
                   <b-col md="8">
                     <div v-if="data.item.billing">
-                      <!-- <h5>{{ data.item.student.name }} </h5> -->
                       <b-row class="mb-2">
                         <b-col md="6">
                           Reference No. : <b>{{ data.item.referenceNo }}</b
@@ -214,7 +212,167 @@
                   </b-col>
                 </b-row>
               </b-card>
-            </b-overlay>
+            </b-overlay> -->
+            <ActiveRowViewer
+                :isBusy="data.item.isLoading"
+                backTitle="Go back to list"
+                @onBack="data.toggleDetails()"
+                :showOptions="
+                  isAccessible($options.StudentPaymentPermissions.APPROVAL.id) && data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
+                "
+                :options="[
+                  {
+                    label: 'Approve',
+                    callback: () => setApproval(data),
+                    isAllowed: isAccessible(
+                      $options.StudentPaymentPermissions.APPROVAL.id
+                    ),
+                  },
+                  {
+                    label: 'Reject',
+                    callback: () => setDisapproval(data),
+                    isAllowed: isAccessible(
+                      $options.StudentPaymentPermissions.DISAPPROVAL.id
+                    ),
+                  },
+                ]"
+              >
+              <template v-slot:header>
+                  <div class="active-view__header-details-container">
+                    <AvatarMaker
+                      :avatarId="data.item.student.id"
+                      :size="50"
+                      :text="
+                        `${data.item.student.firstName.charAt(
+                          0
+                        )}${data.item.student.lastName.charAt(0)}`
+                      "
+                      :src="avatar(data.item.student)"
+                    />
+                    <div class="active-view__header-details">
+                      <p class="active-view__header-name">
+                        {{ data.item.student.name }}
+                      </p>
+                      <p class="active-view__header-email">
+                        {{ data.item.student.email }}
+                      </p>
+                    </div>
+                    <p class="active-view__header-date">
+                      <BIconAlarm />
+                      {{
+                        $options.format(
+                          new Date(data.item.datePaid),
+                          'MMMM dd, yyyy'
+                        )
+                      }}
+                    </p>
+                  </div>
+              </template>
+
+              <template v-slot:navigation>
+                  <ActiveViewLinks
+                    :items="[
+                      {
+                        text: 'Payment Details',
+                        target: 'header-payment-details',
+                      },
+                      {
+                        text: 'Billing Details',
+                        target: 'header-billing-details',
+                      },
+                      {
+                        text: 'Attachments',
+                        target: 'header-attachments',
+                      },
+                    ]"
+                  />
+              </template>
+
+              <template v-slot:content>
+                <div>
+                  <ActiveViewHeader
+                    id="header-payment-details"
+                    title="Review submitted Payment Details"
+                    circleText="1"
+                  />
+                    <ActiveViewItems>
+                      <ActiveViewItem label="Transaction No: ">
+                        <p>
+                          {{ data.item.transactionNo }}
+                        </p>
+                      </ActiveViewItem>
+                      <ActiveViewItem label="Paid Amount : ">
+                        <p>
+                          {{ formatNumber(data.item.amount) }}
+                        </p>
+                      </ActiveViewItem>
+                      <ActiveViewItem label="Billing No: ">
+                        <p>
+                          {{ data.item.billing.billingNo }}
+                        </p>
+                      </ActiveViewItem>
+                      <ActiveViewItem label="Total Amount: ">
+                        <p>
+                          {{ formatNumber(data.item.billing.totalAmount) }}
+                        </p>
+                      </ActiveViewItem>
+                      <ActiveViewItem label="Due Date : ">
+                        <p>
+                          {{ data.item.billing.dueDate }}
+                        </p>
+                      </ActiveViewItem>
+                      <ActiveViewItem label="Billing Type : ">
+                        <p>
+                          {{ data.item.billing.billingType? data.item.billing.billingType.name: '' }}
+                        </p>
+                      </ActiveViewItem>
+                    </ActiveViewItems>
+                </div>
+                <div>
+                  <ActiveViewHeader
+                    id="header-billing-details"
+                    title="Billing Details"
+                    circleText="2"
+                  />
+                  <b-table
+                    class="mb-1 mt-4"
+                    hover outlined small responsive show-empty
+                    :fields="tables.billingItems.fields"
+                    :items="data.item.billingItems"
+                    :busy="tables.billingItems.isBusy">
+                      <template v-slot:cell(item)="row">
+                        <span v-if="data.item.billing.billingTypeId === BillingTypes.INITIAL_FEE.id">{{ row.item.item }}</span>
+                        <span v-else>{{ row.item.term? row.item.term.name : row.item.schoolFee.name }}</span>
+                      </template>
+                      <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon
+                          name="spinner"
+                          spin
+                          class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                  </b-table>
+                </div>
+                <div class="mt-4">
+                  <ActiveViewHeader
+                    id="header-attachments"
+                    title="Attachments"
+                    circleText="3"
+                  />
+                  <AttachmentList
+                    class="mt-2"
+                    :items="data.item.files"
+                    titleKey="name"
+                    descriptionKey="notes"
+                    @onAttachmentItemView="
+                      (file) => previewFile(file, data)
+                    "
+                  />
+                </div>
+              </template>
+            </ActiveRowViewer>
           </template>
         </b-table>
         <b-row>
@@ -313,12 +471,12 @@
         </b-col>
       </b-row>
       <b-row class="mt-3">
-        <b-col md="6">
-          <b-form-group label="Reference No" label-class="required">
+        <b-col md=6 >
+          <b-form-group>
+            <label class="required">Reference No <v-icon name="info-circle" class="icon-tooltip" v-b-tooltip.hover="{ variant: 'info', title: 'Reference No'}"/></label>
             <b-form-input
               v-model="forms.payment.fields.referenceNo"
-              :state="forms.payment.states.referenceNo"
-            />
+              :state="forms.payment.states.referenceNo"/>
             <b-form-invalid-feedback>
               {{ forms.payment.errors.referenceNo }}
             </b-form-invalid-feedback>
@@ -497,6 +655,14 @@ import { format } from 'date-fns';
 import Card from '../components/Card';
 import { StudentColumn, ContactColumn } from '../components/ColumnDetails';
 
+import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
+import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
+import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
+import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
+import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
+import AttachmentList from '../components/Attachment/AttachmentList';
+import AvatarMaker from '../components/AvatarMaker';
+
 export default {
   name: 'Payment',
   mixins: [
@@ -514,7 +680,15 @@ export default {
     Card,
     StudentColumn,
     ContactColumn,
+    ActiveRowViewer,
+    ActiveViewHeader,
+    AttachmentList,
+    ActiveViewItems,
+    ActiveViewItem,
+    ActiveViewLinks,
+    AvatarMaker,
   },
+  format,
   StudentPaymentPermissions,
   data() {
     return {
@@ -766,16 +940,15 @@ export default {
       };
       this.updatePayment(data, id)
         .then(({ data }) => {
-          this.row.paymentStatusId = PaymentStatuses.APPROVED.id;
-          this.isProcessing = false;
-          this.showModalApproval = false;
-          showNotification(this, 'success', 'Approved Successfully.');
-          this.$store.state.approvalCount.payment--;
-        })
-        .catch((error) => {
-          const errors = error.response.data.errors;
-          this.isProcessing = false;
-          validate(this.forms.payment, errors);
+          this.row.paymentStatusId = PaymentStatuses.APPROVED.id
+          this.isProcessing = false
+          this.showModalApproval = false
+          this.loadPaymentList()
+          showNotification(this, "success", "Approved Successfully.")
+        }).catch(error => {
+          const errors = error.response.data.errors
+          this.isProcessing = false
+          validate(this.forms.payment, errors)
         });
     },
     setDisapproval(row) {
@@ -794,12 +967,12 @@ export default {
 
       this.updatePayment(data, id)
         .then(({ data }) => {
-          this.row.paymentStatusId = PaymentStatuses.REJECTED.id;
-          this.isProcessing = false;
-          this.showModalRejection = false;
-          showNotification(this, 'success', 'Rejected Successfully.');
-        })
-        .catch((error) => {
+          this.row.paymentStatusId = PaymentStatuses.REJECTED.id
+          this.isProcessing = false
+          this.showModalRejection = false
+          this.loadPaymentList()
+          showNotification(this, "success", "Rejected Successfully.")
+        }).catch((error) => {
           this.isProcessing = false;
         });
     },
@@ -1053,8 +1226,16 @@ export default {
   margin: 20px 0 20px 0;
 }
 
-.file-item-container {
-  width: 100%;
-  height: auto;
-}
+  .file-item-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .icon-tooltip {
+    height: 14px;
+    width: 14px;
+    color: rgb(68, 185, 224);
+    margin: 0 0 -1px 4px;
+  }
+</style>
 </style>
