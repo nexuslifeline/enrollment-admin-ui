@@ -539,6 +539,9 @@
                         :items="data.item.files"
                         titleKey="name"
                         descriptionKey="notes"
+                        @onAttachmentItemDownload="
+                          (file) => downloadFile(file, data)
+                        "
                         @onAttachmentItemView="
                           (file) => previewFile(file, data)
                         "
@@ -1967,6 +1970,26 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => (this.file.src = e.target.result);
         reader.readAsDataURL(file);
+      });
+    },
+    downloadFile(row, data) {
+      const { studentId, id, name } = row.item;
+
+      this.getStudentFilePreview(studentId, id).then((response) => {
+        const fileUrl = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: response.headers.contentType,
+          })
+        );
+        const reader = new FileReader();
+        reader.onload = (e) => (this.file.src = e.target.result);
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileUrl;
+        fileLink.setAttribute('download', name);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
       });
     },
     loadCurriculum(id, row) {
