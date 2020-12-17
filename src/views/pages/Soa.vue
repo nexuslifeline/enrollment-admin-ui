@@ -41,7 +41,7 @@
             >
               <template v-slot:button-content>
                 <v-icon name="plus-circle" />
-                Generate Soa
+                Generate SOA
               </template>
               <b-dropdown-item @click="setCreateSoa()"
                 >Generate Single SOA</b-dropdown-item
@@ -80,46 +80,13 @@
             </div>
           </template>
           <template v-slot:cell(name)="data">
-            <b-media>
-              <template v-slot:aside>
-                <b-avatar
-                  rounded
-                  blank
-                  size="64"
-                  :text="
-                    data.item.student.firstName.charAt(0) +
-                      '' +
-                      data.item.student.lastName.charAt(0)
-                  "
-                  :src="avatar(data.item.student)"
-                />
-              </template>
-              <span>{{ data.item.student.name }}</span
-              ><br />
-              <small
-                >Student no.:
-                {{
-                  data.item.student.studentNo
-                    ? data.item.student.studentNo
-                    : 'Awaiting Confirmation'
-                }}</small
-              ><br />
-              <small
-                >Address :
-                {{
-                  data.item.student.address
-                    ? data.item.student.currentAddress
-                      ? data.item.student.currentAddress
-                      : data.item.student.address.currentCompleteAddress
-                    : ''
-                }}
-              </small>
-            </b-media>
+            <StudentColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => previewBilling(data.item.id) }"
+            />
           </template>
-          <template v-slot:cell(contact)="data">
-            Email : {{ data.item.student.email }} <br />
-            <small>Phone : {{ data.item.student.phoneNo }}</small> <br />
-            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br />
+          <template v-slot:cell(education)="data">
+            <EducationColumn :data="data.item.student.latestAcademicRecord" />
           </template>
           <template v-slot:cell(billingStatusId)="{ value }">
             <b-badge
@@ -793,6 +760,7 @@ import {
   ReportApi,
   SchoolFeeApi,
 } from '../../mixins/api';
+import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 import {
   clearFields,
   formatNumber,
@@ -842,6 +810,8 @@ export default {
     VueBootstrapTypeahead,
     Card,
     FileViewer,
+    StudentColumn,
+    EducationColumn,
   },
   mixins: [
     TermApi,
@@ -886,31 +856,31 @@ export default {
           fields: [
             {
               key: 'name',
-              label: 'Student',
+              label: 'STUDENT',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
             },
             {
-              key: 'contact',
-              label: 'Contact Info',
+              key: 'education',
+              label: 'EDUCATION',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
             },
             {
               key: 'dueDate',
-              label: 'Due Date',
+              label: 'DUE DATE',
               tdClass: 'align-middle',
               thStyle: { width: '130px' },
             },
             {
               key: 'billingNo',
-              label: 'Billing No.',
+              label: 'BILLING NO.',
               tdClass: 'align-middle',
               thStyle: { width: '15%' },
             },
             {
               key: 'previousBalance',
-              label: 'Prev Balance',
+              label: 'PREV BALANCE',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: 'auto' },
@@ -920,7 +890,7 @@ export default {
             },
             {
               key: 'totalAmount',
-              label: 'Amount',
+              label: 'AMOUNT',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: 'auto' },
@@ -930,7 +900,7 @@ export default {
             },
             {
               key: 'billingStatusId',
-              label: 'Status',
+              label: 'STATUS',
               tdClass: 'align-middle text-center',
               thClass: 'text-center',
               thStyle: { width: '10%' },
