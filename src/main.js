@@ -55,7 +55,7 @@ import { TablePlugin } from 'bootstrap-vue'
 import { TabsPlugin } from 'bootstrap-vue'
 //import { TimePlugin } from 'bootstrap-vue'
 import { ToastPlugin } from 'bootstrap-vue'
-//import { TooltipPlugin } from 'bootstrap-vue'
+import { TooltipPlugin } from 'bootstrap-vue'
 import {
   BIconFolderSymlink,
   BIconFolder2Open,
@@ -120,6 +120,7 @@ import 'vue-awesome/icons/clock'
 import 'vue-awesome/icons/folder'
 import 'vue-awesome/icons/folder-open'
 import 'vue-awesome/icons/print'
+import 'vue-awesome/icons/info-circle'
 import Icon from 'vue-awesome/components/Icon'
 // import vSelect from 'vue-select'
 
@@ -192,7 +193,7 @@ Vue.use(TablePlugin)
 Vue.use(TabsPlugin)
 //ue.use(TimePlugin)
 Vue.use(ToastPlugin)
-//Vue.use(TooltipPlugin)
+Vue.use(TooltipPlugin)
 
 new Vue({
   el: '#app',
