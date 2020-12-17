@@ -38,7 +38,7 @@
               :items="tables.students.items"
             >
               <template v-slot:cell(name)="data">
-                <b-media>
+                <!-- <b-media>
                   <template v-slot:aside>
                     <b-avatar
                       rounded
@@ -51,12 +51,48 @@
                   <small>Student no.: {{ data.item.studentNo ? data.item.studentNo : 'Awaiting Confirmation' }}</small><br>
                   <small>Address : {{ data.item.address ? data.item.currentAddress ? data.item.currentAddress :  data.item.address.currentCompleteAddress : '' }}
                   </small>
-                </b-media>
+                </b-media> -->
+                <!-- <b-media>
+                  <template v-slot:aside>
+                    <AvatarMaker
+                      :avatarId="data.item.id"
+                      :size="50"
+                      :text="
+                        `${data.item.firstName.charAt(0)}${data.item.lastName.charAt(
+                          0
+                        )}`
+                      "
+                      :src="
+                        $options.getFilePath(
+                          (data.item.photo && data.item.photo.hashName) || ''
+                        )
+                      "
+                    />
+                   </template>
+                  <div class="text-muted">
+                    {{ data.item && data.item.name }}
+                  </div>
+                  <div class="text-muted">
+                    {{
+                      data.item.currentAddress || data.item.address
+                        ? data.item.address.currentCompleteAddress
+                        : ''
+                    }}
+                  </div>
+                </b-media> -->
+                <StudentColumn
+                  :data="{ student: data.item }"
+                  :callback="{ loadDetails: () => null }"
+                />
               </template>
               <template v-slot:cell(contact)="data">
                 Email : {{ data.item.email }} <br>
                 <small>Phone : {{ data.item.phoneNo }}</small> <br>
                 <small>Mobile : {{ data.item.mobileNo }}</small> <br>
+              </template>
+              <template v-slot:cell(education)="data">
+                <!-- <div>School Year: {{ data.item.latestAcademicRecord ? data.item.latestAcademicRecord.schoolYearId : null }} </div> -->
+                <EducationColumn :data="data.item.latestAcademicRecord" />
               </template>
               <template v-slot:table-busy>
                 <div class="text-center my-2">
@@ -295,9 +331,13 @@ import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/e
 import Tables from "../../../helpers/tables"
 import PhotoViewer from '../../components/PhotoViewer'
 import FileViewer from '../../components/FileViewer'
+import AvatarMaker from '../../components/AvatarMaker'
+
 import { copyValue } from '../../../helpers/extractor'
 import Access from '../../../mixins/utils/Access'
 import Card from '../../components/Card'
+import { StudentColumn, EducationColumn, ContactColumn } from '../../components/ColumnDetails';
+import { getFilePath } from '../../../helpers/utils';
 
 const studentFields = {
   id: null,
@@ -420,7 +460,8 @@ const userErrorFields = {
 }
 
 export default {
-	name: "StudentList",
+  name: "StudentList",
+  getFilePath,
   mixins: [
     StudentApi,
     Tables,
@@ -432,7 +473,11 @@ export default {
   components: {
     PhotoViewer,
     FileViewer,
-    Card
+    Card,
+    StudentColumn,
+    EducationColumn,
+    ContactColumn,
+    AvatarMaker
   },
   props: {
      showAddButton: {
@@ -510,7 +555,7 @@ export default {
 							key: "name",
 							label: "Name",
 							tdClass: "align-middle",
-							thStyle: { width: "50%"},
+							thStyle: { width: "40%"},
 							// formatter: (value, key, item) => {
 							// 	if(!item.middleName) {
 							// 		item.middleName = ""
@@ -518,11 +563,17 @@ export default {
 							// 	item.name = item.firstName + " " + item.middleName + " " + item.lastName
 							// }
 						},
+            {
+							key: "education",
+							label: "Education",
+							tdClass: "align-middle",
+							thStyle: { width: "30%" },
+						},
 						{
 							key: "contact",
 							label: "Contact Info",
 							tdClass: "align-middle",
-							thStyle: { width: "45%" },
+							thStyle: { width: "20%" },
 						},
 						{
 							key: "action",

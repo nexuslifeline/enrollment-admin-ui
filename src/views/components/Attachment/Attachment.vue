@@ -5,7 +5,10 @@
     </div>
     <div class="attachment-item__details" @click="$emit('onView', data)">
       <div class="attachment-item__title">{{data[titleKey]}}</div>
-      <div class="attachment-item__size">{{data[descriptionKey]}}</div>
+      <div class="attachment-item__size">
+        <span> {{data[descriptionKey]}}</span>
+        <b-badge variant="dark" class="document-type">{{data[documentTypeKey]? data[documentTypeKey].name : '' }}</b-badge>
+      </div>
     </div>
     <div class="attachment-item__actions">
       <button @click="$emit('onDownload', data)" class="attachment-item__action">
@@ -29,6 +32,10 @@ export default {
     descriptionKey: {
       type: [String],
       default: 'description'
+    },
+    documentTypeKey: {
+      type: [String],
+      default: 'documentType'
     },
   }
 }
@@ -108,6 +115,10 @@ export default {
     border: 0;
     margin: 0 4px;
     color: $dark-gray-500;
+  }
+
+  .document-type {
+    margin-left: 10px;
   }
 
 </style>

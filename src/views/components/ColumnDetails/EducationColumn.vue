@@ -1,13 +1,13 @@
 <template>
   <div>
     <div>
-      {{ $options.getPropValue(data.level) }}
+      {{ data && data.level ? $options.getPropValue(data.level) : ''}}
     </div>
     <div>
-      {{ data.course ? $options.getPropValue(data.course) : '' }} {{ data.semester ? $options.getPropValue(data.semester) : '' }}
+      {{ data && data.course ? $options.getPropValue(data.course) : '' }} {{ data && data.semester ? $options.getPropValue(data.semester) : '' }}
     </div>
     <div>
-      {{ $options.getPropValue(data.schoolYear) }}
+      {{ data && data.schoolYear ? $options.getPropValue(data.schoolYear): '' }}
     </div>
   </div>
 </template>

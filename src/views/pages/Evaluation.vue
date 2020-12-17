@@ -539,6 +539,7 @@
                         :items="data.item.files"
                         titleKey="name"
                         descriptionKey="notes"
+                        documentTypeKey="documentType"
                         @onAttachmentItemDownload="
                           (file) => downloadFile(file, data)
                         "
@@ -548,33 +549,6 @@
                       />
                     </div>
                   </div>
-
-                  <!-- <div class="p-4" v-if="data.item.files">
-                    <b-table
-                      outlined responsive show-empty
-                      :fields="tables.files.fields"
-                      :items="data.item.files"
-                      :busy="tables.files.isBusy">
-                      <template v-slot:cell(action)="row">
-                        <b-button
-                          @click="previewFile(row, data)"
-                          size="sm" variant="secondary">
-                          <v-icon
-                            name="search"/>
-                        </b-button>
-                      </template>
-                      <template v-slot:table-busy>
-                        <div class="text-center my-2">
-                          <v-icon
-                            name="spinner"
-                            spin
-                            class="mr-2" />
-                          <strong>Loading...</strong>
-                        </div>
-                      </template>
-                    </b-table>
-                  </div> -->
-
                   <div>
                     <ActiveViewHeader
                       id="header-evaluation-student"

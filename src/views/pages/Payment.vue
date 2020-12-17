@@ -369,6 +369,7 @@
                     @onAttachmentItemView="
                       (file) => previewFile(file, data)
                     "
+                    @onAttachmentItemDownload="(file) => onDownloadFile(file)"
                   />
                 </div>
               </template>
@@ -1215,6 +1216,23 @@ export default {
         item: file,
       };
       this.previewPaymentReceiptFile(currentIdx);
+    },
+    onDownloadFile(row) {
+      const { paymentId, id, name, notes } = row.item;
+      this.getPaymentFilePreview(paymentId, id).then((response) => {
+        const file = new Blob([response.data], {
+          type: response.headers.contentType,
+        });
+
+        var fileURL = window.URL.createObjectURL(file);
+        var fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', name);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      });
     },
   },
 };
