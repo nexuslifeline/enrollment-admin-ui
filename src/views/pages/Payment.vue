@@ -307,9 +307,9 @@
                         </p>
                       </ActiveViewItem>
                       <ActiveViewItem label="Billing No: ">
-                        <p>
+                        <b-link @click="previewSoa(data.item.billing)">
                           {{ data.item.billing.billingNo }}
-                        </p>
+                        </b-link>
                       </ActiveViewItem>
                       <ActiveViewItem label="Total Amount: ">
                         <p>
@@ -612,6 +612,13 @@
       </div>
       <!-- modal footer buttons -->
     </b-modal>
+    <FileViewer
+      :show="fileViewer.show"
+      :file="file"
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="fileViewer.show = false"
+    />
   </div>
   <!-- main container -->
 </template>
@@ -627,12 +634,12 @@ const paymentReceiptFileFields = {
   studentId: null,
   notes: null,
 };
-
 import {
   PaymentApi,
   PaymentFileApi,
   BillingApi,
   PaymentReceiptFileApi,
+  ReportApi,
 } from '../../mixins/api';
 import {
   PaymentStatuses,
@@ -671,6 +678,7 @@ export default {
     PaymentFileApi,
     BillingApi,
     PaymentReceiptFileApi,
+    ReportApi,
     Tables,
     Access,
   ],
@@ -985,10 +993,8 @@ export default {
         this.getBilling(billingId)
           .then(({ data }) => {
             this.$set(row.item, 'billing', data);
-            console.log(row.item.billing);
             this.getBillingItemsOfBilling(billingId).then(({ data }) => {
               this.$set(row.item, 'billingItems', data);
-              console.log(row.item.billingItems);
             });
             this.getPaymentFileList(id, params)
               .then(({ data }) => {
@@ -1234,6 +1240,24 @@ export default {
         fileLink.click();
       });
     },
+    previewSoa(billing) {
+      const { id, billingTypeId } = billing
+      if (billingTypeId === this.BillingTypes.SOA.id) {
+        this.file.type = null;
+        this.file.src = null;
+        this.fileViewer.show = true;
+        this.file.isLoading = true;
+        this.file.name = 'Statement of Account';
+        this.previewStatementOfAccount(id).then((response) => {
+          this.file.type = response.headers.contentType;
+          const file = new Blob([response.data], { type: 'application/pdf' });
+          const reader = new FileReader();
+          reader.onload = (e) => (this.file.src = e.target.result);
+          reader.readAsDataURL(file);
+          this.file.isLoading = false;
+        });
+      }
+    }
   },
 };
 </script>
