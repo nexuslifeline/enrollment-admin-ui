@@ -12,6 +12,10 @@ export default {
     {
       label: 'Terms Settings',
       to: '/terms-setting'
+    },
+    {
+      label: 'Requirements Settings',
+      to: '/requirements-setting'
     }
   ]
 }

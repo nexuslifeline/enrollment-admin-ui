@@ -12,6 +12,7 @@ const Setting = () => import('@/views/pages/settings/Setting')
 const OrganizationSetting = () => import('@/views/pages/settings/OrganizationSetting')
 const GeneralSetting = () => import('@/views/pages/settings/GeneralSetting')
 const TermsSetting = () => import('@/views/pages/settings/TermsSetting')
+const RequirementsSetting = () => import('@/views/pages/settings/RequirementsSetting')
 
 
 // Views - Pages
@@ -466,6 +467,12 @@ function configRoutes () {
                   path: 'terms-setting',
                   name: 'TermsSetting',
                   component: TermsSetting,
+                  meta: { requiresAuth: true }
+                },
+                {
+                  path: 'requirements-setting',
+                  name: 'Requirements Setting',
+                  component: RequirementsSetting,
                   meta: { requiresAuth: true }
                 },
               ]
