@@ -3,12 +3,12 @@
     <b-card>
       <h5 slot="header">
         <span>
-          Requirements <br>
+          Requirements <br />
           <small>List of all requirement of the student.</small>
         </span>
       </h5>
-      <b-card-body>
-        <b-table
+      <b-card-body v-if="student">
+        <!-- <b-table
           details-td-class="table-secondary"
           hover outlined small show-empty responsive
           :fields="tables.evaluations.fields"
@@ -52,7 +52,6 @@
             <span>
               {{ getName(data.item, 'level') }}<br>
               {{ getName(data.item, 'course') }}<br>
-              <!-- {{ data.item.enrolledYear ? `Enrolled Year: ${data.item.enrolledYear}` : '' }} -->
             </span>
           </template>
           <template v-slot:cell(studentCategory.name)="{ item: { studentCategory, studentCategoryId } }">
@@ -82,150 +81,381 @@
               </b-dropdown-item>
             </b-dropdown>
           </template>
-        </b-table>
+        </b-table> -->
+        <b-row class="mb-2">
+          <b-col md="12">
+            <span class="font-weight-bold">Student Information</span>
+            <hr class="bg-light mt-1 mb-0" />
+          </b-col>
+        </b-row>
+        <b-row class="pb-1">
+          <b-col md="6">
+            Student Number :
+            <span class="font-weight-bold">{{
+              student.studentNo ? student.studentNo : 'Awaiting Confirmation'
+            }}</span>
+          </b-col>
+          <b-col md="6">
+            Name : <span class="font-weight-bold">{{ student.name }}</span>
+          </b-col>
+        </b-row>
+        <b-row class="pb-1">
+          <b-col md="6">
+            Student Category :
+            <b-badge
+              :variant="
+                student.latestAcademicRecord.studentCategoryId ===
+                $options.StudentCategories.NEW.id
+                  ? 'success'
+                  : student.studentCategoryId ===
+                    $options.StudentCategories.OLD.id
+                  ? 'primary'
+                  : 'warning'
+              "
+            >
+              {{
+                $options.StudentCategories.getEnum(
+                  student.latestAcademicRecord.studentCategoryId
+                )
+                  ? $options.StudentCategories.getEnum(
+                      student.latestAcademicRecord.studentCategoryId
+                    ).name
+                  : ''
+              }}
+            </b-badge>
+          </b-col>
+          <b-col md="6">
+            Contact Number :
+            <span class="font-weight-bold">{{ student.mobileNo }}</span>
+          </b-col>
+        </b-row>
+        <b-row class="pb-1">
+          <b-col md="6">
+            Email : <span class="font-weight-bold">{{ student.email }}</span>
+          </b-col>
+          <b-col md="6">
+            Address :
+            <span class="font-weight-bold">
+              {{
+                student.address ? student.address.currentCompleteAddress : ''
+              }}
+            </span>
+          </b-col>
+        </b-row>
+        <b-row class="mt-3">
+          <b-col md="8">
+            <h5>Files</h5>
+            <b-row>
+              <b-col md="12">
+                <div class="file-uploader-container">
+                  <FileUploader
+                    @onFileChange="onStudentFileUpload($event, student)"
+                    @onFileDrop="onStudentFileUpload($event, student)"
+                  />
+                </div>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md="12">
+                <div class="file-item-container">
+                  <FileItem
+                    v-for="(item, index) of student.files"
+                    :key="index"
+                    :title="item.name"
+                    :description="item.notes"
+                    :fileIndex="index"
+                    @onFileItemSelect="onStudentFileItemSelect(item, student)"
+                    @onFileItemRemove="onDeleteStudentFile(item, student)"
+                    @onFileItemPreview="previewFile(item)"
+                    :isBusy="item.isBusy"
+                  />
+                </div>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col md="4">
+            <h5>Checklist</h5>
+            <b-form-checkbox
+              v-for="requirement in requirements"
+              :key="requirement.id"
+              :checked="checkIfAlreadyChecked(requirement.id)"
+              @input="onUpdateStudent($event, requirement.id)"
+            >
+              {{ requirement.name }}
+            </b-form-checkbox>
+          </b-col>
+        </b-row>
       </b-card-body>
     </b-card>
+    <b-modal
+      v-model="showStudentFileModal"
+      centered
+      header-bg-variant="success"
+      header-text-variant="light"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+    >
+      <div slot="modal-title">
+        Student File
+      </div>
+      <b-row>
+        <b-col md="12">
+          <label>Notes</label>
+          <b-textarea
+            v-model="forms.studentFile.fields.notes"
+            :state="forms.studentFile.states.notes"
+            rows="7"
+            debounce="500"
+          />
+          <b-form-invalid-feedback>
+            {{ forms.studentFile.errors.notes }}
+          </b-form-invalid-feedback>
+        </b-col>
+      </b-row>
+      <div slot="modal-footer" class="w-100">
+        <b-button
+          class="float-left"
+          @click="onDeleteStudentFile(selectedStudentFile, studentRow)"
+          variant="outline-danger"
+        >
+          <v-icon v-if="isFileDeleting" name="sync" class="mr-2" spin />
+          Delete
+        </b-button>
+        <b-button
+          @click="onUpdateStudentFile()"
+          class="float-right"
+          variant="outline-primary"
+        >
+          <v-icon v-if="isFileUpdating" name="sync" class="mr-2" spin />
+          Update
+        </b-button>
+      </div>
+    </b-modal>
+    <FileViewer
+      :show="showModalPreview"
+      :file="file"
+      :isBusy="file.isLoading"
+      @close="showModalPreview = false"
+    />
   </div>
 </template>
 <script>
-import { StudentApi, EvaluationApi, EvaluationFileApi } from '../../../mixins/api'
-import { EvaluationStatuses, StudentCategories } from '../../../helpers/enum'
-import { clearFields, reset, showNotification } from '../../../helpers/forms'
+import {
+  RequirementApi,
+  StudentApi,
+  StudentFileApi,
+} from '../../../mixins/api';
+import { clearFields, reset, showNotification } from '../../../helpers/forms';
+import { StudentCategories } from '../../../helpers/enum';
+import FileViewer from '../../components/FileViewer';
+import FileUploader from '../../components/FileUploader';
+import FileItem from '../../components/FileItem';
+import { copyValue } from '../../../helpers/extractor';
 
-const evaluationFileFields = {
+const studentFileFields = {
   id: null,
-  notes: null
-}
+  notes: null,
+};
 
 export default {
-  mixins: [ StudentApi, EvaluationApi, EvaluationFileApi ],
-  created() {
-    this.studentId = this.$route.params.studentId
-    this.loadStudentEvaluationList()
+  mixins: [StudentApi, StudentFileApi, RequirementApi],
+  components: {
+    FileUploader,
+    FileItem,
+    FileViewer,
   },
+  created() {
+    this.studentId = this.$route.params.studentId;
+    this.loadStudent();
+  },
+  StudentCategories,
   data() {
     return {
-      evaluationFiles: [],
-      isProcessing: false,
-      showEntry: false,
-      isEntryLoading: false,
-      studentCategories: StudentCategories,
-      evaluationStatuses: EvaluationStatuses,
+      showModalPreview: false,
       studentId: null,
-      tables: {
-        evaluations: {
-          isBusy: false,
-          fields: [
-						{
-							key: "name",
-							label: "Name",
-							tdClass: "align-middle",
-							thStyle: { width: "auto"},
-							formatter: (value, key, item) => {
-								if(!item.student.middleName){
-									item.student.middleName = ""
-								}
-								item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-							}
-						},
-						{
-							key: "contact",
-							label: "Contact Info",
-							tdClass: "align-middle",
-							thStyle: { width: "20%" },
-
-						},
-						{
-							key: "education",
-							label: "Education",
-							tdClass: "align-middle",
-              thStyle: { width: "20%"}
-            },
-            {
-              key: "studentCategory.name",
-							label: "Student Category",
-							tdClass: "align-middle text-center font-weight-bold",
-							thClass: "text-center",
-							thStyle: { width: "12%"}
-            },
-						{
-							key: "status",
-							label: "Status",
-							tdClass: "align-middle text-center",
-							thClass: "text-center",
-							thStyle: { width: "12%"}
-            },
-            {
-							key: "attachments",
-							label: "",
-							tdClass: "align-middle text-center",
-							thClass: "text-center",
-							thStyle: { width: "8%"}
-						},
-						{
-							key: "action",
-							label: "",
-							tdClass: "align-middle",
-							thStyle: { width: "40px"}
-						},
-					],
-          items: []
-        },
-        files: {
-					isBusy: false,
-					fields: [
-            {
-							key: "name",
-							label: "Filename",
-							tdClass: "align-middle",
-              thStyle: { width: "40%" }
-						},
-            {
-							key: "notes",
-							label: "Notes",
-							tdClass: "align-middle",
-              thStyle: { width: "auto" }
-						},
-						{
-              key: "action",
-              label: "",
-							tdClass: "align-middle",
-							thStyle: { width: "35px" }
-            }
-          ],
-					items: []
-				},
+      student: null,
+      file: {
+        type: null,
+        src: null,
+        name: null,
+        notes: null,
+        isLoading: false,
       },
-    }
+      forms: {
+        studentFile: {
+          fields: { ...studentFileFields },
+          states: { ...studentFileFields },
+          errors: { ...studentFileFields },
+        },
+      },
+      requirements: [],
+      checkedRequirements: [],
+      showStudentFileModal: false,
+      selectedStudentFile: null,
+      studentRow: null,
+      isFileDeleting: false,
+      isFileUpdating: false,
+      schoolCategoryId: null,
+    };
   },
   methods: {
-    loadStudentEvaluationList() {
-      const evaluationStatusId = EvaluationStatuses.APPROVED.id
-      const params = { paginate: false, evaluationStatusId }
-      const { evaluations } = this.tables
-      evaluations.isBusy = true
-      this.getEvaluationsOfStudent(this.studentId, params)
-      .then(({ data }) => {
-        evaluations.isBusy = false
-        evaluations.items = data
-      })
+    loadStudent() {
+      this.getStudent(this.studentId).then(({ data }) => {
+        const { latestAcademicRecord, requirements } = data;
+        this.student = data;
+        this.schoolCategoryId = latestAcademicRecord.schoolCategoryId;
+        const studentRequirements = this.student.requirements.map((r) => {
+          return {
+            requirementId: r.id,
+            schoolCategoryId: this.schoolCategoryId,
+          };
+        });
+        this.checkedRequirements = studentRequirements;
+        this.loadRequirements();
+      });
     },
-    avatar(student){
-      let src = ''
-      if (student.photo) {
-        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+    loadRequirements() {
+      const params = {
+        paginate: false,
+        schoolCategoryId: this.schoolCategoryId,
+      };
+      this.getRequirementList(params)
+        .then(({ data }) => {
+          this.requirements = data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    onStudentFileUpload(file, item) {
+      const formData = new FormData();
+
+      formData.append('file', file);
+
+      item.files.push({
+        id: null,
+        name: null,
+        notes: null,
+        isBusy: true,
+      });
+
+      const studentFile = item.files[item.files.length - 1];
+      const { isBusy, ...studentKeys } = studentFile;
+      this.addStudentFile(formData, this.studentId)
+        .then(({ data }) => {
+          copyValue(data, studentFile, Object.keys(studentKeys));
+          studentFile.isBusy = false;
+        })
+        .catch((error) => {
+          item.files.splice(item.files.length - 1, 1);
+        });
+    },
+    onDeleteStudentFile(file, item) {
+      const index = item.files.findIndex((f) => f.id === file.id);
+      this.deleteStudentFile(this.studentId, file.id)
+        .then(() => {
+          this.isFileDeleting = false;
+          this.showStudentFileModal = false;
+          item.files.splice(index, 1);
+        })
+        .catch((error) => {
+          this.isFileDeleting = false;
+          this.selectedStudentFile.isBusy = false;
+        });
+    },
+    onStudentFileItemSelect(file, item) {
+      const { studentFile } = this.forms;
+      reset(studentFile);
+      this.selectedStudentFile = file;
+      this.studentRow = item;
+
+      studentFile.fields.id = file.id;
+      studentFile.fields.notes = this.selectedStudentFile.notes;
+
+      this.showStudentFileModal = true;
+    },
+    onUpdateStudentFile() {
+      const { studentFile } = this.forms;
+
+      this.isFileUpdating = true;
+      this.selectedStudentFile.isBusy = true;
+
+      this.updateStudentFile(
+        studentFile.fields,
+        this.studentRow.id,
+        studentFile.fields.id
+      )
+        .then(({ data }) => {
+          this.selectedStudentFile.notes = data.notes;
+          this.isFileUpdating = false;
+          this.showStudentFileModal = false;
+          this.selectedStudentFile.isBusy = false;
+        })
+        .catch((error) => {
+          const { errors } = error.response.data;
+          validate(studentFile, errors);
+          this.isFileUpdating = true;
+          this.selectedStudentFile.isBusy = false;
+        });
+    },
+    previewFile(item) {
+      const { studentId, id, name, notes } = item;
+      this.file.type = null;
+      this.file.src = null;
+      this.file.name = name;
+      this.file.notes = notes;
+      this.showModalPreview = true;
+      this.file.isLoading = true;
+      this.getStudentFilePreview(studentId, id).then((response) => {
+        this.file.type = response.headers.contentType;
+        this.file.isLoading = false;
+        const file = new Blob([response.data], {
+          type: response.headers.contentType,
+        });
+        const reader = new FileReader();
+        reader.onload = (e) => (this.file.src = e.target.result);
+        reader.readAsDataURL(file);
+      });
+    },
+    onUpdateStudent(isChecked, requirementId) {
+      if (isChecked) {
+        this.checkedRequirements.push({
+          requirementId,
+          schoolCategoryId: this.schoolCategoryId,
+        });
+      } else {
+        const index = this.checkedRequirements
+          .map((r) => r.requirementId)
+          .indexOf(requirementId);
+        this.checkedRequirements.splice(index, 1);
       }
-      return src
+
+      this.updateStudent(
+        {
+          requirements: this.checkedRequirements,
+        },
+        this.studentId
+      );
     },
-    getName(item, child){
-      if (item) {
-        let value = item[child]
-        if (value) {
-          return value['name']
-        }
+    checkIfAlreadyChecked(requirementId) {
+      const studentRequirements = this.student.requirements.map((r) => r.id);
+      if (studentRequirements.includes(requirementId)) {
+        return true;
       }
-      return ''
+      return false;
     },
-  }
-}
+  },
+};
 </script>
+<style scoped>
+.file-uploader-container {
+  width: 100%;
+  height: 150px;
+  margin: 20px 0 20px 0;
+}
+
+.file-item-container {
+  width: 100%;
+  height: auto;
+}
+</style>
