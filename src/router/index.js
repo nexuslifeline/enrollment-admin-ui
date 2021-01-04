@@ -59,11 +59,14 @@ const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
 const AcademicRecordApplicationList = () => import('@/views/pages/academic-record-applications/AcademicRecordApplicationList')
+const DocumentType = () => import('@/views/pages/DocumentType');
 
 const Collection = () => import('@/views/pages/reports/Collection')
 const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
 const TranscriptRecord = () => import('@/views/pages/TranscriptRecord')
 const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentList')
+
+
 
 Vue.use(Router)
 
@@ -325,7 +328,13 @@ function configRoutes () {
                   ]
                 }
               ]
-            }
+            },
+            {
+              path: 'document-type',
+              name: 'Document Type',
+              component: DocumentType,
+              meta: { requiresAuth: true, userType: 0 }
+            },
           ]
         },
         {

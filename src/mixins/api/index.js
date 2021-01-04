@@ -32,4 +32,5 @@ export { default as TermApi } from './Term';
 export { default as ReportApi } from './Report';
 export { default as TranscriptRecordApi } from './TranscriptRecord';
 export { default as StudentFileApi } from './StudentFile';
+export { default as DocumentTypeApi } from './DocumentType';
 // export { default as StudentFileApi } from './StudentFile';
