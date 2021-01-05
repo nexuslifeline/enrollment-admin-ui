@@ -102,6 +102,18 @@
                 <!-- <div>School Year: {{ data.item.latestAcademicRecord ? data.item.latestAcademicRecord.schoolYearId : null }} </div> -->
                 <EducationColumn :data="data.item.latestAcademicRecord" />
               </template>
+              <template v-slot:cell(requirementPercentage)="{ item, value }">
+                <div class="text-center">
+                  <b-link
+                    :to="
+                      `/master-files/student/${item.id}/school-records/requirements`
+                    "
+                  >
+                    {{ value }}%
+                    <BProgress :value="value" variant="info" animated striped />
+                  </b-link>
+                </div>
+              </template>
               <template v-slot:table-busy>
                 <div class="text-center my-2">
                   <v-icon name="spinner" spin class="mr-2" />
@@ -623,6 +635,12 @@ export default {
             {
               key: 'contact',
               label: 'Contact Info',
+              tdClass: 'align-middle',
+              thStyle: { width: '20%' },
+            },
+            {
+              key: 'requirementPercentage',
+              label: 'Requirement %',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
             },

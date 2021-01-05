@@ -70,7 +70,8 @@ import {
   BIconGeoAlt,
   BIconCalendar2Week,
   BIconCaretDownFill,
-  BIconCaretUpFill
+  BIconCaretUpFill,
+  BProgress
 } from 'bootstrap-vue'
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
@@ -86,6 +87,7 @@ Vue.component('BIconGeoAlt', BIconGeoAlt);
 Vue.component('BIconCalendar2Week', BIconCalendar2Week);
 Vue.component('BIconCaretDownFill', BIconCaretDownFill);
 Vue.component('BIconCaretUpFill', BIconCaretUpFill);
+Vue.component('BProgress', BProgress)
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'
