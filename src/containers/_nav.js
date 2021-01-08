@@ -58,7 +58,6 @@ export const navs = () => {
         ]
       },
       {
-        
         _name: 'CSidebarNavDropdown',
         name: 'Registrar',
         route: '/subject',

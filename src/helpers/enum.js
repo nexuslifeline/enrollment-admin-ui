@@ -644,3 +644,9 @@ export const TranscriptRecordPermissions = new Enum({
   REVIEW: { id: 321, name: 'Review' },
   PRINT: { id: 322, name: 'Print' },
 });
+
+export const DocumentTypePermission = new Enum({
+  ADD: { id: 331, name: 'Add' },
+  EDIT: { id: 332, name: 'Edit' },
+  DELETE: { id: 333, name: 'Delete' }
+});

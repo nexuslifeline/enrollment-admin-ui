@@ -23,7 +23,8 @@ import {
   PaymentPermissions,
   StatementOfAccountPermissions,
   OtherBillingPermissions,
-  TranscriptRecordPermissions
+  TranscriptRecordPermissions,
+  DocumentTypePermission
 } from '../helpers/enum';
 
 export default [
@@ -232,6 +233,11 @@ export default [
         label: 'E Wallet Account',
         to: '/maintenance/e-wallet-account',
         permissionIds: EWalletAccountPermissions.getIds()
+      },
+      {
+        label: 'Document Type',
+        to: '/maintenance/document-type',
+        permissionIds: DocumentTypePermission.getIds()
       },
     ]
   },
