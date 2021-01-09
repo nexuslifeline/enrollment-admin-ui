@@ -1,6 +1,6 @@
 <template>
   <div class="c-page-content">
-    <Card title="Evaluation & Admission Records">
+    <Card title="Evaluation & Admission Records" :showRefresh="true" @onRefresh="loadEvaluation()">
       <div>
         <SchoolCategoryTabs
           :showAll="true"

@@ -1,6 +1,6 @@
 <template>
   <div class="c-app">
-    <Card title="Payment Transactions">
+    <Card title="Payment Transactions" :showRefresh="true" @onRefresh="loadPaymentList()">
       <div>
         <b-row class="mb-2">
           <!-- row button and search input -->

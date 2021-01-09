@@ -1,6 +1,6 @@
 <template>
 	<div class="c-page-content">
-    <Card title="Student Assessment Fee">
+    <Card title="Student Assessment Fee" :showRefresh="true" @onRefresh="loadAcademicRecord()">
       <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="filters.student.schoolCategoryId = $event, loadAcademicRecord()"

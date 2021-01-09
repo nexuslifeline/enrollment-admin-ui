@@ -54,7 +54,7 @@
                   v-if="isAccessible([
                     $options.DocumentTypePermission.EDIT.id,
                     $options.DocumentTypePermission.DELETE.id
-                  ])"
+                ])"
                   right variant="link"
                   toggle-class="text-decoration-none"
                   no-caret>

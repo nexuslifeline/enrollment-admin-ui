@@ -1,6 +1,6 @@
 <template>
   <div class="c-page-content">
-    <Card title="Subject Enlistment">
+    <Card title="Subject Enlistment" :showRefresh="true" @onRefresh="loadAcademicRecord()">
       <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="

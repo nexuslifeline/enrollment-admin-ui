@@ -1,6 +1,6 @@
 <template>
   <div class="c-page-content">
-    <Card v-if="!showEntry" title="Manual Enrollment">
+    <Card v-if="!showEntry" title="Manual Enrollment" :showRefresh="true" @onRefresh="loadAcademicRecord()">
       <div>
         <SchoolCategoryTabs
           :showAll="true"

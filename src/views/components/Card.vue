@@ -4,6 +4,9 @@
       <h4 class="c-card__header-title">
         {{ title }}
       </h4>
+      <b-button class="c-card__refresh-button" v-if="showRefresh" variant="primary" @click="$emit('onRefresh')">
+        <v-icon name="sync"/>
+          Reresh</b-button>
     </div>
     <div class="c-card__body">
       <slot></slot>
@@ -15,6 +18,10 @@ export default {
   props: {
     title: {
       type: [String]
+    },
+    showRefresh: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -32,6 +39,11 @@ export default {
   .c-card__header {
     border-bottom: 1px solid $brand-border-color;
     padding: 15px;
+    display: flex;
+
+    @include for-size(phone-only) {
+      flex-direction: column;
+    }
   }
 
   .c-card__body {
@@ -41,6 +53,16 @@ export default {
   .c-card__header-title {
     margin: 0;
     font-size: 21px;
+    flex: 1;
+  }
+
+  .c-card__refresh-button {
+    width: 100px;;
+
+    @include for-size(phone-only) {
+      width: 100%;
+      margin-top: 10px;
+    }
   }
 
 </style>
