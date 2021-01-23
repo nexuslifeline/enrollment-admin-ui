@@ -2135,6 +2135,7 @@ export default {
           academicRecord: {
             ...academicRecordDataSet,
             manualStepId: ManualSteps.EVALUATION.id,
+            academicRecordStatusId: AcademicRecordStatuses.DRAFT.id,
             isManual: 1,
           },
           transcriptRecord: {
