@@ -307,9 +307,12 @@
                         </p>
                       </ActiveViewItem>
                       <ActiveViewItem label="Billing No: ">
-                        <b-link @click="previewSoa(data.item.billing)">
+                        <b-link v-if="data.item.billing.billingTypeId === BillingTypes.SOA.id" @click="previewSoa(data.item.billing)">
                           {{ data.item.billing.billingNo }}
                         </b-link>
+                        <p>
+                          {{ data.item.billing.billingNo }}
+                        </p>
                       </ActiveViewItem>
                       <ActiveViewItem label="Total Amount: ">
                         <p>

@@ -103,6 +103,10 @@
           <b-col md="6">
             Student Category :
             <b-badge
+              v-if="
+                student.latestAcademicRecord &&
+                  student.latestAcademicRecord.studentCategoryId
+              "
               :variant="
                 student.latestAcademicRecord.studentCategoryId ===
                 $options.StudentCategories.NEW.id
@@ -123,6 +127,7 @@
                   : ''
               }}
             </b-badge>
+            <span v-else>N/A</span>
           </b-col>
           <b-col md="6">
             Contact Number :
