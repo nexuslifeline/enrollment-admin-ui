@@ -1,44 +1,70 @@
 <template>
-	<div class="c-page-content">
-    <Card title="Student Assessment Fee" :showRefresh="true" @onRefresh="loadAcademicRecord()">
+  <div class="c-page-content">
+    <Card
+      title="Student Assessment Fee"
+      :showRefresh="true"
+      @onRefresh="loadAcademicRecord()"
+    >
       <SchoolCategoryTabs
         :showAll="true"
-        @loadSchoolCategoryId="filters.student.schoolCategoryId = $event, loadAcademicRecord()"
-        @clickAll="filters.student.schoolCategoryId = null, filters.student.courseId = null, loadAcademicRecord()"
-        @click="filters.student.schoolCategoryId = $event, filters.student.courseId = null, loadAcademicRecord()"
+        @loadSchoolCategoryId="
+          (filters.student.schoolCategoryId = $event), loadAcademicRecord()
+        "
+        @clickAll="
+          (filters.student.schoolCategoryId = null),
+            (filters.student.courseId = null),
+            loadAcademicRecord()
+        "
+        @click="
+          (filters.student.schoolCategoryId = $event),
+            (filters.student.courseId = null),
+            loadAcademicRecord()
+        "
       />
       <div>
-        <b-row class="mb-2"> <!-- row button and search input -->
+        <b-row class="mb-2">
+          <!-- row button and search input -->
           <b-col md="6">
-            <b-form-radio-group @input="loadAcademicRecord()" v-model="filters.student.applicationStatusId">
+            <b-form-radio-group
+              @input="loadAcademicRecord()"
+              v-model="filters.student.applicationStatusId"
+            >
               <b-form-radio :value="null">Show All</b-form-radio>
-              <b-form-radio
-                :value="applicationStatuses.APPROVED.id">
+              <b-form-radio :value="applicationStatuses.APPROVED.id">
                 Approved
               </b-form-radio>
-              <b-form-radio
-                :value="applicationStatuses.SUBMITTED.id">
+              <b-form-radio :value="applicationStatuses.SUBMITTED.id">
                 Pending
               </b-form-radio>
             </b-form-radio-group>
           </b-col>
           <b-col md="3">
             <b-form-select
-              v-if="filters.student.schoolCategoryId === options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-                filters.student.schoolCategoryId === options.schoolCategories.COLLEGE.id ||
-                filters.student.schoolCategoryId === options.schoolCategories.GRADUATE_SCHOOL.id"
+              v-if="
+                filters.student.schoolCategoryId ===
+                  options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
+                  filters.student.schoolCategoryId ===
+                    options.schoolCategories.COLLEGE.id ||
+                  filters.student.schoolCategoryId ===
+                    options.schoolCategories.GRADUATE_SCHOOL.id
+              "
               @change="loadAcademicRecord()"
               v-model="filters.student.courseId"
-              class="float-right">
+              class="float-right"
+            >
               <template v-slot:first>
-                <b-form-select-option :value="null" disabled>-- Course --</b-form-select-option>
+                <b-form-select-option :value="null" disabled
+                  >-- Course --</b-form-select-option
+                >
               </template>
               <b-form-select-option :value="null">None</b-form-select-option>
               <b-form-select-option
                 v-for="course in options.courses.items"
                 :key="course.id"
-                :value="course.id">
-                {{course.description}} {{course.major ? `(${course.major})` : ''}}
+                :value="course.id"
+              >
+                {{ course.description }}
+                {{ course.major ? `(${course.major})` : '' }}
               </b-form-select-option>
             </b-form-select>
           </b-col>
@@ -48,41 +74,59 @@
               debounce="500"
               @update="loadAcademicRecord()"
               type="text"
-              placeholder="Search">
+              placeholder="Search"
+            >
             </b-form-input>
           </b-col>
-        </b-row> <!-- row button and search input -->
+        </b-row>
+        <!-- row button and search input -->
         <b-table
           class="c-table"
-          hover outlined small responsive show-empty
+          hover
+          outlined
+          small
+          responsive
+          show-empty
           :fields="tables.students.fields"
           :items="tables.students.items"
-          :busy="tables.students.isBusy">
+          :busy="tables.students.isBusy"
+        >
           <template v-slot:table-busy>
             <div class="text-center my-2">
-              <v-icon
-                name="spinner"
-                spin
-                class="mr-2" />
+              <v-icon name="spinner" spin class="mr-2" />
               <strong>Loading...</strong>
             </div>
           </template>
           <template v-slot:cell(name)="data">
-            <StudentColumn :data="data.item" :callback="{ loadDetails: () => loadDetails(data) }" />
+            <StudentColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => loadDetails(data) }"
+            />
           </template>
           <template v-slot:cell(education)="data">
             <EducationColumn :data="data.item" />
           </template>
           <template v-slot:cell(status)="data">
             <b-badge
-              :variant="(data.item.applicationId ?
-              data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-              data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
-                ? 'warning'
-                : 'primary'">
-              {{ (data.item.applicationId ?
-              data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-              data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id) ? 'Pending' : 'Approved' }}
+              :variant="
+                (data.item.applicationId
+                ? data.item.application.applicationStatusId ===
+                  applicationStatuses.SUBMITTED.id
+                : data.item.admission.applicationStatusId ===
+                  applicationStatuses.SUBMITTED.id)
+                  ? 'warning'
+                  : 'success'
+              "
+            >
+              {{
+                (data.item.applicationId
+                ? data.item.application.applicationStatusId ===
+                  applicationStatuses.SUBMITTED.id
+                : data.item.admission.applicationStatusId ===
+                  applicationStatuses.SUBMITTED.id)
+                  ? 'Pending'
+                  : 'Approved'
+              }}
             </b-badge>
           </template>
           <template v-slot:cell(action)="row">
@@ -90,286 +134,379 @@
               :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
               @click="loadDetails(row)" /> -->
 
-              <b-dropdown
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+            >
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+              <b-dropdown-item @click.prevent="loadDetails(row)">
+                {{
+                  row.item.application
+                    ? getEllipsisCaption(
+                        row.item.application.applicationStatusId
+                      )
+                    : getEllipsisCaption(row.item.admission.applicationStatusId)
+                }}
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="
+                  (row.item.application
+                    ? row.item.application.applicationStatusId
+                    : row.item.application.applicationStatusId) !==
+                    applicationStatuses.SUBMITTED.id
+                "
+                @click.prevent="loadAssessmentForm(row.item.id)"
               >
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
-                <b-dropdown-item @click.prevent="loadDetails(row)">
-                  {{
-                    row.item.application ? getEllipsisCaption(row.item.application.applicationStatusId) : getEllipsisCaption(row.item.admission.applicationStatusId)
-                  }}
-                </b-dropdown-item>
-              </b-dropdown>
+                Preview Assessment Form
+              </b-dropdown-item>
+            </b-dropdown>
           </template>
           <template v-slot:row-details="data">
             <ActiveRowViewer
-                :isBusy="data.item.isLoading"
-                backTitle="Go back to list"
-                @onBack="data.toggleDetails()"
-                :showOptions="
-                  !isAccessible($options.StudentFeePermissions.APPROVAL.id) ? false :
-                      (data.item.applicationId ?
-                        data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                        data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
-                "
-                :options="[
-                  {
-                    label: 'Approve',
-                    callback: () => setApproveFees(data),
-                    isAllowed: isAccessible(
-                      $options.StudentFeePermissions.APPROVAL.id
-                    ),
-                  },
-                ]"
-              >
+              :isBusy="data.item.isLoading"
+              backTitle="Go back to list"
+              @onBack="data.toggleDetails()"
+              :showOptions="
+                !isAccessible($options.StudentFeePermissions.APPROVAL.id)
+                  ? false
+                  : data.item.applicationId
+                  ? data.item.application.applicationStatusId ===
+                    applicationStatuses.SUBMITTED.id
+                  : data.item.admission.applicationStatusId ===
+                    applicationStatuses.SUBMITTED.id
+              "
+              :options="[
+                {
+                  label: 'Approve',
+                  callback: () => setApproveFees(data),
+                  isAllowed: isAccessible(
+                    $options.StudentFeePermissions.APPROVAL.id
+                  ),
+                },
+              ]"
+            >
               <template v-slot:header>
-                  <div class="active-view__header-details-container">
-                    <AvatarMaker
-                      :avatarId="data.item.student.id"
-                      :size="50"
-                      :text="
-                        `${data.item.student.firstName.charAt(
-                          0
-                        )}${data.item.student.lastName.charAt(0)}`
-                      "
-                      :src="avatar(data.item.student)"
-                    />
-                    <div class="active-view__header-details">
-                      <p class="active-view__header-name">
-                        {{ data.item.student.name }}
-                      </p>
-                      <p class="active-view__header-email">
-                        {{ data.item.student.email }}
-                      </p>
-                    </div>
-                    <p class="active-view__header-date">
-                      <BIconAlarm />
-                      {{
-                        $options.format(
-                          new Date(data.item.application ? data.item.application.appliedDate : data.item.admission.appliedDate),
-                          'MMMM dd, yyyy'
-                        )
-                      }}
+                <div class="active-view__header-details-container">
+                  <AvatarMaker
+                    :avatarId="data.item.student.id"
+                    :size="50"
+                    :text="
+                      `${data.item.student.firstName.charAt(
+                        0
+                      )}${data.item.student.lastName.charAt(0)}`
+                    "
+                    :src="avatar(data.item.student)"
+                  />
+                  <div class="active-view__header-details">
+                    <p class="active-view__header-name">
+                      {{ data.item.student.name }}
+                    </p>
+                    <p class="active-view__header-email">
+                      {{ data.item.student.email }}
                     </p>
                   </div>
+                  <p class="active-view__header-date">
+                    <BIconAlarm />
+                    {{
+                      $options.format(
+                        new Date(
+                          data.item.application
+                            ? data.item.application.appliedDate
+                            : data.item.admission.appliedDate
+                        ),
+                        'MMMM dd, yyyy'
+                      )
+                    }}
+                  </p>
+                </div>
               </template>
 
               <template v-slot:navigation>
-                  <ActiveViewLinks
-                    :items="[
-                      {
-                        text: 'Application',
-                        target: 'header-current-application',
-                      },
-                      {
-                        text: 'Subjects',
-                        target: 'header-subjects',
-                      },
-                      {
-                        text: 'Fees',
-                        target: 'header-fees',
-                      },
-                    ]"
-                  />
+                <ActiveViewLinks
+                  :items="[
+                    {
+                      text: 'Application',
+                      target: 'header-current-application',
+                    },
+                    {
+                      text: 'Subjects',
+                      target: 'header-subjects',
+                    },
+                    {
+                      text: 'Fees',
+                      target: 'header-fees',
+                    },
+                  ]"
+                />
               </template>
 
               <template v-slot:content>
-                  <div>
-                     <ActiveViewHeader
-                      id="header-current-application"
-                      title="Review Application for current Academic Year"
-                      circleText="1"
-                    />
-                    <ActiveViewItems>
-                      <ActiveViewItem label="Level: ">
-                        <p>
-                          {{ getName(data.item, 'level') }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Course: " v-if="!!getName(data.item, 'course')">
-                        <p >
-                          {{data.item.course.description}} {{data.item.course.major ? `(${data.item.course.major})` : ''}}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem
-                        v-if="!!getName(data.item, 'course')"
-                        label="Semester: "
+                <div>
+                  <ActiveViewHeader
+                    id="header-current-application"
+                    title="Review Application for current Academic Year"
+                    circleText="1"
+                  />
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Level: ">
+                      <p>
+                        {{ getName(data.item, 'level') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem
+                      label="Course: "
+                      v-if="!!getName(data.item, 'course')"
+                    >
+                      <p>
+                        {{ data.item.course.description }}
+                        {{
+                          data.item.course.major
+                            ? `(${data.item.course.major})`
+                            : ''
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem
+                      v-if="!!getName(data.item, 'course')"
+                      label="Semester: "
+                    >
+                      <p>
+                        {{ getName(data.item, 'semester') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="School Year: ">
+                      <p>
+                        {{ getName(data.item, 'schoolYear') }}
+                      </p>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
+                </div>
+                <div v-if="data.item.subjects">
+                  <ActiveViewHeader
+                    id="header-subjects"
+                    title="Subjects"
+                    circleText="2"
+                  />
+                  <b-row class="mb-1 mt-4">
+                    <b-col md="6">
+                      <h5>SUBJECTS</h5>
+                    </b-col>
+                  </b-row>
+                  <b-table
+                    hover
+                    outlined
+                    small
+                    responsive
+                    show-empty
+                    :fields="tables.subjects.fields"
+                    :items="data.item.subjects"
+                    :busy="tables.subjects.isBusy"
+                  >
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon name="spinner" spin class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                  </b-table>
+                  <b-row>
+                    <b-col md="10">
+                      <h5 class="float-right font-weight-bold">TUITION FEE</h5>
+                    </b-col>
+                    <b-col md="2">
+                      <h5 class="float-right pr-2 font-weight-bold">
+                        {{ subjectsTotalAmount(data.item.subjects) }}
+                      </h5>
+                    </b-col>
+                  </b-row>
+                </div>
+                <div v-if="data.item.fees">
+                  <ActiveViewHeader
+                    id="header-fees"
+                    title="Fees"
+                    circleText="3"
+                  />
+                  <b-row class="mb-1 mt-4">
+                    <b-col md="4">
+                      <h5 class="pt-2">STUDENT FEES</h5>
+                    </b-col>
+                    <b-col md="4" class="text-center">
+                      <span
+                        v-if="data.item.msg"
+                        class="text-danger font-weight-bold"
+                        >{{ data.item.msg }}</span
                       >
-                        <p>
-                          {{ getName(data.item, 'semester') }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="School Year: ">
-                        <p>
-                          {{ getName(data.item, 'schoolYear') }}
-                        </p>
-                      </ActiveViewItem>
-                    </ActiveViewItems>
-                  </div>
-                  <div v-if="data.item.subjects">
-                     <ActiveViewHeader
-                      id="header-subjects"
-                      title="Subjects"
-                      circleText="2"
-                    />
-                    <b-row class="mb-1 mt-4">
-                      <b-col md=6>
-                        <h5>SUBJECTS</h5>
-                      </b-col>
-                    </b-row>
-                    <b-table
-                      hover outlined small responsive show-empty
-                      :fields="tables.subjects.fields"
-                      :items="data.item.subjects"
-                      :busy="tables.subjects.isBusy">
-                      <template v-slot:table-busy>
-                        <div class="text-center my-2">
-                          <v-icon
-                            name="spinner"
-                            spin
-                            class="mr-2" />
-                          <strong>Loading...</strong>
-                        </div>
-                      </template>
-                    </b-table>
-                    <b-row>
-                      <b-col md=10>
-                        <h5 class="float-right font-weight-bold">TUITION FEE</h5>
-                      </b-col>
-                      <b-col md=2>
-                        <h5 class="float-right pr-2 font-weight-bold">{{ subjectsTotalAmount(data.item.subjects) }}</h5>
-                      </b-col>
-                    </b-row>
-                  </div>
-                  <div v-if="data.item.fees">
-                    <ActiveViewHeader
-                      id="header-fees"
-                      title="Fees"
-                      circleText="3"
-                    />
-                      <b-row class="mb-1 mt-4">
-                        <b-col md=4>
-                          <h5 class="pt-2">STUDENT FEES</h5>
-                        </b-col>
-                        <b-col md=4 class="text-center">
-                          <span v-if="data.item.msg" class="text-danger font-weight-bold">{{ data.item.msg }}</span>
-                        </b-col>
-                        <b-col md=4>
-                          <b-button
-                            @click="onAddFees(data.item.fees)"
-                            v-if="data.item.applicationId ?
-                              data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                              data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id"
-                            variant="outline-primary"
-                            class="float-right">
-                            <v-icon name="plus-circle" /> New Item
-                          </b-button>
-                        </b-col>
-                      </b-row>
-                      <b-table
-                        hover outlined small responsive show-empty
-                        :fields="tables.studentFees.fields"
-                        :items="data.item.fees"
-                        :busy="tables.studentFees.isBusy">
-                        <template v-slot:table-busy>
-                          <div class="text-center my-2">
-                            <v-icon
-                              name="spinner"
-                              spin
-                              class="mr-2" />
-                            <strong>Loading...</strong>
-                          </div>
-                        </template>
-                        <template v-slot:cell(pivot.notes)="row">
-                          <b-form-input
-                            v-model="row.item.pivot.notes"
-                            :disabled="data.item.application ?
-                              data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
-                              data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id" />
-                        </template>
-                        <template v-slot:cell(pivot.isInitialFee)="row">
-                          <b-form-checkbox
-                            :disabled="data.item.application ?
-                              data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
-                              data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id"
-                            value="1"
-                            unchecked-value="0"
-                            v-model="row.item.pivot.isInitialFee" />
-                        </template>
-                        <template v-slot:cell(pivot.amount)="row">
-                          <vue-autonumeric
-                            :disabled="(row.item.id === fees.TUITION_FEE.id && data.item.isComputedByUnits === 1) || (data.item.application ?
-                              data.item.application.applicationStatusId !== applicationStatuses.SUBMITTED.id :
-                              data.item.admission.applicationStatusId !== applicationStatuses.SUBMITTED.id)"
-                            v-model="row.item.pivot.amount"
-                            class="form-control text-right"
-                            :options="[{minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0}]">
-                          </vue-autonumeric>
-                        </template>
-                        <template v-slot:cell(action)="row">
-                          <b-button
-                            v-if="(data.item.applicationId ?
-                                data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id :
-                                data.item.admission.applicationStatusId === applicationStatuses.SUBMITTED.id)
-                                && row.item.id !== fees.TUITION_FEE.id"
-                            @click="removeFee(data.item.fees, row)"
-                            size="sm" variant="danger">
-                            <v-icon name="trash" />
-                          </b-button>
-                        </template>
-                      </b-table>
-                      <b-row>
-                        <b-col md=4>
-                          <b-form-group
-                            label="INITIAL FEE TOTAL :"
-                            label-for="enrollmentFee"
-                            label-class="font-weight-bold"
-                            label-cols="4">
-                            <vue-autonumeric
-                              disabled
-                              class="form-control text-right"
-                              :value="initialFeeTotal(data)"
-                              :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
-                            </vue-autonumeric>
-                          </b-form-group>
-                        </b-col>
-                        <b-col md=4>
-                          <b-form-group
-                            label="PREVIOUS BALANCE :"
-                            label-for="enrollmentFee"
-                            label-class="font-weight-bold"
-                            label-cols="4">
-                            <vue-autonumeric
-                              class="form-control text-right"
-                              v-model="data.item.previousBalance"
-                              :options="[{ minimumValue: 0, modifyValueOnWheel: false, emptyInputBehavior: 0 }]">
-                            </vue-autonumeric>
-                          </b-form-group>
-                        </b-col>
-                        <b-col md=2>
-                          <h5 class="float-right font-weight-bold">Total</h5>
-                        </b-col>
-                        <b-col md=2>
-                          <h5 class="float-right font-weight-bold">{{ feesTotalAmount(data.item.fees) }}</h5>
-                        </b-col>
-                      </b-row>
-                  </div>
+                    </b-col>
+                    <b-col md="4">
+                      <b-button
+                        @click="onAddFees(data.item.fees)"
+                        v-if="
+                          data.item.applicationId
+                            ? data.item.application.applicationStatusId ===
+                              applicationStatuses.SUBMITTED.id
+                            : data.item.admission.applicationStatusId ===
+                              applicationStatuses.SUBMITTED.id
+                        "
+                        variant="outline-primary"
+                        class="float-right"
+                      >
+                        <v-icon name="plus-circle" /> New Item
+                      </b-button>
+                    </b-col>
+                  </b-row>
+                  <b-table
+                    hover
+                    outlined
+                    small
+                    responsive
+                    show-empty
+                    :fields="tables.studentFees.fields"
+                    :items="data.item.fees"
+                    :busy="tables.studentFees.isBusy"
+                  >
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon name="spinner" spin class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                    <template v-slot:cell(pivot.notes)="row">
+                      <b-form-input
+                        v-model="row.item.pivot.notes"
+                        :disabled="
+                          data.item.application
+                            ? data.item.application.applicationStatusId !==
+                              applicationStatuses.SUBMITTED.id
+                            : data.item.admission.applicationStatusId !==
+                              applicationStatuses.SUBMITTED.id
+                        "
+                      />
+                    </template>
+                    <template v-slot:cell(pivot.isInitialFee)="row">
+                      <b-form-checkbox
+                        :disabled="
+                          data.item.application
+                            ? data.item.application.applicationStatusId !==
+                              applicationStatuses.SUBMITTED.id
+                            : data.item.admission.applicationStatusId !==
+                              applicationStatuses.SUBMITTED.id
+                        "
+                        value="1"
+                        unchecked-value="0"
+                        v-model="row.item.pivot.isInitialFee"
+                      />
+                    </template>
+                    <template v-slot:cell(pivot.amount)="row">
+                      <vue-autonumeric
+                        :disabled="
+                          (row.item.id === fees.TUITION_FEE.id &&
+                            data.item.isComputedByUnits === 1) ||
+                            (data.item.application
+                              ? data.item.application.applicationStatusId !==
+                                applicationStatuses.SUBMITTED.id
+                              : data.item.admission.applicationStatusId !==
+                                applicationStatuses.SUBMITTED.id)
+                        "
+                        v-model="row.item.pivot.amount"
+                        class="form-control text-right"
+                        :options="[
+                          {
+                            minimumValue: 0,
+                            modifyValueOnWheel: false,
+                            emptyInputBehavior: 0,
+                          },
+                        ]"
+                      >
+                      </vue-autonumeric>
+                    </template>
+                    <template v-slot:cell(action)="row">
+                      <b-button
+                        v-if="
+                          (data.item.applicationId
+                            ? data.item.application.applicationStatusId ===
+                              applicationStatuses.SUBMITTED.id
+                            : data.item.admission.applicationStatusId ===
+                              applicationStatuses.SUBMITTED.id) &&
+                            row.item.id !== fees.TUITION_FEE.id
+                        "
+                        @click="removeFee(data.item.fees, row)"
+                        size="sm"
+                        variant="danger"
+                      >
+                        <v-icon name="trash" />
+                      </b-button>
+                    </template>
+                  </b-table>
+                  <b-row>
+                    <b-col md="4">
+                      <b-form-group
+                        label="INITIAL FEE TOTAL :"
+                        label-for="enrollmentFee"
+                        label-class="font-weight-bold"
+                        label-cols="4"
+                      >
+                        <vue-autonumeric
+                          disabled
+                          class="form-control text-right"
+                          :value="initialFeeTotal(data)"
+                          :options="[
+                            {
+                              minimumValue: 0,
+                              modifyValueOnWheel: false,
+                              emptyInputBehavior: 0,
+                            },
+                          ]"
+                        >
+                        </vue-autonumeric>
+                      </b-form-group>
+                    </b-col>
+                    <b-col md="4">
+                      <b-form-group
+                        label="PREVIOUS BALANCE :"
+                        label-for="enrollmentFee"
+                        label-class="font-weight-bold"
+                        label-cols="4"
+                      >
+                        <vue-autonumeric
+                          class="form-control text-right"
+                          v-model="data.item.previousBalance"
+                          :options="[
+                            {
+                              minimumValue: 0,
+                              modifyValueOnWheel: false,
+                              emptyInputBehavior: 0,
+                            },
+                          ]"
+                        >
+                        </vue-autonumeric>
+                      </b-form-group>
+                    </b-col>
+                    <b-col md="2">
+                      <h5 class="float-right font-weight-bold">Total</h5>
+                    </b-col>
+                    <b-col md="2">
+                      <h5 class="float-right font-weight-bold">
+                        {{ feesTotalAmount(data.item.fees) }}
+                      </h5>
+                    </b-col>
+                  </b-row>
+                </div>
               </template>
-
             </ActiveRowViewer>
           </template>
         </b-table>
         <b-row>
-          <b-col md=6>
-            Showing {{paginations.student.from}} to {{paginations.student.to}} of {{paginations.student.totalRows}} records.
+          <b-col md="6">
+            Showing {{ paginations.student.from }} to
+            {{ paginations.student.to }} of
+            {{ paginations.student.totalRows }} records.
           </b-col>
-          <b-col md=6>
+          <b-col md="6">
             <b-pagination
               class="c-pagination"
               v-model="paginations.student.page"
@@ -384,56 +521,61 @@
       </div>
     </Card>
     <!-- MODAL FEES -->
-		<b-modal
-			v-model="showModalFees"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true"
-			size="xl">
-			<div slot="modal-title"> <!-- modal title -->
-					School Fees
-			</div> <!-- modal title -->
-			<b-row> <!-- modal body -->
-				<b-col md=12>
+    <b-modal
+      v-model="showModalFees"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+      size="xl"
+    >
+      <div slot="modal-title">
+        <!-- modal title -->
+        School Fees
+      </div>
+      <!-- modal title -->
+      <b-row>
+        <!-- modal body -->
+        <b-col md="12">
           <b-row class="mb-2">
             <b-col offset-md="8" md="4">
               <b-form-input
                 v-model="filters.fee.criteria"
                 type="text"
-                placeholder="Search">
+                placeholder="Search"
+              >
               </b-form-input>
             </b-col>
           </b-row>
-					<b-table
-						small hover outlined show-empty
-						:items.sync="tables.fees.items"
-						:fields="tables.fees.fields"
+          <b-table
+            small
+            hover
+            outlined
+            show-empty
+            :items.sync="tables.fees.items"
+            :fields="tables.fees.fields"
             :filter="filters.fee.criteria"
-						:busy="tables.fees.isBusy2"
+            :busy="tables.fees.isBusy2"
             :current-page="paginations.fee.page"
             :per-page="paginations.fee.perPage"
-            @filtered="onFiltered($event, paginations.fee)">
-						<template v-slot:cell(action)="row">
-							<b-button
-                @click="addFee(row)"
-                size="sm" variant="success">
+            @filtered="onFiltered($event, paginations.fee)"
+          >
+            <template v-slot:cell(action)="row">
+              <b-button @click="addFee(row)" size="sm" variant="success">
                 <v-icon name="plus" />
               </b-button>
-						</template>
+            </template>
             <template v-slot:table-busy>
               <div class="text-center my-2">
-                <v-icon
-                  name="spinner"
-                  spin
-                  class="mr-2" />
+                <v-icon name="spinner" spin class="mr-2" />
                 <strong>Loading...</strong>
               </div>
             </template>
-					</b-table>
+          </b-table>
           <b-row>
-            <b-col md=6>
-              Showing {{paginations.fee.from}} to {{paginations.fee.to}} of {{paginations.fee.totalRows}} records.
+            <b-col md="6">
+              Showing {{ paginations.fee.from }} to {{ paginations.fee.to }} of
+              {{ paginations.fee.totalRows }} records.
             </b-col>
-            <b-col md=6>
+            <b-col md="6">
               <b-pagination
                 v-model="paginations.fee.page"
                 :total-rows="paginations.fee.totalRows"
@@ -444,71 +586,96 @@
               />
             </b-col>
           </b-row>
-				</b-col>
-			</b-row> <!-- modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button
+        </b-col>
+      </b-row>
+      <!-- modal body -->
+      <div slot="modal-footer" class="w-100">
+        <!-- modal footer buttons -->
+        <b-button
           class="float-right"
           variant="outline-danger"
-          @click="showModalFees=false">
+          @click="showModalFees = false"
+        >
           Close
         </b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
+      </div>
+      <!-- modal footer buttons -->
+    </b-modal>
     <!-- Modal Approval -->
-		<b-modal
-			v-model="showModalApproval"
-			centered
-			header-bg-variant="success"
-			header-text-variant="light"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					Finalize Approval
-			</div> <!-- modal title -->
-			<b-row> <!-- modal body -->
-				<b-col md=12>
-					<label>Notes</label>
-					<b-textarea
-            v-model="approvalNotes"
-						rows=7 />
-				</b-col>
-			</b-row> <!-- modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button
-          class="float-left"
-          @click="showModalApproval=false">
+    <b-modal
+      v-model="showModalApproval"
+      centered
+      header-bg-variant="success"
+      header-text-variant="light"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+    >
+      <div slot="modal-title">
+        <!-- modal title -->
+        Finalize Approval
+      </div>
+      <!-- modal title -->
+      <b-row>
+        <!-- modal body -->
+        <b-col md="12">
+          <label>Notes</label>
+          <b-textarea v-model="approvalNotes" rows="7" />
+        </b-col>
+      </b-row>
+      <!-- modal body -->
+      <div slot="modal-footer" class="w-100">
+        <!-- modal footer buttons -->
+        <b-button class="float-left" @click="showModalApproval = false">
           Cancel
         </b-button>
-				<b-button
+        <b-button
           @click="approveFees()"
           class="float-right"
-          variant="outline-primary">
-          <v-icon
-            v-if="isProcessing"
-            name="sync"
-            class="mr-2"
-            spin
-          />
-					Confirm
-				</b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
-		<!-- Modal Approval -->
-	</div> <!-- main container -->
+          variant="outline-primary"
+        >
+          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
+          Confirm
+        </b-button>
+      </div>
+      <!-- modal footer buttons -->
+    </b-modal>
+    <!-- Modal Approval -->
+    <FileViewer
+      :show="fileViewer.show"
+      :file="file"
+      :owner="file.owner"
+      :isBusy="file.isLoading"
+      @close="fileViewer.show = false"
+    />
+  </div>
+  <!-- main container -->
 </template>
 <script>
-import { StudentApi, CourseApi, AcademicRecordApi, RateSheetApi, SchoolFeeApi } from "../../mixins/api"
-import { SchoolCategories, AcademicRecordStatuses, ApplicationStatuses, StudentFeeStatuses, Fees, UserGroups, BillingTypes, BillingStatuses, StudentFeePermissions } from "../../helpers/enum"
-import { showNotification, formatNumber } from "../../helpers/forms"
-import SchoolCategoryTabs from "../components/SchoolCategoryTabs"
-import Tables from "../../helpers/tables"
-import Access from '../../mixins/utils/Access'
-import Card from '../components/Card'
 import {
-  StudentColumn,
-  EducationColumn
-} from '../components/ColumnDetails'
+  StudentApi,
+  CourseApi,
+  AcademicRecordApi,
+  RateSheetApi,
+  SchoolFeeApi,
+  ReportApi,
+} from '../../mixins/api';
+import {
+  SchoolCategories,
+  AcademicRecordStatuses,
+  ApplicationStatuses,
+  StudentFeeStatuses,
+  Fees,
+  UserGroups,
+  BillingTypes,
+  BillingStatuses,
+  StudentFeePermissions,
+} from '../../helpers/enum';
+import { showNotification, formatNumber } from '../../helpers/forms';
+import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
+import Tables from '../../helpers/tables';
+import Access from '../../mixins/utils/Access';
+import Card from '../components/Card';
+import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 
 import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
@@ -517,18 +684,20 @@ import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
+import FileViewer from '../components/FileViewer';
 import { format } from 'date-fns';
 
 export default {
-	name: "StudentFee",
+  name: 'StudentFee',
   mixins: [
     StudentApi,
     CourseApi,
     AcademicRecordApi,
     RateSheetApi,
     SchoolFeeApi,
+    ReportApi,
     Tables,
-    Access
+    Access,
   ],
   format,
   components: {
@@ -543,234 +712,245 @@ export default {
     ActiveViewItem,
     ActiveViewLinks,
     AvatarMaker,
+    FileViewer,
   },
   StudentFeePermissions,
-	data() {
-		return {
+  data() {
+    return {
+      fileViewer: {
+        show: false,
+      },
+      file: {
+        type: null,
+        src: null,
+        name: null,
+        notes: null,
+        isLoading: false,
+      },
       showModalFees: false,
       showModalApproval: false,
       approvalNotes: null,
       applicationStatuses: ApplicationStatuses,
       fees: Fees,
       isProcessing: false,
-			tables: {
-				students: {
-					isBusy: false,
-					fields: [
-						{
-							key: "name",
-							label: "Name",
-							tdClass: "align-middle",
-							thStyle: { width: "auto"},
-            },
-						{
-							key: "education",
-							label: "Education",
-							tdClass: "align-middle",
-							thStyle: { width: "auto"}
+      tables: {
+        students: {
+          isBusy: false,
+          fields: [
+            {
+              key: 'name',
+              label: 'Name',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
             },
             {
-							key: "status",
-							label: "Status",
-              tdClass: "align-middle text-center",
-              thClass: "text-center",
-							thStyle: { width: "12%"}
-						},
-						{
-							key: "action",
-							label: "",
-							tdClass: "align-middle",
-							thStyle: { width: "40px"}
-						},
-					],
-					items: []
-				},
-				subjects: {
-					isBusy: false,
-					fields: [
-						{
-							key: "name",
-							label: "Subject Code",
-							tdClass: "align-middle",
-							thStyle: {width: "15%"}
-						},
-						{
-							key: "description",
-							label: "DESCRIPTION",
-							tdClass: "align-middle",
-							thStyle: {width: "auto"}
-						},
-						{
-							key: "units",
-							label: "LEC UNITS",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "8%"}
+              key: 'education',
+              label: 'Education',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
             },
             {
-							key: "amountPerUnit",
-							label: "AMOUNT PER LEC UNIT",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-              thStyle: {width: "13%"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
-						},
-						{
-							key: "labs",
-							label: "LAB UNITS",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "8%"}
+              key: 'status',
+              label: 'Status',
+              tdClass: 'align-middle text-center',
+              thClass: 'text-center',
+              thStyle: { width: '12%' },
             },
             {
-							key: "amountPerLab",
-							label: "AMOUNT PER LAB",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-              thStyle: {width: "13%"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
+              key: 'action',
+              label: '',
+              tdClass: 'align-middle',
+              thStyle: { width: '40px' },
             },
-            {
-							key: "totalAmount",
-							label: "TOTAL AMOUNT",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-              thStyle: {width: "15%"},
-              formatter: (value) => {
-                return formatNumber(value)
-              }
-            }
           ],
-					items: []
+          items: [],
         },
-				studentFees: {
-					isBusy: false,
-					fields: [
-						{
-							key: "name",
-							label: "NAME",
-							tdClass: "align-middle",
-							thStyle: { width: "25%"}
+        subjects: {
+          isBusy: false,
+          fields: [
+            {
+              key: 'name',
+              label: 'Subject Code',
+              tdClass: 'align-middle',
+              thStyle: { width: '15%' },
             },
             {
-							key: "schoolFeeCategory.name",
-							label: "CATEGORY",
-							tdClass: "align-middle",
-							thStyle: {width: "auto"}
-						},
-						{
-							key: "pivot.notes",
-							label: "NOTES",
-							tdClass: "align-middle",
-							thStyle: { width: "25%"}
+              key: 'description',
+              label: 'DESCRIPTION',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
             },
             {
-							key: "pivot.isInitialFee",
-							label: "INITIAL FEE",
-							tdClass: "align-middle text-center",
-							thClass: "text-center",
-							thStyle: {width: "10%"}
-            },
-						{
-							key: "pivot.amount",
-							label: "AMOUNT",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: { width: "20%"}
+              key: 'units',
+              label: 'LEC UNITS',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '8%' },
             },
             {
-							key: "action",
-							label: "",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "5px"}
-						}
-					],
-					items: []
+              key: 'amountPerUnit',
+              label: 'AMOUNT PER LEC UNIT',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '13%' },
+              formatter: (value) => {
+                return formatNumber(value);
+              },
+            },
+            {
+              key: 'labs',
+              label: 'LAB UNITS',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '8%' },
+            },
+            {
+              key: 'amountPerLab',
+              label: 'AMOUNT PER LAB',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '13%' },
+              formatter: (value) => {
+                return formatNumber(value);
+              },
+            },
+            {
+              key: 'totalAmount',
+              label: 'TOTAL AMOUNT',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '15%' },
+              formatter: (value) => {
+                return formatNumber(value);
+              },
+            },
+          ],
+          items: [],
+        },
+        studentFees: {
+          isBusy: false,
+          fields: [
+            {
+              key: 'name',
+              label: 'NAME',
+              tdClass: 'align-middle',
+              thStyle: { width: '25%' },
+            },
+            {
+              key: 'schoolFeeCategory.name',
+              label: 'CATEGORY',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
+            },
+            {
+              key: 'pivot.notes',
+              label: 'NOTES',
+              tdClass: 'align-middle',
+              thStyle: { width: '25%' },
+            },
+            {
+              key: 'pivot.isInitialFee',
+              label: 'INITIAL FEE',
+              tdClass: 'align-middle text-center',
+              thClass: 'text-center',
+              thStyle: { width: '10%' },
+            },
+            {
+              key: 'pivot.amount',
+              label: 'AMOUNT',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '20%' },
+            },
+            {
+              key: 'action',
+              label: '',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '5px' },
+            },
+          ],
+          items: [],
         },
         fees: {
           fields: [
             {
-							key: "name",
-							label: "NAME",
-							tdClass: "align-middle",
-							thStyle: {width: "30%"}
-						},
-						{
-							key: "description",
-							label: "Description",
-							tdClass: "align-middle",
-							thStyle: {width: "40%"}
+              key: 'name',
+              label: 'NAME',
+              tdClass: 'align-middle',
+              thStyle: { width: '30%' },
             },
             {
-							key: "schoolFeeCategory.name",
-							label: "Category",
-							tdClass: "align-middle",
-							thStyle: {width: "auto"}
-						},
-						{
-							key: "action",
-							label: "",
-							tdClass: "align-middle text-right",
-							thClass: "text-right",
-							thStyle: {width: "150px"}
-						}
+              key: 'description',
+              label: 'Description',
+              tdClass: 'align-middle',
+              thStyle: { width: '40%' },
+            },
+            {
+              key: 'schoolFeeCategory.name',
+              label: 'Category',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
+            },
+            {
+              key: 'action',
+              label: '',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right',
+              thStyle: { width: '150px' },
+            },
           ],
-          items: []
-        }
-			},
-			paginations: {
-				student: {
+          items: [],
+        },
+      },
+      paginations: {
+        student: {
           from: 0,
-					to: 0,
-					totalRows: 0,
-					page: 1,
-					perPage: 10,
+          to: 0,
+          totalRows: 0,
+          page: 1,
+          perPage: 10,
         },
         fee: {
-					from: 0,
-					to: 0,
-					totalRows: 0,
-					page: 1,
-					perPage: 10,
-				}
-			},
-			filters: {
-				student: {
-					criteria: null,
-					schoolCategoryId: null,
-					courseId: null,
-					applicationStatusId: null
+          from: 0,
+          to: 0,
+          totalRows: 0,
+          page: 1,
+          perPage: 10,
+        },
+      },
+      filters: {
+        student: {
+          criteria: null,
+          schoolCategoryId: null,
+          courseId: null,
+          applicationStatusId: null,
         },
         fee: {
-          criteria: null
-        }
-			},
-			options: {
-				courses: {
-					items: []
-				},
-				schoolCategories: SchoolCategories
+          criteria: null,
+        },
+      },
+      options: {
+        courses: {
+          items: [],
+        },
+        schoolCategories: SchoolCategories,
       },
       schoolCategoryId: null,
       studentFees: [],
-      row: []
-		}
-	},
-	created(){
-		// this.checkRights()
-    this.loadCourseList()
-    this.loadFees()
-	},
-	methods: {
+      row: [],
+    };
+  },
+  created() {
+    // this.checkRights()
+    this.loadCourseList();
+    this.loadFees();
+  },
+  methods: {
     setApproveFees(row) {
-      this.approvalNotes = null
-      this.row = row
-      this.showModalApproval = true
+      this.approvalNotes = null;
+      this.row = row;
+      this.showModalApproval = true;
     },
     approveFees() {
       const {
@@ -782,35 +962,37 @@ export default {
           enrollmentFee,
           previousBalance,
           student,
-          isComputedByUnits
-        }
-      } = this.row
+          isComputedByUnits,
+        },
+      } = this.row;
 
       const applicationAdmission = [
-        { application: {
-            applicationStatusId: ApplicationStatuses.APPROVED.id
-          }
+        {
+          application: {
+            applicationStatusId: ApplicationStatuses.APPROVED.id,
+          },
         },
-        { admission: {
-            applicationStatusId: ApplicationStatuses.APPROVED.id
-          }
-        }
-      ]
+        {
+          admission: {
+            applicationStatusId: ApplicationStatuses.APPROVED.id,
+          },
+        },
+      ];
 
-      const index = applicationId ? 0 : 1
+      const index = applicationId ? 0 : 1;
 
-      let fees = []
-      let totalAmount = 0
+      let fees = [];
+      let totalAmount = 0;
 
-      item.fees.forEach(fee => {
-				fees.push({
+      item.fees.forEach((fee) => {
+        fees.push({
           schoolFeeId: fee.id,
           amount: fee.pivot.amount,
           notes: fee.pivot.notes,
-          isInitialFee: fee.pivot.isInitialFee
-        })
-        totalAmount += Number(fee.pivot.amount)
-      })
+          isInitialFee: fee.pivot.isInitialFee,
+        });
+        totalAmount += Number(fee.pivot.amount);
+      });
 
       const data = {
         ...applicationAdmission[index],
@@ -819,7 +1001,7 @@ export default {
           totalAmount,
           isComputedByUnits,
           enrollmentFee: enrollmentFee,
-          approvalNotes: this.approvalNotes
+          approvalNotes: this.approvalNotes,
         },
         id: academicRecordId,
         fees,
@@ -831,252 +1013,298 @@ export default {
           billingStatusId: BillingStatuses.UNPAID.id,
           schoolYearId: item.schoolYearId,
           semesterId: item.semesterId,
-          previousBalance
+          previousBalance,
         },
         billingItem: {
           item: 'Registration Fee',
-          amount: enrollmentFee
-        }
-      }
+          amount: enrollmentFee,
+        },
+      };
 
       this.isProcessing = true;
-      this.updateAcademicRecord(data, academicRecordId).then(({ data }) => {
-        const form = applicationId ? 'application' : 'admission'
-        item[form].applicationStatusId = ApplicationStatuses.APPROVED.id
-        this.isProcessing = false
-        this.loadAcademicRecord();
-        this.showModalApproval = false
-        showNotification(this, "success", "Approved Successfully.")
-      }).catch((error) => {
-        console.log(error)
-        this.isProcessing = false;
-      });
+      this.updateAcademicRecord(data, academicRecordId)
+        .then(({ data }) => {
+          const form = applicationId ? 'application' : 'admission';
+          item[form].applicationStatusId = ApplicationStatuses.APPROVED.id;
+          this.isProcessing = false;
+          this.loadAcademicRecord();
+          this.showModalApproval = false;
+          showNotification(this, 'success', 'Approved Successfully.');
+        })
+        .catch((error) => {
+          console.log(error);
+          this.isProcessing = false;
+        });
     },
-		loadAcademicRecord(){
-      const { students } = this.tables
-      const { student, student: { perPage, page } } = this.paginations
-      students.isBusy = true
-      const { applicationStatusId, schoolCategoryId, courseId, criteria } = this.filters.student
-      const orderBy = 'updated_at'
-      const sort = 'DESC'
-			const notAcademicRecordStatusId = AcademicRecordStatuses.DRAFT.id
-			let params = {
-				paginate: true,
-				perPage, page,
-				notAcademicRecordStatusId,
-				schoolCategoryId,
-				courseId,
+    loadAcademicRecord() {
+      const { students } = this.tables;
+      const {
+        student,
+        student: { perPage, page },
+      } = this.paginations;
+      students.isBusy = true;
+      const {
+        applicationStatusId,
+        schoolCategoryId,
+        courseId,
+        criteria,
+      } = this.filters.student;
+      const orderBy = 'updated_at';
+      const sort = 'DESC';
+      const notAcademicRecordStatusId = AcademicRecordStatuses.DRAFT.id;
+      let params = {
+        paginate: true,
+        perPage,
+        page,
+        notAcademicRecordStatusId,
+        schoolCategoryId,
+        courseId,
         applicationStatusId,
         orderBy,
         sort,
-        criteria }
-			this.getAcademicRecordList(params)
-				.then(response => {
-					const res = response.data
-					students.items = res.data;
-					student.from = res.meta.from
-					student.to = res.meta.to
-					student.totalRows = res.meta.total
-					students.isBusy = false
-				})
-		},
-		loadCourseList(){
-			let params = { paginate: false }
-			this.getCourseList(params)
-			.then(response => {
-				const res = response.data
-				this.options.courses.items = res
-			})
-		},
-		loadDetails(row){
-			if (!row.detailsShowing) {
-				const {
-					id: academicRecordId,
-					levelId,
-					courseId,
+        criteria,
+      };
+      this.getAcademicRecordList(params).then((response) => {
+        const res = response.data;
+        students.items = res.data;
+        student.from = res.meta.from;
+        student.to = res.meta.to;
+        student.totalRows = res.meta.total;
+        students.isBusy = false;
+      });
+    },
+    loadCourseList() {
+      let params = { paginate: false };
+      this.getCourseList(params).then((response) => {
+        const res = response.data;
+        this.options.courses.items = res;
+      });
+    },
+    loadDetails(row) {
+      if (!row.detailsShowing) {
+        const {
+          id: academicRecordId,
+          levelId,
+          courseId,
           semesterId,
           schoolCategoryId,
           application,
-          admission
-				} = row.item
+          admission,
+        } = row.item;
 
-				const params = { paginate: false }
-				this.$set(row.item, 'isLoading', true)
-				this.getSubjectsOfAcademicRecord(academicRecordId, params)
-					.then(({ data }) => {
-            this.$set(row.item, 'subjects', data)
-            let applicationStatusId = null
+        const params = { paginate: false };
+        this.$set(row.item, 'isLoading', true);
+        this.getSubjectsOfAcademicRecord(academicRecordId, params).then(
+          ({ data }) => {
+            this.$set(row.item, 'subjects', data);
+            let applicationStatusId = null;
             if (application) {
-              applicationStatusId = application.applicationStatusId
+              applicationStatusId = application.applicationStatusId;
             } else {
-              applicationStatusId = admission.applicationStatusId
+              applicationStatusId = admission.applicationStatusId;
             }
             if (applicationStatusId === ApplicationStatuses.SUBMITTED.id) {
-              const rateSheetParams = { levelId, courseId, semesterId  }
-              this.getRateSheetList(rateSheetParams)
-                .then(({ data }) => {
-                  const res = data.data
-                  this.$set(row.item, 'enrollmentFee', res[0] ? res[0].enrollmentFee : 0)
-                  this.$set(row.item, 'previousBalance', 0)
-                  this.$set(row.item, 'isComputedByUnits', res[0] ? res[0].isComputedByUnits : 0)
-                  this.$set(row.item, 'fees', res[0] ? res[0].fees : [])
-                  if (res.length > 0) {
-                    if (res[0].isComputedByUnits) {
-                      const tuitionFee = row.item.fees.find(fee => fee.id === Fees.TUITION_FEE.id)
-                      let amount = 0
-                      let notes = ""
-                      row.item.subjects.forEach(subject => {
-                        amount += Number(subject.totalAmount)
-                        notes += subject.name + ", "
-                      })
+              const rateSheetParams = { levelId, courseId, semesterId };
+              this.getRateSheetList(rateSheetParams).then(({ data }) => {
+                const res = data.data;
+                this.$set(
+                  row.item,
+                  'enrollmentFee',
+                  res[0] ? res[0].enrollmentFee : 0
+                );
+                this.$set(row.item, 'previousBalance', 0);
+                this.$set(
+                  row.item,
+                  'isComputedByUnits',
+                  res[0] ? res[0].isComputedByUnits : 0
+                );
+                this.$set(row.item, 'fees', res[0] ? res[0].fees : []);
+                if (res.length > 0) {
+                  if (res[0].isComputedByUnits) {
+                    const tuitionFee = row.item.fees.find(
+                      (fee) => fee.id === Fees.TUITION_FEE.id
+                    );
+                    let amount = 0;
+                    let notes = '';
+                    row.item.subjects.forEach((subject) => {
+                      amount += Number(subject.totalAmount);
+                      notes += subject.name + ', ';
+                    });
 
-                      if(tuitionFee) {
-                        tuitionFee.pivot.amount = amount
-                        tuitionFee.pivot.notes = notes.replace(/,\s*$/, "");
-                      } else {
-                        row.item.fees.unshift({
-                          id: Fees.TUITION_FEE.id,
-                          name : Fees.TUITION_FEE.name,
-                          pivot:{ amount: amount, notes: notes }
-                        })
-                      }
+                    if (tuitionFee) {
+                      tuitionFee.pivot.amount = amount;
+                      tuitionFee.pivot.notes = notes.replace(/,\s*$/, '');
+                    } else {
+                      row.item.fees.unshift({
+                        id: Fees.TUITION_FEE.id,
+                        name: Fees.TUITION_FEE.name,
+                        pivot: { amount: amount, notes: notes },
+                      });
                     }
-                  } else {
-                    this.$set(row.item, 'msg', 'No rate sheet fee is set.')
                   }
-                  row.item.isLoading = false
-                })
+                } else {
+                  this.$set(row.item, 'msg', 'No rate sheet fee is set.');
+                }
+                row.item.isLoading = false;
+              });
             } else {
-              this.getStudentFeeOfAcademicRecord(academicRecordId)
-                .then(({ data }) => {
-                  this.$set(row.item, 'enrollmentFee', data.enrollmentFee)
-                  this.$set(row.item, 'previousBalance', data.billings[0].previousBalance )
-                  this.$set(row.item, 'fees', data.studentFeeItems)
-                  this.$set(row.item, 'isComputedByUnits', data.isComputedByUnits)
-                  row.item.isLoading = false
-                })
+              this.getStudentFeeOfAcademicRecord(academicRecordId).then(
+                ({ data }) => {
+                  this.$set(row.item, 'enrollmentFee', data.enrollmentFee);
+                  this.$set(
+                    row.item,
+                    'previousBalance',
+                    data.billings[0].previousBalance
+                  );
+                  this.$set(row.item, 'fees', data.studentFeeItems);
+                  this.$set(
+                    row.item,
+                    'isComputedByUnits',
+                    data.isComputedByUnits
+                  );
+                  row.item.isLoading = false;
+                }
+              );
             }
-				})
-			}
-			row.toggleDetails()
-		},
-    getName(item, child){
+          }
+        );
+      }
+      row.toggleDetails();
+    },
+    getName(item, child) {
       if (item) {
-        let value = item[child]
+        let value = item[child];
         if (value) {
-          return value['name']
+          return value['name'];
         }
       }
-      return ''
+      return '';
     },
     onAddFees(fees) {
-      this.studentFees = fees
-      this.showModalFees = true
+      this.studentFees = fees;
+      this.showModalFees = true;
     },
-		addFee(row) {
-      const { item } = row
+    addFee(row) {
+      const { item } = row;
       // check if rate sheet exist in the table
-      const result = this.studentFees.find(fee => fee.id === item.id)
+      const result = this.studentFees.find((fee) => fee.id === item.id);
       // let result2
       // if ([Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(item.id)) {
       //   result2 = this.studentFees.find(fee => [Fees.TUITION_FEE_PER_UNIT.id, Fees.TUITION_FEE.id].includes(fee.id))
       // }
 
       if (result) {
-        showNotification(this, 'danger', item.name + ' is already added.')
-        return
+        showNotification(this, 'danger', item.name + ' is already added.');
+        return;
       }
       this.studentFees.push({
         id: row.item.id,
-        name : row.item.name,
+        name: row.item.name,
         isIntegrated: row.item.isIntegrated,
         schoolFeeCategory: { name: row.item.schoolFeeCategory.name },
         description: row.item.description,
-        pivot:{ schoolFeeId: row.item.id, amount: 0.00, notes: "" }
-      })
+        pivot: { schoolFeeId: row.item.id, amount: 0.0, notes: '' },
+      });
     },
-		removeFee(fees, row){
-			fees.splice(row.index, 1);
+    removeFee(fees, row) {
+      fees.splice(row.index, 1);
     },
-    loadFees(){
-      const { fees } = this.tables
-      const { fee } = this.paginations
-      const params = { paginate: false }
-      fees.isBusy = true
-      this.getSchoolFeeList(params)
-        .then(({ data }) => {
-          fees.items = data
-          fee.totalRows = data.length
-          this.recordDetails(fee)
-          fees.isBusy = false
-      })
+    loadFees() {
+      const { fees } = this.tables;
+      const { fee } = this.paginations;
+      const params = { paginate: false };
+      fees.isBusy = true;
+      this.getSchoolFeeList(params).then(({ data }) => {
+        fees.items = data;
+        fee.totalRows = data.length;
+        this.recordDetails(fee);
+        fees.isBusy = false;
+      });
     },
-    checkRights(){
-			const userGroupId = localStorage.getItem('userGroupId')
-			const userGroup = UserGroups.getEnum(Number(userGroupId))
-			let result = false
-			if (userGroup) {
-				this.filters.student.schoolCategoryId = userGroup.schoolCategoryId
-				this.schoolCategoryId = userGroup.schoolCategoryId
-			}
-			this.loadAcademicRecord()
-    },
-    avatar(student){
-      let src = ''
-      if (student.photo) {
-        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName
+    checkRights() {
+      const userGroupId = localStorage.getItem('userGroupId');
+      const userGroup = UserGroups.getEnum(Number(userGroupId));
+      let result = false;
+      if (userGroup) {
+        this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
+        this.schoolCategoryId = userGroup.schoolCategoryId;
       }
-      return src
+      this.loadAcademicRecord();
+    },
+    avatar(student) {
+      let src = '';
+      if (student.photo) {
+        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
+      }
+      return src;
     },
     getEllipsisCaption(applicationStatusId) {
-      if(applicationStatusId === ApplicationStatuses.APPROVED_ASSESSMENT.id) {
-        return 'Review Record'
+      if (applicationStatusId === ApplicationStatuses.APPROVED_ASSESSMENT.id) {
+        return 'Review Record';
       }
 
-      return 'View Details'
-    }
+      return 'View Details';
+    },
+    loadAssessmentForm(academicRecordId) {
+      this.file.type = null;
+      this.file.src = null;
+      this.fileViewer.show = true;
+      this.file.isLoading = true;
+      this.file.name = 'Assessment Form';
+      this.previewAssessmentForm(academicRecordId).then(({ data, headers }) => {
+        this.file.type = headers.contentType;
+        const file = new Blob([data], { type: 'application/pdf' });
+        const reader = new FileReader();
+        reader.onload = (e) => (this.file.src = e.target.result);
+        reader.readAsDataURL(file);
+        this.file.isLoading = false;
+      });
+    },
   },
   computed: {
     subjectsTotalAmount() {
-      return subjects => {
-        let amount = 0
-        subjects.forEach(s => {
-          amount += Number(s.totalAmount)
-        })
-        return formatNumber(amount)
-      }
+      return (subjects) => {
+        let amount = 0;
+        subjects.forEach((s) => {
+          amount += Number(s.totalAmount);
+        });
+        return formatNumber(amount);
+      };
     },
     feesTotalAmount() {
-      return fees => {
-        let amount = 0
-        fees.forEach(fee => {
-          amount += Number(fee.pivot.amount)
-        })
-        return formatNumber(amount)
-      }
+      return (fees) => {
+        let amount = 0;
+        fees.forEach((fee) => {
+          amount += Number(fee.pivot.amount);
+        });
+        return formatNumber(amount);
+      };
     },
     initialFeeTotal: {
-      get: function () {
-        return data => {
-          let total = 0
-          const { item, item: { fees } } = data
-          fees.forEach(fee => {
+      get: function() {
+        return (data) => {
+          let total = 0;
+          const {
+            item,
+            item: { fees },
+          } = data;
+          fees.forEach((fee) => {
             if (fee.pivot.isInitialFee) {
-              total += Number(fee.pivot.amount)
+              total += Number(fee.pivot.amount);
             }
-          })
-        item.enrollmentFee = total
-        return total
-        }
+          });
+          item.enrollmentFee = total;
+          return total;
+        };
       },
-      set: function (newValue) {
-        return data => {
-          const { item } = data
-          item.enrollmentFee = newValue
-          return newValue
-        }
-      }
+      set: function(newValue) {
+        return (data) => {
+          const { item } = data;
+          item.enrollmentFee = newValue;
+          return newValue;
+        };
+      },
     },
-  }
-}
+  },
+};
 </script>

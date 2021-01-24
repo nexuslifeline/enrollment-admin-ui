@@ -4,15 +4,21 @@
       <h4 class="c-card__header-title">
         {{ title }}
       </h4>
-      <b-button
-        class="c-card__refresh-button"
+      <b-dropdown
         v-if="showRefresh"
-        variant="primary"
-        @click="$emit('onRefresh')"
+        right
+        variant="link"
+        toggle-class="text-decoration-none"
+        no-caret
       >
-        <v-icon name="sync" />
-        Refresh</b-button
-      >
+        <template v-slot:button-content>
+          <v-icon name="ellipsis-v" />
+        </template>
+        <b-dropdown-item @click="$emit('onRefresh')">
+          <v-icon name="sync" />
+          Refresh
+        </b-dropdown-item>
+      </b-dropdown>
     </div>
     <div class="c-card__body">
       <slot></slot>

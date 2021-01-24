@@ -1,6 +1,10 @@
 <template>
   <div class="c-page-content">
-    <Card title="Subject Enlistment" :showRefresh="true" @onRefresh="loadAcademicRecord()">
+    <Card
+      title="Subject Enlistment"
+      :showRefresh="true"
+      @onRefresh="loadAcademicRecord()"
+    >
       <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="
@@ -126,10 +130,19 @@
             </b-badge>
           </template>
           <template v-slot:cell(action)="row">
-            <v-icon
-              :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
-              @click="loadDetails(row)"
-            />
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+            >
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <b-dropdown-item @click.prevent="loadDetails(row)">
+                View Details
+              </b-dropdown-item>
+            </b-dropdown>
           </template>
           <template v-slot:row-details="data">
             <ActiveRowViewer
@@ -138,23 +151,24 @@
               @onBack="data.toggleDetails()"
               :showOptions="
                 data.item.academicRecordStatusId ===
-                      AcademicRecordStatuses.DRAFT.id"
+                  AcademicRecordStatuses.DRAFT.id
+              "
               :options="[
-                  {
-                    label: 'Approve',
-                    callback: () => setApproval(data),
-                    isAllowed: isAccessible(
-                      $options.StudentSubjectPermissions.APPROVAL.id
-                    ),
-                  },
-                  {
-                    label: 'Reject',
-                    callback: () => setDisapproval(data),
-                    isAllowed: isAccessible(
-                      $options.StudentSubjectPermissions.DISAPPROVAL.id
-                    ),
-                  },
-                ]"
+                {
+                  label: 'Approve',
+                  callback: () => setApproval(data),
+                  isAllowed: isAccessible(
+                    $options.StudentSubjectPermissions.APPROVAL.id
+                  ),
+                },
+                {
+                  label: 'Reject',
+                  callback: () => setDisapproval(data),
+                  isAllowed: isAccessible(
+                    $options.StudentSubjectPermissions.DISAPPROVAL.id
+                  ),
+                },
+              ]"
             >
               <template v-slot:header>
                 <div class="active-view__header-details-container">
@@ -334,7 +348,7 @@
                     </template>
                     <template v-slot:custom-foot>
                       <b-tr class="font-weight-bold">
-                        <b-td colspan="2" class="text-right">
+                        <b-td class="text-right">
                           <span class="text-danger">Total Units </span>
                         </b-td>
                         <b-td class="text-center">
@@ -454,7 +468,7 @@
                     </template>
                     <template v-slot:custom-foot>
                       <b-tr class="font-weight-bold">
-                        <b-td colspan="2" class="text-right">
+                        <b-td class="text-right">
                           <span class="text-danger">Total Units </span>
                         </b-td>
                         <b-td class="text-center">

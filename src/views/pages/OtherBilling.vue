@@ -348,7 +348,7 @@
                 spin
                 class="mr-2"
               />
-              Save
+              Generate
             </b-button>
           </b-col>
         </b-row>
@@ -546,7 +546,7 @@
               spin
               class="mr-2"
             />
-            Save
+            Generate
           </b-button>
         </b-col>
       </b-row>

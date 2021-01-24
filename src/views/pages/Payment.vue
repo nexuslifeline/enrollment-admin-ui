@@ -78,7 +78,7 @@
             <b-badge
               :variant="
                 data.item.paymentStatusId === paymentStatuses.APPROVED.id
-                  ? 'primary'
+                  ? 'success'
                   : data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
                   ? 'warning'
                   : 'danger'
@@ -477,7 +477,16 @@
       <b-row class="mt-3">
         <b-col md=6 >
           <b-form-group>
-            <label class="required">Reference No <v-icon name="info-circle" class="icon-tooltip" v-b-tooltip.hover="{ variant: 'info', title: 'Reference No'}"/></label>
+            <label class="required">
+              Reference No
+              <v-icon
+                name="info-circle"
+                class="icon-tooltip"
+                v-b-tooltip.hover="{
+                  variant: 'info',
+                  title: 'OR number of the receipt or any transaction number that can be use for tracking.'}"
+              />
+            </label>
             <b-form-input
               v-model="forms.payment.fields.referenceNo"
               :state="forms.payment.states.referenceNo"/>

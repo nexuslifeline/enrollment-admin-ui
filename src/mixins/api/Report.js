@@ -29,6 +29,11 @@ export default {
         params: params,
         responseType: 'blob'
       });
+    },
+    previewAssessmentForm(academicRecordId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/assessment-form/${academicRecordId}`, {
+        responseType: 'blob'
+      });
     }
   }
 }
