@@ -90,7 +90,7 @@
                   : 'warning'
               "
             >
-              {{ studentCategory.name }}
+              {{ studentCategoryId === studentCategories.TRANSFEREE_OLD.id ? 'TRANSFEREE' : studentCategory.name }}
             </b-badge>
           </template>
           <template v-slot:cell(status)="data">
