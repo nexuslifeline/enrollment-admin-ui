@@ -261,7 +261,6 @@ export default {
   created() {
     this.getAuthenticatedUser().then(({ data }) => {
       const { userable: personnelData, photo } = data;
-      console.log(data);
       const { personnel, user } = this.forms;
       copyValue(personnelData, personnel.fields);
       copyValue(data, user.fields);

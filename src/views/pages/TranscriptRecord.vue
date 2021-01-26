@@ -630,7 +630,7 @@
                             :items="data.item.subjects"
                             :busy="tables.subjects.isBusy"
                           >
-                            <template v-slot:head(pivot.isTaken)>
+                            <!-- <template v-slot:head(pivot.isTaken)>
                               <b-form-checkbox
                                 v-if="
                                   data.item.transcriptRecordStatusId ===
@@ -641,7 +641,6 @@
                                 "
                                 v-model="data.item.isTakenAll"
                               >
-                                <!-- Credited -->
                               </b-form-checkbox>
                             </template>
                             <template v-slot:cell(pivot.isTaken)="row">
@@ -654,7 +653,7 @@
                                 :unchecked-value="0"
                                 v-model="row.item.pivot.isTaken"
                               />
-                            </template>
+                            </template> -->
                             <template v-slot:table-busy>
                               <div class="text-center my-2">
                                 <v-icon name="spinner" spin class="mr-2" />
@@ -665,8 +664,7 @@
                               <vue-autonumeric
                                 :disabled="
                                   data.item.transcriptRecordStatusId !==
-                                    $options.TranscriptRecordStatuses.DRAFT
-                                      .id || !row.item.pivot.isTaken
+                                    $options.TranscriptRecordStatuses.DRAFT.id
                                 "
                                 v-model="row.item.pivot.grade"
                                 class="form-control text-right"
@@ -684,8 +682,7 @@
                               <b-form-input
                                 :disabled="
                                   data.item.transcriptRecordStatusId !==
-                                    $options.TranscriptRecordStatuses.DRAFT
-                                      .id || !row.item.pivot.isTaken
+                                    $options.TranscriptRecordStatuses.DRAFT.id
                                 "
                                 v-model="row.item.pivot.notes"
                               >
@@ -853,8 +850,7 @@
                                                 .transcriptRecordStatusId !==
                                                 $options
                                                   .TranscriptRecordStatuses
-                                                  .DRAFT.id ||
-                                                !row.item.pivot.isTaken
+                                                  .DRAFT.id
                                             "
                                             v-model="row.item.pivot.grade"
                                             class="form-control text-right"
@@ -886,8 +882,7 @@
                                                 .transcriptRecordStatusId !==
                                                 $options
                                                   .TranscriptRecordStatuses
-                                                  .DRAFT.id ||
-                                                !row.item.pivot.isTaken
+                                                  .DRAFT.id
                                             "
                                             v-model="row.item.pivot.notes"
                                           >
@@ -977,7 +972,7 @@
                                             </b-td>
                                           </b-tr>
                                         </template>
-                                        <template v-slot:head(pivot.isTaken)>
+                                        <!-- <template v-slot:head(pivot.isTaken)>
                                           <b-form-checkbox
                                             v-if="
                                               data.item
@@ -1022,7 +1017,7 @@
                                             :unchecked-value="0"
                                             v-model="row.item.pivot.isTaken"
                                           />
-                                        </template>
+                                        </template> -->
                                       </b-table>
                                     </b-col>
                                   </b-row>
@@ -1482,13 +1477,13 @@ export default {
         subjects: {
           isBusy: false,
           fields: [
-            {
-              key: 'pivot.isTaken',
-              label: 'Credited',
-              tdClass: 'align-middle text-center',
-              thClass: 'text-center',
-              thStyle: { width: '120px' },
-            },
+            // {
+            //   key: 'pivot.isTaken',
+            //   label: 'Credited',
+            //   tdClass: 'align-middle text-center',
+            //   thClass: 'text-center',
+            //   thStyle: { width: '120px' },
+            // },
             {
               key: 'pivot.grade',
               label: 'Grade',
@@ -1679,6 +1674,8 @@ export default {
         perPage,
         page,
         transcriptRecordStatusId,
+        notTranscriptRecordStatusId: this.$options.TranscriptRecordStatuses
+          .PENDING.id,
         schoolCategoryId,
         courseId,
         levelId,
@@ -1761,7 +1758,12 @@ export default {
       this.getTranscriptRecord(id).then(({ data }) => {
         const newSubjects = data.subjects.map((obj) => ({
           ...obj,
-          pivot: { ...obj.pivot, isTaken: 0, grade: 0, notes: '' },
+          pivot: {
+            ...obj.pivot,
+            isTaken: obj.pivot.isTaken ?? 0,
+            grade: obj.pivot.grade ?? 0,
+            notes: obj.pivot.notes ?? 0,
+          },
         }));
         this.$set(row.item, 'isTakenAll', false);
         this.$set(row.item, 'subjects', newSubjects);
@@ -1909,7 +1911,6 @@ export default {
       this.file.isLoading = true;
       this.file.name = 'Transcript Of Record';
       this.previewTranscriptRecord(id).then(({ data, headers }) => {
-        console.log(data);
         this.file.type = headers.contentType;
         const file = new Blob([data], { type: 'application/pdf' });
         const reader = new FileReader();
