@@ -181,8 +181,8 @@ export default [
         permissionIds: StudentPermissions.getIds()
       },
       {
-        label: 'Transcript Records',
-        to: '/master-files/transcript-records',
+        label: 'Grade Sheet',
+        to: '/master-files/grade-sheet',
         permissionIds: TranscriptRecordPermissions.getIds()
       },
       {

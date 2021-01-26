@@ -351,8 +351,8 @@ function configRoutes () {
               meta: { requiresAuth: true, userType: 0 }
             },
             {
-              path: 'transcript-records',
-              name: 'Transcript Records',
+              path: 'grade-sheet',
+              name: 'Grade Sheet',
               component: TranscriptRecord,
               meta: { requiresAuth: true }
             },

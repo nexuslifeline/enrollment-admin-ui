@@ -1,6 +1,6 @@
 <template>
   <div class="c-page-content">
-    <Card title="Transcript Records">
+    <Card title="Grade Sheet">
       <div>
         <SchoolCategoryTabs
           :showAll="true"
@@ -246,7 +246,7 @@
                     isAllowed: true,
                   },
                   {
-                    label: 'Update & Finalized',
+                    label: 'Finalized',
                     callback: () => onUpdateTranscriptRecord(data, true),
                     isAllowed: true,
                   },
