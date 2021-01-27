@@ -28,6 +28,7 @@ export { default as BankAccountApi } from './BankAccount';
 export { default as EWalletAccountApi } from './EWalletAccount';
 export { default as PeraPadalaAccountApi } from './PeraPadalaAccount';
 export { default as OrganizationSettingApi } from './OrganizationSetting';
+export { default as GeneralSettingApi } from './GeneralSetting';
 export { default as TermApi } from './Term';
 export { default as RequirementApi } from './Requirement';
 export { default as ReportApi } from './Report';

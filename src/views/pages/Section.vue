@@ -284,7 +284,7 @@
                           </b-form-invalid-feedback>
                         </b-form-group>
                         <b-form-group>
-                          <label class="required">Description</label>
+                          <label>Description</label>
                           <b-form-textarea
                             ref="description"
                             v-model="forms.section.fields.description"
@@ -1075,12 +1075,11 @@ export default {
       if (errorKeys && errorKeys.length > 0) {
         this.entryTabIndex =
           errorKeys.includes('name') ||
-          errorKeys.includes('description') ||
-          errorKeys.includes('school_year_id') ||
-          errorKeys.includes('school_category_id') ||
-          errorKeys.includes('level_id') ||
-          errorKeys.includes('course_id') ||
-          errorKeys.includes('semester_id')
+          errorKeys.includes('schoolYearId') ||
+          errorKeys.includes('schoolCategoryId') ||
+          errorKeys.includes('levelId') ||
+          errorKeys.includes('courseId') ||
+          errorKeys.includes('semesterId')
             ? 0
             : 1;
       }
