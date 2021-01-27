@@ -35,7 +35,7 @@
                 "
               >
                 {{
-                  student.studentCategory ? student.studentCategory.name : ''
+                  student.studentCategory ? student.studentCategoryId === $options.StudentCategories.TRANSFEREE_OLD.id ? 'TRANSFEREE' : student.studentCategory.id : ''
                 }}
               </b-badge>
             </b-col>
