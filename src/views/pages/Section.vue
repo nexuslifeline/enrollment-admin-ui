@@ -622,13 +622,21 @@
           <b-col md="6">
             <b-form-group>
               <label class="required">Start</label>
-              <b-form-input type="time" v-model="forms.schedule.fields.start" />
+              <b-form-input
+                @change="timeValidation('start')"
+                type="time"
+                v-model="forms.schedule.fields.start"
+              />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group>
               <label class="required">End</label>
-              <b-form-input type="time" v-model="forms.schedule.fields.end" />
+              <b-form-input
+                @change="timeValidation('end')"
+                type="time"
+                v-model="forms.schedule.fields.end"
+              />
             </b-form-group>
           </b-col>
         </b-row>
@@ -780,6 +788,7 @@ import ScheduleViewer from '../components/ScheduleViewer';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
+import { differenceInMinutes, addMinutes } from 'date-fns';
 
 export default {
   name: 'ClassSection',
@@ -1066,6 +1075,38 @@ export default {
             this.validateSchedules(section, errors);
             validate(section, errors);
           });
+      }
+    },
+    timeValidation(input) {
+      const { fields } = this.forms.schedule;
+      if (fields.start < '07:00') {
+        fields.start = '07:00';
+      }
+      if (fields.end > '18:30') {
+        fields.end = '18:30';
+      }
+      const startDatetime = new Date();
+      const startTime = fields.start.split(':');
+      startDatetime.setHours(startTime[0], startTime[1], 0);
+      const endDatetime = new Date();
+      const endTime = fields.end.split(':');
+      endDatetime.setHours(endTime[0], endTime[1], 0);
+      if (differenceInMinutes(endDatetime, startDatetime) < 30) {
+        if (input === 'start') {
+          const time = addMinutes(endDatetime, -30);
+          const hour = String(time.getHours());
+          const minute = String(time.getMinutes());
+          fields.start = `${hour.length === 1 ? `0${hour}` : hour}:${
+            minute.length === 1 ? `0${minute}` : minute
+          }`;
+        } else {
+          const time = addMinutes(startDatetime, 30);
+          const hour = String(time.getHours());
+          const minute = String(time.getMinutes());
+          fields.end = `${hour.length === 1 ? `0${hour}` : hour}:${
+            minute.length === 1 ? `0${minute}` : minute
+          }`;
+        }
       }
     },
     validateSchedules(section, errors) {
