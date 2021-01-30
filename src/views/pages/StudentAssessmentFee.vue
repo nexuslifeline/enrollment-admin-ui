@@ -157,7 +157,7 @@
                 v-if="
                   (row.item.application
                     ? row.item.application.applicationStatusId
-                    : row.item.application.applicationStatusId) !==
+                    : row.item.admission.applicationStatusId) !==
                     applicationStatuses.SUBMITTED.id
                 "
                 @click.prevent="loadAssessmentForm(row.item.id)"
@@ -924,7 +924,7 @@ export default {
           criteria: null,
           schoolCategoryId: null,
           courseId: null,
-          applicationStatusId: null,
+          applicationStatusId: ApplicationStatuses.SUBMITTED.id,
         },
         fee: {
           criteria: null,

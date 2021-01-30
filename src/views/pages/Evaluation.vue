@@ -1600,7 +1600,7 @@ export default {
           criteria: null,
           schoolCategoryId: null,
           courseId: null,
-          evaluationStatusId: null,
+          evaluationStatusId: EvaluationStatuses.SUBMITTED.id,
         },
         subject: {
           criteria: null,

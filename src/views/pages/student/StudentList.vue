@@ -1,7 +1,7 @@
 <template>
   <div class="c-page-content">
     <Card title="Student Management">
-      <div>
+      <div class="content">
         <!-- add button and search -->
         <b-row class="mb-3">
           <b-col md="12">
@@ -44,50 +44,9 @@
               :fields="tables.students.fields"
               :busy="tables.students.isBusy"
               :items="tables.students.items"
+              responsive
             >
               <template v-slot:cell(name)="data">
-                <!-- <b-media>
-                  <template v-slot:aside>
-                    <b-avatar
-                      rounded
-                      blank
-                      size="64"
-                      :text="data.item.firstName.charAt(0) + '' + data.item.lastName.charAt(0)"
-                      :src="avatar(data.item)" />
-                  </template>
-                  <span>{{ data.item.name }}</span><br>
-                  <small>Student no.: {{ data.item.studentNo ? data.item.studentNo : 'Awaiting Confirmation' }}</small><br>
-                  <small>Address : {{ data.item.address ? data.item.currentAddress ? data.item.currentAddress :  data.item.address.currentCompleteAddress : '' }}
-                  </small>
-                </b-media> -->
-                <!-- <b-media>
-                  <template v-slot:aside>
-                    <AvatarMaker
-                      :avatarId="data.item.id"
-                      :size="50"
-                      :text="
-                        `${data.item.firstName.charAt(0)}${data.item.lastName.charAt(
-                          0
-                        )}`
-                      "
-                      :src="
-                        $options.getFilePath(
-                          (data.item.photo && data.item.photo.hashName) || ''
-                        )
-                      "
-                    />
-                   </template>
-                  <div class="text-muted">
-                    {{ data.item && data.item.name }}
-                  </div>
-                  <div class="text-muted">
-                    {{
-                      data.item.currentAddress || data.item.address
-                        ? data.item.address.currentCompleteAddress
-                        : ''
-                    }}
-                  </div>
-                </b-media> -->
                 <StudentColumn
                   :data="{ student: data.item }"
                   :callback="{ loadDetails: () => null }"
@@ -618,7 +577,8 @@ export default {
               key: 'name',
               label: 'Name',
               tdClass: 'align-middle',
-              thStyle: { width: '40%' },
+              thClass: 'align-middle',
+              thStyle: { width: 'auto' },
               // formatter: (value, key, item) => {
               // 	if(!item.middleName) {
               // 		item.middleName = ""
@@ -630,24 +590,28 @@ export default {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
-              thStyle: { width: '30%' },
+              thClass: 'align-middle',
+              thStyle: { width: '20%' },
             },
             {
               key: 'contact',
               label: 'Contact Info',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '20%' },
             },
             {
               key: 'requirementPercentage',
               label: 'Requirement %',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '20%' },
             },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '40px' },
             },
           ],
@@ -921,4 +885,5 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 </style>

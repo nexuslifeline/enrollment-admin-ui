@@ -1310,7 +1310,7 @@ export default {
           criteria: null,
           schoolCategoryId: null,
           courseId: null,
-          academicRecordStatusId: null,
+          academicRecordStatusId: AcademicRecordStatuses.DRAFT.id,
         },
         subject: {
           criteria: null,

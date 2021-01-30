@@ -901,7 +901,7 @@ export default {
       filters: {
         payment: {
           criteria: null,
-          paymentStatusId: null,
+          paymentStatusId: PaymentStatuses.SUBMITTED.id,
         },
       },
       isProcessing: false,

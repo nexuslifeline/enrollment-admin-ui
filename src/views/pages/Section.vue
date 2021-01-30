@@ -230,6 +230,14 @@
                   </b-card>
                 </b-overlay>
               </template>
+              <template v-slot:cell(name)="row">
+                <div><span class="link" 
+                  @click="setUpdate(row, 0)"
+                  :disabled="showEntry || isAccessible(
+                        $options.SectionAndSchedulePermissions.EDIT.id
+                      )"
+                  >{{ row.item.name }}</span></div>
+              </template>
             </b-table>
             <b-row>
               <b-col md="6">
@@ -1515,3 +1523,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .link {
+    color: rgb(45, 164, 204);
+    cursor: pointer;
+
+    &:hover {
+      color: lightblue;
+    }
+  }
+</style>

@@ -1196,7 +1196,7 @@ export default {
     display: flex;
     flex-direction: column;
 
-    @include for-size(phone-only, 500px) {
+    @include for-size(phone-only) {
       margin-top: 30px;
     }
   }
@@ -1205,7 +1205,7 @@ export default {
     display: flex;
     height: 100%;
 
-    @include for-size(phone-only, 500px) {
+    @include for-size(phone-only) {
       flex-direction: column;
     }
   }
