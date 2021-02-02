@@ -302,9 +302,9 @@
                         </p>
                       </ActiveViewItem>
                       <ActiveViewItem label="Paid Amount : ">
-                        <p>
+                        <b-badge variant="success">
                           {{ formatNumber(data.item.amount) }}
-                        </p>
+                        </b-badge>
                       </ActiveViewItem>
                       <ActiveViewItem label="Billing No: ">
                         <b-link v-if="data.item.billing.billingTypeId === BillingTypes.SOA.id" @click="previewSoa(data.item.billing)">

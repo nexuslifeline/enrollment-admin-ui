@@ -858,31 +858,35 @@ export default {
               key: 'name',
               label: 'STUDENT',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '20%' },
             },
             {
               key: 'education',
               label: 'EDUCATION',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '20%' },
             },
             {
               key: 'dueDate',
               label: 'DUE DATE',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '130px' },
             },
             {
               key: 'billingNo',
               label: 'BILLING NO.',
               tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: '15%' },
             },
             {
               key: 'previousBalance',
               label: 'PREV BALANCE',
               tdClass: 'align-middle text-right',
-              thClass: 'text-right',
+              thClass: 'text-right align-middle',
               thStyle: { width: 'auto' },
               formatter: (value) => {
                 return formatNumber(value);
@@ -890,19 +894,29 @@ export default {
             },
             {
               key: 'totalAmount',
-              label: 'AMOUNT',
+              label: 'CURRENT DUE',
               tdClass: 'align-middle text-right',
-              thClass: 'text-right',
+              thClass: 'text-right align-middle',
               thStyle: { width: 'auto' },
               formatter: (value) => {
                 return formatNumber(value);
               },
             },
             {
+              key: 'totalAmountDue',
+              label: 'TOTAL AMOUNT DUE',
+              tdClass: 'align-middle text-right',
+              thClass: 'text-right align-middle',
+              thStyle: { width: 'auto' },
+              formatter: (value, key, item) => {
+                return formatNumber(Number(item.previousBalance) + Number(item.totalAmount) );
+              },
+            },
+            {
               key: 'billingStatusId',
               label: 'STATUS',
               tdClass: 'align-middle text-center',
-              thClass: 'text-center',
+              thClass: 'text-center aling-middle',
               thStyle: { width: '10%' },
             },
             {

@@ -737,7 +737,7 @@
             spin
             class="mr-2"
           />
-          Save
+          Add
         </b-button>
       </div>
       <!-- modal footer buttons -->
