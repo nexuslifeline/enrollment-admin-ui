@@ -955,6 +955,7 @@ export default {
       const { id } = this.row;
       const { approvalNotes, referenceNo } = this.forms.payment.fields;
       const data = {
+        id,
         approvalNotes,
         referenceNo,
         paymentStatusId: PaymentStatuses.APPROVED.id,
