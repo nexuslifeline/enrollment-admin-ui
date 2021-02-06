@@ -336,7 +336,7 @@
                           {{
                             data.item.student.currentAddress ||
                             data.item.student.address
-                              ? data.item.student.address.currentCompleteAddress
+                              ? data.item.student.currentAddress
                               : ''
                           }}
                         </p>

@@ -59,7 +59,7 @@
     <CDropdownItem>
       <CIcon name="cil-shield-alt" /> Lock Account
     </CDropdownItem>-->
-    <CDropdownItem @click="logout()">
+    <CDropdownItem @click="logout()" style="width: 100%; height: 100%;">
       <CIcon name="cil-lock-locked" /> Logout
     </CDropdownItem>
   </CDropdown>

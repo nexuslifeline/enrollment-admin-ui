@@ -110,6 +110,26 @@
                         v-model="row.item.pivot.isInitialFee"
                       />
                     </template>
+                    <template v-slot:head(isComputedByUnits)>
+                      COMPUTED BY UNITS
+                      <v-icon
+                        name="info-circle"
+                        class="icon-tooltip"
+                        v-b-tooltip.hover="{
+                          variant: 'info',
+                          title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                      />
+                    </template>
+                     <template v-slot:head(pivot.isInitialFee)>
+                      INITIAL FEE
+                      <v-icon
+                        name="info-circle"
+                        class="icon-tooltip"
+                        v-b-tooltip.hover="{
+                          variant: 'info',
+                          title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                      />
+                    </template>
                     <template v-slot:cell(isComputedByUnits)="row">
                       <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                       <b-form-checkbox

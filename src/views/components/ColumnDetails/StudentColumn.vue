@@ -27,7 +27,7 @@
     <div class="text-muted">
       {{
         data.student.currentAddress || data.student.address
-          ? data.student.address.currentCompleteAddress
+          ? data.student.currentAddress
           : ''
       }}
     </div>

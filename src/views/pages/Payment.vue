@@ -1286,11 +1286,4 @@ export default {
     height: auto;
   }
 
-  .icon-tooltip {
-    height: 14px;
-    width: 14px;
-    color: rgb(68, 185, 224);
-    margin: 0 0 -1px 4px;
-  }
-</style>
 </style>

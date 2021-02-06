@@ -49,6 +49,15 @@
                   <strong>Loading...</strong>
                 </div>
               </template>
+              <template v-slot:cell(name)="row">
+                <div><span class="link"
+                  @click="setUpdate(row)"
+                  :disabled="isAccessible([
+                    $options.SchoolFeePermissions.EDIT.id,
+                    $options.SchoolFeePermissions.DELETE.id
+                  ]) || row.item.id !== fees.TUITION_FEE.id"
+                  >{{ row.item.name }}</span></div>
+              </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
                   v-if="isAccessible([
@@ -405,3 +414,14 @@ export default {
 	}
 }
 </script>
+
+<style lang="scss">
+.link {
+    color: rgb(45, 164, 204);
+    cursor: pointer;
+
+    &:hover {
+      color: lightblue;
+    }
+  }
+</style>

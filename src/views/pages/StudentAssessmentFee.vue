@@ -444,12 +444,22 @@
                   </b-table>
                   <b-row>
                     <b-col md="4">
-                      <b-form-group
+                      <!-- <b-form-group
                         label="INITIAL FEE TOTAL :"
                         label-for="enrollmentFee"
                         label-class="font-weight-bold"
                         label-cols="4"
-                      >
+                      > -->
+                      <div class="footer-info" >
+                        <label>INITIAL FEE TOTAL :
+                          <v-icon
+                            name="info-circle"
+                            class="icon-tooltip"
+                            v-b-tooltip.hover="{
+                              variant: 'info',
+                              title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                          />
+                        </label>
                         <vue-autonumeric
                           disabled
                           class="form-control text-right"
@@ -461,17 +471,28 @@
                               emptyInputBehavior: 0,
                             },
                           ]"
-                        >
-                        </vue-autonumeric>
-                      </b-form-group>
+                        />
+                      </div>
+                      <!-- </b-form-group> -->
                     </b-col>
                     <b-col md="4">
-                      <b-form-group
+
+                      <!-- <b-form-group
                         label="PREVIOUS BALANCE :"
                         label-for="enrollmentFee"
                         label-class="font-weight-bold"
                         label-cols="4"
-                      >
+                      > -->
+                      <div class="footer-info" >
+                        <label>PREVIOUS BALANCE :
+                          <v-icon
+                            name="info-circle"
+                            class="icon-tooltip"
+                            v-b-tooltip.hover="{
+                              variant: 'info',
+                              title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                          />
+                        </label>
                         <vue-autonumeric
                           class="form-control text-right"
                           v-model="data.item.previousBalance"
@@ -482,9 +503,9 @@
                               emptyInputBehavior: 0,
                             },
                           ]"
-                        >
-                        </vue-autonumeric>
-                      </b-form-group>
+                       />
+                      </div>
+                      <!-- </b-form-group> -->
                     </b-col>
                     <b-col md="2">
                       <h5 class="float-right font-weight-bold">Total</h5>
@@ -1314,3 +1335,29 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@import "../../assets/scss/shared.scss";
+  .footer-info {
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    label {
+      min-width: 170px;
+      font-weight: bold;
+    }
+
+
+    @include for-size(desktop-down) {
+      label {
+        min-width: 110px;
+        max-width: 110px;
+      }
+    }
+
+    @include for-size(phone-only) {
+     margin-bottom: 5px;
+    }
+  }
+</style>
