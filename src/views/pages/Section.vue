@@ -97,7 +97,7 @@
                     </b-form-select>
                   </b-col>
                   <b-col md="4">
-                    <b-form-select
+                    <!-- <b-form-select
                       @input="loadSections()"
                       v-model="filters.section.schoolYearId"
                       class="float-right"
@@ -117,7 +117,7 @@
                       >
                         {{ schoolYear.name }}
                       </b-form-select-option>
-                    </b-form-select>
+                    </b-form-select> -->
                   </b-col>
                 </b-row>
               </b-col>
@@ -231,12 +231,19 @@
                 </b-overlay>
               </template>
               <template v-slot:cell(name)="row">
-                <div><span class="link" 
-                  @click="setUpdate(row, 0)"
-                  :disabled="showEntry || isAccessible(
-                        $options.SectionAndSchedulePermissions.EDIT.id
-                      )"
-                  >{{ row.item.name }}</span></div>
+                <div>
+                  <span
+                    class="link"
+                    @click="setUpdate(row, 0)"
+                    :disabled="
+                      showEntry ||
+                        isAccessible(
+                          $options.SectionAndSchedulePermissions.EDIT.id
+                        )
+                    "
+                    >{{ row.item.name }}</span
+                  >
+                </div>
               </template>
             </b-table>
             <b-row>
@@ -965,7 +972,6 @@ export default {
         courseId,
         levelId,
         semesterId,
-        schoolYearId,
         criteria,
       } = this.filters.section;
       let params = {
@@ -976,7 +982,7 @@ export default {
         courseId,
         levelId,
         semesterId,
-        schoolYearId,
+        schoolYearId: this.$store.state.schoolYearId,
         criteria,
       };
       this.getSectionList(params).then(({ data }) => {
@@ -1521,16 +1527,21 @@ export default {
       return true;
     },
   },
+  watch: {
+    '$store.state.schoolYearId': function(newVal) {
+      this.loadSections();
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-  .link {
-    color: rgb(45, 164, 204);
-    cursor: pointer;
+.link {
+  color: rgb(45, 164, 204);
+  cursor: pointer;
 
-    &:hover {
-      color: lightblue;
-    }
+  &:hover {
+    color: lightblue;
   }
+}
 </style>

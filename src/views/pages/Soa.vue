@@ -909,7 +909,9 @@ export default {
               thClass: 'text-right align-middle',
               thStyle: { width: 'auto' },
               formatter: (value, key, item) => {
-                return formatNumber(Number(item.previousBalance) + Number(item.totalAmount) );
+                return formatNumber(
+                  Number(item.previousBalance) + Number(item.totalAmount)
+                );
               },
             },
             {
@@ -1070,6 +1072,7 @@ export default {
         page,
         billingStatusId,
         billingTypeId: BillingTypes.SOA.id,
+        schoolYearId: this.$store.state.schoolYearId,
         orderBy,
         sort,
       };
@@ -1408,6 +1411,9 @@ export default {
     'forms.billing.studentQuery': debounce(function() {
       this.loadStudents();
     }, 500),
+    '$store.state.schoolYearId': function(newVal) {
+      this.loadBillings();
+    },
   },
   computed: {
     totalAmount() {

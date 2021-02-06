@@ -7,9 +7,7 @@
     >
       <SchoolCategoryTabs
         :showAll="true"
-        @loadSchoolCategoryId="
-          (filters.student.schoolCategoryId = $event), loadAcademicRecord()
-        "
+        @loadSchoolCategoryId="filters.student.schoolCategoryId = $event"
         @clickAll="
           (filters.student.schoolCategoryId = null),
             (filters.student.courseId = null),
@@ -1499,6 +1497,7 @@ export default {
         schoolCategoryId,
         courseId,
         notApplicationStatusId,
+        schoolYearId: this.$store.state.schoolYearId,
         orderBy,
         sort,
         criteria,
@@ -1766,6 +1765,11 @@ export default {
         });
         return units;
       };
+    },
+  },
+  watch: {
+    '$store.state.schoolYearId': function(newVal) {
+      this.loadAcademicRecord();
     },
   },
 };

@@ -1060,6 +1060,7 @@ export default {
         schoolCategoryId,
         courseId,
         applicationStatusId,
+        schoolYearId: this.$store.state.schoolYearId,
         orderBy,
         sort,
         criteria,
@@ -1259,6 +1260,11 @@ export default {
         reader.readAsDataURL(file);
         this.file.isLoading = false;
       });
+    },
+  },
+  watch: {
+    '$store.state.schoolYearId': function(newVal) {
+      this.loadAcademicRecord();
     },
   },
   computed: {

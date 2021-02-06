@@ -80,6 +80,23 @@
           <p class="header__account-group">{{ userGroup }}</p>
         </div>
         <div class="header__account-actions">
+          <div class="header__school-year">
+            <b-form-select
+              v-model="$store.state.schoolYearId"
+              class="float-right"
+            >
+              <b-form-select-option :value="null">
+                ALL
+              </b-form-select-option>
+              <b-form-select-option
+                v-for="schoolYear in options.schoolYears.items"
+                :key="schoolYear.id"
+                :value="schoolYear.id"
+              >
+                {{ schoolYear.name }}
+              </b-form-select-option>
+            </b-form-select>
+          </div>
           <button
             @click.stop="showDropdown = !showDropdown"
             type="button"
@@ -199,7 +216,7 @@
 <script>
 import navItems from './navs';
 import ProfileMaker from '../views/components/ProfileMaker';
-import { AuthApi } from '../mixins/api';
+import { AuthApi, SchoolYearApi } from '../mixins/api';
 import WaveBackground from '../views/components/WaveMaker';
 import Access from '../mixins/utils/Access';
 import { createLimiter } from '../helpers/utils';
@@ -213,7 +230,7 @@ export default {
     ProfileMaker,
     WaveBackground,
   },
-  mixins: [AuthApi, Access],
+  mixins: [AuthApi, SchoolYearApi, Access],
   navItems,
   createLimiter,
   data() {
@@ -224,6 +241,11 @@ export default {
       mainNavLimit: MAIN_NAV_LIMIT,
       subNavOpen: [],
       mainNavOpen: [],
+      options: {
+        schoolYears: {
+          items: [],
+        },
+      },
     };
   },
   computed: {
@@ -279,6 +301,16 @@ export default {
     window.removeEventListener('click', this.hideDropdownItems);
   },
   methods: {
+    loadSchoolYearList() {
+      const { schoolYears } = this.options;
+      this.getSchoolYearList({ paginate: false }).then(({ data }) => {
+        const activeSchoolYear = data.find((d) => d.isActive === 1);
+        this.$store.state.schoolYearId = activeSchoolYear
+          ? activeSchoolYear.id
+          : null;
+        schoolYears.items = data;
+      });
+    },
     calculateNavLimit() {
       this.subNavLimit = this.getSubNavLimit();
       this.mainNavLimit = this.getMainNavLimit();
@@ -330,6 +362,9 @@ export default {
     onMainNavViewMore(idx) {
       this.mainNavOpen = !!this.mainNavOpen?.length ? [] : [idx];
     },
+  },
+  created() {
+    this.loadSchoolYearList();
   },
 };
 </script>
@@ -673,5 +708,9 @@ export default {
     background-color: $dark-gray-600;
     color: $white;
   }
+}
+
+.header__school-year {
+  margin-right: 15px;
 }
 </style>

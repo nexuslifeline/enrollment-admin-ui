@@ -7,6 +7,7 @@ const state = {
   sidebarMinimize: false,
   isLoggedIn: !!localStorage.getItem('adminAccessToken') ?? false,
   user: [],
+  schoolYearId: null,
   approvalCount: {
     assessment: 0,
     enlistment: 0,
