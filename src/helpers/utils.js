@@ -48,3 +48,4 @@ export const formatAddress = (address) => {
   return currentAddress || permaAddress;
 }
 
+export const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);

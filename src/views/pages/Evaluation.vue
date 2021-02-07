@@ -44,6 +44,7 @@
           :fields="tables.students.fields"
           :items="tables.students.items"
           :busy="tables.students.isBusy"
+          @sort-changed="onSortChanged"
         >
           <template v-slot:head(attachments)>
             <div class="text-center">
@@ -1254,6 +1255,7 @@ import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import { copyValue } from '../../helpers/extractor';
 import FileViewer from '../components/FileViewer';
 import Access from '../../mixins/utils/Access';
+import { camelToSnakeCase } from '../../helpers/utils';
 import { format } from 'date-fns';
 import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
 import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
@@ -1282,6 +1284,7 @@ export default {
     COLOR_FACTORY_LENGTH,
   },
   colorFactory,
+  camelToSnakeCase,
   format,
   mixins: [
     EvaluationApi,
@@ -1312,6 +1315,8 @@ export default {
   EvaluationAndAdmissionPermissions,
   data() {
     return {
+      sortBy: 'submittedDate',
+      sortDesc: true,
       isFilterVisible: true,
       fileViewer: {
         isActiveNavEnabled: false,
@@ -1352,6 +1357,7 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
+              sortable: false // allow first in backend
               // formatter: (value, key, item) => {
               // 	if(!item.student.middleName){
               // 		item.student.middleName = ""
@@ -1376,6 +1382,7 @@ export default {
               label: 'Submitted',
               tdClass: 'align-middle',
               thStyle: { width: '10%' },
+              sortable: true,
               formatter: (value, key, item) => {
                 if (!value) return '';
 
@@ -1712,8 +1719,8 @@ export default {
         criteria,
       } = this.filters.student;
       const applicationStatusId = EvaluationStatuses.SUBMITTED.id;
-      const orderBy = 'submitted_date';
-      const sort = 'DESC';
+      const orderBy = this.$options.camelToSnakeCase(this.sortBy);
+      const sort = this.sortDesc ? 'DESC' : 'ASC';
       let params = {
         paginate: true,
         perPage,
@@ -2071,6 +2078,11 @@ export default {
       const { student } = this.filters;
       student.evaluationStatusId = item?.id || 0;
       student.evaluationStatusItem = item;
+      this.loadEvaluation();
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
       this.loadEvaluation();
     }
   },
