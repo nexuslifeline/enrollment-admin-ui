@@ -71,11 +71,19 @@ import {
   BIconCalendar2Week,
   BIconCaretDownFill,
   BIconCaretUpFill,
-  BProgress
+  BProgress,
+  BIconFunnelFill,
+  BIconChevronLeft,
+  BIconChevronRight,
+  BIconArrowRepeat
 } from 'bootstrap-vue'
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
 Vue.component('BIconAlarm', BIconAlarm);
+Vue.component('BIconFunnelFill', BIconFunnelFill);
+Vue.component('BIconChevronLeft', BIconChevronLeft);
+Vue.component('BIconChevronRight', BIconChevronRight);
+Vue.component('BIconArrowRepeat', BIconArrowRepeat);
 Vue.component('BIconArrowRightCircle', BIconArrowRightCircle);
 Vue.component('BIconArrowLeftCircle', BIconArrowLeftCircle);
 Vue.component('BIconPaperclip', BIconPaperclip);

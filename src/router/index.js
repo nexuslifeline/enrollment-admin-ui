@@ -436,7 +436,7 @@ function configRoutes () {
           ]
         },
         {
-          path: 'dashboard',
+          path: 'home',
           name: 'Dashboard',
           component: Dashboard,
           redirect: { name: 'MyProfile' },

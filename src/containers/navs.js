@@ -30,19 +30,19 @@ import {
 export default [
   {
     label: 'Home',
-    to: '/dashboard',
+    to: '/home',
     children: [
       {
         label: 'Profile',
-        to: '/dashboard/profile'
+        to: '/home/profile'
       },
       {
         label: 'Activity',
-        to: '/dashboard/activity'
+        to: '/home/activity'
       },
       {
         label: 'Settings',
-        to: '/dashboard/settings',
+        to: '/home/settings',
       },
     ]
   },
@@ -79,7 +79,7 @@ export default [
         permissionIds: StudentPaymentPermissions.getIds()
       },
       {
-        label: 'Manual Enrollment',
+        label: 'Manual Entry',
         to: '/enrollment/academic-record-applications',
         permissionIds: ManualEnrollmentPermissions.getIds()
         // to be added

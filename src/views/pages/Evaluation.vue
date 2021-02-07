@@ -1,117 +1,170 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Evaluation & Admission Records" :showRefresh="true" @onRefresh="loadEvaluation()">
+  <PageContent
+    title="Evaluation and Admission Records"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadEvaluation"
+    :filterVisible="isFilterVisible">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.student.criteria"
+        debounce="500"
+        @update="loadEvaluation()"
+        type="text"
+        placeholder="Search"
+      >
+      </b-form-input>
+      <v-select
+        :options="options.schoolCategories.values"
+        :value="filters.student.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+      />
+      <v-select
+        :options="evaluationStatuses.values"
+        :value="filters.student.evaluationStatusItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
+      <!-- <div class="mb-2">
+        <FilterButton />
+      </div> -->
       <div>
-        <SchoolCategoryTabs
-          :showAll="true"
-          @loadSchoolCategoryId="
-            (filters.student.schoolCategoryId = $event), loadEvaluation()
-          "
-          @clickAll="
-            (filters.student.schoolCategoryId = null),
-              (filters.student.courseId = null),
-              loadEvaluation()
-          "
-          @click="
-            (filters.student.schoolCategoryId = $event),
-              (filters.student.courseId = null),
-              loadEvaluation()
-          "
-        />
-        <div>
-          <b-row class="mb-2">
-            <!-- row button and search input -->
-            <b-col md="6">
-              <b-form-radio-group
-                @input="loadEvaluation()"
-                v-model="filters.student.evaluationStatusId"
-              >
-                <b-form-radio :value="null">All</b-form-radio>
-                <b-form-radio
-                  v-for="status in evaluationStatuses.values"
-                  :value="status.id"
-                  :key="status.id"
-                >
-                  {{ status.name }}
-                </b-form-radio>
-              </b-form-radio-group>
-            </b-col>
-            <b-col md="3">
-              <b-form-select
-                v-if="
-                  filters.student.schoolCategoryId ===
-                    options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-                    filters.student.schoolCategoryId ===
-                      options.schoolCategories.COLLEGE.id ||
-                    filters.student.schoolCategoryId ===
-                      options.schoolCategories.GRADUATE_SCHOOL.id
-                "
-                @change="loadEvaluation()"
-                v-model="filters.student.courseId"
-                class="float-right"
-              >
-                <template v-slot:first>
-                  <b-form-select-option :value="null" disabled
-                    >-- Course --</b-form-select-option
-                  >
-                </template>
-                <b-form-select-option :value="null">None</b-form-select-option>
-                <b-form-select-option
-                  v-for="course in options.courses.items"
-                  :key="course.id"
-                  :value="course.id"
-                >
-                  {{ course.description }}
-                  {{ course.major ? `(${course.major})` : '' }}
-                </b-form-select-option>
-              </b-form-select>
-            </b-col>
-            <b-col md="3">
-              <b-form-input
-                v-model="filters.student.criteria"
-                debounce="500"
-                @update="loadEvaluation()"
-                type="text"
-                placeholder="Search"
-              >
-              </b-form-input>
-            </b-col>
-          </b-row>
-          <!-- row button and search input -->
-          <b-table
-            class="c-table"
-            outlined
-            small
-            show-empty
-            responsive
-            :fields="tables.students.fields"
-            :items="tables.students.items"
-            :busy="tables.students.isBusy"
-          >
-            <template v-slot:head(attachments)>
-              <div class="text-center">
-                <v-icon name="paperclip" />
-              </div>
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(attachments)="data">
-              <span
-                >{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp;
-              </span>
+        <b-table
+          class="c-table"
+          outlined
+          small
+          show-empty
+          responsive
+          :fields="tables.students.fields"
+          :items="tables.students.items"
+          :busy="tables.students.isBusy"
+        >
+          <template v-slot:head(attachments)>
+            <div class="text-center">
               <v-icon name="paperclip" />
-            </template>
-            <template v-slot:cell(name)="data">
-              <StudentColumn
-                :data="data.item"
-                :callback="{ loadDetails: () => loadDetails(data) }"
-              />
-              <!-- <b-media>
-                <template v-slot:aside>
+            </div>
+          </template>
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(attachments)="data">
+            <span
+              >{{ data.item.filesCount }} &nbsp; &nbsp; &nbsp; &nbsp;
+            </span>
+            <v-icon name="paperclip" />
+          </template>
+          <template v-slot:cell(name)="data">
+            <StudentColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => loadDetails(data) }"
+            />
+          </template>
+          <template v-slot:cell(address)="data">
+            <AddressColumn :data="data.item" />
+          </template>
+          <template v-slot:cell(education)="data">
+            <EducationColumn :data="data.item" />
+          </template>
+          <template
+            v-slot:cell(studentCategory.name)="{
+              item: { studentCategory, studentCategoryId },
+            }"
+          >
+            <b-badge
+              :variant="
+                studentCategoryId === studentCategories.NEW.id
+                  ? 'success'
+                  : studentCategoryId === studentCategories.OLD.id
+                  ? 'primary'
+                  : 'warning'
+              "
+            >
+              {{  studentCategoryId === studentCategories.TRANSFEREE_OLD.id ? 'TRANSFEREE' : studentCategory.name }}
+            </b-badge>
+          </template>
+          <template v-slot:cell(status)="data">
+            <b-badge
+              :variant="
+                data.item.evaluationStatusId ===
+                evaluationStatuses.APPROVED.id
+                  ? 'success'
+                  : data.item.evaluationStatusId ===
+                    evaluationStatuses.REJECTED.id
+                  ? 'danger'
+                  : 'warning'
+              "
+            >
+              {{
+                evaluationStatuses.getEnum(data.item.evaluationStatusId).name
+              }}
+            </b-badge>
+          </template>
+          <template v-slot:cell(attachments)="data">
+            <span>{{ data.item.filesCount }} </span>
+            <v-icon name="paperclip" class="ml-2" />
+          </template>
+          <template v-slot:cell(action)="row">
+            <!-- <button type="button" @click="loadDetails(row)" class="btn-invisible">
+              <BIconFolder2Open v-if="row.detailsShowing " />
+              <BIconFolderSymlink v-else scale="1.2" />
+            </button> -->
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+            >
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+              <b-dropdown-item @click.prevent="loadDetails(row)">
+                {{
+                  row.item.evaluationStatusId ===
+                  evaluationStatuses.APPROVED.id
+                    ? 'View Details'
+                    : 'Review Record'
+                }}
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+          <template v-slot:row-details="data">
+            <ActiveRowViewer
+              :isBusy="data.item.isLoading"
+              backTitle="Go back to list"
+              @onBack="data.toggleDetails()"
+              :showOptions="
+                data.item.evaluationStatusId ===
+                  evaluationStatuses.SUBMITTED.id
+              "
+              :options="[
+                {
+                  label: 'Approve',
+                  callback: () => setApproval(data),
+                  isAllowed: isAccessible(
+                    $options.EvaluationAndAdmissionPermissions.APPROVAL.id
+                  ),
+                },
+                {
+                  label: 'Reject',
+                  callback: () => setDisapproval(data),
+                  isAllowed: isAccessible(
+                    $options.EvaluationAndAdmissionPermissions.DISAPPROVAL.id
+                  ),
+                },
+              ]"
+            >
+              <template v-slot:header>
+                <div class="active-view__header-details-container">
                   <AvatarMaker
                     :avatarId="data.item.student.id"
                     :size="50"
@@ -122,478 +175,198 @@
                     "
                     :src="avatar(data.item.student)"
                   />
-                </template>
-                <div>
-                  <b-link @click="loadDetails(data)">{{
-                    data.item.student.name
-                  }}</b-link>
-                </div>
-                <div class="text-muted">
-                  {{ data.item.student.email }}
-                </div>
-                <div class="text-muted">
-                  {{
-                    data.item.student.currentAddress ||
-                    data.item.student.address
-                      ? data.item.student.address.currentCompleteAddress
-                      : ''
-                  }}
-                </div>
-              </b-media> -->
-            </template>
-            <template v-slot:cell(education)="data">
-              <EducationColumn :data="data.item" />
-              <!-- <span>
-                {{ getName(data.item, 'level') }}<br />
-                {{ getName(data.item, 'course') }}<br />
-              </span> -->
-            </template>
-            <template
-              v-slot:cell(studentCategory.name)="{
-                item: { studentCategory, studentCategoryId },
-              }"
-            >
-              <b-badge
-                :variant="
-                  studentCategoryId === studentCategories.NEW.id
-                    ? 'success'
-                    : studentCategoryId === studentCategories.OLD.id
-                    ? 'primary'
-                    : 'warning'
-                "
-              >
-                {{  studentCategoryId === studentCategories.TRANSFEREE_OLD.id ? 'TRANSFEREE' : studentCategory.name }}
-              </b-badge>
-            </template>
-            <template v-slot:cell(status)="data">
-              <b-badge
-                :variant="
-                  data.item.evaluationStatusId ===
-                  evaluationStatuses.APPROVED.id
-                    ? 'success'
-                    : data.item.evaluationStatusId ===
-                      evaluationStatuses.REJECTED.id
-                    ? 'danger'
-                    : 'warning'
-                "
-              >
-                {{
-                  evaluationStatuses.getEnum(data.item.evaluationStatusId).name
-                }}
-              </b-badge>
-            </template>
-            <template v-slot:cell(attachments)="data">
-              <span>{{ data.item.filesCount }} </span>
-              <v-icon name="paperclip" class="ml-2" />
-            </template>
-            <template v-slot:cell(action)="row">
-              <!-- <button type="button" @click="loadDetails(row)" class="btn-invisible">
-                <BIconFolder2Open v-if="row.detailsShowing " />
-                <BIconFolderSymlink v-else scale="1.2" />
-              </button> -->
-              <b-dropdown
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret
-              >
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
-                <b-dropdown-item @click.prevent="loadDetails(row)">
-                  {{
-                    row.item.evaluationStatusId ===
-                    evaluationStatuses.APPROVED.id
-                      ? 'View Details'
-                      : 'Review Record'
-                  }}
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-            <template v-slot:row-details="data">
-              <ActiveRowViewer
-                :isBusy="data.item.isLoading"
-                backTitle="Go back to list"
-                @onBack="data.toggleDetails()"
-                :showOptions="
-                  data.item.evaluationStatusId ===
-                    evaluationStatuses.SUBMITTED.id
-                "
-                :options="[
-                  {
-                    label: 'Approve',
-                    callback: () => setApproval(data),
-                    isAllowed: isAccessible(
-                      $options.EvaluationAndAdmissionPermissions.APPROVAL.id
-                    ),
-                  },
-                  {
-                    label: 'Reject',
-                    callback: () => setDisapproval(data),
-                    isAllowed: isAccessible(
-                      $options.EvaluationAndAdmissionPermissions.DISAPPROVAL.id
-                    ),
-                  },
-                ]"
-              >
-                <template v-slot:header>
-                  <div class="active-view__header-details-container">
-                    <AvatarMaker
-                      :avatarId="data.item.student.id"
-                      :size="50"
-                      :text="
-                        `${data.item.student.firstName.charAt(
-                          0
-                        )}${data.item.student.lastName.charAt(0)}`
-                      "
-                      :src="avatar(data.item.student)"
-                    />
-                    <div class="active-view__header-details">
-                      <p class="active-view__header-name">
-                        {{ data.item.student.name }}
-                      </p>
-                      <p class="active-view__header-email">
-                        {{ data.item.student.email }}
-                      </p>
-                    </div>
-                    <p class="active-view__header-date">
-                      <BIconAlarm />
-                      {{
-                        $options.format(
-                          new Date(data.item.submittedDate),
-                          'MMMM dd, yyyy'
-                        )
-                      }}
+                  <div class="active-view__header-details">
+                    <p class="active-view__header-name">
+                      {{ data.item.student.name }}
+                    </p>
+                    <p class="active-view__header-email">
+                      {{ data.item.student.email }}
                     </p>
                   </div>
-                </template>
+                  <p class="active-view__header-date">
+                    <BIconAlarm />
+                    {{
+                      $options.format(
+                        new Date(data.item.submittedDate),
+                        'MMMM dd, yyyy'
+                      )
+                    }}
+                  </p>
+                </div>
+              </template>
 
-                <template v-slot:navigation>
-                  <ActiveViewLinks
-                    :items="[
-                      {
-                        text: 'Student Information',
-                        target: 'header-student-information',
-                      },
-                      {
-                        text: 'Educational Background',
-                        target: 'header-educational-background',
-                      },
-                      {
-                        text: 'Application',
-                        target: 'header-current-application',
-                      },
-                      {
-                        text: 'Evaluation',
-                        target: 'header-evaluation-student',
-                      },
-                    ]"
+              <template v-slot:navigation>
+                <ActiveViewLinks
+                  :items="[
+                    {
+                      text: 'Student Information',
+                      target: 'header-student-information',
+                    },
+                    {
+                      text: 'Educational Background',
+                      target: 'header-educational-background',
+                    },
+                    {
+                      text: 'Application',
+                      target: 'header-current-application',
+                    },
+                    {
+                      text: 'Evaluation',
+                      target: 'header-evaluation-student',
+                    },
+                  ]"
+                />
+              </template>
+
+              <template v-slot:content>
+                <div>
+                  <ActiveViewHeader
+                    id="header-student-information"
+                    title="Review Student Information"
+                    circleText="1"
                   />
-                </template>
 
-                <template v-slot:content>
-                  <div>
-                    <ActiveViewHeader
-                      id="header-student-information"
-                      title="Review Student Information"
-                      circleText="1"
-                    />
-
-                    <ActiveViewItems>
-                      <ActiveViewItem label="Student Number:">
-                        <p>
-                          {{
-                            data.item.student.studentNo
-                              ? data.item.student.studentNo
-                              : 'Awaiting Confirmation'
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Name:">
-                        <p>
-                          {{ data.item.student.name }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem
-                        v-if="!!data.item.student.email"
-                        label="Email:"
-                      >
-                        <p>
-                          {{ data.item.student.email }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem
-                        v-if="!!data.item.student.mobileNo"
-                        label="Mobile Number:"
-                      >
-                        <p>
-                          {{ data.item.student.mobileNo }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Address:">
-                        <p>
-                          {{
-                            data.item.student.currentAddress ||
-                            data.item.student.address
-                              ? data.item.student.currentAddress
-                              : ''
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Category:">
-                        <p>
-                          <b-badge
-                            :variant="
-                              data.item.studentCategoryId ===
-                              studentCategories.NEW.id
-                                ? 'success'
-                                : data.item.studentCategoryId ===
-                                  studentCategories.OLD.id
-                                ? 'primary'
-                                : 'warning'
-                            "
-                          >
-                            {{ data.item.studentCategory.name }}
-                          </b-badge>
-                        </p>
-                      </ActiveViewItem>
-                    </ActiveViewItems>
-                  </div>
-
-                  <div>
-                    <ActiveViewHeader
-                      id="header-educational-background"
-                      title="Review Previous Educational Background"
-                      circleText="2"
-                    />
-                    <ActiveViewItems>
-                      <ActiveViewItem label="Last School Attended:">
-                        <p>
-                          {{ data.item.lastSchoolAttended }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Last School Level:">
-                        <p>
-                          {{
-                            data.item.lastSchoolLevel
-                              ? data.item.lastSchoolLevel.name
-                              : 'N/A'
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Attended Period:">
-                        <p>
-                          {{ data.item.lastSchoolYearFrom }}-{{
-                            data.item.lastSchoolYearTo
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                    </ActiveViewItems>
-                  </div>
-
-                  <div>
-                    <ActiveViewHeader
-                      id="header-current-application"
-                      title="Review Application for current Academic Year"
-                      circleText="3"
-                    />
-
-                    <ActiveViewItems>
-                      <ActiveViewItem label="Curriculum:">
-                        <div
-                          v-if="!data.item.studentCurriculumEdit"
-                          class="mb-3"
-                        >
-                          <span
-                            :class="
-                              `font-weight-bold ${
-                                !data.item.studentCurriculum
-                                  ? 'text-danger'
-                                  : ''
-                              }`
-                            "
-                          >
-                            {{
-                              data.item.studentCurriculum
-                                ? data.item.studentCurriculum.name
-                                : 'Nothing is Set'
-                            }} </span
-                          >&nbsp;
-                          <b-link
-                            v-if="
-                              data.item.evaluationStatusId ===
-                                evaluationStatuses.SUBMITTED.id
-                            "
-                            @click="
-                              data.item.studentCurriculumEdit = !data.item
-                                .studentCurriculumEdit
-                            "
-                          >
-                            [Set Curriculum]
-                          </b-link>
-                        </div>
-                        <div v-else class="w-75 ml-2 mb-3">
-                          <b-form-select
-                            @change="
-                              loadStudentCurriculum($event, data),
-                                (data.item.studentCurriculumEdit = !data.item
-                                  .studentCurriculumEdit)
-                            "
-                            v-model="data.item.studentCurriculumId"
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- Curriculum --</b-form-select-option
-                              >
-                            </template>
-                            <b-form-select-option
-                              v-for="curriculum in data.item.curriculums"
-                              :key="curriculum.id"
-                              :value="curriculum.id"
-                            >
-                              {{ curriculum.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                        </div>
-                      </ActiveViewItem>
-                      <ActiveViewItem v-if="data.item.course" label="Course:">
-                        <div v-if="!data.item.studentCourseEdit" class="mb-3">
-                          <span>
-                            {{
-                              data.item.course
-                                ? data.item.course.description
-                                : ''
-                            }}
-                            {{
-                              data.item.course && data.item.course.major
-                                ? ' - ' + data.item.course.major
-                                : ''
-                            }} </span
-                          >&nbsp;&nbsp;
-                          <b-link
-                            v-if="
-                              data.item.evaluationStatusId ===
-                                evaluationStatuses.SUBMITTED.id
-                            "
-                            @click="
-                              data.item.studentCourseEdit = !data.item
-                                .studentCourseEdit
-                            "
-                          >
-                            [Change Course]
-                          </b-link>
-                        </div>
-                        <div v-else class="w-75 ml-2 mb-3">
-                          <b-form-select
-                            @change="onChangeCourse(data)"
-                            v-model="data.item.courseId"
-                            class="float-right"
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- Course --</b-form-select-option
-                              >
-                            </template>
-                            <b-form-select-option :value="null"
-                              >None</b-form-select-option
-                            >
-                            <b-form-select-option
-                              v-for="course in options.courses.items"
-                              :key="course.id"
-                              :value="course.id"
-                            >
-                              {{ course.description }}
-                              {{ course.major ? `(${course.major})` : '' }}
-                            </b-form-select-option>
-                          </b-form-select>
-                        </div>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Level:">
-                        <p>
-                          {{ getName(data.item, 'level') }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem
-                        v-if="data.item.semesterId"
-                        label="Semester:"
-                      >
-                        <p>
-                          {{ semesters.getEnum(data.item.semesterId).name }}
-                        </p>
-                      </ActiveViewItem>
-                      <ActiveViewItem label="Date Submitted:">
-                        <p>
-                          {{
-                            $options.format(
-                              new Date(data.item.submittedDate),
-                              'MMMM dd, yyyy'
-                            )
-                          }}
-                        </p>
-                      </ActiveViewItem>
-                    </ActiveViewItems>
-                    <div class="p-4 mb-4">
-                      <h5>Attachments</h5>
-                      <AttachmentList
-                        :items="data.item.files"
-                        titleKey="name"
-                        descriptionKey="notes"
-                        documentTypeKey="documentType"
-                        @onAttachmentItemDownload="
-                          (file) => downloadFile(file, data)
-                        "
-                        @onAttachmentItemView="
-                          (file) => previewFile(file, data)
-                        "
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <ActiveViewHeader
-                      id="header-evaluation-student"
-                      title="Evaluate Student Grade"
-                      circleText="4"
-                    />
-
-                    <b-row class="mb-3 text-center">
-                      <b-col md="12">
-                        <h5>Evaluation Form</h5>
-                        <div
-                          v-if="!data.item.curriculumEdit"
-                          :class="!data.item.curriculum ? 'text-danger' : ''"
-                        >
-                          <b>{{
-                            data.item.curriculum
-                              ? data.item.curriculum.name
-                              : data.item.curriculumMsg
-                              ? `There's no active curriculum set. Please set a curriculum`
-                              : 'Nothing is Set'
-                          }}</b
-                          >&nbsp;
-                          <b-link
-                            v-if="
-                              !data.item.curriculumMsg &&
-                                data.item.evaluationStatusId ===
-                                  evaluationStatuses.SUBMITTED.id
-                            "
-                            @click="
-                              data.item.curriculumEdit = !data.item
-                                .curriculumEdit
-                            "
-                          >
-                            [Change]
-                          </b-link>
-                        </div>
-                        <b-form-select
-                          class="w-50"
-                          v-else
-                          @change="
-                            loadCurriculum($event, data),
-                              (data.item.curriculumEdit = !data.item
-                                .curriculumEdit)
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Student Number:">
+                      <p>
+                        {{
+                          data.item.student.studentNo
+                            ? data.item.student.studentNo
+                            : 'Awaiting Confirmation'
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Name:">
+                      <p>
+                        {{ data.item.student.name }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem
+                      v-if="!!data.item.student.email"
+                      label="Email:"
+                    >
+                      <p>
+                        {{ data.item.student.email }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem
+                      v-if="!!data.item.student.mobileNo"
+                      label="Mobile Number:"
+                    >
+                      <p>
+                        {{ data.item.student.mobileNo }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Address:">
+                      <p>
+                        {{
+                          data.item.student.currentAddress ||
+                          data.item.student.address
+                            ? data.item.student.currentAddress
+                            : ''
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Category:">
+                      <p>
+                        <b-badge
+                          :variant="
+                            data.item.studentCategoryId ===
+                            studentCategories.NEW.id
+                              ? 'success'
+                              : data.item.studentCategoryId ===
+                                studentCategories.OLD.id
+                              ? 'primary'
+                              : 'warning'
                           "
-                          v-model="data.item.curriculumId"
+                        >
+                          {{ data.item.studentCategory.name }}
+                        </b-badge>
+                      </p>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
+                </div>
+
+                <div>
+                  <ActiveViewHeader
+                    id="header-educational-background"
+                    title="Review Previous Educational Background"
+                    circleText="2"
+                  />
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Last School Attended:">
+                      <p>
+                        {{ data.item.lastSchoolAttended }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Last School Level:">
+                      <p>
+                        {{
+                          data.item.lastSchoolLevel
+                            ? data.item.lastSchoolLevel.name
+                            : 'N/A'
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Attended Period:">
+                      <p>
+                        {{ data.item.lastSchoolYearFrom }}-{{
+                          data.item.lastSchoolYearTo
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
+                </div>
+
+                <div>
+                  <ActiveViewHeader
+                    id="header-current-application"
+                    title="Review Application for current Academic Year"
+                    circleText="3"
+                  />
+
+                  <ActiveViewItems>
+                    <ActiveViewItem label="Curriculum:">
+                      <div
+                        v-if="!data.item.studentCurriculumEdit"
+                        class="mb-3"
+                      >
+                        <span
+                          :class="
+                            `font-weight-bold ${
+                              !data.item.studentCurriculum
+                                ? 'text-danger'
+                                : ''
+                            }`
+                          "
+                        >
+                          {{
+                            data.item.studentCurriculum
+                              ? data.item.studentCurriculum.name
+                              : 'Nothing is Set'
+                          }} </span
+                        >&nbsp;
+                        <b-link
+                          v-if="
+                            data.item.evaluationStatusId ===
+                              evaluationStatuses.SUBMITTED.id
+                          "
+                          @click="
+                            data.item.studentCurriculumEdit = !data.item
+                              .studentCurriculumEdit
+                          "
+                        >
+                          [Set Curriculum]
+                        </b-link>
+                      </div>
+                      <div v-else class="w-75 ml-2 mb-3">
+                        <b-form-select
+                          @change="
+                            loadStudentCurriculum($event, data),
+                              (data.item.studentCurriculumEdit = !data.item
+                                .studentCurriculumEdit)
+                          "
+                          v-model="data.item.studentCurriculumId"
                         >
                           <template v-slot:first>
                             <b-form-select-option :value="null" disabled
@@ -608,603 +381,754 @@
                             {{ curriculum.name }}
                           </b-form-select-option>
                         </b-form-select>
+                      </div>
+                    </ActiveViewItem>
+                    <ActiveViewItem v-if="data.item.course" label="Course:">
+                      <div v-if="!data.item.studentCourseEdit" class="mb-3">
+                        <span>
+                          {{
+                            data.item.course
+                              ? data.item.course.description
+                              : ''
+                          }}
+                          {{
+                            data.item.course && data.item.course.major
+                              ? ' - ' + data.item.course.major
+                              : ''
+                          }} </span
+                        >&nbsp;&nbsp;
+                        <b-link
+                          v-if="
+                            data.item.evaluationStatusId ===
+                              evaluationStatuses.SUBMITTED.id
+                          "
+                          @click="
+                            data.item.studentCourseEdit = !data.item
+                              .studentCourseEdit
+                          "
+                        >
+                          [Change Course]
+                        </b-link>
+                      </div>
+                      <div v-else class="w-75 ml-2 mb-3">
+                        <b-form-select
+                          @change="onChangeCourse(data)"
+                          v-model="data.item.courseId"
+                          class="float-right"
+                        >
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled
+                              >-- Course --</b-form-select-option
+                            >
+                          </template>
+                          <b-form-select-option :value="null"
+                            >None</b-form-select-option
+                          >
+                          <b-form-select-option
+                            v-for="course in options.courses.items"
+                            :key="course.id"
+                            :value="course.id"
+                          >
+                            {{ course.description }}
+                            {{ course.major ? `(${course.major})` : '' }}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </div>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Level:">
+                      <p>
+                        {{ getName(data.item, 'level') }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem
+                      v-if="data.item.semesterId"
+                      label="Semester:"
+                    >
+                      <p>
+                        {{ semesters.getEnum(data.item.semesterId).name }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Date Submitted:">
+                      <p>
+                        {{
+                          $options.format(
+                            new Date(data.item.submittedDate),
+                            'MMMM dd, yyyy'
+                          )
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                  </ActiveViewItems>
+                  <div class="p-4 mb-4">
+                    <h5>Attachments</h5>
+                    <AttachmentList
+                      :items="data.item.files"
+                      titleKey="name"
+                      descriptionKey="notes"
+                      documentTypeKey="documentType"
+                      @onAttachmentItemDownload="
+                        (file) => downloadFile(file, data)
+                      "
+                      @onAttachmentItemView="
+                        (file) => previewFile(file, data)
+                      "
+                    />
+                  </div>
+                </div>
+                <div>
+                  <ActiveViewHeader
+                    id="header-evaluation-student"
+                    title="Evaluate Student Grade"
+                    circleText="4"
+                  />
+
+                  <b-row class="mb-3 text-center">
+                    <b-col md="12">
+                      <h5>Evaluation Form</h5>
+                      <div
+                        v-if="!data.item.curriculumEdit"
+                        :class="!data.item.curriculum ? 'text-danger' : ''"
+                      >
+                        <b>{{
+                          data.item.curriculum
+                            ? data.item.curriculum.name
+                            : data.item.curriculumMsg
+                            ? `There's no active curriculum set. Please set a curriculum`
+                            : 'Nothing is Set'
+                        }}</b
+                        >&nbsp;
+                        <b-link
+                          v-if="
+                            !data.item.curriculumMsg &&
+                              data.item.evaluationStatusId ===
+                                evaluationStatuses.SUBMITTED.id
+                          "
+                          @click="
+                            data.item.curriculumEdit = !data.item
+                              .curriculumEdit
+                          "
+                        >
+                          [Change]
+                        </b-link>
+                      </div>
+                      <b-form-select
+                        class="w-50"
+                        v-else
+                        @change="
+                          loadCurriculum($event, data),
+                            (data.item.curriculumEdit = !data.item
+                              .curriculumEdit)
+                        "
+                        v-model="data.item.curriculumId"
+                      >
+                        <template v-slot:first>
+                          <b-form-select-option :value="null" disabled
+                            >-- Curriculum --</b-form-select-option
+                          >
+                        </template>
+                        <b-form-select-option
+                          v-for="curriculum in data.item.curriculums"
+                          :key="curriculum.id"
+                          :value="curriculum.id"
+                        >
+                          {{ curriculum.name }}
+                        </b-form-select-option>
+                      </b-form-select>
+                    </b-col>
+                  </b-row>
+                  <div v-if="data.item.subjects">
+                    <b-row v-if="data.item.courseId === null">
+                      <b-col md="12">
+                        <b-row>
+                          <b-col md="6">
+                            <h5>{{ getName(data.item, 'level') }}</h5>
+                          </b-col>
+                        </b-row>
+                        <b-table
+                          class="mb-4"
+                          outlined
+                          responsive
+                          show-empty
+                          :fields="tables.subjects.fields"
+                          :items="data.item.subjects"
+                          :busy="tables.subjects.isBusy"
+                        >
+                          <template v-slot:head(pivot.isTaken)>
+                            <b-form-checkbox
+                              v-if="
+                                data.item.evaluationStatusId ===
+                                  evaluationStatuses.SUBMITTED.id
+                              "
+                              @input="
+                                toggleCheckAll(data.item.subjects, $event)
+                              "
+                              v-model="data.item.isTakenAll"
+                            >
+                              Credited
+                            </b-form-checkbox>
+                          </template>
+                          <template v-slot:cell(pivot.isTaken)="row">
+                            <b-form-checkbox
+                              :disabled="
+                                data.item.evaluationStatusId !==
+                                  evaluationStatuses.SUBMITTED.id
+                              "
+                              :value="1"
+                              :unchecked-value="0"
+                              v-model="row.item.pivot.isTaken"
+                            />
+                          </template>
+                          <template v-slot:table-busy>
+                            <div class="text-center my-2">
+                              <v-icon name="spinner" spin class="mr-2" />
+                              <strong>Loading...</strong>
+                            </div>
+                          </template>
+                          <template v-slot:cell(pivot.grade)="row">
+                            <vue-autonumeric
+                              :disabled="
+                                data.item.evaluationStatusId !==
+                                  evaluationStatuses.SUBMITTED.id ||
+                                  !row.item.pivot.isTaken
+                              "
+                              v-model="row.item.pivot.grade"
+                              class="form-control text-right"
+                              :options="[
+                                {
+                                  minimumValue: 0,
+                                  modifyValueOnWheel: false,
+                                  emptyInputBehavior: 0,
+                                },
+                              ]"
+                            >
+                            </vue-autonumeric>
+                          </template>
+                          <template v-slot:cell(pivot.notes)="row">
+                            <b-form-input
+                              :disabled="
+                                data.item.evaluationStatusId !==
+                                  evaluationStatuses.SUBMITTED.id ||
+                                  !row.item.pivot.isTaken
+                              "
+                              v-model="row.item.pivot.notes"
+                            >
+                            </b-form-input>
+                          </template>
+                          <template v-slot:cell(labs)="row">
+                            {{
+                              data.item.schoolCategoryId ===
+                              options.schoolCategories.VOCATIONAL.id
+                                ? 'N/A'
+                                : row.item.labs
+                            }}
+                          </template>
+                          <template v-slot:cell(units)="row">
+                            {{
+                              data.item.schoolCategoryId ===
+                              options.schoolCategories.VOCATIONAL.id
+                                ? 'N/A'
+                                : row.item.units
+                            }}
+                          </template>
+                          <template v-slot:custom-foot>
+                            <b-tr>
+                              <b-td colspan="5" class="text-right">
+                                <span class="text-danger">Total Units </span>
+                              </b-td>
+                              <b-td class="text-center">
+                                <span class="text-danger">
+                                  {{
+                                    data.item.schoolCategoryId ===
+                                    options.schoolCategories.VOCATIONAL.id
+                                      ? 'N/A'
+                                      : totalUnits(
+                                          data.item.subjects,
+                                          'units'
+                                        )
+                                  }}
+                                </span>
+                              </b-td>
+                              <b-td class="text-center">
+                                <span class="text-danger">
+                                  {{
+                                    data.item.schoolCategoryId ===
+                                    options.schoolCategories.VOCATIONAL.id
+                                      ? 'N/A'
+                                      : totalUnits(data.item.subjects, 'labs')
+                                  }}
+                                </span>
+                              </b-td>
+                              <b-td class="text-center">
+                                <span class="text-danger">
+                                  {{
+                                    data.item.schoolCategoryId ===
+                                    options.schoolCategories.VOCATIONAL.id
+                                      ? 'N/A'
+                                      : totalUnits(
+                                          data.item.subjects,
+                                          'totalUnits'
+                                        )
+                                  }}
+                                </span>
+                              </b-td>
+                            </b-tr>
+                          </template>
+                        </b-table>
                       </b-col>
                     </b-row>
-                    <div v-if="data.item.subjects">
-                      <b-row v-if="data.item.courseId === null">
-                        <b-col md="12">
-                          <b-row>
-                            <b-col md="6">
-                              <h5>{{ getName(data.item, 'level') }}</h5>
-                            </b-col>
-                          </b-row>
-                          <b-table
-                            class="mb-4"
-                            outlined
-                            responsive
-                            show-empty
-                            :fields="tables.subjects.fields"
-                            :items="data.item.subjects"
-                            :busy="tables.subjects.isBusy"
+                    <b-row v-else>
+                      <b-col md="12">
+                        <b-list-group>
+                          <b-list-group-item
+                            v-for="(level, idx) in data.item.levels"
+                            :key="level.id"
                           >
-                            <template v-slot:head(pivot.isTaken)>
-                              <b-form-checkbox
-                                v-if="
-                                  data.item.evaluationStatusId ===
-                                    evaluationStatuses.SUBMITTED.id
-                                "
-                                @input="
-                                  toggleCheckAll(data.item.subjects, $event)
-                                "
-                                v-model="data.item.isTakenAll"
-                              >
-                                Credited
-                              </b-form-checkbox>
-                            </template>
-                            <template v-slot:cell(pivot.isTaken)="row">
-                              <b-form-checkbox
-                                :disabled="
-                                  data.item.evaluationStatusId !==
-                                    evaluationStatuses.SUBMITTED.id
-                                "
-                                :value="1"
-                                :unchecked-value="0"
-                                v-model="row.item.pivot.isTaken"
-                              />
-                            </template>
-                            <template v-slot:table-busy>
-                              <div class="text-center my-2">
-                                <v-icon name="spinner" spin class="mr-2" />
-                                <strong>Loading...</strong>
-                              </div>
-                            </template>
-                            <template v-slot:cell(pivot.grade)="row">
-                              <vue-autonumeric
-                                :disabled="
-                                  data.item.evaluationStatusId !==
-                                    evaluationStatuses.SUBMITTED.id ||
-                                    !row.item.pivot.isTaken
-                                "
-                                v-model="row.item.pivot.grade"
-                                class="form-control text-right"
-                                :options="[
-                                  {
-                                    minimumValue: 0,
-                                    modifyValueOnWheel: false,
-                                    emptyInputBehavior: 0,
-                                  },
-                                ]"
-                              >
-                              </vue-autonumeric>
-                            </template>
-                            <template v-slot:cell(pivot.notes)="row">
-                              <b-form-input
-                                :disabled="
-                                  data.item.evaluationStatusId !==
-                                    evaluationStatuses.SUBMITTED.id ||
-                                    !row.item.pivot.isTaken
-                                "
-                                v-model="row.item.pivot.notes"
-                              >
-                              </b-form-input>
-                            </template>
-                            <template v-slot:cell(labs)="row">
-                              {{
-                                data.item.schoolCategoryId ===
-                                options.schoolCategories.VOCATIONAL.id
-                                  ? 'N/A'
-                                  : row.item.labs
-                              }}
-                            </template>
-                            <template v-slot:cell(units)="row">
-                              {{
-                                data.item.schoolCategoryId ===
-                                options.schoolCategories.VOCATIONAL.id
-                                  ? 'N/A'
-                                  : row.item.units
-                              }}
-                            </template>
-                            <template v-slot:custom-foot>
-                              <b-tr>
-                                <b-td colspan="5" class="text-right">
-                                  <span class="text-danger">Total Units </span>
-                                </b-td>
-                                <b-td class="text-center">
-                                  <span class="text-danger">
-                                    {{
-                                      data.item.schoolCategoryId ===
-                                      options.schoolCategories.VOCATIONAL.id
-                                        ? 'N/A'
-                                        : totalUnits(
-                                            data.item.subjects,
-                                            'units'
-                                          )
-                                    }}
-                                  </span>
-                                </b-td>
-                                <b-td class="text-center">
-                                  <span class="text-danger">
-                                    {{
-                                      data.item.schoolCategoryId ===
-                                      options.schoolCategories.VOCATIONAL.id
-                                        ? 'N/A'
-                                        : totalUnits(data.item.subjects, 'labs')
-                                    }}
-                                  </span>
-                                </b-td>
-                                <b-td class="text-center">
-                                  <span class="text-danger">
-                                    {{
-                                      data.item.schoolCategoryId ===
-                                      options.schoolCategories.VOCATIONAL.id
-                                        ? 'N/A'
-                                        : totalUnits(
-                                            data.item.subjects,
-                                            'totalUnits'
-                                          )
-                                    }}
-                                  </span>
-                                </b-td>
-                              </b-tr>
-                            </template>
-                          </b-table>
-                        </b-col>
-                      </b-row>
-                      <b-row v-else>
-                        <b-col md="12">
-                          <b-list-group>
-                            <b-list-group-item
-                              v-for="(level, idx) in data.item.levels"
-                              :key="level.id"
+                            <div
+                              v-b-toggle="'level' + level.id"
+                              class="d-flex justify-content-between align-items-center"
                             >
+                              <h5>{{ level.name }}</h5>
+                              <span class="when-open">
+                                <v-icon name="caret-down" />
+                              </span>
+                              <span class="when-closed">
+                                <v-icon name="caret-left" />
+                              </span>
+                            </div>
+                            <b-collapse
+                              :id="'level' + level.id"
+                              class="mt-2"
+                              role="tabpanel"
+                              active
+                            >
+                              <b-form-checkbox
+                                class="mb-2"
+                                @input="getSemesters(level, $event)"
+                              >
+                                Show All Semesters
+                              </b-form-checkbox>
                               <div
-                                v-b-toggle="'level' + level.id"
-                                class="d-flex justify-content-between align-items-center"
+                                v-for="semester in filterSemester(
+                                  data,
+                                  level
+                                )"
+                                :key="semester.id"
                               >
-                                <h5>{{ level.name }}</h5>
-                                <span class="when-open">
-                                  <v-icon name="caret-down" />
-                                </span>
-                                <span class="when-closed">
-                                  <v-icon name="caret-left" />
-                                </span>
-                              </div>
-                              <b-collapse
-                                :id="'level' + level.id"
-                                class="mt-2"
-                                role="tabpanel"
-                                active
-                              >
-                                <b-form-checkbox
-                                  class="mb-2"
-                                  @input="getSemesters(level, $event)"
-                                >
-                                  Show All Semesters
-                                </b-form-checkbox>
-                                <div
-                                  v-for="semester in filterSemester(
-                                    data,
-                                    level
-                                  )"
-                                  :key="semester.id"
-                                >
-                                  <b-row>
-                                    <b-col md="9">
-                                      <h6>{{ semester.name }}</h6>
-                                    </b-col>
-                                    <b-col md="3"> </b-col>
-                                  </b-row>
-                                  <b-row>
-                                    <b-col md="12">
-                                      <b-table
-                                        responsive
-                                        hover
-                                        striped
-                                        show-empty
-                                        :items="
-                                          filterSubjects(
-                                            data,
-                                            level.id,
-                                            semester.id
-                                          ).items
-                                        "
-                                        :fields="tables.subjects.fields"
-                                        :busy="tables.subjects.isBusy"
+                                <b-row>
+                                  <b-col md="9">
+                                    <h6>{{ semester.name }}</h6>
+                                  </b-col>
+                                  <b-col md="3"> </b-col>
+                                </b-row>
+                                <b-row>
+                                  <b-col md="12">
+                                    <b-table
+                                      responsive
+                                      hover
+                                      striped
+                                      show-empty
+                                      :items="
+                                        filterSubjects(
+                                          data,
+                                          level.id,
+                                          semester.id
+                                        ).items
+                                      "
+                                      :fields="tables.subjects.fields"
+                                      :busy="tables.subjects.isBusy"
+                                    >
+                                      <template v-slot:table-busy>
+                                        <div class="text-center my-2">
+                                          <v-icon
+                                            name="spinner"
+                                            spin
+                                            class="mr-2"
+                                          />
+                                          <strong>Loading...</strong>
+                                        </div>
+                                      </template>
+                                      <template
+                                        v-slot:cell(pivot.grade)="row"
                                       >
-                                        <template v-slot:table-busy>
-                                          <div class="text-center my-2">
-                                            <v-icon
-                                              name="spinner"
-                                              spin
-                                              class="mr-2"
-                                            />
-                                            <strong>Loading...</strong>
-                                          </div>
-                                        </template>
-                                        <template
-                                          v-slot:cell(pivot.grade)="row"
+                                        <vue-autonumeric
+                                          :disabled="
+                                            data.item.evaluationStatusId !==
+                                              evaluationStatuses.SUBMITTED
+                                                .id || !row.item.pivot.isTaken
+                                          "
+                                          v-model="row.item.pivot.grade"
+                                          class="form-control text-right"
+                                          :options="[
+                                            {
+                                              minimumValue: 0,
+                                              modifyValueOnWheel: false,
+                                              emptyInputBehavior: 0,
+                                            },
+                                          ]"
                                         >
-                                          <vue-autonumeric
-                                            :disabled="
-                                              data.item.evaluationStatusId !==
-                                                evaluationStatuses.SUBMITTED
-                                                  .id || !row.item.pivot.isTaken
-                                            "
-                                            v-model="row.item.pivot.grade"
-                                            class="form-control text-right"
-                                            :options="[
-                                              {
-                                                minimumValue: 0,
-                                                modifyValueOnWheel: false,
-                                                emptyInputBehavior: 0,
-                                              },
-                                            ]"
-                                          >
-                                          </vue-autonumeric>
-                                        </template>
-                                        <template
-                                          v-slot:cell(pivot.notes)="row"
+                                        </vue-autonumeric>
+                                      </template>
+                                      <template
+                                        v-slot:cell(pivot.notes)="row"
+                                      >
+                                        <b-form-input
+                                          :disabled="
+                                            data.item.evaluationStatusId !==
+                                              evaluationStatuses.SUBMITTED
+                                                .id || !row.item.pivot.isTaken
+                                          "
+                                          v-model="row.item.pivot.notes"
                                         >
-                                          <b-form-input
-                                            :disabled="
-                                              data.item.evaluationStatusId !==
-                                                evaluationStatuses.SUBMITTED
-                                                  .id || !row.item.pivot.isTaken
-                                            "
-                                            v-model="row.item.pivot.notes"
+                                        </b-form-input>
+                                      </template>
+                                      <template v-slot:cell(labs)="row">
+                                        {{
+                                          data.item.schoolCategoryId ===
+                                          options.schoolCategories.VOCATIONAL
+                                            .id
+                                            ? 'N/A'
+                                            : row.item.labs
+                                        }}
+                                      </template>
+                                      <template v-slot:cell(units)="row">
+                                        {{
+                                          data.item.schoolCategoryId ===
+                                          options.schoolCategories.VOCATIONAL
+                                            .id
+                                            ? 'N/A'
+                                            : row.item.units
+                                        }}
+                                      </template>
+                                      <template v-slot:custom-foot>
+                                        <b-tr>
+                                          <b-td
+                                            colspan="5"
+                                            class="text-right"
                                           >
-                                          </b-form-input>
-                                        </template>
-                                        <template v-slot:cell(labs)="row">
-                                          {{
-                                            data.item.schoolCategoryId ===
-                                            options.schoolCategories.VOCATIONAL
-                                              .id
-                                              ? 'N/A'
-                                              : row.item.labs
-                                          }}
-                                        </template>
-                                        <template v-slot:cell(units)="row">
-                                          {{
-                                            data.item.schoolCategoryId ===
-                                            options.schoolCategories.VOCATIONAL
-                                              .id
-                                              ? 'N/A'
-                                              : row.item.units
-                                          }}
-                                        </template>
-                                        <template v-slot:custom-foot>
-                                          <b-tr>
-                                            <b-td
-                                              colspan="5"
-                                              class="text-right"
-                                            >
-                                              <span class="text-danger"
-                                                >Total Units
-                                              </span>
-                                            </b-td>
-                                            <b-td class="text-center">
-                                              <span class="text-danger">
-                                                {{
-                                                  data.item.schoolCategoryId ===
-                                                  options.schoolCategories
-                                                    .VOCATIONAL.id
-                                                    ? 'N/A'
-                                                    : totalUnits(
-                                                        filterSubjects(
-                                                          data,
-                                                          level.id,
-                                                          semester.id
-                                                        ).items,
-                                                        'units'
-                                                      )
-                                                }}
-                                              </span>
-                                            </b-td>
-                                            <b-td class="text-center">
-                                              <span class="text-danger">
-                                                {{
-                                                  data.item.schoolCategoryId ===
-                                                  options.schoolCategories
-                                                    .VOCATIONAL.id
-                                                    ? 'N/A'
-                                                    : totalUnits(
-                                                        filterSubjects(
-                                                          data,
-                                                          level.id,
-                                                          semester.id
-                                                        ).items,
-                                                        'labs'
-                                                      )
-                                                }}
-                                              </span>
-                                            </b-td>
-                                            <b-td class="text-center">
-                                              <span class="text-danger">
-                                                {{
-                                                  data.item.schoolCategoryId ===
-                                                  options.schoolCategories
-                                                    .VOCATIONAL.id
-                                                    ? 'N/A'
-                                                    : totalUnits(
-                                                        filterSubjects(
-                                                          data,
-                                                          level.id,
-                                                          semester.id
-                                                        ).items,
-                                                        'totalUnits'
-                                                      )
-                                                }}
-                                              </span>
-                                            </b-td>
-                                          </b-tr>
-                                        </template>
-                                        <template v-slot:head(pivot.isTaken)>
-                                          <b-form-checkbox
-                                            v-if="
-                                              data.item.evaluationStatusId ===
-                                                evaluationStatuses.SUBMITTED.id
-                                            "
-                                            @input="
-                                              toggleCheckAll(
-                                                filterSubjects(
-                                                  data,
-                                                  level.id,
-                                                  semester.id
-                                                ).items,
-                                                $event
-                                              )
-                                            "
-                                            v-model="
+                                            <span class="text-danger"
+                                              >Total Units
+                                            </span>
+                                          </b-td>
+                                          <b-td class="text-center">
+                                            <span class="text-danger">
+                                              {{
+                                                data.item.schoolCategoryId ===
+                                                options.schoolCategories
+                                                  .VOCATIONAL.id
+                                                  ? 'N/A'
+                                                  : totalUnits(
+                                                      filterSubjects(
+                                                        data,
+                                                        level.id,
+                                                        semester.id
+                                                      ).items,
+                                                      'units'
+                                                    )
+                                              }}
+                                            </span>
+                                          </b-td>
+                                          <b-td class="text-center">
+                                            <span class="text-danger">
+                                              {{
+                                                data.item.schoolCategoryId ===
+                                                options.schoolCategories
+                                                  .VOCATIONAL.id
+                                                  ? 'N/A'
+                                                  : totalUnits(
+                                                      filterSubjects(
+                                                        data,
+                                                        level.id,
+                                                        semester.id
+                                                      ).items,
+                                                      'labs'
+                                                    )
+                                              }}
+                                            </span>
+                                          </b-td>
+                                          <b-td class="text-center">
+                                            <span class="text-danger">
+                                              {{
+                                                data.item.schoolCategoryId ===
+                                                options.schoolCategories
+                                                  .VOCATIONAL.id
+                                                  ? 'N/A'
+                                                  : totalUnits(
+                                                      filterSubjects(
+                                                        data,
+                                                        level.id,
+                                                        semester.id
+                                                      ).items,
+                                                      'totalUnits'
+                                                    )
+                                              }}
+                                            </span>
+                                          </b-td>
+                                        </b-tr>
+                                      </template>
+                                      <template v-slot:head(pivot.isTaken)>
+                                        <b-form-checkbox
+                                          v-if="
+                                            data.item.evaluationStatusId ===
+                                              evaluationStatuses.SUBMITTED.id
+                                          "
+                                          @input="
+                                            toggleCheckAll(
                                               filterSubjects(
                                                 data,
                                                 level.id,
                                                 semester.id
-                                              ).isTakenAll
-                                            "
-                                          >
-                                            Credited
-                                          </b-form-checkbox>
-                                        </template>
-                                        <template
-                                          v-slot:cell(pivot.isTaken)="row"
+                                              ).items,
+                                              $event
+                                            )
+                                          "
+                                          v-model="
+                                            filterSubjects(
+                                              data,
+                                              level.id,
+                                              semester.id
+                                            ).isTakenAll
+                                          "
                                         >
-                                          <b-form-checkbox
-                                            :disabled="
-                                              data.item.evaluationStatusId !==
-                                                evaluationStatuses.SUBMITTED.id
-                                            "
-                                            :value="1"
-                                            :unchecked-value="0"
-                                            v-model="row.item.pivot.isTaken"
-                                          />
-                                        </template>
-                                      </b-table>
-                                    </b-col>
-                                  </b-row>
-                                </div>
-                              </b-collapse>
-                            </b-list-group-item>
-                          </b-list-group>
+                                          Credited
+                                        </b-form-checkbox>
+                                      </template>
+                                      <template
+                                        v-slot:cell(pivot.isTaken)="row"
+                                      >
+                                        <b-form-checkbox
+                                          :disabled="
+                                            data.item.evaluationStatusId !==
+                                              evaluationStatuses.SUBMITTED.id
+                                          "
+                                          :value="1"
+                                          :unchecked-value="0"
+                                          v-model="row.item.pivot.isTaken"
+                                        />
+                                      </template>
+                                    </b-table>
+                                  </b-col>
+                                </b-row>
+                              </div>
+                            </b-collapse>
+                          </b-list-group-item>
+                        </b-list-group>
+                      </b-col>
+                    </b-row>
+                  </div>
+                </div>
+              </template>
+
+              <b-tabs content>
+                <b-tab title="Details">
+                  <div class="p-4">
+                    <div class="mt-2 mb-4">
+                      <b-row class="my-2 pb-1">
+                        <b-col md="12">
+                          <span class="h5">Applying for Academic Record</span>
+                          <hr class="bg-light mt-1 mb-2" />
+                        </b-col>
+                      </b-row>
+                      <b-row class="pb-1">
+                        <b-col md="12">
+                          <div class="d-flex flex-row">
+                            <div class="mr-2">Curriculum:</div>
+                            <div v-if="!data.item.studentCurriculumEdit">
+                              <span
+                                :class="
+                                  `font-weight-bold ${
+                                    !data.item.studentCurriculum
+                                      ? 'text-danger'
+                                      : ''
+                                  }`
+                                "
+                              >
+                                {{
+                                  data.item.studentCurriculum
+                                    ? data.item.studentCurriculum.name
+                                    : 'Nothing is Set'
+                                }} </span
+                              >&nbsp;
+                              <b-link
+                                v-if="
+                                  data.item.evaluationStatusId ===
+                                    evaluationStatuses.SUBMITTED.id
+                                "
+                                @click="
+                                  data.item.studentCurriculumEdit = !data.item
+                                    .studentCurriculumEdit
+                                "
+                              >
+                                [Set Curriculum]
+                              </b-link>
+                            </div>
+                            <div v-else class="w-75 ml-2">
+                              <b-form-select
+                                @change="
+                                  loadStudentCurriculum($event, data),
+                                    (data.item.studentCurriculumEdit = !data
+                                      .item.studentCurriculumEdit)
+                                "
+                                v-model="data.item.studentCurriculumId"
+                              >
+                                <template v-slot:first>
+                                  <b-form-select-option :value="null" disabled
+                                    >-- Curriculum --</b-form-select-option
+                                  >
+                                </template>
+                                <b-form-select-option
+                                  v-for="curriculum in data.item.curriculums"
+                                  :key="curriculum.id"
+                                  :value="curriculum.id"
+                                >
+                                  {{ curriculum.name }}
+                                </b-form-select-option>
+                              </b-form-select>
+                            </div>
+                          </div>
+                        </b-col>
+                      </b-row>
+                      <b-row class="pb-1">
+                        <b-col md="12" v-if="data.item.course">
+                          <div class="d-flex flex-row">
+                            <div class="mr-2">Course:</div>
+                            <div v-if="!data.item.studentCourseEdit">
+                              <span>
+                                {{ data.item.course.description }}
+                                {{
+                                  data.item.course.major
+                                    ? ' - ' + data.item.course.major
+                                    : ''
+                                }} </span
+                              >&nbsp;&nbsp;
+                              <b-link
+                                v-if="
+                                  data.item.evaluationStatusId ===
+                                    evaluationStatuses.SUBMITTED.id
+                                "
+                                @click="
+                                  data.item.studentCourseEdit = !data.item
+                                    .studentCourseEdit
+                                "
+                              >
+                                [Change Course]
+                              </b-link>
+                            </div>
+                            <div v-else class="w-75 ml-2">
+                              <b-form-select
+                                @change="onChangeCourse(data)"
+                                v-model="data.item.courseId"
+                                class="float-right"
+                              >
+                                <template v-slot:first>
+                                  <b-form-select-option :value="null" disabled
+                                    >-- Course --</b-form-select-option
+                                  >
+                                </template>
+                                <b-form-select-option :value="null"
+                                  >None</b-form-select-option
+                                >
+                                <b-form-select-option
+                                  v-for="course in options.courses.items"
+                                  :key="course.id"
+                                  :value="course.id"
+                                >
+                                  {{ course.description }}
+                                  {{
+                                    course.major ? `(${course.major})` : ''
+                                  }}
+                                </b-form-select-option>
+                              </b-form-select>
+                            </div>
+                          </div>
+                        </b-col>
+                      </b-row>
+                      <b-row class="pb-1">
+                        <b-col md="12">
+                          Level:<span class="ml-2">{{
+                            getName(data.item, 'level')
+                          }}</span>
+                        </b-col>
+                      </b-row>
+                      <b-row class="pb-1">
+                        <b-col md="12" v-if="data.item.semesterId">
+                          Semester:<span class="ml-2">{{
+                            semesters.getEnum(data.item.semesterId).name
+                          }}</span>
+                        </b-col>
+                      </b-row>
+                      <b-row class="pb-1">
+                        <b-col md="12">
+                          Date Submitted:<span class="ml-2">{{
+                            data.item.submittedDate
+                          }}</span>
                         </b-col>
                       </b-row>
                     </div>
                   </div>
-                </template>
-
-                <b-tabs content>
-                  <b-tab title="Details">
-                    <div class="p-4">
-                      <div class="mt-2 mb-4">
-                        <b-row class="my-2 pb-1">
-                          <b-col md="12">
-                            <span class="h5">Applying for Academic Record</span>
-                            <hr class="bg-light mt-1 mb-2" />
-                          </b-col>
-                        </b-row>
-                        <b-row class="pb-1">
-                          <b-col md="12">
-                            <div class="d-flex flex-row">
-                              <div class="mr-2">Curriculum:</div>
-                              <div v-if="!data.item.studentCurriculumEdit">
-                                <span
-                                  :class="
-                                    `font-weight-bold ${
-                                      !data.item.studentCurriculum
-                                        ? 'text-danger'
-                                        : ''
-                                    }`
-                                  "
-                                >
-                                  {{
-                                    data.item.studentCurriculum
-                                      ? data.item.studentCurriculum.name
-                                      : 'Nothing is Set'
-                                  }} </span
-                                >&nbsp;
-                                <b-link
-                                  v-if="
-                                    data.item.evaluationStatusId ===
-                                      evaluationStatuses.SUBMITTED.id
-                                  "
-                                  @click="
-                                    data.item.studentCurriculumEdit = !data.item
-                                      .studentCurriculumEdit
-                                  "
-                                >
-                                  [Set Curriculum]
-                                </b-link>
-                              </div>
-                              <div v-else class="w-75 ml-2">
-                                <b-form-select
-                                  @change="
-                                    loadStudentCurriculum($event, data),
-                                      (data.item.studentCurriculumEdit = !data
-                                        .item.studentCurriculumEdit)
-                                  "
-                                  v-model="data.item.studentCurriculumId"
-                                >
-                                  <template v-slot:first>
-                                    <b-form-select-option :value="null" disabled
-                                      >-- Curriculum --</b-form-select-option
-                                    >
-                                  </template>
-                                  <b-form-select-option
-                                    v-for="curriculum in data.item.curriculums"
-                                    :key="curriculum.id"
-                                    :value="curriculum.id"
-                                  >
-                                    {{ curriculum.name }}
-                                  </b-form-select-option>
-                                </b-form-select>
-                              </div>
-                            </div>
-                          </b-col>
-                        </b-row>
-                        <b-row class="pb-1">
-                          <b-col md="12" v-if="data.item.course">
-                            <div class="d-flex flex-row">
-                              <div class="mr-2">Course:</div>
-                              <div v-if="!data.item.studentCourseEdit">
-                                <span>
-                                  {{ data.item.course.description }}
-                                  {{
-                                    data.item.course.major
-                                      ? ' - ' + data.item.course.major
-                                      : ''
-                                  }} </span
-                                >&nbsp;&nbsp;
-                                <b-link
-                                  v-if="
-                                    data.item.evaluationStatusId ===
-                                      evaluationStatuses.SUBMITTED.id
-                                  "
-                                  @click="
-                                    data.item.studentCourseEdit = !data.item
-                                      .studentCourseEdit
-                                  "
-                                >
-                                  [Change Course]
-                                </b-link>
-                              </div>
-                              <div v-else class="w-75 ml-2">
-                                <b-form-select
-                                  @change="onChangeCourse(data)"
-                                  v-model="data.item.courseId"
-                                  class="float-right"
-                                >
-                                  <template v-slot:first>
-                                    <b-form-select-option :value="null" disabled
-                                      >-- Course --</b-form-select-option
-                                    >
-                                  </template>
-                                  <b-form-select-option :value="null"
-                                    >None</b-form-select-option
-                                  >
-                                  <b-form-select-option
-                                    v-for="course in options.courses.items"
-                                    :key="course.id"
-                                    :value="course.id"
-                                  >
-                                    {{ course.description }}
-                                    {{
-                                      course.major ? `(${course.major})` : ''
-                                    }}
-                                  </b-form-select-option>
-                                </b-form-select>
-                              </div>
-                            </div>
-                          </b-col>
-                        </b-row>
-                        <b-row class="pb-1">
-                          <b-col md="12">
-                            Level:<span class="ml-2">{{
-                              getName(data.item, 'level')
-                            }}</span>
-                          </b-col>
-                        </b-row>
-                        <b-row class="pb-1">
-                          <b-col md="12" v-if="data.item.semesterId">
-                            Semester:<span class="ml-2">{{
-                              semesters.getEnum(data.item.semesterId).name
-                            }}</span>
-                          </b-col>
-                        </b-row>
-                        <b-row class="pb-1">
-                          <b-col md="12">
-                            Date Submitted:<span class="ml-2">{{
-                              data.item.submittedDate
-                            }}</span>
-                          </b-col>
-                        </b-row>
-                      </div>
-                    </div>
-                  </b-tab>
-                  <b-tab title="Evaluation Form"> </b-tab>
-                  <b-tab>
-                    <template v-slot:title>
-                      Attachments
-                      <span v-if="data.item.filesCount > 0">
-                        ({{ data.item.filesCount }})
-                      </span>
-                    </template>
-                  </b-tab>
-                </b-tabs>
-                <div
+                </b-tab>
+                <b-tab title="Evaluation Form"> </b-tab>
+                <b-tab>
+                  <template v-slot:title>
+                    Attachments
+                    <span v-if="data.item.filesCount > 0">
+                      ({{ data.item.filesCount }})
+                    </span>
+                  </template>
+                </b-tab>
+              </b-tabs>
+              <div
+                v-if="
+                  data.item.evaluationStatusId ===
+                    evaluationStatuses.SUBMITTED.id
+                "
+              >
+                <b-button
                   v-if="
-                    data.item.evaluationStatusId ===
-                      evaluationStatuses.SUBMITTED.id
+                    isAccessible(
+                      $options.EvaluationAndAdmissionPermissions.DISAPPROVAL
+                        .id
+                    )
                   "
+                  @click="setDisapproval(data)"
+                  class="float-right my-2 mr-2"
+                  variant="outline-danger"
+                  >Reject</b-button
                 >
-                  <b-button
-                    v-if="
-                      isAccessible(
-                        $options.EvaluationAndAdmissionPermissions.DISAPPROVAL
-                          .id
-                      )
-                    "
-                    @click="setDisapproval(data)"
-                    class="float-right my-2 mr-2"
-                    variant="outline-danger"
-                    >Reject</b-button
-                  >
-                  <b-button
-                    v-if="
-                      isAccessible(
-                        $options.EvaluationAndAdmissionPermissions.APPROVAL.id
-                      )
-                    "
-                    @click="setApproval(data)"
-                    class="float-right m-2"
-                    variant="outline-primary"
-                    >Approve</b-button
-                  >
-                </div>
-              </ActiveRowViewer>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.student.from }} to
-              {{ paginations.student.to }} of
-              {{ paginations.student.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.student.page"
-                :total-rows="paginations.student.totalRows"
-                :per-page="paginations.student.perPage"
-                size="sm"
-                align="end"
-                @input="loadEvaluation()"
-              />
-            </b-col>
-          </b-row>
-        </div>
+                <b-button
+                  v-if="
+                    isAccessible(
+                      $options.EvaluationAndAdmissionPermissions.APPROVAL.id
+                    )
+                  "
+                  @click="setApproval(data)"
+                  class="float-right m-2"
+                  variant="outline-primary"
+                  >Approve</b-button
+                >
+              </div>
+            </ActiveRowViewer>
+          </template>
+        </b-table>
+        <b-row>
+          <b-col md="6">
+            Showing {{ paginations.student.from }} to
+            {{ paginations.student.to }} of
+            {{ paginations.student.totalRows }} records.
+          </b-col>
+          <b-col md="6">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.student.page"
+              :total-rows="paginations.student.totalRows"
+              :per-page="paginations.student.perPage"
+              size="sm"
+              align="end"
+              @input="loadEvaluation()"
+            />
+          </b-col>
+        </b-row>
       </div>
-    </Card>
-    <FileViewer
+       <FileViewer
       :show="fileViewer.show"
       :file="file"
       :owner="file.owner"
@@ -1300,8 +1224,8 @@
       </div>
       <!-- modal footer buttons -->
     </b-modal>
-    <!-- Modal Reject -->
-  </div>
+    </template>
+  </PageContent>
   <!-- main container -->
 </template>
 <script>
@@ -1340,7 +1264,9 @@ import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
 import Card from '../components/Card';
-import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, AddressColumn } from '../components/ColumnDetails';
+import PageContent from '../components/PageContainer/PageContent';
+import FilterButton from '../components/PageContainer/FilterButton';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1379,10 +1305,14 @@ export default {
     Card,
     StudentColumn,
     EducationColumn,
+    AddressColumn,
+    PageContent,
+    FilterButton,
   },
   EvaluationAndAdmissionPermissions,
   data() {
     return {
+      isFilterVisible: true,
       fileViewer: {
         isActiveNavEnabled: false,
         activeNavCount: 0,
@@ -1429,6 +1359,12 @@ export default {
               // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
               // }
             },
+             {
+              key: 'address',
+              label: 'Address',
+              tdClass: 'align-middle',
+              thStyle: { width: '28%' },
+            },
             {
               key: 'education',
               label: 'Education',
@@ -1439,7 +1375,7 @@ export default {
               key: 'submittedDate',
               label: 'Submitted',
               tdClass: 'align-middle',
-              thStyle: { width: '13%' },
+              thStyle: { width: '10%' },
               formatter: (value, key, item) => {
                 if (!value) return '';
 
@@ -1451,14 +1387,14 @@ export default {
               label: 'Category',
               tdClass: 'align-middle text-center font-weight-bold',
               thClass: 'text-center',
-              thStyle: { width: '12%' },
+              thStyle: { width: '80px' },
             },
             {
               key: 'status',
               label: 'Status',
               tdClass: 'align-middle text-center',
               thClass: 'text-center',
-              thStyle: { width: '12%' },
+              thStyle: { width: '50px' },
             },
             // {
             // 	key: "attachments",
@@ -1471,7 +1407,7 @@ export default {
               key: 'action',
               label: '',
               tdClass: 'align-middle',
-              thStyle: { width: '40px' },
+              thStyle: { width: '25px' },
             },
           ],
           items: [],
@@ -1598,9 +1534,11 @@ export default {
       filters: {
         student: {
           criteria: null,
-          schoolCategoryId: null,
+          schoolCategoryId: 0,
+          schoolCategoryItem: null,
           courseId: null,
           evaluationStatusId: EvaluationStatuses.SUBMITTED.id,
+          evaluationStatusItem: EvaluationStatuses.SUBMITTED
         },
         subject: {
           criteria: null,
@@ -1627,6 +1565,7 @@ export default {
   },
   created() {
     // this.checkRights()
+    this.loadEvaluation();
     this.loadCourseList();
   },
   methods: {
@@ -2122,6 +2061,18 @@ export default {
       };
       this.previewFile(currentFileItem, this.lastActiveEvaluation);
     },
+    onCategoryFilterChange(item) {
+      const { student } = this.filters;
+      student.schoolCategoryId = item?.id || 0;
+      student.schoolCategoryItem = item;
+      this.loadEvaluation();
+    },
+    onStatusFilterChange(item) {
+      const { student } = this.filters;
+      student.evaluationStatusId = item?.id || 0;
+      student.evaluationStatusItem = item;
+      this.loadEvaluation();
+    }
   },
   computed: {
     totalUnits() {
@@ -2163,4 +2114,5 @@ export default {
 .evaluation__form-details-second {
   width: 30%;
 }
+
 </style>

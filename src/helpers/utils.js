@@ -26,3 +26,25 @@ export const createLimiter = (values) => {
   if (w >= MEDIUM_PHONE) return values[6];
   return values[7];
 }
+
+export const formatAddress = (address) => {
+  console.log('formatAddress', address)
+  const currentAddress = [
+    address?.currentHouseNoStreet,
+    address?.currentDistrict,
+    (`${address?.currentCityTown} ${address?.currentPostalCode}`)?.trim(),
+    address?.currentProvince,
+    address?.currentRegion,
+  ].filter(v => !!v).join(', ') || address?.currentCompleteAddress;
+
+  const permaAddress = [
+    address?.permanentHouseNoStreet,
+    address?.permanentDistrict,
+    (`${address?.permanentCityTown} ${address?.permanentPostalCode}`)?.trim(),
+    address?.permanentProvince,
+    address?.permanentRegion,
+  ].filter(v => !!v).join(', ') || address?.permanentCompleteAddress;
+
+  return currentAddress || permaAddress;
+}
+

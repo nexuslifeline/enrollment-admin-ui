@@ -11,7 +11,7 @@
             :class="{ active: $route.path.includes(item.to)}">
             <router-link
               class="sub-nav__link"
-              :to="`/dashboard/settings${item.to}`">
+              :to="`/home/settings${item.to}`">
               {{item.label}}
             </router-link>
           </li>

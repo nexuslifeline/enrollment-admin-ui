@@ -41,7 +41,7 @@
     </CHeaderBrand>
     <CHeaderNav class="d-md-down-none mr-auto">
       <!--<CHeaderNavItem class="px-3">
-        <CHeaderNavLink to="/dashboard">
+        <CHeaderNavLink to="/home">
           Dashboard
         </CHeaderNavLink>
       </CHeaderNavItem>

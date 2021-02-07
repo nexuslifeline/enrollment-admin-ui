@@ -4,7 +4,7 @@
     <b-overlay :show="isLoading" class="full-overlay-container">
       <div v-if="!isLoading" class="c-wrapper">
         <TheHeader />
-        <div class="main-content">
+        <div class="main-content" :class="{ shrink: !isHome }">
           <LeftPane />
           <div class="c-body">
             <main class="c-main">
@@ -43,6 +43,11 @@ export default {
     this.loadProfile();
     this.loadApprovalCount();
   },
+  computed: {
+    isHome() {
+      return this.$route.path?.includes('/home');
+    },
+  },
   methods: {
     loadProfile() {
       this.isLoading = true;
@@ -66,11 +71,24 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .main-content {
   display: flex;
   padding: 0;
   margin: 175px 0 0 0;
+  transition: all .3s;
+
+  .c-body {
+    transition: all .3s;
+  }
+
+  &.shrink {
+    margin-top: 50px;
+
+    .c-body {
+      margin-left: 0;
+    }
+  }
 }
 
 .full-overlay-container {

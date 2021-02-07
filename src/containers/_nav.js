@@ -18,7 +18,7 @@ export const navs = () => {
       {
         _name: 'CSidebarNavItem',
         name: 'Dashboard',
-        to: '/dashboard',
+        to: '/home',
         icon: 'cil-speedometer'
       },
       {

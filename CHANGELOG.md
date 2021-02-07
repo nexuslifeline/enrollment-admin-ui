@@ -135,7 +135,7 @@
 other:  
 
 - feat: app-footer fixed
-- refactor(dashboard): brand-card, progress-group-bars 
+- refactor(home): brand-card, progress-group-bars 
 - refactor(social-box-chart-example): props
 - feat(forms): new `<b-form-input type="date">` example added
 - refactor(cards): Card outline, Card accent - title variants added

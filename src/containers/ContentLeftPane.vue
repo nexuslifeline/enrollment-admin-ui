@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content__left-panel">
+  <div class="main-content__left-panel" :class="{ shrink: !isHome }">
     <div class="left-panel__section">
       <p class="left-panel__text">
         <BIconEnvelope scale="1.25" class="mr-2" /> {{user.username}}
@@ -34,6 +34,9 @@
 export default {
   name: 'Sidebar',
   computed: {
+    isHome() {
+      return this.$route.path?.includes('/home');
+    },
     user() {
       return this.$store.state.user;
     },
@@ -59,9 +62,18 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: all .3s;
 
     @include for-size(tablet-landscape-down) {
       display: none;
+    }
+
+    &.shrink {
+      width: 0;
+      .left-panel__section {
+        display: none;
+      }
+
     }
   }
 

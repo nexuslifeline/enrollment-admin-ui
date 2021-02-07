@@ -3,7 +3,7 @@
     <template v-slot:aside>
       <AvatarMaker
         :avatarId="data.student.id"
-        :size="50"
+        :size="33"
         :text="
           `${data.student.firstName.charAt(0)}${data.student.lastName.charAt(
             0
@@ -24,13 +24,13 @@
     <div class="text-muted">
       {{ data.student.email }}
     </div>
-    <div class="text-muted">
+    <!-- <div class="text-muted">
       {{
         data.student.currentAddress || data.student.address
           ? data.student.currentAddress
           : ''
       }}
-    </div>
+    </div> -->
   </b-media>
 </template>
 

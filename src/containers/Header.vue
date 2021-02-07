@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="header__menus-container">
-      <ul class="header__menus">
+      <ul class="header__menus" :class="{ shrink: !isHome }">
         <li
           v-for="(nav, idx) in $options.navItems.filter(
             (v, i) => i < mainNavLimit
@@ -43,6 +43,7 @@
                       @click="mainNavOpen = []"
                       class="header__main-nav-dropdown-item"
                       :class="{ active: $route.path.startsWith(nav.to) }"
+                      :key="idx"
                     >
                       <a
                         :href="`#${redirectTo(nav)}`"
@@ -58,78 +59,93 @@
           </li>
         </template>
       </ul>
-    </div>
-    <div class="header__account-details">
-      <WaveBackground />
-      <div class="header__account-details-row">
-        <div class="header__account-photo-container">
-          <img
-            v-if="!!userPhoto"
-            class="header__account-photo"
-            :src="userPhoto"
-          />
-          <ProfileMaker
-            v-else
-            class="header__account-photo"
-            :initials="user.userable.name.charAt(0)"
-            :colorIndex="user.id % 8"
-          />
-        </div>
-        <div class="header__account-profile-details">
-          <p class="header__account-name">{{ user.userable.name }}</p>
-          <p class="header__account-group">{{ userGroup }}</p>
-        </div>
-        <div class="header__account-actions">
-          <div class="header__school-year">
-            <b-form-select
-              v-model="$store.state.schoolYearId"
-              class="float-right"
-            >
-              <b-form-select-option :value="null">
-                ALL
-              </b-form-select-option>
-              <b-form-select-option
-                v-for="schoolYear in options.schoolYears.items"
-                :key="schoolYear.id"
-                :value="schoolYear.id"
-              >
-                {{ schoolYear.name }}
-              </b-form-select-option>
-            </b-form-select>
-          </div>
-          <button
-            @click.stop="showDropdown = !showDropdown"
-            type="button"
-            class="account-action__settings"
-          >
-            <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
-            <v-icon
-              name="caret-down"
-              class="account-action__icon"
-              scale=".85"
-            />
-            <div v-if="showDropdown" class="account-action__dropdown">
-              <ul class="account-action__dropdown-items">
-                <li class="account-action__dropdown-item">
-                  <a href="#" class="account-action__dropdown-item-link">
-                    My Profile
-                  </a>
-                </li>
-                <li
-                  @click.prevent.stop="logout"
-                  class="account-action__dropdown-item"
-                >
-                  <a href="#" class="account-action__dropdown-item-link">
-                    Logout
-                    <v-icon v-if="isLoading" name="spinner" spin class="ml-2" />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </button>
-        </div>
+      <div v-if="!isHome" class="header__secondary-account-details">
+        <img
+          class="header__secondary-account-photo"
+          v-if="!!userPhoto"
+          :src="userPhoto"
+        />
+        <ProfileMaker
+          v-else
+          class="header__secondary-account-photo"
+          :initials="user.userable.name.charAt(0)"
+          :colorIndex="user.id % 8"
+        />
       </div>
-      <div class="header__sub-menus-container">
+    </div>
+    <div class="header__account-details" :class="{ shrink: !isHome }">
+      <WaveBackground v-if="isHome" />
+      <div class="header__account-details-row">
+        <template v-if="isHome">
+          <div class="header__account-photo-container">
+            <img
+              v-if="!!userPhoto"
+              class="header__account-photo"
+              :src="userPhoto"
+            />
+            <ProfileMaker
+              v-else
+              class="header__account-photo"
+              :initials="user.userable.name.charAt(0)"
+              :colorIndex="user.id % 8"
+            />
+          </div>
+          <div class="header__account-profile-details">
+            <p class="header__account-name">{{ user.userable.name }}</p>
+            <p class="header__account-group">{{ userGroup }}</p>
+          </div>
+          <div class="header__account-actions">
+            <div class="header__school-year">
+              <b-form-select
+                v-model="$store.state.schoolYearId"
+                class="float-right"
+              >
+                <b-form-select-option :value="null">
+                  ALL
+                </b-form-select-option>
+                <b-form-select-option
+                  v-for="schoolYear in options.schoolYears.items"
+                  :key="schoolYear.id"
+                  :value="schoolYear.id"
+                >
+                  {{ schoolYear.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </div>
+            <button
+              @click.stop="showDropdown = !showDropdown"
+              type="button"
+              class="account-action__settings"
+            >
+              <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
+              <v-icon
+                name="caret-down"
+                class="account-action__icon"
+                scale=".85"
+              />
+              <div v-if="showDropdown" class="account-action__dropdown">
+                <ul class="account-action__dropdown-items">
+                  <li class="account-action__dropdown-item">
+                    <a href="#" class="account-action__dropdown-item-link">
+                      My Profile
+                    </a>
+                  </li>
+                  <li
+                    @click.prevent.stop="logout"
+                    class="account-action__dropdown-item"
+                  >
+                    <a href="#" class="account-action__dropdown-item-link">
+                      Logout
+                      <v-icon v-if="isLoading" name="spinner" spin class="ml-2" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </button>
+          </div>
+        </template>
+      </div>
+      <div class="header__sub-menus-container" :class="{ shrink: !isHome }">
         <ul class="header__sub-menus">
           <template
             v-for="(subNav, idx) in $options.navItems[
@@ -249,6 +265,9 @@ export default {
     };
   },
   computed: {
+    isHome() {
+      return this.$route.path?.includes('/home');
+    },
     activeIndex() {
       return this.$options.navItems.findIndex((v) =>
         this.$route.path.includes(v.to)
@@ -438,6 +457,7 @@ export default {
   height: 45px;
   width: 100%;
   padding: 0 60px;
+  display: flex;
 
   @include for-size(tablet-landscape-down) {
     padding: 0 20px;
@@ -448,10 +468,12 @@ export default {
   height: 33px;
   //width: 100%;
   flex: 1;
+  align-items: flex-end;
   margin-left: 235px;
   //padding: 0 230px;
   //background-color: $brand-primary;
   z-index: 1;
+  transition: all .3s;
 
   @include for-size(tablet-portrait-down) {
     padding: 0 20px;
@@ -469,6 +491,16 @@ export default {
   font-size: 14px;
   height: 100%;
   align-items: center;
+
+  &.shrink {
+    .header__menu-item {
+      &.active {
+        &:after {
+          border-color: transparent transparent $white transparent;
+        }
+      }
+    }
+  }
 }
 
 .header__menu-item {
@@ -510,6 +542,29 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
+  transition: all .3s;
+
+  &.shrink {
+    height: 39px;
+    background-color: $white;
+    border-bottom: 1px solid $light-gray-10;
+    //box-shadow: 0 3px 2px 0 #e2e2e2;
+
+    .header__sub-menus-container {
+      margin-left: 15px;
+      margin-top: 0;
+    }
+
+    .header__sub-menu-item {
+      background: none;
+      color: black;
+      margin-right: 5px;
+
+      &.active {
+        border-bottom: 3px solid $brand-primary;
+      }
+    }
+  }
 }
 
 .header__account-details-row {
@@ -712,5 +767,19 @@ export default {
 
 .header__school-year {
   margin-right: 15px;
+}
+
+.header__secondary-account-details {
+  display: flex;
+  margin-left: auto;
+  margin-top: 7px;
+}
+
+.header__secondary-account-photo {
+  border-radius: 50%;
+  object-fit: cover;
+  position: absolute;
+  height: 32px;
+  width: 32px;
 }
 </style>

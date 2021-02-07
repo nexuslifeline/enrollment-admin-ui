@@ -44,6 +44,19 @@ body {
   padding: 0.75rem;
   vertical-align: top;
   border-top: 1px solid #d8dbe0 !important;
+  background-color: $white;
+}
+
+.table tr {
+  
+}
+
+.table tr {
+  &:nth-child(even) {
+    td {
+      background-color: #f7f7f7;
+    }
+  }
 }
 
 .border {
@@ -395,6 +408,7 @@ legend.required:before {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  background-color: #f7f7f7;
 }
 
 .c-wrapper {
@@ -426,7 +440,7 @@ legend.required:before {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  background-color: #fff;
+  background-color: #f7f7f7;
 }
 
 .c-body {
@@ -456,15 +470,15 @@ legend.required:before {
 
 @media (min-width: 768px){
   .c-main > .container-fluid {
-    padding-right: 30px;
-    padding-left: 30px;
+    padding-right: 0;
+    padding-left: 0;
   }
 }
 
 .container-fluid {
   width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 0;
+  padding-left: 0;
   margin-right: auto;
   margin-left: auto;
 }
@@ -573,3 +587,14 @@ legend.required:before {
   color: rgb(68, 185, 224);
   margin: 0 0 -1px 4px;
 }
+
+.c-table thead th {
+  color: $bluish-gray !important;
+  padding: 4px !important;
+}
+
+.c-table tbody td {
+  padding: 6px !important;
+}
+
+
