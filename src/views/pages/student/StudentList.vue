@@ -49,7 +49,13 @@
               <template v-slot:cell(name)="data">
                 <StudentColumn
                   :data="{ student: data.item }"
-                  :callback="{ loadDetails: () => null }"
+                  :callback="{
+                    loadDetails: () => {
+                      $options.StudentPermissions.EDIT.id
+                        ? $router.push(`/master-files/student/${data.item.id}`)
+                        : null;
+                    },
+                  }"
                 />
               </template>
               <template v-slot:cell(contact)="data">
@@ -885,5 +891,4 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 </style>

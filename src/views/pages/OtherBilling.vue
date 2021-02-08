@@ -1198,7 +1198,6 @@ export default {
         } = row;
         this.$set(item, 'isLoading', true);
         this.getBilling(id).then(({ data }) => {
-          console.log(data);
           this.$set(item, 'billingItems', data.billingItems);
           item.isLoading = false;
         });

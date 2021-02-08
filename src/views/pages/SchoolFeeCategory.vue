@@ -52,6 +52,17 @@
                   <strong>Loading...</strong>
                 </div>
               </template>
+              <template v-slot:cell(name)="{ item, value }">
+                <b-link
+                  @click="setUpdate(item)"
+                  :disabled="
+                    !isAccessible($options.FeeCategoryPermissions.EDIT.id) ||
+                      item.id ===
+                        $options.SchoolFeeCategories.MISCELLANEOUS_FEE.id
+                  "
+                  >{{ value }}
+                </b-link>
+              </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
                   v-if="
@@ -72,7 +83,7 @@
                   </template>
                   <b-dropdown-item
                     v-if="isAccessible($options.FeeCategoryPermissions.EDIT.id)"
-                    @click="setUpdate(row)"
+                    @click="setUpdate(row.item)"
                     :disabled="showModalEntry"
                   >
                     Edit
@@ -402,14 +413,14 @@ export default {
         this.showModalConfirmation = false;
       });
     },
-    setUpdate(row) {
+    setUpdate(item) {
       this.showModalEntry = true;
       const {
         schoolFeeCategory,
         schoolFeeCategory: { fields },
       } = this.forms;
       schoolFeeCategory.isLoading = true;
-      copyValue(row.item, fields);
+      copyValue(item, fields);
       reset(schoolFeeCategory);
       this.entryMode = 'Edit';
       schoolFeeCategory.isLoading = false;
