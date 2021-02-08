@@ -192,7 +192,7 @@
                   <v-icon name="ellipsis-v" />
                 </template>
                 <b-dropdown-item @click="setResume(row)">
-                  Resume
+                  <v-icon name="sync" class="mr-1"/> Resume
                 </b-dropdown-item>
               </b-dropdown>
             </template>

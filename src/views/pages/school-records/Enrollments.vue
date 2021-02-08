@@ -55,7 +55,7 @@
               </template>
               <b-dropdown-item
                 :to="`/master-files/student/${$route.params.studentId}/school-records/enrollments/${row.item.id}`">
-                Edit
+                <v-icon name="pen" class="mr-1"/> Edit
               </b-dropdown-item>
             </b-dropdown>
           </template>

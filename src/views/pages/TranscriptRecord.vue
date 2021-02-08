@@ -214,7 +214,7 @@
                   "
                   @click.prevent="printTranscriptRecord(row.item.id)"
                 >
-                  Print
+                  <v-icon name="print" class="mr-1"/> Print
                 </b-dropdown-item>
                 <b-dropdown-item
                   v-if="
@@ -226,7 +226,7 @@
                   "
                   @click.prevent="loadDetails(row)"
                 >
-                  Review Record
+                  <v-icon name="search" class="mr-1"/> Review Record
                 </b-dropdown-item>
               </b-dropdown>
             </template>

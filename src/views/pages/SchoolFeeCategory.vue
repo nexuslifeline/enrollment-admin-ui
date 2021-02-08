@@ -75,7 +75,7 @@
                     @click="setUpdate(row)"
                     :disabled="showModalEntry"
                   >
-                    Edit
+                    <v-icon name="pen"  class="mr-1"/> Edit
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -87,7 +87,7 @@
                     "
                     :disabled="showModalConfirmation"
                   >
-                    Delete
+                    <v-icon name="trash"  class="mr-1"/> Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

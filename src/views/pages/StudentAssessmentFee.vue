@@ -30,11 +30,11 @@
               v-model="filters.student.applicationStatusId"
             >
               <b-form-radio :value="null">Show All</b-form-radio>
-              <b-form-radio :value="applicationStatuses.APPROVED.id">
-                Approved
-              </b-form-radio>
               <b-form-radio :value="applicationStatuses.SUBMITTED.id">
                 Pending
+              </b-form-radio>
+              <b-form-radio :value="applicationStatuses.APPROVED.id">
+                Approved
               </b-form-radio>
             </b-form-radio-group>
           </b-col>
@@ -145,7 +145,7 @@
               </template>
               <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
               <b-dropdown-item @click.prevent="loadDetails(row)">
-                {{
+                <v-icon name="search" class="mr-1"/> {{
                   row.item.application
                     ? getEllipsisCaption(
                         row.item.application.applicationStatusId
@@ -162,7 +162,7 @@
                 "
                 @click.prevent="loadAssessmentForm(row.item.id)"
               >
-                Preview Assessment Form
+                <v-icon name="search" class="mr-1"/> Preview Assessment Form
               </b-dropdown-item>
             </b-dropdown>
           </template>

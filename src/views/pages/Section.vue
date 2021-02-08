@@ -168,7 +168,7 @@
                     <v-icon name="ellipsis-v" />
                   </template>
                   <b-dropdown-item @click="loadSchedules(row)">
-                    {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
+                    <v-icon name="search"  class="mr-1"/> {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -179,7 +179,7 @@
                     @click="setUpdate(row, 0)"
                     :disabled="showEntry"
                   >
-                    Edit
+                   <v-icon name="pen"  class="mr-1"/> Edit
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -190,7 +190,7 @@
                     @click="setUpdate(row, 1)"
                     :disabled="showEntry"
                   >
-                    Setup Schedule
+                    <v-icon name="calendar-alt"  class="mr-1"/> Setup Schedule
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -204,7 +204,7 @@
                     "
                     :disabled="showModalConfirmation"
                   >
-                    Delete
+                    <v-icon name="trash"  class="mr-1"/> Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

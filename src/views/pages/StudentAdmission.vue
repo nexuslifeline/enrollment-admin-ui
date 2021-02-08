@@ -138,7 +138,7 @@
                 <v-icon name="ellipsis-v" />
               </template>
               <b-dropdown-item @click.prevent="loadDetails(row)">
-                View Details
+                <v-icon name="search" class="mr-1"/>  View Details
               </b-dropdown-item>
             </b-dropdown>
           </template>

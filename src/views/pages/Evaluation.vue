@@ -202,6 +202,7 @@
                 </template>
                 <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
                 <b-dropdown-item @click.prevent="loadDetails(row)">
+                  <v-icon name="search" class="mr-1"/>
                   {{
                     row.item.evaluationStatusId ===
                     evaluationStatuses.APPROVED.id

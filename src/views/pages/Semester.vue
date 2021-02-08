@@ -52,7 +52,7 @@
                   <!-- need to add user access settings -->
                   <b-dropdown-item
                     @click="setAsActiveSemester(row)">
-                    Set as Active Semester
+                    <v-icon name="wrench"  class="mr-1"/> Set as Active Semester
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

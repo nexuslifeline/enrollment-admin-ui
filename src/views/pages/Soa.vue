@@ -125,7 +125,7 @@
                 "
                 @click="previewBilling(id)"
               >
-                <v-icon name="file-pdf" /> Preview
+                <v-icon name="search" class="mr-1"/> Preview
               </b-dropdown-item>
               <b-dropdown-item
                 v-if="
@@ -133,7 +133,7 @@
                 "
                 @click="setUpdateSoa(id)"
               >
-                <v-icon name="pen" /> Edit
+                <v-icon name="pen" class="mr-1"/> Edit
               </b-dropdown-item>
               <b-dropdown-item
                 v-if="
@@ -143,7 +143,7 @@
                   (forms.billing.fields.id = id), (showModalConfirmation = true)
                 "
               >
-                <v-icon name="trash" /> Delete
+                <v-icon name="trash" class="mr-1"/> Delete
               </b-dropdown-item>
             </b-dropdown>
           </template>

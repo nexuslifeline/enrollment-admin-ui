@@ -66,19 +66,19 @@
                     v-if="isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)"
                     :to="`/maintenance/user-group/${row.item.id}/`"
                     :disabled="showModalEntry">
-                    Setup Permission
+                    <v-icon name="wrench" class="mr-1"/> Setup Permission
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.UserGroupPermissions.EDIT.id)"
                     @click="setUpdate(row)"
                     :disabled="showModalEntry">
-                    Edit
+                    <v-icon name="pen" class="mr-1"/> Edit
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.UserGroupPermissions.DELETE.id)"
                     @click="forms.userGroup.fields.id = row.item.id, showModalConfirmation = true"
                     :disabled="showModalConfirmation">
-                    Delete
+                    <v-icon name="trash" class="mr-1"/> Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

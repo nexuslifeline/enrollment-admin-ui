@@ -15,7 +15,7 @@
           <v-icon name="ellipsis-v" />
         </template>
         <b-dropdown-item @click="$emit('onRefresh')">
-          <v-icon name="sync" />
+          <v-icon name="sync" class="mr-1"/>
           Refresh
         </b-dropdown-item>
       </b-dropdown>

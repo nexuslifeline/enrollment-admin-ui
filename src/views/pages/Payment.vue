@@ -65,6 +65,7 @@
                   <v-icon name="ellipsis-v" />
                 </template>
                 <b-dropdown-item @click.prevent="loadDetails(row)">
+                  <v-icon name="search"  class="mr-1"/>
                   {{
                     row.item.paymentStatusId ===
                     paymentStatuses.APPROVED.id

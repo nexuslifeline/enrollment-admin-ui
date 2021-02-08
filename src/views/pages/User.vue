@@ -78,18 +78,18 @@
                     v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
                     @click="setUpdatePersonnel(row)"
                     :disabled="showModalEntry">
-                    Edit Personnel Info
+                    <v-icon name="pen" class="mr-1"/> Edit Personnel Info
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id)"
                     @click="setUpdateUser(row)"
                     :disabled="showModalConfirmation">
-                    Edit Account Info
+                    <v-icon name="user-edit" class="mr-1"/> Edit Account Info
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
                     @click="forms.user.fields.id = row.item.id, showModalConfirmation = true">
-                    Delete
+                    <v-icon name="trash" class="mr-1"/> Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

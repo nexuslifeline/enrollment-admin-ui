@@ -124,7 +124,7 @@
                   `/master-files/student/${$route.params.studentId}/school-records/evaluations/${row.item.id}`
                 "
               >
-                Edit
+                <v-icon name="pen" class="mr-1"/> Edit
               </b-dropdown-item>
             </b-dropdown>
           </template>

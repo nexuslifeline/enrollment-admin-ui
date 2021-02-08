@@ -111,14 +111,14 @@
                   <b-dropdown-item
                     :to="`/master-files/student/${row.item.id}/school-records`"
                   >
-                    Update School Records
+                    <v-icon name="file-signature" class="mr-1"/> Update School Records
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.StudentPermissions.EDIT.id)"
                     @click="setUpdateStudent(row)"
                     :disabled="showStudentEntry"
                   >
-                    Edit Student Info
+                    <v-icon name="pen" class="mr-1"/> Edit Student Info
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -129,7 +129,7 @@
                     @click="setUpdateUser(row)"
                     :disabled="showModalUpdateUser"
                   >
-                    Edit Account
+                    <v-icon name="user-edit" class="mr-1"/> Edit Account
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.StudentPermissions.DELETE.id)"
@@ -139,7 +139,7 @@
                     "
                     :disabled="showModalConfirmation"
                   >
-                    Delete
+                   <v-icon name="trash" class="mr-1"/> Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

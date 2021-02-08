@@ -131,7 +131,7 @@
                   "
                   :disabled="showModalConfirmation"
                 >
-                  Cancel Payment
+                  <v-icon name="trash" class="mr-1"/> Cancel Payment
                 </b-dropdown-item>
               </b-dropdown>
             </template>

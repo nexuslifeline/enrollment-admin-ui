@@ -53,12 +53,12 @@
                   <b-dropdown-item
                     @click="setUpdate(row)"
                     :disabled="showModalEntry">
-                    Edit
+                    <v-icon name="pen"  class="mr-1"/> Edit
                   </b-dropdown-item>
                   <b-dropdown-item
                     @click="forms.bankAccount.fields.id = row.item.id, showModalConfirmation = true"
                     :disabled="showModalConfirmation">
-                    Delete
+                     <v-icon name="trash" class="mr-1"/> Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

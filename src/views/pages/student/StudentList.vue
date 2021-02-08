@@ -101,7 +101,7 @@
                     v-if="showRowActionButton"
                     :to="`/master-files/student/${row.item.id}/school-records`"
                   >
-                    Update School Records
+                    <v-icon name="file-signature" class="mr-1"/> Update School Records
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -111,7 +111,7 @@
                     :to="`/master-files/student/${row.item.id}`"
                     :disabled="showStudentEntry"
                   >
-                    Edit Student Info
+                    <v-icon name="pen" class="mr-1"/> Edit Student Info
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -122,7 +122,7 @@
                     @click="setUpdateUser(row)"
                     :disabled="showModalUpdateUser"
                   >
-                    Edit Account
+                    <v-icon name="user-edit" class="mr-1"/> Edit Account
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -135,14 +135,14 @@
                     "
                     :disabled="showModalConfirmation"
                   >
-                    Delete
+                    <v-icon name="trash" class="mr-1"/> Delete
                   </b-dropdown-item>
                   <!-- TODO: SET USER ACCESS OF PREVIEW LEDGER BUTTON -->
                   <b-dropdown-item
                     v-if="showPreviewLedgerButton"
                     @click="onShowLedgerModal(row.item.id)"
                   >
-                    Preview Ledger
+                    <v-icon name="search" class="mr-1"/>  Preview Ledger
                   </b-dropdown-item>
                 </b-dropdown>
               </template>

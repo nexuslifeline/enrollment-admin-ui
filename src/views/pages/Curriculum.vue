@@ -120,19 +120,19 @@
                     </template>
                     <b-dropdown-item
                       @click="setViewDetails(row)">
-                      {{row.detailsShowing ? 'Hide' : 'View'}} Details
+                      <v-icon name="search" class="mr-1"/> {{row.detailsShowing ? 'Hide' : 'View'}} Details
                     </b-dropdown-item>
                     <b-dropdown-item
                       v-if="isAccessible($options.CurriculumPermissions.EDIT.id)"
                       @click="setUpdate(row.item.id)"
                       :disabled="showEntry">
-                      Edit
+                      <v-icon name="pen"  class="mr-1"/> Edit
                     </b-dropdown-item>
                     <b-dropdown-item
                       v-if="isAccessible($options.CurriculumPermissions.DELETE.id)"
                       @click="forms.curriculum.fields.id = row.item.id, showModalConfirmation = true"
                       :disabled="showModalConfirmation">
-                      Delete
+                      <v-icon name="trash" class="mr-1"/> Delete
                     </b-dropdown-item>
                   </b-dropdown>
                 </template>
