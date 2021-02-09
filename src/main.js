@@ -68,6 +68,7 @@ import {
   BIconEnvelope,
   BIconPersonBadge,
   BIconGeoAlt,
+  BIconGeo,
   BIconCalendar2Week,
   BIconCaretDownFill,
   BIconCaretUpFill,
@@ -75,8 +76,13 @@ import {
   BIconFunnelFill,
   BIconChevronLeft,
   BIconChevronRight,
-  BIconArrowRepeat
+  BIconArrowRepeat,
+  BIconPerson,
+  BIconTelephone
 } from 'bootstrap-vue'
+Vue.component('BIconTelephone', BIconTelephone);
+Vue.component('BIconGeo', BIconGeo);
+Vue.component('BIconPerson', BIconPerson);
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
 Vue.component('BIconAlarm', BIconAlarm);

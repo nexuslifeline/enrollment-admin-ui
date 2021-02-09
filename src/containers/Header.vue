@@ -71,6 +71,72 @@
           :initials="user.userable.name.charAt(0)"
           :colorIndex="user.id % 8"
         />
+        <div class="header__secondary-account-name">
+          {{ user.userable.name }}
+        </div>
+        <button @click.stop="isOverviewOpen = !isOverviewOpen" class="header__secondary-overview-action">
+          <v-icon name="ellipsis-v" />
+          <div v-if="isOverviewOpen" class="header__secondary-overview-dropdown">
+            <div class="header__secondary-overview-top-bar">
+              <span class="header__top-bar-title">
+                Overview
+              </span>
+              <span class="header__top-bar-action" @click.stop="logout">
+                <v-icon
+                  v-if="isLoading"
+                  name="spinner"
+                  spin
+                  class="mr-2"
+                />
+                Logout
+              </span>
+            </div>
+            <div class="header__secondary-overview-content">
+              <div class="header__overview-personal-info-row">
+                <BIconPerson class="header__overview-icon" />
+                <div class="header__overview-personal-info">
+                  <div class="header__overview-personal-info-item">
+                    {{ user.userable.name }}
+                  </div>
+                  <div class="header__overview-personal-info-item-light">
+                    {{ user.userGroup.name }}
+                  </div>
+                </div>
+                <div class="header__overview-photo-container">
+                  <img
+                    v-if="!!userPhoto"
+                    :src="userPhoto"
+                    class="header__overview-photo"
+                  />
+                  <ProfileMaker
+                    v-else
+                    :initials="user.userable.name.charAt(0)"
+                    :colorIndex="user.id % 8"
+                    class="header__overview-photo"
+                  />
+                </div>
+              </div>
+              <div v-if="user.username" class="header__overview-personal-info-row mt-0">
+                <BIconEnvelope class="header__overview-icon" />
+                <div class="header__overview-personal-info-item-light">
+                  {{ user.username }}
+                </div>
+              </div>
+              <div v-if="user.userable && (user.userable.mobileNo || user.userable.phoneNo)" class="header__overview-personal-info-row mt-0">
+                <BIconTelephone class="header__overview-icon" />
+                <div class="header__overview-personal-info-item-light">
+                  {{ user.userable.mobileNo || user.userable.phoneNo }}
+                </div>
+              </div>
+              <div v-if="user.userable && user.userable.completeAddress" class="header__overview-personal-info-row mt-0">
+                <BIconGeoAlt class="header__overview-icon" />
+                <div class="header__overview-personal-info-item-light">
+                  {{ user.userable.completeAddress }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
       </div>
     </div>
     <div class="header__account-details" :class="{ shrink: !isHome }">
@@ -251,6 +317,7 @@ export default {
   createLimiter,
   data() {
     return {
+      isOverviewOpen: false,
       showDropdown: false,
       isLoading: false,
       subNavLimit: SUB_NAV_LIMIT,
@@ -314,6 +381,7 @@ export default {
     this.calculateNavLimit();
     window.addEventListener('resize', this.calculateNavLimit);
     window.addEventListener('click', this.hideDropdownItems);
+    console.log(this.user)
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.calculateNavLimit);
@@ -342,6 +410,7 @@ export default {
     },
     hideDropdownItems() {
       this.showDropdown = false;
+      this.isOverviewOpen = false;
       this.subNavOpen = [];
       this.mainNavOpen = [];
     },
@@ -772,14 +841,109 @@ export default {
 .header__secondary-account-details {
   display: flex;
   margin-left: auto;
-  margin-top: 7px;
+  align-items: center;
+  margin-right: -50px;
 }
 
 .header__secondary-account-photo {
   border-radius: 50%;
   object-fit: cover;
-  position: absolute;
-  height: 32px;
-  width: 32px;
+  height: 28px;
+  width: 28px;
 }
+
+.header__secondary-account-name {
+  flex: 1;
+  margin: 0 10px;
+  color: $white;
+}
+
+.header__secondary-overview-action {
+  border: 0;
+  outline: 0;
+  background: none ;
+  color: $white;
+  position: relative;
+}
+
+.header__secondary-overview-dropdown {
+  position: absolute;
+  right: 6px;
+  top: 30px;
+  background-color: $white;
+  border: 1px solid $light-gray-10;
+  border-radius: 3px;
+  box-shadow: 0 3px 6px 0 #e2e2e2;
+  min-width: 280px;
+  z-index: 10;
+  padding-bottom: 20px;
+}
+
+.header__secondary-overview-top-bar {
+  color: $dark-gray-500;
+  display: flex;
+  padding: 7px 15px;
+  margin-bottom: 10px;
+}
+
+.header__top-bar-title {
+  font-weight: 500;
+  font-size: 15px;
+  color: $dark-gray-500;
+}
+
+.header__top-bar-action {
+  color: $blue;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.header__overview-photo {
+  border-radius: 50%;
+  object-fit: cover;
+  height: 43px;
+  width: 43px;
+}
+
+.header__overview-personal-info-row {
+  display: flex;
+  padding: 5px 15px;
+  color: $dark-gray-500;
+}
+
+.header__overview-personal-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.header__overview-personal-info-item {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  color: $dark-gray-500;
+  font-weight: 500;
+}
+
+.header__overview-personal-info-item-light {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  color: $dark-gray-100;
+  font-size: 13px;
+}
+
+.header__overview-photo-container {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.header__overview-icon {
+  margin-right: 10px;
+  margin-top: 2px;
+  height: 20px;
+  width: 20px;
+}
+
+
 </style>
