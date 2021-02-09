@@ -153,6 +153,7 @@
                         'Assessment',
                         'Payment',
                       ].includes(subNav.label) &&
+                        $options.navItems[activeIndex].label === 'Enrollment' &&
                         $store.state.approvalCount[subNav.label.toLowerCase()] >
                           0
                     "

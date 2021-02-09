@@ -7,7 +7,9 @@
     >
       <SchoolCategoryTabs
         :showAll="true"
-        @loadSchoolCategoryId="filters.student.schoolCategoryId = $event"
+        @loadSchoolCategoryId="
+          (filters.student.schoolCategoryId = $event), loadAcademicRecord()
+        "
         @clickAll="
           (filters.student.schoolCategoryId = null),
             (filters.student.courseId = null),
@@ -1419,6 +1421,7 @@ export default {
           this.isProcessing = false;
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
+          this.loadAcademicRecord();
           this.$store.state.approvalCount.enlistment--;
         })
         .catch((error) => {
