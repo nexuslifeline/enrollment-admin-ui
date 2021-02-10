@@ -22,6 +22,14 @@
         class="mt-2"
       />
       <v-select
+        v-if="isCourseVisible"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
         :options="evaluationStatuses.values"
         :value="filters.student.evaluationStatusItem"
         @input="onStatusFilterChange"
@@ -1543,6 +1551,7 @@ export default {
           criteria: null,
           schoolCategoryId: 0,
           schoolCategoryItem: null,
+          courseItem: null,
           courseId: null,
           evaluationStatusId: EvaluationStatuses.SUBMITTED.id,
           evaluationStatusItem: EvaluationStatuses.SUBMITTED
@@ -2080,6 +2089,12 @@ export default {
       student.evaluationStatusItem = item;
       this.loadEvaluation();
     },
+    onCourseFilterChange(item) {
+      const { student } = this.filters;
+      student.courseId = item?.id || 0;
+      student.courseItem = item;
+      this.loadEvaluation();
+    },
     onSortChanged({ sortBy, sortDesc }) {
       this.sortBy = sortBy;
       this.sortDesc = sortDesc;
@@ -2096,6 +2111,15 @@ export default {
         return units;
       };
     },
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.student;
+      const { schoolCategories } = this.options;
+      return [
+        schoolCategories.SENIOR_HIGH_SCHOOL.id,
+        schoolCategories.COLLEGE.id,
+        schoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    }
   },
 };
 </script>
