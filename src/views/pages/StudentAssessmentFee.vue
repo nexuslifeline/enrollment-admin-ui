@@ -450,14 +450,17 @@
                         label-class="font-weight-bold"
                         label-cols="4"
                       > -->
-                      <div class="footer-info" >
-                        <label>INITIAL FEE TOTAL :
+                      <div class="footer-info">
+                        <label
+                          >INITIAL FEE TOTAL :
                           <v-icon
                             name="info-circle"
                             class="icon-tooltip"
                             v-b-tooltip.hover="{
                               variant: 'info',
-                              title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                              title:
+                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                            }"
                           />
                         </label>
                         <vue-autonumeric
@@ -476,21 +479,23 @@
                       <!-- </b-form-group> -->
                     </b-col>
                     <b-col md="4">
-
                       <!-- <b-form-group
                         label="PREVIOUS BALANCE :"
                         label-for="enrollmentFee"
                         label-class="font-weight-bold"
                         label-cols="4"
                       > -->
-                      <div class="footer-info" >
-                        <label>PREVIOUS BALANCE :
+                      <div class="footer-info">
+                        <label
+                          >PREVIOUS BALANCE :
                           <v-icon
                             name="info-circle"
                             class="icon-tooltip"
                             v-b-tooltip.hover="{
                               variant: 'info',
-                              title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                              title:
+                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                            }"
                           />
                         </label>
                         <vue-autonumeric
@@ -503,7 +508,7 @@
                               emptyInputBehavior: 0,
                             },
                           ]"
-                       />
+                        />
                       </div>
                       <!-- </b-form-group> -->
                     </b-col>
@@ -1051,6 +1056,7 @@ export default {
           this.loadAcademicRecord();
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
+          this.$store.state.approvalCount.assessment--;
         })
         .catch((error) => {
           console.log(error);
@@ -1337,27 +1343,26 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../assets/scss/shared.scss";
-  .footer-info {
-    display: flex;
-    width: 100%;
-    align-items: center;
+@import '../../assets/scss/shared.scss';
+.footer-info {
+  display: flex;
+  width: 100%;
+  align-items: center;
 
+  label {
+    min-width: 170px;
+    font-weight: bold;
+  }
+
+  @include for-size(desktop-down) {
     label {
-      min-width: 170px;
-      font-weight: bold;
-    }
-
-
-    @include for-size(desktop-down) {
-      label {
-        min-width: 110px;
-        max-width: 110px;
-      }
-    }
-
-    @include for-size(phone-only) {
-     margin-bottom: 5px;
+      min-width: 110px;
+      max-width: 110px;
     }
   }
+
+  @include for-size(phone-only) {
+    margin-bottom: 5px;
+  }
+}
 </style>
