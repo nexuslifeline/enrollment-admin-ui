@@ -247,16 +247,19 @@ export default [
     children: [
       {
         label: 'Collections',
+        description: 'Gives an overview of the state of the collection activities within the school.',
         to: '/report/collection',
         //permissionIds: BankAccountPermissions.getIds()
       },
       {
         label: 'Student Ledger',
+        description: 'The student ledger card is the document that summarizes the financial transactions pertaining to each student\'s attendance at the institution including a listing of all costs charged to the student and all fees received from the student or any other funding source on behalf of the student.',
         to: '/report/student-ledger',
         //permissionIds: BankAccountPermissions.getIds()
       },
       {
-        label: 'Enrolled List',
+        label: 'Class Masterlist',
+        description: 'This report provides a list of all students currently enrolled in class.',
         to: '/report/enrolled-list',
         //permissionIds: BankAccountPermissions.getIds()
       }

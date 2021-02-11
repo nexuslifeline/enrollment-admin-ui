@@ -1,7 +1,7 @@
 <template>
-  <div class="header">
+  <div class="header" :class="{ shrink: !isHome && !isReport, left: isReport }">
     <div class="header__menus-container">
-      <ul class="header__menus" :class="{ shrink: !isHome }">
+      <ul class="header__menus">
         <li
           v-for="(nav, idx) in $options.navItems.filter(
             (v, i) => i < mainNavLimit
@@ -139,7 +139,7 @@
         </button>
       </div>
     </div>
-    <div class="header__account-details" :class="{ shrink: !isHome }">
+    <div class="header__account-details">
       <WaveBackground v-if="isHome" />
       <div class="header__account-details-row">
         <template v-if="isHome">
@@ -211,7 +211,19 @@
           </div>
         </template>
       </div>
-      <div class="header__sub-menus-container" :class="{ shrink: !isHome }">
+      <div class="header__sub-menus-container">
+        <template v-if="isReport" >
+          <div class="header__left-panel-header">
+            <span>List of Reports</span>
+          </div>
+          <div class="header__left-panel-search-container">
+            <b-form-input
+              type="text"
+              placeholder="Search"
+              v-model="searchReport"
+            ></b-form-input>
+          </div>
+        </template>
         <ul class="header__sub-menus">
           <template
             v-for="(subNav, idx) in $options.navItems[
@@ -224,7 +236,7 @@
                 class="header__sub-menu-item"
                 :class="{ active: $route.path === subNav.to }"
               >
-                <a :href="`#${subNav.to}`" class="header__menu-link">
+                <a :href="`#${subNav.to}`" class="header__sub-menu-link">
                   {{ subNav.label }}
                   <div
                     class="ml-1"
@@ -244,6 +256,9 @@
                       $store.state.approvalCount[subNav.label.toLowerCase()]
                     }})
                   </div>
+                  <span v-if="isReport" class="header__menu-description">
+                    {{ subNav.description }}
+                  </span>
                 </a>
               </li>
             </template>
@@ -318,6 +333,7 @@ export default {
   createLimiter,
   data() {
     return {
+      searchReport: '',
       isOverviewOpen: false,
       showDropdown: false,
       isLoading: false,
@@ -335,6 +351,9 @@ export default {
   computed: {
     isHome() {
       return this.$route.path?.includes('/home');
+    },
+    isReport() {
+      return this.$route.path?.includes('/report');
     },
     activeIndex() {
       return this.$options.navItems.findIndex((v) =>
@@ -516,10 +535,164 @@ export default {
   color: $dark-gray-600;
 }
 
+
+.header__sub-menu-item {
+  margin-right: 20px;
+  font-size: 14px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  color: $white;
+
+  &.active,
+  &:hover {
+    font-weight: 600;
+    color: $dark-gray-500;
+    background-color: $white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    //border-radius-top-left: 3px;
+    //border-top: 3px solid $dark-blue;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  @include for-size(tablet-portrait-down) {
+    margin-right: 15px;
+    padding: 0 12px;
+  }
+}
+
 .header {
   position: fixed;
   width: 100%;
   z-index: 4;
+
+  &.shrink {
+    .header__menus {
+      .header__menu-item {
+        &.active {
+          &:after {
+            border-color: transparent transparent $white transparent;
+          }
+        }
+      }
+    }
+
+    .header__account-details {
+      height: 39px;
+      background-color: $white;
+      border-bottom: 1px solid $light-gray-10;
+
+      .header__sub-menus-container {
+        margin-left: 15px;
+        margin-top: 0;
+      }
+
+      .header__sub-menu-item {
+        background: none;
+        color: black;
+        margin-right: 5px;
+
+        &.active {
+          border-bottom: 3px solid $brand-primary;
+        }
+      }
+    }
+  }
+
+  &.left {
+    .header__left-panel-search-container {
+      padding: 10px 10px 0 10px;
+      //border-bottom: 1px solid $light-gray-10;
+      //background-color: $white;
+    }
+
+    .header__account-details {
+      position: fixed;
+      top: 45px;
+      left: 0;
+      width: 280px;
+      bottom: 0;
+      height: 100%;
+    }
+
+    .header__sub-menus-container {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      background-color: $light-gray-100;
+      border-right: 1px solid $light-gray-10;
+    }
+
+    .header__sub-menus {
+      margin: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 15px 0;
+      height: auto;
+    }
+
+    .header__sub-menu-item {
+      color: $black;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 10px 15px 15px 15px;
+      margin: 0;
+      border-radius: 3px;
+      background-color: $white;
+      margin: 3px 8px;
+
+      &.active {
+        color: $black;
+        border-left: 3px solid $blue;
+      }
+
+      &:hover {
+        border-left: 3px solid $blue;
+      }
+    }
+
+    .header__sub-menu-link {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .header__menu-description {
+      color: $dark-gray;
+      font-weight: normal;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      cursor: pointer;
+      line-height: 17px;
+    }
+
+    .header__left-panel-header {
+      padding: 8px 15px;
+      font-size: 13px;
+      height: 36px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: $dark-gray-500;
+      border-bottom: 1px solid $light-gray-10;
+      background-color: $white;
+      display: flex;
+      align-items: center;
+    }
+  }
 }
 
 .header__menus-container {
@@ -561,16 +734,6 @@ export default {
   font-size: 14px;
   height: 100%;
   align-items: center;
-
-  &.shrink {
-    .header__menu-item {
-      &.active {
-        &:after {
-          border-color: transparent transparent $white transparent;
-        }
-      }
-    }
-  }
 }
 
 .header__menu-item {
@@ -613,28 +776,6 @@ export default {
   flex-direction: column;
   position: relative;
   transition: all .3s;
-
-  &.shrink {
-    height: 39px;
-    background-color: $white;
-    border-bottom: 1px solid $light-gray-10;
-    //box-shadow: 0 3px 2px 0 #e2e2e2;
-
-    .header__sub-menus-container {
-      margin-left: 15px;
-      margin-top: 0;
-    }
-
-    .header__sub-menu-item {
-      background: none;
-      color: black;
-      margin-right: 5px;
-
-      &.active {
-        border-bottom: 3px solid $brand-primary;
-      }
-    }
-  }
 }
 
 .header__account-details-row {
@@ -655,36 +796,6 @@ export default {
 
   @include for-size(tablet-portrait-down) {
     padding: 0;
-  }
-}
-
-.header__sub-menu-item {
-  margin-right: 20px;
-  font-size: 14px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0 18px;
-  color: $white;
-
-  &.active,
-  &:hover {
-    font-weight: 600;
-    color: $dark-gray-500;
-    background-color: $white;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    //border-radius-top-left: 3px;
-    //border-top: 3px solid $dark-blue;
-  }
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  @include for-size(tablet-portrait-down) {
-    margin-right: 15px;
-    padding: 0 12px;
   }
 }
 
@@ -751,7 +862,7 @@ export default {
   color: $white;
 }
 
-.header__menu-link {
+.header__menu-link, .header__sub-menu-link {
   color: inherit;
   width: 100%;
   height: 100%;

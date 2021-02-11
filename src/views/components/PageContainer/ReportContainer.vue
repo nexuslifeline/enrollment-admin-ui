@@ -1,15 +1,5 @@
 <template>
   <div class="c-page-content" :class="{ 'filter-visible': filterVisible }">
-    <div v-if="filterVisible" class="c-side-filter__container">
-      <div class="c-side-filter__container-header">
-        <span>
-          Filter
-        </span>
-      </div>
-      <div class="c-side-filter__filter-body">
-        <slot name="filters"></slot>
-      </div>
-    </div>
     <div class="content-list__container">
       <div class="c-side-filter__title">
         {{ title }}
@@ -20,7 +10,20 @@
         <slot name="actions"></slot>
       </div>
       <div class="content-list__body">
-        <slot name="content"></slot>
+        <div v-if="filterVisible" class="c-side-filter__container">
+          <div class="c-side-filter__container-header">
+            <span>
+              Filter
+            </span>
+          </div>
+          <div class="c-side-filter__filter-body">
+            <slot name="filters"></slot>
+          </div>
+        </div>
+        <div class="c-page-content__report-area" :class="{ noPreview: noPreview }">
+          <p v-if="noPreview">No Preview</p>
+          <slot v-else name="content"></slot>
+        </div>
       </div>
     </div>
   </div>
@@ -39,6 +42,10 @@ export default {
       type: Boolean,
       default: true
     },
+    noPreview: {
+      type: Boolean,
+      default: true
+    },
     title: {
       type: String,
       default: ''
@@ -52,10 +59,7 @@ export default {
 .c-side-filter__container {
   height: 100%;
   border-right: 1px solid $light-gray-10;
-  position: fixed;
-  top: 85px;
-  left: 0;
-  width: 240px;
+  width: 300px;
   background-color: $white;
   z-index: 2;
 }
@@ -64,10 +68,7 @@ export default {
   border-bottom: 1px solid $light-gray-10;
   padding: 7px 10px;
   font-weight: 500;
-  height: 36px;
-  text-transform: uppercase;
-  font-size: 13px;
-  color: $dark-gray-500;
+  //box-shadow: 0 3px 6px 0 #e2e2e2;
 }
 
 .c-side-filter__content {
@@ -76,10 +77,12 @@ export default {
 }
 
 .c-page-content {
+  height: calc(100% - 36px);
+
   &.filter-visible {
     .content-list__container {
       padding: 0;
-      margin-left: 240px;
+      margin-left: 0;
     }
 
     .row {
@@ -99,19 +102,38 @@ export default {
   background-color: $white;
   font-weight: 500;
   font-size: 13px;
+  height: 36px;
   display: flex;
-  height: 39px;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
   color: $dark-gray-500;
 }
 
 .content-list__body {
-  padding: 10px 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
 }
 
 .content-list__actions {
   display: flex;
   flex-direction: row;
+}
+
+.c-page-content__report-area {
+  background-color: $dark-gray-500;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $light-gray-10;
+}
+
+.content-list__container {
+  height: 100%;
 }
 
 </style>

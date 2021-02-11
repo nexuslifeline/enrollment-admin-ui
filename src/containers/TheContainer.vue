@@ -4,11 +4,11 @@
     <b-overlay :show="isLoading" class="full-overlay-container">
       <div v-if="!isLoading" class="c-wrapper">
         <TheHeader />
-        <div class="main-content" :class="{ shrink: !isHome }">
+        <div class="main-content" :class="{ shrink: !isHome && !isReport, report: isReport }">
           <LeftPane />
           <div class="c-body">
             <main class="c-main">
-              <div class="container-fluid">
+              <div class="container-fluid" :style="isReport ? { height: '100%' } : {}">
                 <router-view></router-view>
               </div>
             </main>
@@ -47,6 +47,9 @@ export default {
     isHome() {
       return this.$route.path?.includes('/home');
     },
+    isReport() {
+      return this.$route.path?.includes('/report');
+    },
   },
   methods: {
     loadProfile() {
@@ -84,6 +87,16 @@ export default {
 
   &.shrink {
     margin-top: 50px;
+
+    .c-body {
+      margin-left: 0;
+    }
+  }
+
+  &.report {
+    margin-left: 280px;
+    margin-top: 13px;
+    height: 100%;
 
     .c-body {
       margin-left: 0;
