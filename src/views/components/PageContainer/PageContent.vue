@@ -15,6 +15,7 @@
         {{ title }}
         <FilterButton class="ml-auto" :isExpanded="filterVisible" @toggle="$emit('toggleFilter')" />
         <RefreshButton @reload="$emit('refresh')" class="ml-1" />
+        <CreateButton @create="$emit('create')" class="ml-1" v-if="createButtonVisible"/>
       </div>
       <div class="content-list__actions">
         <slot name="actions"></slot>
@@ -28,14 +29,20 @@
 <script>
 import RefreshButton from './RefreshButton';
 import FilterButton from './FilterButton';
+import CreateButton from './CreateButton';
 
 export default {
   components: {
     RefreshButton,
-    FilterButton
+    FilterButton,
+    CreateButton
   },
   props: {
     filterVisible: {
+      type: Boolean,
+      default: true
+    },
+    createButtonVisible: {
       type: Boolean,
       default: true
     },

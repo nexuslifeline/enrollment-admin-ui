@@ -82,11 +82,12 @@ export const ApplicationSteps = new Enum({
   WAITING: { id: 10, name: 'Waiting', description: 'Lorem ipsum dolor amet' }
 });
 
+//submitted = pending
 export const ApplicationStatuses = new Enum({
   APPROVED: { id: 1, name: 'Approved' },
   DRAFT: { id: 2, name: 'Draft' },
   REJECTED: { id: 3, name: 'Reject' },
-  SUBMITTED: { id: 4, name: 'Submitted' },
+  SUBMITTED: { id: 4, name: 'Pending' },
   APPROVED_ASSESSMENT: { id: 5, name: 'Approved Assesment' },
   PAYMENT_SUBMITTED: { id: 6, name: 'Payment Submitted' },
   COMPLETED: { id: 7, name: 'Completed' },

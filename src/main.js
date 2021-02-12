@@ -8,7 +8,7 @@ import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
 import vSelect from 'vue-select'
-import { AlertPlugin } from 'bootstrap-vue';
+import { AlertPlugin, BIconPlus } from 'bootstrap-vue';
 import { AvatarPlugin } from 'bootstrap-vue';
 import { BadgePlugin } from 'bootstrap-vue';
 //import { BreadcrumbPlugin } from 'bootstrap-vue'
@@ -102,6 +102,8 @@ Vue.component('BIconCalendar2Week', BIconCalendar2Week);
 Vue.component('BIconCaretDownFill', BIconCaretDownFill);
 Vue.component('BIconCaretUpFill', BIconCaretUpFill);
 Vue.component('BProgress', BProgress)
+Vue.component('BIconPlus', BIconPlus);
+
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'

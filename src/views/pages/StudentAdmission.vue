@@ -1,11 +1,51 @@
 <template>
-  <div class="c-page-content">
-    <Card
+  <PageContent
+    title="Subject Enlistment"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadAcademicRecord"
+    :filterVisible="isFilterVisible">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.student.criteria"
+        debounce="500"
+        @update="loadAcademicRecord()"
+        type="text"
+        placeholder="Search"
+      >
+      </b-form-input>
+      <v-select
+        :options="options.schoolCategories.values"
+        :value="filters.student.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.items"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
+        :options="AcademicRecordStatuses.values"
+        :value="filters.student.academicRecordStatusItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
+    <!-- <Card
       title="Subject Enlistment"
       :showRefresh="true"
       @onRefresh="loadAcademicRecord()"
-    >
-      <SchoolCategoryTabs
+    > -->
+      <!-- <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="
           (filters.student.schoolCategoryId = $event), loadAcademicRecord()
@@ -20,10 +60,9 @@
             (filters.student.courseId = null),
             loadAcademicRecord()
         "
-      />
+      /> -->
       <div>
-        <b-row class="mb-2">
-          <!-- row button and search input -->
+        <!-- <b-row class="mb-2">
           <b-col md="6">
             <b-form-radio-group
               @input="loadAcademicRecord()"
@@ -79,7 +118,7 @@
             >
             </b-form-input>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- row button and search input -->
         <b-table
           class="c-table"
@@ -567,7 +606,7 @@
           </b-col>
         </b-row>
       </div>
-    </Card>
+    <!-- </Card> -->
 
     <!-- Modal Preview -->
     <b-modal
@@ -895,8 +934,9 @@
         Notes : {{ file.notes }}
       </div>
     </div>
+    </template>
     <!-- Modal Subject -->
-  </div>
+  </PageContent>
   <!-- main container -->
 </template>
 <script>
@@ -931,6 +971,9 @@ import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
+import PageContent from "../components/PageContainer/PageContent";
+import FilterButton from '../components/PageContainer/FilterButton';
+
 
 const acdemicRecordFields = {
   academicRecordStatusId: null,
@@ -974,10 +1017,13 @@ export default {
     ActiveViewHeader,
     ActiveViewItems,
     ActiveViewItem,
+    PageContent,
+    FilterButton
   },
   StudentSubjectPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalPreview: false,
       showModalApproval: false,
       showModalRejection: false,
@@ -1308,9 +1354,12 @@ export default {
       filters: {
         student: {
           criteria: null,
-          schoolCategoryId: null,
+          schoolCategoryId: 0,
+          schoolCategoryItem: null,
+          courseItem: null,
           courseId: null,
           academicRecordStatusId: AcademicRecordStatuses.DRAFT.id,
+          academicRecordStatusItem: AcademicRecordStatuses.DRAFT
         },
         subject: {
           criteria: null,
@@ -1354,6 +1403,8 @@ export default {
     this.loadCourseList();
     // this.loadDepartmentList()
     this.loadSections();
+    // this.filters.student.academicRecordStatusId = this.AcademicRecordStatuses.DRAFT.id
+    // this.filters.student.academicRecordStatusItem = this.AcademicRecordStatuses.DRAFT
   },
   methods: {
     setApproval(row) {
@@ -1758,6 +1809,24 @@ export default {
         }
       );
     },
+    onCategoryFilterChange(item) {
+      const { student } = this.filters;
+      student.schoolCategoryId = item?.id || 0;
+      student.schoolCategoryItem = item;
+      this.loadAcademicRecord();
+    },
+    onStatusFilterChange(item) {
+      const { student } = this.filters;
+      student.academicRecordStatusId = item?.id || 0;
+      student.academicRecordStatusItem = item;
+      this.loadAcademicRecord();
+    },
+    onCourseFilterChange(item) {
+      const { student } = this.filters;
+      student.courseId = item?.id || 0;
+      student.courseItem = item;
+      this.loadAcademicRecord();
+    },
   },
   computed: {
     totalUnits() {
@@ -1769,6 +1838,15 @@ export default {
         return units;
       };
     },
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.student;
+      const { schoolCategories } = this.options;
+      return [
+        schoolCategories.SENIOR_HIGH_SCHOOL.id,
+        schoolCategories.COLLEGE.id,
+        schoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    }
   },
   watch: {
     '$store.state.schoolYearId': function(newVal) {

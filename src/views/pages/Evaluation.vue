@@ -23,6 +23,7 @@
       />
       <v-select
         v-if="isCourseVisible"
+        :options="options.courses.items"
         :value="filters.student.courseItem"
         @input="onCourseFilterChange"
         label="name"

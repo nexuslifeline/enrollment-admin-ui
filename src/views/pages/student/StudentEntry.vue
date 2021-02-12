@@ -1195,6 +1195,7 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding: 20px;
 
     @include for-size(phone-only) {
       margin-top: 30px;

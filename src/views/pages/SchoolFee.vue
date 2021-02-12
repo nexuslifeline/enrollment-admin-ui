@@ -1,9 +1,23 @@
 <template>
-  <div class="c-page-content">
-    <Card title="School Fee Management">
+  <PageContent
+    title="School Fee  Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSchoolFees"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.SchoolFeePermissions.ADD.id)">
+     <template v-slot:filters>
+      <b-form-input
+        v-model="filters.schoolFee.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content>
       <div>
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md=12>
             <b-row>
               <b-col md=8>
@@ -24,7 +38,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row >
@@ -104,125 +118,125 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
-    <b-modal
-			v-model="showModalEntry"
-			:noCloseOnEsc="true"
-			:noCloseOnBackdrop="true">
-			<div slot="modal-title"> <!-- modal title -->
-					School Fees - {{ entryMode }}
-			</div> <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.schoolFee.isLoading" rounded="sm">
-        <b-row>
-          <b-col md=12>
-            <b-form-group >
-              <label class="required">Name</label>
-              <b-form-input
-                ref="name"
-                v-model="forms.schoolFee.fields.name"
-                :state="forms.schoolFee.states.name" />
-              <b-form-invalid-feedback>
-                {{forms.schoolFee.errors.name}}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md=12>
-            <b-form-group >
-                <label class="required">Description</label>
-                <b-form-textarea
-                  ref="description"
-                  v-model="forms.schoolFee.fields.description"
-                  :state="forms.schoolFee.states.description"/>
+      <!-- Modal Entry -->
+      <b-modal
+        v-model="showModalEntry"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true">
+        <div slot="modal-title"> <!-- modal title -->
+            School Fees - {{ entryMode }}
+        </div> <!-- modal title -->
+        <!-- modal body -->
+        <b-overlay :show="forms.schoolFee.isLoading" rounded="sm">
+          <b-row>
+            <b-col md=12>
+              <b-form-group >
+                <label class="required">Name</label>
+                <b-form-input
+                  ref="name"
+                  v-model="forms.schoolFee.fields.name"
+                  :state="forms.schoolFee.states.name" />
                 <b-form-invalid-feedback>
-                  {{forms.schoolFee.errors.description}}
+                  {{forms.schoolFee.errors.name}}
                 </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md=12>
-            <b-form-group >
-              <label>School Fee Category</label>
-              <b-form-select
-                v-model="forms.schoolFee.fields.schoolFeeCategoryId"
-                :state="forms.schoolFee.states.schoolFeeCategoryId">
-                <template v-slot:first>
-                  <b-form-select-option :value="null" >-- N/A --</b-form-select-option>
-                </template>
-                <b-form-select-option
-                  v-for="schoolFeeCategory in options.schoolFeeCategories.items"
-                  :key="schoolFeeCategory.id"
-                  :value="schoolFeeCategory.id">
-                  {{ schoolFeeCategory.name }}
-                </b-form-select-option>
-              </b-form-select>
-              <b-form-invalid-feedback>
-                {{ forms.schoolFee.errors.schoolFeeCategoryId }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-overlay>
-      <!-- end modal body -->
-			<div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
-				<b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry=false">
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.schoolFee.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onSchoolFeeEntry()">
-          <v-icon
-            v-if="forms.schoolFee.isProcessing"
-            name="sync"
-            spin
-            class="mr-2" />
-          Save
-        </b-button>
-			</div> <!-- modal footer buttons -->
-		</b-modal>
-    <!-- End Modal Entry -->
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=12>
+              <b-form-group >
+                  <label class="required">Description</label>
+                  <b-form-textarea
+                    ref="description"
+                    v-model="forms.schoolFee.fields.description"
+                    :state="forms.schoolFee.states.description"/>
+                  <b-form-invalid-feedback>
+                    {{forms.schoolFee.errors.description}}
+                  </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md=12>
+              <b-form-group >
+                <label>School Fee Category</label>
+                <b-form-select
+                  v-model="forms.schoolFee.fields.schoolFeeCategoryId"
+                  :state="forms.schoolFee.states.schoolFeeCategoryId">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" >-- N/A --</b-form-select-option>
+                  </template>
+                  <b-form-select-option
+                    v-for="schoolFeeCategory in options.schoolFeeCategories.items"
+                    :key="schoolFeeCategory.id"
+                    :value="schoolFeeCategory.id">
+                    {{ schoolFeeCategory.name }}
+                  </b-form-select-option>
+                </b-form-select>
+                <b-form-invalid-feedback>
+                  {{ forms.schoolFee.errors.schoolFeeCategoryId }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-overlay>
+        <!-- end modal body -->
+        <div slot="modal-footer" class="w-100"><!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry=false">
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.schoolFee.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onSchoolFeeEntry()">
+            <v-icon
+              v-if="forms.schoolFee.isProcessing"
+              name="sync"
+              spin
+              class="mr-2" />
+            Save
+          </b-button>
+        </div> <!-- modal footer buttons -->
+      </b-modal>
+      <!-- End Modal Entry -->
 
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true" >
-      <div slot="modal-title">
-          Delete School Fee
-      </div>
-      Are you sure you want to delete this School Fee ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="forms.schoolFee.isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onSchoolFeeDelete()">
-          <v-icon
-            v-if="forms.schoolFee.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"/>
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation=false">
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-  </div>
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true" >
+        <div slot="modal-title">
+            Delete School Fee
+        </div>
+        Are you sure you want to delete this School Fee ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="forms.schoolFee.isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onSchoolFeeDelete()">
+            <v-icon
+              v-if="forms.schoolFee.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"/>
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation=false">
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+    </template>
+  </PageContent>
 </template>
 <script>
 
@@ -240,6 +254,7 @@ import Tables from '../../helpers/tables'
 import { Fees, SchoolFeePermissions } from '../../helpers/enum'
 import Access from '../../mixins/utils/Access'
 import Card from '../components/Card'
+import PageContent from '../components/PageContainer/PageContent'
 
 export default {
 	name: "schoolFee",
@@ -250,11 +265,13 @@ export default {
     Access
   ],
   components: {
-    Card
+    Card,
+    PageContent
   },
   SchoolFeePermissions,
 	data() {
 		return {
+      isFilterVisible: true,
       fees: Fees,
       showModalEntry: false,
       showModalConfirmation: false,

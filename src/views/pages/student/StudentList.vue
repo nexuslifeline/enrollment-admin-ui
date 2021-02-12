@@ -1,9 +1,24 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Student Management">
+  <PageContent
+    title="Student Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadStudents"
+    :filterVisible="isFilterVisible"
+    @create="$router.push(`/master-files/student/add`)"
+    :createButtonVisible="isAccessible($options.StudentPermissions.ADD.id) && showAddButton">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.student.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+        @update="loadStudents()"
+      />
+    </template>
+    <template v-slot:content>
       <div class="content">
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="8">
@@ -30,7 +45,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -175,171 +190,171 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <b-modal
-      @shown="$refs.username.focus()"
-      v-model="showModalUpdateUser"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <b-modal
+        @shown="$refs.username.focus()"
+        v-model="showModalUpdateUser"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          User Account - Edit
+        </div>
         <!-- modal title -->
-        User Account - Edit
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-row>
-        <b-col md="12">
-          <b-form-group>
-            <label class="required">Email</label>
-            <b-form-input
-              ref="username"
-              v-model="forms.user.fields.username"
-              :state="forms.user.states.userUsername"
-              debounce="500"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.user.errors.userUsername }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group>
-            <label class="required">Password</label>
-            <b-form-input
-              type="password"
-              v-model="forms.user.fields.password"
-              :state="forms.user.states.userPassword"
-              debounce="500"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.user.errors.userPassword }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group>
-            <label class="required">Confirm Password</label>
-            <b-form-input
-              type="password"
-              v-model="forms.user.fields.passwordConfirmation"
-              debounce="500"
-            />
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+        <!-- modal body -->
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label class="required">Email</label>
+              <b-form-input
+                ref="username"
+                v-model="forms.user.fields.username"
+                :state="forms.user.states.userUsername"
+                debounce="500"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.user.errors.userUsername }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Password</label>
+              <b-form-input
+                type="password"
+                v-model="forms.user.fields.password"
+                :state="forms.user.states.userPassword"
+                debounce="500"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.user.errors.userPassword }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Confirm Password</label>
+              <b-form-input
+                type="password"
+                v-model="forms.user.fields.passwordConfirmation"
+                debounce="500"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalUpdateUser = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="isUserSaving"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onStudentEntry()"
+          >
+            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalUpdateUser = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="isUserSaving"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onStudentEntry()"
-        >
-          <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Student
-      </div>
-      Are you sure you want to delete this student ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="isUserSaving"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onStudentDelete()"
-        >
-          <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
+      </b-modal>
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Student
+        </div>
+        Are you sure you want to delete this student ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="isUserSaving"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onStudentDelete()"
+          >
+            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
 
-    <b-modal
-      v-model="showModalPreview"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-      size="sm"
-    >
-      <div slot="modal-title">
-        Preview Student Ledger
-      </div>
-      <b-row>
-        <b-col md="12">
-          <b-form-group>
-            <label class="required">School Year</label>
-            <b-form-select v-model="filters.ledger.schoolYearId">
-              <b-form-select-option
-                v-for="schoolYear in options.schoolYears.items"
-                :key="schoolYear.id"
-                :value="schoolYear.id"
-              >
-                {{ schoolYear.name }}
-              </b-form-select-option>
-            </b-form-select>
-          </b-form-group>
-          <b-form-group>
-            <label class="required">As Of Date</label>
-            <b-form-datepicker
-              :date-format-options="{
-                year: 'numeric',
-                month: 'long',
-                day: '2-digit',
-                weekday: 'short',
-              }"
-              class="date-pickers"
-              v-model="filters.ledger.asOfDate"
-            />
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <div slot="modal-footer">
-        <b-button
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="previewLedger(selectedStudentId)"
-        >
-          <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-          Preview
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalPreview = false"
-        >
-          Close
-        </b-button>
-      </div>
-    </b-modal>
+      <b-modal
+        v-model="showModalPreview"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+        size="sm"
+      >
+        <div slot="modal-title">
+          Preview Student Ledger
+        </div>
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label class="required">School Year</label>
+              <b-form-select v-model="filters.ledger.schoolYearId">
+                <b-form-select-option
+                  v-for="schoolYear in options.schoolYears.items"
+                  :key="schoolYear.id"
+                  :value="schoolYear.id"
+                >
+                  {{ schoolYear.name }}
+                </b-form-select-option>
+              </b-form-select>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">As Of Date</label>
+              <b-form-datepicker
+                :date-format-options="{
+                  year: 'numeric',
+                  month: 'long',
+                  day: '2-digit',
+                  weekday: 'short',
+                }"
+                class="date-pickers"
+                v-model="filters.ledger.asOfDate"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <div slot="modal-footer">
+          <b-button
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="previewLedger(selectedStudentId)"
+          >
+            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
+            Preview
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalPreview = false"
+          >
+            Close
+          </b-button>
+        </div>
+      </b-modal>
 
-    <FileViewer
-      :show="showModalFileViewer"
-      :file="file"
-      :owner="file.owner"
-      :isBusy="file.isLoading"
-      @close="showModalFileViewer = false"
-    />
-  </div>
+      <FileViewer
+        :show="showModalFileViewer"
+        :file="file"
+        :owner="file.owner"
+        :isBusy="file.isLoading"
+        @close="showModalFileViewer = false"
+      />
+    </template>
+  </PageContent>
 </template>
 <script>
 import {
@@ -373,6 +388,7 @@ import {
   ContactColumn,
 } from '../../components/ColumnDetails';
 import { getFilePath } from '../../../helpers/utils';
+import PageContent from "../../components/PageContainer/PageContent";
 
 const studentFields = {
   id: null,
@@ -506,6 +522,7 @@ export default {
     EducationColumn,
     ContactColumn,
     AvatarMaker,
+    PageContent
   },
   props: {
     showAddButton: {
@@ -525,6 +542,7 @@ export default {
   StudentPermissions,
   data() {
     return {
+      isFilterVisible: true,
       selectedStudentId: null,
       showModalPreview: false,
       showModalFileViewer: false,

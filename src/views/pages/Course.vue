@@ -1,9 +1,23 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Course Management">
+  <PageContent
+    title="Course Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadCourses"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.CoursePermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.course.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content>
       <div>
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="8">
@@ -26,7 +40,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -116,145 +130,145 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
-    <b-modal
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <!-- Modal Entry -->
+      <b-modal
+        v-model="showModalEntry"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Courses - {{ entryMode }}
+        </div>
         <!-- modal title -->
-        Courses - {{ entryMode }}
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.course.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Name</label>
-              <b-form-input
-                ref="name"
-                v-model="forms.course.fields.name"
-                :state="forms.course.states.name"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.course.errors.name }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label class="required">Description</label>
-              <b-form-textarea
-                ref="description"
-                v-model="forms.course.fields.description"
-                :state="forms.course.states.description"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.course.errors.description }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label>Major</label>
-              <b-form-input
-                ref="major"
-                v-model="forms.course.fields.major"
-                :state="forms.course.states.major"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.course.errors.major }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label class="required">Degree Types</label>
-              <b-form-select
-                v-model="forms.course.fields.degreeTypeId"
-                :state="forms.course.states.degreeTypeId"
-              >
-                <template v-slot:first>
-                  <b-form-select-option :value="null" disabled
-                    >-- Select Degree Type --</b-form-select-option
-                  >
-                </template>
-                <b-form-select-option
-                  v-for="degreeType in options.degreeTypes.values"
-                  :key="degreeType.id"
-                  :value="degreeType.id"
+        <!-- modal body -->
+        <b-overlay :show="forms.course.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Name</label>
+                <b-form-input
+                  ref="name"
+                  v-model="forms.course.fields.name"
+                  :state="forms.course.states.name"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.course.errors.name }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+              <b-form-group>
+                <label class="required">Description</label>
+                <b-form-textarea
+                  ref="description"
+                  v-model="forms.course.fields.description"
+                  :state="forms.course.states.description"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.course.errors.description }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+              <b-form-group>
+                <label>Major</label>
+                <b-form-input
+                  ref="major"
+                  v-model="forms.course.fields.major"
+                  :state="forms.course.states.major"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.course.errors.major }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+              <b-form-group>
+                <label class="required">Degree Types</label>
+                <b-form-select
+                  v-model="forms.course.fields.degreeTypeId"
+                  :state="forms.course.states.degreeTypeId"
                 >
-                  {{ degreeType.name }}
-                </b-form-select-option>
-              </b-form-select>
-              <b-form-invalid-feedback>
-                {{ forms.course.errors.degreeTypeId }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-overlay>
-      <!-- end modal body -->
-      <div slot="modal-footer" class="w-100">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null" disabled
+                      >-- Select Degree Type --</b-form-select-option
+                    >
+                  </template>
+                  <b-form-select-option
+                    v-for="degreeType in options.degreeTypes.values"
+                    :key="degreeType.id"
+                    :value="degreeType.id"
+                  >
+                    {{ degreeType.name }}
+                  </b-form-select-option>
+                </b-form-select>
+                <b-form-invalid-feedback>
+                  {{ forms.course.errors.degreeTypeId }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-overlay>
+        <!-- end modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.course.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onCourseEntry()"
+          >
+            <v-icon
+              v-if="forms.course.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.course.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onCourseEntry()"
-        >
-          <v-icon
-            v-if="forms.course.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- End Modal Entry -->
+      </b-modal>
+      <!-- End Modal Entry -->
 
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Course
-      </div>
-      Are you sure you want to delete this course ?
-      <div slot="modal-footer">
-        <b-button
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onCourseDelete()"
-        >
-          <v-icon
-            v-if="forms.course.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-  </div>
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Course
+        </div>
+        Are you sure you want to delete this course ?
+        <div slot="modal-footer">
+          <b-button
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onCourseDelete()"
+          >
+            <v-icon
+              v-if="forms.course.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+    </template>
+  </PageContent>
 </template>
 <script>
 const courseFields = {
@@ -278,16 +292,19 @@ import { DegreeTypes, CoursePermissions } from '../../helpers/enum';
 import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'Course',
   mixins: [CourseApi, Tables, Access],
   components: {
     Card,
+    PageContent
   },
   CoursePermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',
