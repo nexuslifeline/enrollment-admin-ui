@@ -1,10 +1,15 @@
 <template>
   <ReportContent
-    title="Collection Report">
+    title="Collection Report"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    :isBusy="isLoading"
+    :showPlaceholder="!isFileReady"
+    :filterVisible="isFilterVisible">
     <template v-slot:filters>
       <b-form-input
         type="text"
         placeholder="Search"
+        v-model="filters.payment.criteria"
       >
       </b-form-input>
       <b-form-datepicker
@@ -15,6 +20,8 @@
           weekday: 'short',
         }"
         class="mt-2"
+        placeholder="Period Start Date"
+        v-model="filters.payment.dateFrom"
       />
       <b-form-datepicker
         :date-format-options="{
@@ -24,22 +31,20 @@
           weekday: 'short',
         }"
         class="mt-2"
+        placeholder="Period End Date"
+        v-model="filters.payment.dateTo"
       />
        <b-button
-          class="mt-2"
+          class="mt-4"
           variant="outline-primary"
           size="sm"
           block
-          @click="previewCollection()"
+          @click="previewCollection"
           ><v-icon name="print" /> Preview</b-button
         ></b-button>
     </template>
     <template v-slot:content>
-      <!--<PaymentList
-        :showAddButton="false"
-        :showRowActionButton="false"
-        :showPrintPreviewButton="true"
-        />-->
+      <ReportViewer v-if="isFileReady" :file="file" />
     </template>
   </ReportContent>
 </template>
@@ -47,16 +52,48 @@
 <script>
 import PaymentList from '../payment/PaymentList';
 import ReportContent from '../../components/PageContainer/ReportContainer';
+import ReportViewer from '../../components/ReportViewer/ReportViewer';
+import { ReportApi } from '../../../mixins/api';
 
 export default {
   name: 'Collection',
+  mixins: [ReportApi],
   components:{
     PaymentList,
-    ReportContent
+    ReportContent,
+    ReportViewer
+  },
+  data() {
+    return {
+      file: {},
+      isLoading: false,
+      isFileReady: false,
+      isFilterVisible: true,
+      filters: {
+        payment: {
+          criteria: null,
+          dateFrom: null,
+          dateTo: null,
+        },
+      },
+    };
   },
   methods: {
     previewCollection() {
-
+      const { dateFrom, dateTo, criteria } = this.filters.payment;
+      this.isLoading = true;
+      this.isFileReady = false;
+      this.previewCollectionReport({ dateFrom, dateTo, criteria }).then((response) => {
+        this.file.type = response.headers.contentType;
+        const file = new Blob([response.data], { type: 'application/pdf' });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.file.src = e.target.result;
+          this.isLoading = false;
+          this.isFileReady = true;
+        }
+        reader.readAsDataURL(file);
+      });
     }
   }
 }

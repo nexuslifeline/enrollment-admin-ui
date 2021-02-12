@@ -20,9 +20,12 @@
             <slot name="filters"></slot>
           </div>
         </div>
-        <div class="c-page-content__report-area" :class="{ noPreview: noPreview }">
-          <p v-if="noPreview">No Preview</p>
-          <slot v-else name="content"></slot>
+        <div class="c-page-content__report-area">
+          <b-overlay v-if="isBusy" :show="true" />
+          <template v-if="!isBusy">
+            <slot name="content"></slot>
+          </template>
+          <p v-if="showPlaceholder">No Preview</p>
         </div>
       </div>
     </div>
@@ -42,7 +45,11 @@ export default {
       type: Boolean,
       default: true
     },
-    noPreview: {
+    isBusy: {
+      type: Boolean,
+      default: false
+    },
+    showPlaceholder: {
       type: Boolean,
       default: true
     },
@@ -68,7 +75,6 @@ export default {
   border-bottom: 1px solid $light-gray-10;
   padding: 7px 10px;
   font-weight: 500;
-  //box-shadow: 0 3px 6px 0 #e2e2e2;
 }
 
 .c-side-filter__content {
