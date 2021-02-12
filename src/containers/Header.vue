@@ -2,8 +2,7 @@
   <div class="header" :class="{ shrink: !isHome && !isReport, left: isReport }">
     <div class="header__menus-container">
       <ul class="header__menus">
-        <li
-          v-for="(nav, idx) in $options.navItems.filter(
+        <li v-for="(nav, idx) in $options.navItems.filter(
             (v, i) => i < mainNavLimit
           )"
           v-if="isAccessible(nav.permissionIds)"
@@ -96,16 +95,14 @@
             <div class="header__school-year">
               <b-form-select
                 v-model="$store.state.schoolYearId"
-                class="float-right"
-              >
+                class="float-right">
                 <b-form-select-option :value="null">
                   ALL
                 </b-form-select-option>
                 <b-form-select-option
                   v-for="schoolYear in options.schoolYears.items"
                   :key="schoolYear.id"
-                  :value="schoolYear.id"
-                >
+                  :value="schoolYear.id">
                   {{ schoolYear.name }}
                 </b-form-select-option>
               </b-form-select>
@@ -129,8 +126,7 @@
                   </li>
                   <li
                     @click.prevent.stop="logout"
-                    class="account-action__dropdown-item"
-                  >
+                    class="account-action__dropdown-item">
                     <a href="#" class="account-action__dropdown-item-link">
                       Logout
                       <v-icon v-if="isLoading" name="spinner" spin class="ml-2" />
@@ -151,15 +147,13 @@
             <b-form-input
               type="text"
               placeholder="Search"
-              v-model="searchReport"
+              v-model="search"
             ></b-form-input>
           </div>
         </template>
         <ul class="header__sub-menus">
           <template
-            v-for="(subNav, idx) in $options.navItems[
-              activeIndex
-            ].children.filter((v, i) => i < subNavLimit)">
+            v-for="(subNav, idx) in visibleSubNavItems">
             <template v-if="isAccessible(subNav.permissionIds)">
               <li
                 :key="idx"
@@ -175,8 +169,8 @@
                       'Assessment',
                       'Payment',
                     ].includes(subNav.label) &&
-                        $options.navItems[activeIndex].label === 'Enrollment' &&
-                        $store.state.approvalCount[subNav.label.toLowerCase()] > 0">
+                      $options.navItems[activeIndex].label === 'Enrollment' &&
+                      $store.state.approvalCount[subNav.label.toLowerCase()] > 0">
                     ({{
                       $store.state.approvalCount[subNav.label.toLowerCase()]
                     }})
@@ -255,7 +249,7 @@ export default {
   createLimiter,
   data() {
     return {
-      searchReport: '',
+      search: '',
       isOverviewOpen: false,
       showDropdown: false,
       isLoading: false,
@@ -271,6 +265,19 @@ export default {
     };
   },
   computed: {
+    visibleSubNavItems() {
+      const { search, isReport, $options, subNavLimit, activeIndex } = this;
+      const { children } = $options.navItems[activeIndex];
+      if (isReport) {
+        if (search) {
+           return children.filter(v => [v?.label, v?.description].join(' ').toLowerCase().includes(search));
+        } else {
+          return children;
+        }
+      }
+
+      return children.filter((v, i) => i < subNavLimit);
+    },
     isHome() {
       return this.$route.path?.includes('/home');
     },
