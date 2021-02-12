@@ -2,6 +2,7 @@
   <ReportContent
     title="Collection Report"
     @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="previewCollection"
     :isBusy="isLoading"
     :showPlaceholder="!isFileReady"
     :filterVisible="isFilterVisible">
