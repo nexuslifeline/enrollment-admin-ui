@@ -1,8 +1,56 @@
 <template>
-  <div class="c-page-content">
-    <Card v-show="!showEntry" title="Section and Schedule Management">
-      <div>
-        <SchoolCategoryTabs
+  <PageContent
+    title="Section and Schedule Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSections"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.section.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <v-select
+        :options="options.schoolCategories.values"
+        :value="filters.section.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+      />
+      <v-select
+        :options="options.levels.fixItems"
+        :value="filters.section.levelItem"
+        @input="onLevelFilterChange"
+        label="name"
+        placeholder="Level"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.fixItems"
+        :value="filters.section.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.semesters.values"
+        :value="filters.section.semesterItem"
+        @input="onSemesterFilterChange"
+        label="name"
+        placeholder="Semester"
+        class="mt-2"
+      />
+    </template>
+    <template  v-slot:content>
+      <div v-show="!showEntry">
+        <!-- <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="
             (filters.section.schoolCategoryId = $event), loadSections()
@@ -97,27 +145,6 @@
                     </b-form-select>
                   </b-col>
                   <b-col md="4">
-                    <!-- <b-form-select
-                      @input="loadSections()"
-                      v-model="filters.section.schoolYearId"
-                      class="float-right"
-                    >
-                      <template v-slot:first>
-                        <b-form-select-option :value="null" disabled
-                          >-- School Year --</b-form-select-option
-                        >
-                      </template>
-                      <b-form-select-option :value="null"
-                        >None</b-form-select-option
-                      >
-                      <b-form-select-option
-                        v-for="schoolYear in options.schoolYears.items"
-                        :key="schoolYear.id"
-                        :value="schoolYear.id"
-                      >
-                        {{ schoolYear.name }}
-                      </b-form-select-option>
-                    </b-form-select> -->
                   </b-col>
                 </b-row>
               </b-col>
@@ -132,7 +159,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -268,488 +295,486 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-
-    <div v-show="showEntry">
-      <b-overlay :show="forms.section.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="12">
-            <b-card>
-              <h5 slot="header">
-                <span>
-                  Section - {{ entryMode }} <br />
-                  <small>Details about the section and its schedule.</small>
-                </span>
-              </h5>
-              <b-card-body>
-                <b-tabs v-model="entryTabIndex">
-                  <b-tab title="Details">
-                    <b-row class="mt-4">
-                      <b-col md="6">
-                        <b-form-group>
-                          <label class="required">Name</label>
-                          <b-form-input
-                            ref="name"
-                            @input="loadSectionDetails()"
-                            v-model="forms.section.fields.name"
-                            :state="forms.section.states.name"
-                          />
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.name }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                        <b-form-group>
-                          <label>Description</label>
-                          <b-form-textarea
-                            ref="description"
-                            v-model="forms.section.fields.description"
-                            :state="forms.section.states.description"
-                          />
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.description }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                        <b-form-group>
-                          <label class="required">School Year</label>
-                          <b-form-select
-                            @change="loadSectionDetails()"
-                            v-model="forms.section.fields.schoolYearId"
-                            :state="forms.section.states.schoolYearId"
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- School Year --</b-form-select-option
-                              >
-                            </template>
-                            <b-form-select-option
-                              v-for="schoolYear in options.schoolYears.items"
-                              :key="schoolYear.id"
-                              :value="schoolYear.id"
-                            >
-                              {{ schoolYear.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.schoolYearId }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                      </b-col>
-                      <b-col md="6">
-                        <b-form-group>
-                          <label class="required">School Category</label>
-                          <b-form-select
-                            v-model="forms.section.fields.schoolCategoryId"
-                            :state="forms.section.states.schoolCategoryId"
-                            @change="loadLevelsOfSchoolCategoryList()"
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- School Category --</b-form-select-option
-                              >
-                            </template>
-                            <b-form-select-option
-                              v-for="schoolCategory in options.schoolCategories
-                                .values"
-                              :key="schoolCategory.id"
-                              :value="schoolCategory.id"
-                            >
-                              {{ schoolCategory.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.schoolCategoryId }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                        <b-form-group>
-                          <label class="required">
-                            Level
-                            <v-icon
-                              v-if="options.levels.isLoading"
-                              name="spinner"
-                              spin
+      <div v-show="showEntry">
+        <b-overlay :show="forms.section.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="12">
+              <b-card>
+                <h5 slot="header">
+                  <span>
+                    Section - {{ entryMode }} <br />
+                    <small>Details about the section and its schedule.</small>
+                  </span>
+                </h5>
+                <b-card-body>
+                  <b-tabs v-model="entryTabIndex">
+                    <b-tab title="Details">
+                      <b-row class="mt-4">
+                        <b-col md="6">
+                          <b-form-group>
+                            <label class="required">Name</label>
+                            <b-form-input
+                              ref="name"
+                              @input="loadSectionDetails()"
+                              v-model="forms.section.fields.name"
+                              :state="forms.section.states.name"
                             />
-                          </label>
-                          <b-form-select
-                            v-model="forms.section.fields.levelId"
-                            :state="forms.section.states.levelId"
-                            @change="
-                              loadCoursesOfLevelList(),
-                                loadSubjectsOfCurriculum()
-                            "
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- Level --</b-form-select-option
-                              >
-                            </template>
-                            <b-form-select-option
-                              v-for="level in options.levels.items"
-                              :key="level.id"
-                              :value="level.id"
-                            >
-                              {{ level.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.levelId }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                        <b-form-group>
-                          <label>
-                            Course
-                            <v-icon
-                              v-if="options.courses.isLoading"
-                              name="spinner"
-                              spin
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.name }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                          <b-form-group>
+                            <label>Description</label>
+                            <b-form-textarea
+                              ref="description"
+                              v-model="forms.section.fields.description"
+                              :state="forms.section.states.description"
                             />
-                          </label>
-                          <b-form-select
-                            v-model="forms.section.fields.courseId"
-                            :state="forms.section.states.courseId"
-                            :disabled="
-                              forms.section.fields.schoolCategoryId === null ||
-                                forms.section.fields.schoolCategoryId ===
-                                  options.schoolCategories.PRE_SCHOOL.id ||
-                                forms.section.fields.schoolCategoryId ===
-                                  options.schoolCategories.PRIMARY_SCHOOL.id ||
-                                forms.section.fields.schoolCategoryId ===
-                                  options.schoolCategories.JUNIOR_HIGH_SCHOOL.id
-                            "
-                            @change="loadSubjectsOfCurriculum()"
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- Course --</b-form-select-option
-                              >
-                            </template>
-                            <b-form-select-option
-                              v-for="course in options.courses.items"
-                              :key="course.id"
-                              :value="course.id"
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.description }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                          <b-form-group>
+                            <label class="required">School Year</label>
+                            <b-form-select
+                              @change="loadSectionDetails()"
+                              v-model="forms.section.fields.schoolYearId"
+                              :state="forms.section.states.schoolYearId"
                             >
-                              {{ course.description }}
-                              {{ course.major ? `(${course.major})` : '' }}
-                            </b-form-select-option>
-                          </b-form-select>
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.courseId }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                        <b-form-group>
-                          <label>Semester</label>
-                          <b-form-select
-                            v-model="forms.section.fields.semesterId"
-                            :state="forms.section.states.semesterId"
-                            :disabled="
-                              forms.section.fields.schoolCategoryId === null ||
-                                forms.section.fields.schoolCategoryId ===
-                                  options.schoolCategories.PRE_SCHOOL.id ||
-                                forms.section.fields.schoolCategoryId ===
-                                  options.schoolCategories.PRIMARY_SCHOOL.id ||
-                                forms.section.fields.schoolCategoryId ===
-                                  options.schoolCategories.JUNIOR_HIGH_SCHOOL.id
-                            "
-                            @change="loadSubjectsOfCurriculum()"
-                          >
-                            <template v-slot:first>
-                              <b-form-select-option :value="null" disabled
-                                >-- Semester --</b-form-select-option
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled
+                                  >-- School Year --</b-form-select-option
+                                >
+                              </template>
+                              <b-form-select-option
+                                v-for="schoolYear in options.schoolYears.items"
+                                :key="schoolYear.id"
+                                :value="schoolYear.id"
                               >
-                            </template>
-                            <b-form-select-option
-                              v-for="semester in options.semesters.values"
-                              :key="semester.id"
-                              :value="semester.id"
+                                {{ schoolYear.name }}
+                              </b-form-select-option>
+                            </b-form-select>
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.schoolYearId }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                        </b-col>
+                        <b-col md="6">
+                          <b-form-group>
+                            <label class="required">School Category</label>
+                            <b-form-select
+                              v-model="forms.section.fields.schoolCategoryId"
+                              :state="forms.section.states.schoolCategoryId"
+                              @change="loadLevelsOfSchoolCategoryList()"
                             >
-                              {{ semester.name }}
-                            </b-form-select-option>
-                          </b-form-select>
-                          <b-form-invalid-feedback>
-                            {{ forms.section.errors.semesterId }}
-                          </b-form-invalid-feedback>
-                        </b-form-group>
-                      </b-col>
-                    </b-row>
-                  </b-tab>
-                  <b-tab title="Schedule">
-                    <!-- <b-row>
-                      <b-col md=8>
-                      </b-col>
-                      <b-col md=4>
-                        <b-button
-                          variant="outline-primary"
-                          class="float-right"
-                          @click="setAddSchedule(null)">
-                          <v-icon name="plus-circle" /> ADD SCHEDULE
-                        </b-button>
-                      </b-col>
-                    </b-row> -->
-                    <!-- <Schedule
-                      class="mt-2"
-                      :isEntry="true"
-                      :isShown="showEntry"
-                      :details="scheduleDetails"
-                      :subjects="options.subjects.items"
-                      :scheduleItems="forms.section.fields.schedules"
-                      :scheduleStates="forms.section.states.schedules"/> -->
-                    <h5 class="pt-2 text-center">
-                      {{ forms.section.fields.name }}<br />
-                      <span
-                        >{{
-                          getOptionName(forms.section.fields.levelId, 'levels')
-                        }}
-                        -
-                        {{
-                          getOptionName(
-                            forms.section.fields.schoolYearId,
-                            'schoolYears'
-                          )
-                        }}</span
-                      ><br />
-                      <span v-if="forms.section.fields.courseId"
-                        >{{
-                          getOptionName(
-                            forms.section.fields.courseId,
-                            'courses'
-                          )
-                        }}
-                        -
-                        <span v-if="forms.section.fields.semesterId">{{
-                          options.semesters.getEnum(
-                            forms.section.fields.semesterId
-                          ).name
-                        }}</span>
-                      </span>
-                    </h5>
-                    <br />
-                    <ScheduleViewer
-                      v-if="showEntry"
-                      @onMultipleCellSelect="setAddSchedule"
-                      @onCellItemDblClick="setAddSchedule"
-                      :selectedItems="forms.section.fields.schedules"
-                      :showExtendedTime="false"
-                      :options="[
-                        {
-                          label: 'Edit Schedule',
-                          callback: onEditSchedule,
-                        },
-                        {
-                          label: 'Delete Schedule',
-                          callback: onDeleteSchedule,
-                        },
-                      ]"
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled
+                                  >-- School Category --</b-form-select-option
+                                >
+                              </template>
+                              <b-form-select-option
+                                v-for="schoolCategory in options.schoolCategories
+                                  .values"
+                                :key="schoolCategory.id"
+                                :value="schoolCategory.id"
+                              >
+                                {{ schoolCategory.name }}
+                              </b-form-select-option>
+                            </b-form-select>
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.schoolCategoryId }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                          <b-form-group>
+                            <label class="required">
+                              Level
+                              <v-icon
+                                v-if="options.levels.isLoading"
+                                name="spinner"
+                                spin
+                              />
+                            </label>
+                            <b-form-select
+                              v-model="forms.section.fields.levelId"
+                              :state="forms.section.states.levelId"
+                              @change="
+                                loadCoursesOfLevelList(),
+                                  loadSubjectsOfCurriculum()
+                              "
+                            >
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled
+                                  >-- Level --</b-form-select-option
+                                >
+                              </template>
+                              <b-form-select-option
+                                v-for="level in options.levels.items"
+                                :key="level.id"
+                                :value="level.id"
+                              >
+                                {{ level.name }}
+                              </b-form-select-option>
+                            </b-form-select>
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.levelId }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                          <b-form-group>
+                            <label>
+                              Course
+                              <v-icon
+                                v-if="options.courses.isLoading"
+                                name="spinner"
+                                spin
+                              />
+                            </label>
+                            <b-form-select
+                              v-model="forms.section.fields.courseId"
+                              :state="forms.section.states.courseId"
+                              :disabled="
+                                forms.section.fields.schoolCategoryId === null ||
+                                  forms.section.fields.schoolCategoryId ===
+                                    options.schoolCategories.PRE_SCHOOL.id ||
+                                  forms.section.fields.schoolCategoryId ===
+                                    options.schoolCategories.PRIMARY_SCHOOL.id ||
+                                  forms.section.fields.schoolCategoryId ===
+                                    options.schoolCategories.JUNIOR_HIGH_SCHOOL.id
+                              "
+                              @change="loadSubjectsOfCurriculum()"
+                            >
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled
+                                  >-- Course --</b-form-select-option
+                                >
+                              </template>
+                              <b-form-select-option
+                                v-for="course in options.courses.items"
+                                :key="course.id"
+                                :value="course.id"
+                              >
+                                {{ course.description }}
+                                {{ course.major ? `(${course.major})` : '' }}
+                              </b-form-select-option>
+                            </b-form-select>
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.courseId }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                          <b-form-group>
+                            <label>Semester</label>
+                            <b-form-select
+                              v-model="forms.section.fields.semesterId"
+                              :state="forms.section.states.semesterId"
+                              :disabled="
+                                forms.section.fields.schoolCategoryId === null ||
+                                  forms.section.fields.schoolCategoryId ===
+                                    options.schoolCategories.PRE_SCHOOL.id ||
+                                  forms.section.fields.schoolCategoryId ===
+                                    options.schoolCategories.PRIMARY_SCHOOL.id ||
+                                  forms.section.fields.schoolCategoryId ===
+                                    options.schoolCategories.JUNIOR_HIGH_SCHOOL.id
+                              "
+                              @change="loadSubjectsOfCurriculum()"
+                            >
+                              <template v-slot:first>
+                                <b-form-select-option :value="null" disabled
+                                  >-- Semester --</b-form-select-option
+                                >
+                              </template>
+                              <b-form-select-option
+                                v-for="semester in options.semesters.values"
+                                :key="semester.id"
+                                :value="semester.id"
+                              >
+                                {{ semester.name }}
+                              </b-form-select-option>
+                            </b-form-select>
+                            <b-form-invalid-feedback>
+                              {{ forms.section.errors.semesterId }}
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+                        </b-col>
+                      </b-row>
+                    </b-tab>
+                    <b-tab title="Schedule">
+                      <!-- <b-row>
+                        <b-col md=8>
+                        </b-col>
+                        <b-col md=4>
+                          <b-button
+                            variant="outline-primary"
+                            class="float-right"
+                            @click="setAddSchedule(null)">
+                            <v-icon name="plus-circle" /> ADD SCHEDULE
+                          </b-button>
+                        </b-col>
+                      </b-row> -->
+                      <!-- <Schedule
+                        class="mt-2"
+                        :isEntry="true"
+                        :isShown="showEntry"
+                        :details="scheduleDetails"
+                        :subjects="options.subjects.items"
+                        :scheduleItems="forms.section.fields.schedules"
+                        :scheduleStates="forms.section.states.schedules"/> -->
+                      <h5 class="pt-2 text-center">
+                        {{ forms.section.fields.name }}<br />
+                        <span
+                          >{{
+                            getOptionName(forms.section.fields.levelId, 'levels')
+                          }}
+                          -
+                          {{
+                            getOptionName(
+                              forms.section.fields.schoolYearId,
+                              'schoolYears'
+                            )
+                          }}</span
+                        ><br />
+                        <span v-if="forms.section.fields.courseId"
+                          >{{
+                            getOptionName(
+                              forms.section.fields.courseId,
+                              'courses'
+                            )
+                          }}
+                          -
+                          <span v-if="forms.section.fields.semesterId">{{
+                            options.semesters.getEnum(
+                              forms.section.fields.semesterId
+                            ).name
+                          }}</span>
+                        </span>
+                      </h5>
+                      <br />
+                      <ScheduleViewer
+                        v-if="showEntry"
+                        @onMultipleCellSelect="setAddSchedule"
+                        @onCellItemDblClick="setAddSchedule"
+                        :selectedItems="forms.section.fields.schedules"
+                        :showExtendedTime="false"
+                        :options="[
+                          {
+                            label: 'Edit Schedule',
+                            callback: onEditSchedule,
+                          },
+                          {
+                            label: 'Delete Schedule',
+                            callback: onDeleteSchedule,
+                          },
+                        ]"
+                      />
+                    </b-tab>
+                  </b-tabs>
+                </b-card-body>
+                <template v-slot:footer>
+                  <b-button
+                    class="float-right btn-save ml-2"
+                    @click="showEntry = false"
+                    variant="outline-danger"
+                  >
+                    Close
+                  </b-button>
+                  <b-button
+                    :disabled="forms.section.isProcessing"
+                    class="float-right btn-save"
+                    @click="onSectionEntry()"
+                    variant="outline-primary"
+                  >
+                    <v-icon
+                      v-if="forms.section.isProcessing"
+                      name="sync"
+                      spin
+                      class="mr-2"
                     />
-                  </b-tab>
-                </b-tabs>
-              </b-card-body>
-              <template v-slot:footer>
-                <b-button
-                  class="float-right btn-save ml-2"
-                  @click="showEntry = false"
-                  variant="outline-danger"
-                >
-                  Close
-                </b-button>
-                <b-button
-                  :disabled="forms.section.isProcessing"
-                  class="float-right btn-save"
-                  @click="onSectionEntry()"
-                  variant="outline-primary"
-                >
-                  <v-icon
-                    v-if="forms.section.isProcessing"
-                    name="sync"
-                    spin
-                    class="mr-2"
-                  />
-                  Save
-                </b-button>
-              </template>
-            </b-card>
-          </b-col>
-        </b-row>
-      </b-overlay>
-    </div>
-
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Section
-      </div>
-      Are you sure you want to delete this Section ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="forms.section.isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onSectionDelete()"
-        >
-          <v-icon
-            v-if="forms.section.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-    <!-- Modal Add Schedule -->
-    <b-modal
-      v-model="showModalSchedule"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+                    Save
+                  </b-button>
+                </template>
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-overlay>
+     </div>
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Section
+        </div>
+        Are you sure you want to delete this Section ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="forms.section.isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onSectionDelete()"
+          >
+            <v-icon
+              v-if="forms.section.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+      <!-- Modal Add Schedule -->
+      <b-modal
+        v-model="showModalSchedule"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Schedule - {{ selectedSchedule ? 'Edit' : 'Add' }}
+        </div>
         <!-- modal title -->
-        Schedule - {{ selectedSchedule ? 'Edit' : 'Add' }}
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.schedule.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Day</label>
-              <v-select
-                v-model="forms.schedule.fields.dayIds"
-                :reduce="(item) => item.id"
-                multiple
-                label="name"
-                :options="$options.Days.values"
-              />
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="6">
-            <b-form-group>
-              <label class="required">Start</label>
-              <b-form-input
-                @change="timeValidation('start')"
-                type="time"
-                v-model="forms.schedule.fields.start"
-              />
-            </b-form-group>
-          </b-col>
-          <b-col md="6">
-            <b-form-group>
-              <label class="required">End</label>
-              <b-form-input
-                @change="timeValidation('end')"
-                type="time"
-                v-model="forms.schedule.fields.end"
-              />
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Subject</label>
-              <b-form-select v-model="forms.schedule.fields.subjectId">
-                <template v-slot:first>
-                  <b-form-select-option :value="null"
-                    >-- Select Subject --</b-form-select-option
+        <!-- modal body -->
+        <b-overlay :show="forms.schedule.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Day</label>
+                <v-select
+                  v-model="forms.schedule.fields.dayIds"
+                  :reduce="(item) => item.id"
+                  multiple
+                  label="name"
+                  :options="$options.Days.values"
+                />
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="6">
+              <b-form-group>
+                <label class="required">Start</label>
+                <b-form-input
+                  @change="timeValidation('start')"
+                  type="time"
+                  v-model="forms.schedule.fields.start"
+                />
+              </b-form-group>
+            </b-col>
+            <b-col md="6">
+              <b-form-group>
+                <label class="required">End</label>
+                <b-form-input
+                  @change="timeValidation('end')"
+                  type="time"
+                  v-model="forms.schedule.fields.end"
+                />
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Subject</label>
+                <b-form-select v-model="forms.schedule.fields.subjectId">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null"
+                      >-- Select Subject --</b-form-select-option
+                    >
+                  </template>
+                  <b-form-select-option
+                    v-for="subject in options.subjects.items"
+                    :key="subject.id"
+                    :value="subject.id"
                   >
-                </template>
-                <b-form-select-option
-                  v-for="subject in options.subjects.items"
-                  :key="subject.id"
-                  :value="subject.id"
-                >
-                  {{ subject.name }}
-                </b-form-select-option>
-              </b-form-select>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Instructor</label>
-              <b-form-select v-model="forms.schedule.fields.personnelId">
-                <template v-slot:first>
-                  <b-form-select-option :value="null"
-                    >-- Select Instructor --</b-form-select-option
+                    {{ subject.name }}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Instructor</label>
+                <b-form-select v-model="forms.schedule.fields.personnelId">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null"
+                      >-- Select Instructor --</b-form-select-option
+                    >
+                  </template>
+                  <b-form-select-option
+                    v-for="instructor in options.instructors.items"
+                    :key="instructor.id"
+                    :value="instructor.id"
                   >
-                </template>
-                <b-form-select-option
-                  v-for="instructor in options.instructors.items"
-                  :key="instructor.id"
-                  :value="instructor.id"
+                    {{ instructor.name }}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <b-form-checkbox
+                  v-model="forms.schedule.fields.isLab"
+                  :value="1"
+                  :unchecked-value="0"
                 >
-                  {{ instructor.name }}
-                </b-form-select-option>
-              </b-form-select>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <b-form-checkbox
-                v-model="forms.schedule.fields.isLab"
-                :value="1"
-                :unchecked-value="0"
-              >
-                Laboratory
-              </b-form-checkbox>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label>Remarks</label>
-              <b-form-textarea
-                v-model="forms.schedule.fields.remarks"
-                rows="2"
-              />
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-overlay>
-      <!-- end modal body -->
-      <div slot="modal-footer" class="w-100">
+                  Laboratory
+                </b-form-checkbox>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label>Remarks</label>
+                <b-form-textarea
+                  v-model="forms.schedule.fields.remarks"
+                  rows="2"
+                />
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-overlay>
+        <!-- end modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalSchedule = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.schedule.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="addSchedule()"
+          >
+            <v-icon
+              v-if="forms.schedule.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Add
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalSchedule = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.schedule.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="addSchedule()"
-        >
-          <v-icon
-            v-if="forms.schedule.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Add
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-  </div>
+      </b-modal>
+    </template>
+  </PageContent>
 </template>
 <script>
 const sectionFields = {
@@ -804,6 +829,7 @@ import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
 import { differenceInMinutes, addMinutes } from 'date-fns';
+import PageContent from '../components/PageContainer/PageContent'
 
 export default {
   name: 'ClassSection',
@@ -822,12 +848,14 @@ export default {
     ScheduleViewer,
     SchoolCategoryTabs,
     Card,
+    PageContent
   },
   SectionAndSchedulePermissions,
   Days,
   UserGroups,
   data() {
     return {
+      isFilterVisible: true,
       entryTabIndex: 0,
       showModalEntry: false,
       showModalSchedule: false,
@@ -918,11 +946,15 @@ export default {
       filters: {
         section: {
           criteria: null,
-          schoolCategoryId: null,
-          levelId: null,
-          courseId: null,
           schoolYearId: null,
           semesterId: null,
+          semesterItem: null,
+          schoolCategoryId: null,
+          schoolCategoryItem: null,
+          levelId: null,
+          levelItem: null,
+          courseId: null,
+          courseItem: null,
         },
       },
       options: {
@@ -953,11 +985,11 @@ export default {
     };
   },
   created() {
-    // this.loadSections();
     this.loadSchoolYears();
     this.loadCourses();
     this.loadLevels();
     this.loadPersonnel();
+    this.loadSections();
   },
   methods: {
     loadSections() {
@@ -1326,9 +1358,10 @@ export default {
     },
     loadLevels() {
       const params = { paginate: false };
+      const { schoolCategoryId } = this.filters.section
       const { levels } = this.options;
       this.getLevelList(params).then(({ data }) => {
-        levels.fixItems = data;
+        levels.fixItems = schoolCategoryId ? data.filter(e=> e.schoolCategoryId === this.filters.section.schoolCategoryId) : data;
       });
     },
     // loadSections() {
@@ -1526,12 +1559,55 @@ export default {
 
       return true;
     },
+    onCategoryFilterChange(item) {
+      const { section } = this.filters;
+      section.schoolCategoryId = item?.id || 0;
+      section.schoolCategoryItem = item;
+      section.levelId = null,
+      section.levelItem = null,
+      section.courseId = null
+      section.courseItem = null
+      section.semesterId = null
+       section.semesterItem = null
+      this.loadLevels()
+      this.loadCourses()
+      this.loadSections();
+    },
+    onLevelFilterChange(item) {
+      const { section } = this.filters;
+      section.levelId = item?.id || 0;
+      section.levelItem = item;
+      this.loadSections();
+    },
+    onCourseFilterChange(item) {
+      const { section } = this.filters;
+      section.courseId = item?.id || 0;
+      section.courseItem = item;
+      this.loadSections();
+    },
+     onSemesterFilterChange(item) {
+      const { section } = this.filters;
+      section.semesterId = item?.id || 0;
+      section.semesterItem = item;
+      this.loadSections();
+    },
   },
   watch: {
     '$store.state.schoolYearId': function(newVal) {
       this.loadSections();
     },
   },
+  computed: {
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.section;
+      const { schoolCategories } = this.options;
+      return [
+        schoolCategories.SENIOR_HIGH_SCHOOL.id,
+        schoolCategories.COLLEGE.id,
+        schoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    }
+  }
 };
 </script>
 

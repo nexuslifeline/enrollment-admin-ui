@@ -1,9 +1,23 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Student Management">
+   <PageContent
+    title="Student Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadStudents"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.StudentPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.student.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content>
       <div v-show="!showStudentEntry">
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="8">
@@ -27,7 +41,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -165,8 +179,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <b-row>
+      <b-row>
       <b-col md="12" v-show="showStudentEntry">
         <b-overlay :show="isLoading" rounded="sm">
           <b-card>
@@ -1165,106 +1178,107 @@
           </b-card>
         </b-overlay>
       </b-col>
-    </b-row>
-    <b-modal
-      @shown="$refs.username.focus()"
-      v-model="showModalUpdateUser"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        <!-- modal title -->
-        User Account - Edit
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-row>
-        <b-col md="12">
-          <b-form-group>
-            <label class="required">Email</label>
-            <b-form-input
-              ref="username"
-              v-model="forms.user.fields.username"
-              :state="forms.user.states.userUsername"
-              debounce="500"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.user.errors.userUsername }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group>
-            <label class="required">Password</label>
-            <b-form-input
-              type="password"
-              v-model="forms.user.fields.password"
-              :state="forms.user.states.userPassword"
-              debounce="500"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.user.errors.userPassword }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group>
-            <label class="required">Confirm Password</label>
-            <b-form-input
-              type="password"
-              v-model="forms.user.fields.passwordConfirmation"
-              debounce="500"
-            />
-          </b-form-group>
-        </b-col>
       </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+      <b-modal
+        @shown="$refs.username.focus()"
+        v-model="showModalUpdateUser"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          User Account - Edit
+        </div>
+        <!-- modal title -->
+        <!-- modal body -->
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label class="required">Email</label>
+              <b-form-input
+                ref="username"
+                v-model="forms.user.fields.username"
+                :state="forms.user.states.userUsername"
+                debounce="500"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.user.errors.userUsername }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Password</label>
+              <b-form-input
+                type="password"
+                v-model="forms.user.fields.password"
+                :state="forms.user.states.userPassword"
+                debounce="500"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.user.errors.userPassword }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Confirm Password</label>
+              <b-form-input
+                type="password"
+                v-model="forms.user.fields.passwordConfirmation"
+                debounce="500"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalUpdateUser = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="isUserSaving"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onStudentEntry()"
+          >
+            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalUpdateUser = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="isUserSaving"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onStudentEntry()"
-        >
-          <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Student
-      </div>
-      Are you sure you want to delete this student ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="isUserSaving"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onStudentDelete()"
-        >
-          <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-  </div>
+      </b-modal>
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Student
+        </div>
+        Are you sure you want to delete this student ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="isUserSaving"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onStudentDelete()"
+          >
+            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+    </template>
+  </PageContent>
 </template>
 <script>
 import { StudentApi, UserGroupApi } from '../../mixins/api';
@@ -1284,7 +1298,7 @@ import PhotoViewer from '../components/PhotoViewer';
 import { copyValue } from '../../helpers/extractor';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
-
+import PageContent from "../components/PageContainer/PageContent";
 const studentFields = {
   id: null,
   //studentNo: null,
@@ -1411,10 +1425,12 @@ export default {
   components: {
     PhotoViewer,
     Card,
+    PageContent
   },
   StudentPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showStudentEntry: false,
       showModalUpdateUser: false,
       showModalConfirmation: false,

@@ -1,9 +1,23 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Personnel Management">
+  <PageContent
+    title="Personnel Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadPersonnels"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.PersonnelPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.user.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content >
       <div>
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="8">
@@ -26,7 +40,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -147,8 +161,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry Add -->
+      <!-- Modal Entry Add -->
     <b-modal
       @shown="$refs.username.focus()"
       v-model="showModalEntry"
@@ -614,7 +627,9 @@
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
-  </div>
+    </template>
+    
+  </PageContent>
 </template>
 <script>
 const userFields = {
@@ -652,6 +667,7 @@ import Personnel from '../../mixins/api/Personnel';
 import Access from '../../mixins/utils/Access';
 import { PersonnelPermissions } from '../../helpers/enum';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'Personnel',
@@ -659,10 +675,12 @@ export default {
   components: {
     PhotoViewer,
     Card,
+    PageContent
   },
   PersonnelPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalUpdatePersonnel: false,
       showModalUpdateUser: false,

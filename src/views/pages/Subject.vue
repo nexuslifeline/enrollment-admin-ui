@@ -1,9 +1,31 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Subject Management">
+  <PageContent title="Subject Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSubjects"
+    :filterVisible="isFilterVisible"
+    @create="onCreate()"
+    :createButtonVisible="isAccessible($options.SubjectPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.subject.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+        @update="loadSubjects()"
+      />
+      <v-select
+        :options="options.schoolCategories.values"
+        :value="filters.subject.schoolCategoryItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
       <div>
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="6" class="bottom-space">
@@ -50,7 +72,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -142,347 +164,347 @@
           </b-col>
         </b-row>
       </div>
-    </Card>
-    <!-- Modal Entry -->
-    <b-modal
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <!-- Modal Entry -->
+      <b-modal
+        v-model="showModalEntry"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Subjects - {{ entryMode }}
+        </div>
         <!-- modal title -->
-        Subjects - {{ entryMode }}
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.subject.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="12">
-            <b-row>
-              <b-col md="12">
-                <b-form-group>
-                  <label class="required">Subject Code</label>
-                  <b-form-input
-                    :disabled="
-                      !isAccessible([
-                        $options.SubjectPermissions.ADD.id,
-                        $options.SubjectPermissions.EDIT.id,
-                      ])
-                    "
-                    ref="name"
-                    v-model="forms.subject.fields.name"
-                    :state="forms.subject.states.name"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.subject.errors.name }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="12">
-                <b-form-group>
-                  <label class="required">Description</label>
-                  <b-form-textarea
-                    :disabled="
-                      !isAccessible([
-                        $options.SubjectPermissions.ADD.id,
-                        $options.SubjectPermissions.EDIT.id,
-                      ])
-                    "
-                    ref="description"
-                    v-model="forms.subject.fields.description"
-                    :state="forms.subject.states.description"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.subject.errors.description }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="12">
-                <b-form-group>
-                  <label class="required">School Category</label>
-                  <b-form-select
-                    :disabled="
-                      !isAccessible([
-                        $options.SubjectPermissions.ADD.id,
-                        $options.SubjectPermissions.EDIT.id,
-                      ])
-                    "
-                    v-model="forms.subject.fields.schoolCategoryId"
-                    :state="forms.subject.states.schoolCategoryId"
-                    @change="loadSubjectPrerequisite()"
-                  >
-                    <template v-slot:first>
-                      <b-form-select-option :value="null" disabled
-                        >-- School Category --</b-form-select-option
-                      >
-                    </template>
-                    <b-form-select-option
-                      v-for="schoolCategory in options.schoolCategories.values"
-                      :key="schoolCategory.id"
-                      :value="schoolCategory.id"
+        <!-- modal body -->
+        <b-overlay :show="forms.subject.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="12">
+              <b-row>
+                <b-col md="12">
+                  <b-form-group>
+                    <label class="required">Subject Code</label>
+                    <b-form-input
+                      :disabled="
+                        !isAccessible([
+                          $options.SubjectPermissions.ADD.id,
+                          $options.SubjectPermissions.EDIT.id,
+                        ])
+                      "
+                      ref="name"
+                      v-model="forms.subject.fields.name"
+                      :state="forms.subject.states.name"
+                    />
+                    <b-form-invalid-feedback>
+                      {{ forms.subject.errors.name }}
+                    </b-form-invalid-feedback>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col md="12">
+                  <b-form-group>
+                    <label class="required">Description</label>
+                    <b-form-textarea
+                      :disabled="
+                        !isAccessible([
+                          $options.SubjectPermissions.ADD.id,
+                          $options.SubjectPermissions.EDIT.id,
+                        ])
+                      "
+                      ref="description"
+                      v-model="forms.subject.fields.description"
+                      :state="forms.subject.states.description"
+                    />
+                    <b-form-invalid-feedback>
+                      {{ forms.subject.errors.description }}
+                    </b-form-invalid-feedback>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col md="12">
+                  <b-form-group>
+                    <label class="required">School Category</label>
+                    <b-form-select
+                      :disabled="
+                        !isAccessible([
+                          $options.SubjectPermissions.ADD.id,
+                          $options.SubjectPermissions.EDIT.id,
+                        ])
+                      "
+                      v-model="forms.subject.fields.schoolCategoryId"
+                      :state="forms.subject.states.schoolCategoryId"
+                      @change="loadSubjectPrerequisite()"
                     >
-                      {{ schoolCategory.name }}
-                    </b-form-select-option>
-                  </b-form-select>
-                  <b-form-invalid-feedback>
-                    {{ forms.subject.errors.schoolCategoryId }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <!-- <b-row>
-              <b-col md=12>
-                <b-form-group >
-                  <label class="required">Department</label>
-                  <b-form-select
-                    v-model="forms.subject.fields.departmentId"
-                    :state="forms.subject.states.departmentId">
-                    <template v-slot:first>
-                      <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
-                    </template>
-                    <b-form-select-option
-                      v-for="department in options.departments.items"
-                      :key="department.id"
-                      :value="department.id">
-                      {{department.name}}
-                    </b-form-select-option>
-                  </b-form-select>
-                  <b-form-invalid-feedback>
-                    {{forms.subject.errors.departmentId}}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row> -->
-            <!-- <b-row>
-              <b-col md=12>
-                <b-form-group >
-                  <label>Prerequisites
-                    <v-icon
-                      v-if="isLoading"
-                      class="ml-2"
-                      name="spinner"
-                      spin/>
-                  </label>
-                  <Select2
-                    multiple
-                    :disabled="isLoading"
-                    v-model="forms.subject.fields.prerequisites"
-                    :allowClear="false">
-                    <option
-                      v-for="subject in options.subjects.items"
-                      :key="subject.id"
-                      :value="subject.id">
-                      {{subject.name}}
-                    </option>
-                  </Select2>
-                </b-form-group>
-              </b-col>
-            </b-row> -->
-            <b-row>
-              <b-col md="6">
-                <b-form-group label="Lecture Units">
-                  <vue-autonumeric
-                    @input="computeTotalAmount()"
-                    ref="units"
-                    :disabled="
-                      !isAccessible([
-                        $options.SubjectPermissions.ADD.id,
-                        $options.SubjectPermissions.EDIT.id,
-                      ])
-                    "
-                    v-model="forms.subject.fields.units"
-                    :class="'form-control text-right'"
-                    :options="[
-                      {
-                        decimalPlaces: 0,
-                        minimumValue: 0,
-                        modifyValueOnWheel: false,
-                        emptyInputBehavior: 0,
-                      },
-                    ]"
-                  >
-                  </vue-autonumeric>
-                </b-form-group>
-              </b-col>
-              <b-col md="6">
-                <b-form-group label="Amount per Lecture Units">
-                  <vue-autonumeric
-                    @input="computeTotalAmount()"
-                    ref="amountPerUnit"
-                    :disabled="
-                      !isAccessible($options.SubjectPermissions.EDIT_PRICE.id)
-                    "
-                    v-model="forms.subject.fields.amountPerUnit"
-                    :class="'form-control text-right'"
-                    :options="[
-                      {
-                        minimumValue: 0,
-                        modifyValueOnWheel: false,
-                        emptyInputBehavior: 0,
-                      },
-                    ]"
-                  >
-                  </vue-autonumeric>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="6">
-                <b-form-group label="Lab Units">
-                  <vue-autonumeric
-                    @input="computeTotalAmount()"
-                    ref="labs"
-                    :disabled="
-                      !isAccessible([
-                        $options.SubjectPermissions.ADD.id,
-                        $options.SubjectPermissions.EDIT.id,
-                      ])
-                    "
-                    v-model="forms.subject.fields.labs"
-                    :class="'form-control text-right'"
-                    :options="[
-                      {
-                        decimalPlaces: 0,
-                        minimumValue: 0,
-                        modifyValueOnWheel: false,
-                        emptyInputBehavior: 0,
-                      },
-                    ]"
-                  >
-                  </vue-autonumeric>
-                </b-form-group>
-              </b-col>
-              <b-col md="6">
-                <b-form-group label="Amount per Lab Units">
-                  <vue-autonumeric
-                    @input="computeTotalAmount()"
-                    ref="amountPerLab"
-                    :disabled="
-                      !isAccessible($options.SubjectPermissions.EDIT_PRICE.id)
-                    "
-                    v-model="forms.subject.fields.amountPerLab"
-                    :class="'form-control text-right'"
-                    :options="[
-                      {
-                        minimumValue: 0,
-                        modifyValueOnWheel: false,
-                        emptyInputBehavior: 0,
-                      },
-                    ]"
-                  >
-                  </vue-autonumeric>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="6">
-                <b-form-group label="Total Units">
-                  <vue-autonumeric
-                    :disabled="true"
-                    ref="totalUnits"
-                    v-model="forms.subject.fields.totalUnits"
-                    :class="'form-control text-right'"
-                    :options="[
-                      {
-                        decimalPlaces: 0,
-                        minimumValue: 0,
-                        modifyValueOnWheel: false,
-                        emptyInputBehavior: 0,
-                      },
-                    ]"
-                  >
-                  </vue-autonumeric>
-                </b-form-group>
-              </b-col>
-              <b-col md="6">
-                <b-form-group label="Total Amount">
-                  <vue-autonumeric
-                    :disabled="true"
-                    ref="totalAmount"
-                    v-model="forms.subject.fields.totalAmount"
-                    :class="'form-control text-right'"
-                    :options="[
-                      {
-                        minimumValue: 0,
-                        modifyValueOnWheel: false,
-                        emptyInputBehavior: 0,
-                      },
-                    ]"
-                  >
-                  </vue-autonumeric>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-      </b-overlay>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled
+                          >-- School Category --</b-form-select-option
+                        >
+                      </template>
+                      <b-form-select-option
+                        v-for="schoolCategory in options.schoolCategories.values"
+                        :key="schoolCategory.id"
+                        :value="schoolCategory.id"
+                      >
+                        {{ schoolCategory.name }}
+                      </b-form-select-option>
+                    </b-form-select>
+                    <b-form-invalid-feedback>
+                      {{ forms.subject.errors.schoolCategoryId }}
+                    </b-form-invalid-feedback>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <!-- <b-row>
+                <b-col md=12>
+                  <b-form-group >
+                    <label class="required">Department</label>
+                    <b-form-select
+                      v-model="forms.subject.fields.departmentId"
+                      :state="forms.subject.states.departmentId">
+                      <template v-slot:first>
+                        <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
+                      </template>
+                      <b-form-select-option
+                        v-for="department in options.departments.items"
+                        :key="department.id"
+                        :value="department.id">
+                        {{department.name}}
+                      </b-form-select-option>
+                    </b-form-select>
+                    <b-form-invalid-feedback>
+                      {{forms.subject.errors.departmentId}}
+                    </b-form-invalid-feedback>
+                  </b-form-group>
+                </b-col>
+              </b-row> -->
+              <!-- <b-row>
+                <b-col md=12>
+                  <b-form-group >
+                    <label>Prerequisites
+                      <v-icon
+                        v-if="isLoading"
+                        class="ml-2"
+                        name="spinner"
+                        spin/>
+                    </label>
+                    <Select2
+                      multiple
+                      :disabled="isLoading"
+                      v-model="forms.subject.fields.prerequisites"
+                      :allowClear="false">
+                      <option
+                        v-for="subject in options.subjects.items"
+                        :key="subject.id"
+                        :value="subject.id">
+                        {{subject.name}}
+                      </option>
+                    </Select2>
+                  </b-form-group>
+                </b-col>
+              </b-row> -->
+              <b-row>
+                <b-col md="6">
+                  <b-form-group label="Lecture Units">
+                    <vue-autonumeric
+                      @input="computeTotalAmount()"
+                      ref="units"
+                      :disabled="
+                        !isAccessible([
+                          $options.SubjectPermissions.ADD.id,
+                          $options.SubjectPermissions.EDIT.id,
+                        ])
+                      "
+                      v-model="forms.subject.fields.units"
+                      :class="'form-control text-right'"
+                      :options="[
+                        {
+                          decimalPlaces: 0,
+                          minimumValue: 0,
+                          modifyValueOnWheel: false,
+                          emptyInputBehavior: 0,
+                        },
+                      ]"
+                    >
+                    </vue-autonumeric>
+                  </b-form-group>
+                </b-col>
+                <b-col md="6">
+                  <b-form-group label="Amount per Lecture Units">
+                    <vue-autonumeric
+                      @input="computeTotalAmount()"
+                      ref="amountPerUnit"
+                      :disabled="
+                        !isAccessible($options.SubjectPermissions.EDIT_PRICE.id)
+                      "
+                      v-model="forms.subject.fields.amountPerUnit"
+                      :class="'form-control text-right'"
+                      :options="[
+                        {
+                          minimumValue: 0,
+                          modifyValueOnWheel: false,
+                          emptyInputBehavior: 0,
+                        },
+                      ]"
+                    >
+                    </vue-autonumeric>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col md="6">
+                  <b-form-group label="Lab Units">
+                    <vue-autonumeric
+                      @input="computeTotalAmount()"
+                      ref="labs"
+                      :disabled="
+                        !isAccessible([
+                          $options.SubjectPermissions.ADD.id,
+                          $options.SubjectPermissions.EDIT.id,
+                        ])
+                      "
+                      v-model="forms.subject.fields.labs"
+                      :class="'form-control text-right'"
+                      :options="[
+                        {
+                          decimalPlaces: 0,
+                          minimumValue: 0,
+                          modifyValueOnWheel: false,
+                          emptyInputBehavior: 0,
+                        },
+                      ]"
+                    >
+                    </vue-autonumeric>
+                  </b-form-group>
+                </b-col>
+                <b-col md="6">
+                  <b-form-group label="Amount per Lab Units">
+                    <vue-autonumeric
+                      @input="computeTotalAmount()"
+                      ref="amountPerLab"
+                      :disabled="
+                        !isAccessible($options.SubjectPermissions.EDIT_PRICE.id)
+                      "
+                      v-model="forms.subject.fields.amountPerLab"
+                      :class="'form-control text-right'"
+                      :options="[
+                        {
+                          minimumValue: 0,
+                          modifyValueOnWheel: false,
+                          emptyInputBehavior: 0,
+                        },
+                      ]"
+                    >
+                    </vue-autonumeric>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col md="6">
+                  <b-form-group label="Total Units">
+                    <vue-autonumeric
+                      :disabled="true"
+                      ref="totalUnits"
+                      v-model="forms.subject.fields.totalUnits"
+                      :class="'form-control text-right'"
+                      :options="[
+                        {
+                          decimalPlaces: 0,
+                          minimumValue: 0,
+                          modifyValueOnWheel: false,
+                          emptyInputBehavior: 0,
+                        },
+                      ]"
+                    >
+                    </vue-autonumeric>
+                  </b-form-group>
+                </b-col>
+                <b-col md="6">
+                  <b-form-group label="Total Amount">
+                    <vue-autonumeric
+                      :disabled="true"
+                      ref="totalAmount"
+                      v-model="forms.subject.fields.totalAmount"
+                      :class="'form-control text-right'"
+                      :options="[
+                        {
+                          minimumValue: 0,
+                          modifyValueOnWheel: false,
+                          emptyInputBehavior: 0,
+                        },
+                      ]"
+                    >
+                    </vue-autonumeric>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </b-col>
+          </b-row>
+        </b-overlay>
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.subject.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onSubjectEntry()"
+          >
+            <v-icon
+              v-if="forms.subject.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.subject.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onSubjectEntry()"
-        >
-          <v-icon
-            v-if="forms.subject.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- End Modal Entry -->
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Subject
-      </div>
-      Are you sure you want to delete this subject?
-      <div slot="modal-footer">
-        <b-button
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onSubjectDelete()"
-        >
-          <v-icon
-            v-if="forms.subject.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          class="btn-close"
-          variant="outline-danger"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-  </div>
+      </b-modal>
+      <!-- End Modal Entry -->
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Subject
+        </div>
+        Are you sure you want to delete this subject?
+        <div slot="modal-footer">
+          <b-button
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onSubjectDelete()"
+          >
+            <v-icon
+              v-if="forms.subject.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            class="btn-close"
+            variant="outline-danger"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+    </template>
+  </PageContent>
 </template>
 <script>
 const subjectFields = {
@@ -518,17 +540,20 @@ import {
 import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
+import PageContent from '../components/PageContainer/PageContent.vue';
 
 export default {
   name: 'Subject',
   components: {
     Card,
+    PageContent
   },
   mixins: [SubjectApi, DepartmentApi, Tables, Access],
   // components: { Select2 },
   SubjectPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',
@@ -655,6 +680,7 @@ export default {
         subject: {
           criteria: null,
           schoolCategoryId: null,
+          schoolCategoryItem: null,
         },
       },
       options: {
@@ -835,6 +861,12 @@ export default {
         subjects.filteredItems = subjects.items;
       }
       this.onFiltered(subjects.filteredItems, subject);
+    },
+    onStatusFilterChange(item) {
+      const { subject } = this.filters;
+      subject.schoolCategoryId = item?.id || 0;
+      subject.schoolCategoryItem = item;
+      this.loadSubjects();
     },
   },
 };

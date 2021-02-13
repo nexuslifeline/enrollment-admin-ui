@@ -1,7 +1,28 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Bank Account Management">
-      <div>
+  <PageContent
+    title="Bank Account Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadBankAccounts"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.bankAccount.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <!-- v-if="isAccessible($options.ba.ADD.id)" -->
+      <!-- <b-button
+        variant="primary"
+        class="w-100 mt-2"
+        @click="setCreate()"
+      >
+        <v-icon name="plus-circle" /> ADD NEW BANK ACCOUNT
+      </b-button> -->
+    </template>
+    <template v-slot:content>
+      <!-- <div>
         <b-row class="mb-3">
           <b-col md="12">
             <b-row>
@@ -21,7 +42,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -98,129 +119,129 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
-    <b-modal
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <!-- Modal Entry -->
+      <b-modal
+        v-model="showModalEntry"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Bank Account- {{ entryMode }}
+        </div>
         <!-- modal title -->
-        Bank Account- {{ entryMode }}
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.bankAccount.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Bank</label>
-              <b-form-input
-                ref="name"
-                v-model="forms.bankAccount.fields.bank"
-                :state="forms.bankAccount.states.bank"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.bankAccount.errors.bank }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Account Name</label>
-              <b-form-input
-                v-model="forms.bankAccount.fields.accountName"
-                :state="forms.bankAccount.states.accountName"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.bankAccount.errors.accountName }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Account Number</label>
-              <b-form-input
-                v-model="forms.bankAccount.fields.accountNumber"
-                :state="forms.bankAccount.states.accountNumber"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.bankAccount.errors.accountNumber }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-overlay>
-      <!-- end modal body -->
-      <div slot="modal-footer" class="w-100">
+        <!-- modal body -->
+        <b-overlay :show="forms.bankAccount.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Bank</label>
+                <b-form-input
+                  ref="name"
+                  v-model="forms.bankAccount.fields.bank"
+                  :state="forms.bankAccount.states.bank"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.bankAccount.errors.bank }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Account Name</label>
+                <b-form-input
+                  v-model="forms.bankAccount.fields.accountName"
+                  :state="forms.bankAccount.states.accountName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.bankAccount.errors.accountName }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Account Number</label>
+                <b-form-input
+                  v-model="forms.bankAccount.fields.accountNumber"
+                  :state="forms.bankAccount.states.accountNumber"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.bankAccount.errors.accountNumber }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-overlay>
+        <!-- end modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.bankAccount.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onBankAccountEntry()"
+          >
+            <v-icon
+              v-if="forms.bankAccount.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.bankAccount.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onBankAccountEntry()"
-        >
-          <v-icon
-            v-if="forms.bankAccount.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- End Modal Entry -->
+      </b-modal>
+      <!-- End Modal Entry -->
 
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Bank Account
-      </div>
-      Are you sure you want to delete this Bank Account?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="forms.bankAccount.isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onBankAccountDelete()"
-        >
-          <v-icon
-            v-if="forms.bankAccount.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-  </div>
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Bank Account
+        </div>
+        Are you sure you want to delete this Bank Account?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="forms.bankAccount.isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onBankAccountDelete()"
+          >
+            <v-icon
+              v-if="forms.bankAccount.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+    </template>
+  </PageContent>
 </template>
 <script>
 const bankAccountFields = {
@@ -240,15 +261,18 @@ import {
 import { copyValue } from '../../helpers/extractor';
 import Tables from '../../helpers/tables';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'BankAccount',
   mixins: [BankAccountApi, Tables],
   components: {
     Card,
+    PageContent
   },
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',

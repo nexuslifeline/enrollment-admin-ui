@@ -1,7 +1,46 @@
 <template>
-  <div class="c-page-content">
-    <Card v-show="!showEntry" title="Curriculum Management">
-      <SchoolCategoryTabs
+  <PageContent
+    title="Curriculum Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadCurriculums"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.CurriculumPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.curriculum.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <v-select
+        :options="options.schoolCategories.values"
+        :value="filters.curriculum.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+      />
+      <v-select
+        :options="options.levels.fixItems"
+        :value="filters.curriculum.levelItem"
+        @input="onLevelFilterChange"
+        label="name"
+        placeholder="Level"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.fixItems"
+        :value="filters.curriculum.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
+      <!-- <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="
           (filters.curriculum.schoolCategoryId = $event), loadCurriculums()
@@ -18,10 +57,10 @@
             loadLevelList(),
             loadCourseList()
         "
-      />
-      <div>
+      /> -->
+      <div v-show="!showEntry">
         <div>
-          <b-row class="mb-3">
+          <!-- <b-row class="mb-3">
             <b-col md="12">
               <b-row>
                 <b-col md="3" class="bottom-space">
@@ -107,7 +146,7 @@
                 </b-col>
               </b-row>
             </b-col>
-          </b-row>
+          </b-row> -->
           <!-- end add button and search -->
           <!-- table -->
           <b-row>
@@ -368,9 +407,7 @@
           </b-row>
         </div>
       </div>
-    </Card>
-
-    <div v-show="showEntry">
+      <div v-show="showEntry">
       <div>
         <b-overlay blur="blur" :show="forms.curriculum.isLoading" rounded="sm">
           <b-row>
@@ -1072,7 +1109,8 @@
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
-  </div>
+    </template>
+  </PageContent>
 </template>
 <script>
 import {
@@ -1101,6 +1139,7 @@ import Tables from '../../helpers/tables';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
+import PageContent from '../components/PageContainer/PageContent'
 
 const curriculumFields = {
   id: null,
@@ -1131,10 +1170,12 @@ export default {
   components: {
     SchoolCategoryTabs,
     Card,
+    PageContent
   },
   CurriculumPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalSubjects: false,
       showModalConfirmation: false,
       showEntry: false,
@@ -1421,8 +1462,11 @@ export default {
         curriculum: {
           criteria: null,
           schoolCategoryId: null,
+          schoolCategoryItem: null,
           levelId: null,
+          levelItem: null,
           courseId: null,
+          courseItem: null,
         },
       },
       options: {
@@ -1452,6 +1496,7 @@ export default {
   created() {
     this.loadLevelList();
     this.loadCourseList();
+    this.loadCurriculums()
     // this.checkRights()
     // this.loadDepartments()
   },
@@ -1976,6 +2021,30 @@ export default {
       const vNodesMsg = h('ul', errorList);
       showNotification(this, 'danger', vNodesMsg);
     },
+    onCategoryFilterChange(item) {
+      const { curriculum } = this.filters;
+      curriculum.schoolCategoryId = item?.id || 0;
+      curriculum.schoolCategoryItem = item;
+      curriculum.levelId = null,
+      curriculum.levelItem = null,
+      curriculum.courseId = null
+      curriculum.courseItem = null
+      this.loadLevelList()
+      this.loadCourseList()
+      this.loadCurriculums();
+    },
+    onLevelFilterChange(item) {
+      const { curriculum } = this.filters;
+      curriculum.levelId = item?.id || 0;
+      curriculum.levelItem = item;
+      this.loadCurriculums();
+    },
+    onCourseFilterChange(item) {
+      const { curriculum } = this.filters;
+      curriculum.courseId = item?.id || 0;
+      curriculum.courseItem = item;
+      this.loadCurriculums();
+    },
   },
   computed: {
     totalUnits() {
@@ -1987,6 +2056,15 @@ export default {
         return units;
       };
     },
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.curriculum;
+      const { schoolCategories } = this.options;
+      return [
+        schoolCategories.SENIOR_HIGH_SCHOOL.id,
+        schoolCategories.COLLEGE.id,
+        schoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    }
     // totalLabs() {
     //   return subjects => {
     //     let labs = 0

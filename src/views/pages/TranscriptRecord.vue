@@ -1,7 +1,53 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Grade Sheet">
-      <div>
+  <PageContent title="Grade Sheet"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadTranscriptRecords"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="false">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.transcriptRecord.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <v-select
+        :options="$options.SchoolCategories.values"
+        :value="filters.transcriptRecord.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+      />
+      <v-select
+        :options="options.levels.items"
+        :value="filters.transcriptRecord.levelItem"
+        @input="onLevelFilterChange"
+        label="name"
+        placeholder="Level"
+        class="mt-2"
+      />
+       <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.items"
+        :value="filters.transcriptRecord.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
+        :options="$options.TranscriptRecordStatuses.values"
+        :value="filters.transcriptRecord.transcriptRecordStatusItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
+      <!-- <div>
         <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="
@@ -20,9 +66,8 @@
             loadTranscriptRecords();
           "
         />
-        <div>
-          <b-row class="mb-2">
-            <!-- row button and search input -->
+        <div> -->
+          <!-- <b-row class="mb-2">
             <b-col md="3">
               <b-form-radio-group
                 @input="loadTranscriptRecords()"
@@ -109,7 +154,7 @@
               >
               </b-form-input>
             </b-col>
-          </b-row>
+          </b-row> -->
           <!-- row button and search input -->
           <b-table
             class="c-table"
@@ -1242,8 +1287,7 @@
           </b-row>
         </div>
       </div>
-    </Card>
-    <b-modal
+      <b-modal
       v-model="showModalSubjects"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true"
@@ -1328,15 +1372,16 @@
         </b-button>
       </div>
       <!-- modal footer buttons -->
-    </b-modal>
-    <FileViewer
-      :show="fileViewer.show"
-      :file="file"
-      :owner="file.owner"
-      :isBusy="file.isLoading"
-      @close="fileViewer.show = false"
-    />
-  </div>
+      </b-modal>
+      <FileViewer
+        :show="fileViewer.show"
+        :file="file"
+        :owner="file.owner"
+        :isBusy="file.isLoading"
+        @close="fileViewer.show = false"
+      />
+    </template>
+  </PageContent>
   <!-- main container -->
 </template>
 <script>
@@ -1376,6 +1421,7 @@ import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import Access from '../../mixins/utils/Access';
+import PageContent from  '../components/PageContainer/PageContent'
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1408,6 +1454,7 @@ export default {
     ActiveViewItem,
     ActiveViewLinks,
     FileViewer,
+    PageContent
   },
   TranscriptRecordStatuses,
   SchoolCategories,
@@ -1416,6 +1463,7 @@ export default {
   TranscriptRecordPermissions,
   data() {
     return {
+      isFilterVisible: true,
       fileViewer: {
         isActiveNavEnabled: false,
         activeNavCount: 0,
@@ -1626,9 +1674,13 @@ export default {
         transcriptRecord: {
           criteria: null,
           schoolCategoryId: null,
+          schoolCategoryItem: null,
           courseId: null,
+          courseItem: null,
           transcriptRecordStatusId: null,
+          transcriptRecordStatusItem: null,
           levelId: null,
+          levelItem: null,
         },
         subject: {
           criteria: null,
@@ -1653,9 +1705,11 @@ export default {
       showModalSubjects: false,
     };
   },
-  // created() {
-  //   this.loadTranscriptRecords();
-  // },
+  created() {
+    this.loadLevels()
+    this.loadCourses()
+    this.loadTranscriptRecords();
+  },
   methods: {
     loadTranscriptRecords() {
       const {
@@ -1681,8 +1735,8 @@ export default {
         levelId,
         criteria,
       };
-
       const { transcriptRecords } = this.tables;
+      transcriptRecords.isBusy = true
       this.getTranscriptRecordList(params).then(({ data }) => {
         transcriptRecords.items = data.data;
         transcriptRecord.from = data.meta.from;
@@ -1696,18 +1750,22 @@ export default {
       const { courses } = this.options;
       let params = { paginate: false };
       courses.isLoading = true;
-      this.getCoursesOfSchoolCategoryList(schoolCategoryId, params).then(
-        ({ data }) => {
-          courses.isLoading = false;
-          courses.items = data;
-        }
-      );
+
+      if (schoolCategoryId) {
+        this.getCoursesOfSchoolCategoryList(schoolCategoryId, params).then(
+          ({ data }) => {
+            courses.isLoading = false;
+            courses.items = data;
+          }
+        );
+      }
     },
     loadLevels() {
       const params = { paginate: false };
       const { levels } = this.options;
+     const { schoolCategoryId } = this.filters.transcriptRecord;
       this.getLevelList(params).then(({ data }) => {
-        levels.items = data;
+        levels.items = schoolCategoryId ? data.filter(e => e.schoolCategoryId === schoolCategoryId) : data;
       });
     },
     avatar(student) {
@@ -1919,6 +1977,36 @@ export default {
         this.file.isLoading = false;
       });
     },
+    onCategoryFilterChange(item) {
+      const { transcriptRecord } = this.filters;
+      transcriptRecord.schoolCategoryId = item?.id || 0;
+      transcriptRecord.schoolCategoryItem = item;
+      transcriptRecord.levelId = null
+      transcriptRecord.levelItem = null
+      transcriptRecord.courseId = null
+      transcriptRecord.courseItem = null
+      this.loadLevels()
+      this.loadCourses()
+      this.loadTranscriptRecords();
+    },
+    onStatusFilterChange(item) {
+      const { transcriptRecord } = this.filters;
+      transcriptRecord.transcriptRecordStatusId = item?.id || 0;
+      transcriptRecord.transcriptRecordStatusItem = item;
+      this.loadTranscriptRecords();
+    },
+    onLevelFilterChange(item) {
+      const { transcriptRecord } = this.filters;
+      transcriptRecord.levelId = item?.id || 0;
+      transcriptRecord.levelItem = item;
+      this.loadTranscriptRecords();
+    },
+    onCourseFilterChange(item) {
+      const { transcriptRecord } = this.filters;
+      transcriptRecord.courseId = item?.id || 0;
+      transcriptRecord.courseItem = item;
+      this.loadTranscriptRecords();
+    },
   },
   computed: {
     totalUnits() {
@@ -1930,6 +2018,15 @@ export default {
         return units;
       };
     },
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.transcriptRecord;
+      const { SchoolCategories } = this.$options;
+      return [
+        SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+        SchoolCategories.COLLEGE.id,
+        SchoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    }
   },
 };
 </script>

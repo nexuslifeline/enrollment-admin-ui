@@ -1,22 +1,20 @@
 <template>
-  <div class="c-page-content">
-    <Card title="School Category Management">
+  <PageContent
+    title="Department Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSchoolCategories"
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.schoolCategory.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content>
       <div>
-        <!-- add button and search -->
-        <b-row class="mb-3">
-          <b-col md=12>
-            <b-row>
-              <b-col md=4 offset-md="8"> 
-                <b-form-input
-                  v-model="filters.schoolCategory.criteria"
-                  type="text" 
-                  placeholder="Search" >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end add button and search -->
         <!-- table -->
         <b-row >
           <b-col md=12>
@@ -32,8 +30,8 @@
               <!-- :filter="filters.schoolCategory.criteria> -->
               <template v-slot:table-busy>
                 <div class="text-center my-2">
-                  <v-icon 
-                    name="spinner" 
+                  <v-icon
+                    name="spinner"
                     spin
                     class="mr-2" />
                   <strong>Loading...</strong>
@@ -59,14 +57,15 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-  </div>
+    </template>
+  </PageContent>
 </template>
 
 <script>
 import { SchoolCategoryApi } from "../../mixins/api"
 import Tables from '../../helpers/tables'
 import Card from '../components/Card'
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: "schoolCategory",
@@ -75,10 +74,12 @@ export default {
     SchoolCategoryApi
   ],
   components: {
-    Card
+    Card,
+    PageContent
   },
   data() {
     return {
+      isFilterVisible: true,
       tables: {
 				schoolCategories: {
           isBusy: false,
@@ -116,20 +117,24 @@ export default {
     }
   },
   created() {
-    const { schoolCategories } = this.tables
-    const { schoolCategory } = this.paginations
+    this.loadSchoolCategories()
+  },
+  methods:{
+    loadSchoolCategories() {
+      const { schoolCategories } = this.tables
+      const { schoolCategory } = this.paginations
 
-    schoolCategories.isBusy = true
-    const params = { paginate: false }
-    this.getSchoolCategoryList(params).then(({ data }) => {
-      schoolCategories.items = data
-      schoolCategory.totalRows = data.length
-      this.recordDetails(schoolCategory)
-      schoolCategories.isBusy = false
-    }).catch(error => {
-      schoolCategories.isBusy = false
-    })
-
+      schoolCategories.isBusy = true
+      const params = { paginate: false }
+      this.getSchoolCategoryList(params).then(({ data }) => {
+        schoolCategories.items = data
+        schoolCategory.totalRows = data.length
+        this.recordDetails(schoolCategory)
+        schoolCategories.isBusy = false
+      }).catch(error => {
+        schoolCategories.isBusy = false
+      })
+    }
   }
 }
 </script>

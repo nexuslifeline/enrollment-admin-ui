@@ -1,33 +1,28 @@
 <template>
-  <div class="c-page-content">
-    <Card title="User Group Management">
+  <PageContent title="User Group Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadUserGroups"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.UserGroupPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.userGroup.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <!-- <b-button
+        v-if="isAccessible($options.UserGroupPermissions.ADD.id)"
+        variant="primary"
+        class="w-100 mt-2"
+        @click="setCreate()"
+      >
+        <v-icon name="plus-circle" /> ADD NEW USER GROUP
+      </b-button> -->
+    </template>
+    <template v-slot:content>
       <div>
-        <!-- add button and search -->
-        <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button
-                  v-if="isAccessible($options.UserGroupPermissions.ADD.id)"
-                  variant="primary"
-                  @click="setCreate()"
-                >
-                  <v-icon name="plus-circle" /> ADD NEW USER GROUP
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.userGroup.criteria"
-                  type="text"
-                  placeholder="Search"
-                  debounce="500"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end add button and search -->
         <!-- table -->
         <b-row>
           <b-col md="12">
@@ -129,129 +124,130 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
-    <b-modal
-      @shown="$refs.code.focus()"
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <!-- Modal Entry -->
+      <b-modal
+        @shown="$refs.code.focus()"
+        v-model="showModalEntry"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          User Group - {{ entryMode }}
+        </div>
         <!-- modal title -->
-        User Group - {{ entryMode }}
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.userGroup.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="6">
-            <b-form-group>
-              <label class="required">Code</label>
-              <b-form-input
-                ref="code"
-                v-model="forms.userGroup.fields.code"
-                :state="forms.userGroup.states.code"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.userGroup.errors.code }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-          <b-col md="6">
-            <b-form-group>
-              <label class="required">Name</label>
-              <b-form-input
-                ref="name"
-                v-model="forms.userGroup.fields.name"
-                :state="forms.userGroup.states.name"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.userGroup.errors.name }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Description</label>
-              <b-form-textarea
-                ref="description"
-                v-model="forms.userGroup.fields.description"
-                :state="forms.userGroup.states.description"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.userGroup.errors.description }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-overlay>
+        <!-- modal body -->
+        <b-overlay :show="forms.userGroup.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="6">
+              <b-form-group>
+                <label class="required">Code</label>
+                <b-form-input
+                  ref="code"
+                  v-model="forms.userGroup.fields.code"
+                  :state="forms.userGroup.states.code"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.userGroup.errors.code }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+            <b-col md="6">
+              <b-form-group>
+                <label class="required">Name</label>
+                <b-form-input
+                  ref="name"
+                  v-model="forms.userGroup.fields.name"
+                  :state="forms.userGroup.states.name"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.userGroup.errors.name }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Description</label>
+                <b-form-textarea
+                  ref="description"
+                  v-model="forms.userGroup.fields.description"
+                  :state="forms.userGroup.states.description"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.userGroup.errors.description }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-overlay>
 
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.userGroup.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onUserGroupEntry()"
+          >
+            <v-icon
+              v-if="forms.userGroup.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.userGroup.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onUserGroupEntry()"
-        >
-          <v-icon
-            v-if="forms.userGroup.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- End Modal Entry -->
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete User Group
-      </div>
-      Are you sure you want to delete this user group?
-      <div slot="modal-footer">
-        <b-button
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onUserGroupDelete()"
-        >
-          <v-icon
-            v-if="forms.userGroup.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-  </div>
+      </b-modal>
+      <!-- End Modal Entry -->
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete User Group
+        </div>
+        Are you sure you want to delete this user group?
+        <div slot="modal-footer">
+          <b-button
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onUserGroupDelete()"
+          >
+            <v-icon
+              v-if="forms.userGroup.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+    </template>
+
+  </PageContent>
 </template>
 <script>
 const userGroupFields = {
@@ -273,16 +269,19 @@ import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import { UserGroupPermissions } from '../../helpers/enum';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'UserGroup',
   mixins: [UserGroupApi, Tables, Access],
   components: {
     Card,
+    PageContent
   },
   UserGroupPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',

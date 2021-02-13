@@ -1,23 +1,20 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Semester Management">
+  <PageContent
+    title="Semester Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSemester"
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.semester.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content >
       <div>
-        <!-- add button and search -->
-        <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="4" offset-md="8">
-                <b-form-input
-                  v-model="filters.semester.criteria"
-                  type="text"
-                  placeholder="Search"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end add button and search -->
         <!-- table -->
         <b-row>
           <b-col md="12">
@@ -88,36 +85,36 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <b-modal
-      v-model="showConfirmationModal"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Set Active Semester
-      </div>
-      Are you sure you want to set this Semester as active ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onSetActiveSemester()"
-        >
-          <v-icon v-if="isProcessing" name="sync" spin class="mr-2" />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showConfirmationModal = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-  </div>
+      <b-modal
+        v-model="showConfirmationModal"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Set Active Semester
+        </div>
+        Are you sure you want to set this Semester as active ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onSetActiveSemester()"
+          >
+            <v-icon v-if="isProcessing" name="sync" spin class="mr-2" />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showConfirmationModal = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+    </template>
+  </PageContent>
 </template>
 
 <script>
@@ -131,6 +128,7 @@ import {
   clearFields,
   showNotification,
 } from '../../helpers/forms';
+import PageContent from "../components/PageContainer/PageContent";
 
 const semesterFields = {
   id: null,
@@ -144,9 +142,11 @@ export default {
   mixins: [Tables, SemesterApi],
   components: {
     Card,
+    PageContent
   },
   data() {
     return {
+      isFilterVisible: true,
       isProcessing: false,
       showConfirmationModal: false,
       tables: {

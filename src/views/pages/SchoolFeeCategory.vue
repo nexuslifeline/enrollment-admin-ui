@@ -1,9 +1,23 @@
 <template>
-  <div class="c-page-content">
-    <Card title="School Fee Category Management">
+  <PageContent
+    title="School Fee Category Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSchoolFees"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.FeeCategoryPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.schoolFeeCategory.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content>
       <div>
         <!-- add button and search -->
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="8">
@@ -26,7 +40,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -125,8 +139,7 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
+      <!-- Modal Entry -->
     <b-modal
       v-model="showModalEntry"
       :noCloseOnEsc="true"
@@ -234,7 +247,9 @@
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
-  </div>
+    </template>
+    
+  </PageContent>
 </template>
 <script>
 const schoolFeeCategoryFields = {
@@ -258,17 +273,20 @@ import {
   SchoolFeeCategories,
 } from '../../helpers/enum';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'schoolFeeCategory',
   mixins: [SchoolFeeCategoryApi, Tables, Access],
   components: {
     Card,
+    PageContent
   },
   FeeCategoryPermissions,
   SchoolFeeCategories,
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',

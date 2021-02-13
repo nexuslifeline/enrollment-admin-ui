@@ -1,6 +1,6 @@
 <template>
-  <button class="refresh-button" @click="$emit('reload')">
-    <BIconArrowRepeat />
+  <button class="create-button" @click="$emit('create')">
+    <BIconPlus />
   </button>
 </template>
 <script>
@@ -12,7 +12,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/scss/shared.scss';
 
-.refresh-button {
+.create-button {
   background: none;
   outline: 0;
   border: 1px solid $light-gray-10;

@@ -1,11 +1,11 @@
 <template>
-  <div class="c-page-content">
-    <Card
-      title="Student Assessment Fee"
-      :showRefresh="true"
-      @onRefresh="loadAcademicRecord()"
-    >
-      <SchoolCategoryTabs
+  <PageContent
+    title="Student Assessment Fee"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadAcademicRecord"
+    :filterVisible="isFilterVisible">
+
+      <!-- <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="
           (filters.student.schoolCategoryId = $event), loadAcademicRecord()
@@ -20,10 +20,46 @@
             (filters.student.courseId = null),
             loadAcademicRecord()
         "
+      /> -->
+      <template v-slot:filters>
+      <b-form-input
+        v-model="filters.student.criteria"
+        debounce="500"
+        @update="loadAcademicRecord()"
+        type="text"
+        placeholder="Search"
+      >
+      </b-form-input>
+      <v-select
+        :options="options.schoolCategories.values"
+        :value="filters.student.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
       />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.items"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <!-- :options="filteredApplicationsStatuses" -->
+      <v-select
+        :options="applicationStatuses.values"
+        :value="filters.student.applicationStatusItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+    </template>
+      <template v-slot:content>
       <div>
-        <b-row class="mb-2">
-          <!-- row button and search input -->
+        <!-- <b-row class="mb-2">
           <b-col md="6">
             <b-form-radio-group
               @input="loadAcademicRecord()"
@@ -78,7 +114,7 @@
             >
             </b-form-input>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- row button and search input -->
         <b-table
           class="c-table"
@@ -109,9 +145,7 @@
           <template v-slot:cell(status)="data">
             <b-badge
               :variant="
-                (data.item.applicationId
-                ? data.item.application.applicationStatusId ===
-                  applicationStatuses.SUBMITTED.id
+                (data.item.applicationId ? data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id
                 : data.item.admission.applicationStatusId ===
                   applicationStatuses.SUBMITTED.id)
                   ? 'warning'
@@ -119,13 +153,8 @@
               "
             >
               {{
-                (data.item.applicationId
-                ? data.item.application.applicationStatusId ===
-                  applicationStatuses.SUBMITTED.id
-                : data.item.admission.applicationStatusId ===
-                  applicationStatuses.SUBMITTED.id)
-                  ? 'Pending'
-                  : 'Approved'
+                (data.item.applicationId ? applicationStatuses.getEnum(data.item.application.applicationStatusId).name :
+                  applicationStatuses.getEnum(data.item.admission.applicationStatusId).name)
               }}
             </b-badge>
           </template>
@@ -545,7 +574,7 @@
           </b-col>
         </b-row>
       </div>
-    </Card>
+      </template>
     <!-- MODAL FEES -->
     <b-modal
       v-model="showModalFees"
@@ -673,7 +702,7 @@
       :isBusy="file.isLoading"
       @close="fileViewer.show = false"
     />
-  </div>
+  </PageContent>
   <!-- main container -->
 </template>
 <script>
@@ -712,6 +741,8 @@ import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
 import FileViewer from '../components/FileViewer';
 import { format } from 'date-fns';
+import PageContent from "../components/PageContainer/PageContent";
+import FilterButton from "../components/PageContainer/FilterButton";
 
 export default {
   name: 'StudentFee',
@@ -739,10 +770,13 @@ export default {
     ActiveViewLinks,
     AvatarMaker,
     FileViewer,
+    PageContent,
+    FilterButton
   },
   StudentFeePermissions,
   data() {
     return {
+      isFilterVisible: true,
       fileViewer: {
         show: false,
       },
@@ -948,9 +982,12 @@ export default {
       filters: {
         student: {
           criteria: null,
-          schoolCategoryId: null,
+          schoolCategoryId: 0,
+          schoolCategoryItem: null,
+          courseItem: null,
           courseId: null,
           applicationStatusId: ApplicationStatuses.SUBMITTED.id,
+          applicationStatusItem: ApplicationStatuses.SUBMITTED
         },
         fee: {
           criteria: null,
@@ -1288,6 +1325,24 @@ export default {
         this.file.isLoading = false;
       });
     },
+    onCategoryFilterChange(item) {
+      const { student } = this.filters;
+      student.schoolCategoryId = item?.id || 0;
+      student.schoolCategoryItem = item;
+      this.loadAcademicRecord();
+    },
+    onStatusFilterChange(item) {
+      const { student } = this.filters;
+      student.applicationStatusId = item?.id || 0;
+      student.applicationStatusItem = item;
+      this.loadAcademicRecord();
+    },
+    onCourseFilterChange(item) {
+      const { student } = this.filters;
+      student.courseId = item?.id || 0;
+      student.courseItem = item;
+      this.loadAcademicRecord();
+    },
   },
   watch: {
     '$store.state.schoolYearId': function(newVal) {
@@ -1338,6 +1393,23 @@ export default {
         };
       },
     },
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.student;
+      const { schoolCategories } = this.options;
+      return [
+        schoolCategories.SENIOR_HIGH_SCHOOL.id,
+        schoolCategories.COLLEGE.id,
+        schoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    },
+    filteredApplicationsStatuses() {
+      return this.applicationStatuses.values.filter(e =>
+        e.id === this.applicationStatuses.SUBMITTED.id ||
+        e.id === this.applicationStatuses.APPROVED.id ||
+        e.id === this.applicationStatuses.REJECTED.id ||
+        e.id === this.applicationStatuses.COMPLETED.id
+      )
+    }
   },
 };
 </script>

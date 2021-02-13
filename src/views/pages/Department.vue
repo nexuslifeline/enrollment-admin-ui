@@ -1,125 +1,147 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Department Management">
-      <div>
-        <!-- add button and search -->
-        <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button
-                  v-if="isAccessible($options.DepartmentPermissions.ADD.id)"
-                  variant="primary"
-                  @click="setCreate()"
+  <PageContent
+    title="Department Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadDepartments"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.DepartmentPermissions.ADD.id)">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.department.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <!-- <b-button
+        v-if="isAccessible($options.DepartmentPermissions.ADD.id)"
+        variant="primary"
+        class="w-100 mt-2"
+        @click="setCreate()"
+      >
+        <v-icon name="plus-circle" /> ADD NEW DEPARTMENT
+      </b-button> -->
+    </template>
+    <template v-slot:content>
+    <div>
+      <!-- add button and search -->
+      <!-- <b-row class="mb-3">
+        <b-col md="12">
+          <b-row>
+            <b-col md="8">
+              <b-button
+                v-if="isAccessible($options.DepartmentPermissions.ADD.id)"
+                variant="primary"
+                @click="setCreate()"
+              >
+                <v-icon name="plus-circle" /> ADD NEW DEPARTMENT
+              </b-button>
+            </b-col>
+            <b-col md="4">
+              <b-form-input
+                v-model="filters.department.criteria"
+                type="text"
+                placeholder="Search"
+              >
+              </b-form-input>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row> -->
+      <!-- end add button and search -->
+      <!-- table -->
+      <b-row>
+        <b-col md="12">
+          <b-table
+            class="c-table"
+            hover
+            outlined
+            show-empty
+            :fields="tables.departments.fields"
+            :busy="tables.departments.isBusy"
+            :items="tables.departments.items"
+            :current-page="paginations.department.page"
+            :per-page="paginations.department.perPage"
+            :filter="filters.department.criteria"
+            @filtered="onFiltered($event, paginations.department)"
+          >
+            <!-- :filter="filters.department.criteria> -->
+            <template v-slot:table-busy>
+              <div class="text-center my-2">
+                <v-icon name="spinner" spin class="mr-2" />
+                <strong>Loading...</strong>
+              </div>
+            </template>
+            <template v-slot:cell(name)="{ item, value }">
+              <b-link
+                @click="setUpdate(item)"
+                :disabled="
+                  !isAccessible($options.DepartmentPermissions.EDIT.id)
+                "
+                >{{ value }}
+              </b-link>
+            </template>
+            <template v-slot:cell(action)="row">
+              <b-dropdown
+                v-if="
+                  isAccessible([
+                    $options.DepartmentPermissions.EDIT.id,
+                    $options.DepartmentPermissions.DELETE.id,
+                  ])
+                "
+                right
+                variant="link"
+                toggle-class="text-decoration-none"
+                no-caret
+              >
+                <template v-slot:button-content>
+                  <v-icon name="ellipsis-v" />
+                </template>
+                <b-dropdown-item
+                  v-if="isAccessible($options.DepartmentPermissions.EDIT.id)"
+                  @click="setUpdate(row.item)"
+                  :disabled="showModalEntry"
                 >
-                  <v-icon name="plus-circle" /> ADD NEW DEPARTMENT
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.department.criteria"
-                  type="text"
-                  placeholder="Search"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end add button and search -->
-        <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              hover
-              outlined
-              show-empty
-              :fields="tables.departments.fields"
-              :busy="tables.departments.isBusy"
-              :items="tables.departments.items"
-              :current-page="paginations.department.page"
-              :per-page="paginations.department.perPage"
-              :filter="filters.department.criteria"
-              @filtered="onFiltered($event, paginations.department)"
-            >
-              <!-- :filter="filters.department.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
-              </template>
-              <template v-slot:cell(name)="{ item, value }">
-                <b-link
-                  @click="setUpdate(item)"
-                  :disabled="
-                    !isAccessible($options.DepartmentPermissions.EDIT.id)
-                  "
-                  >{{ value }}
-                </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
+                  Edit
+                </b-dropdown-item>
+                <b-dropdown-item
                   v-if="
-                    isAccessible([
-                      $options.DepartmentPermissions.EDIT.id,
-                      $options.DepartmentPermissions.DELETE.id,
-                    ])
+                    isAccessible($options.DepartmentPermissions.DELETE.id)
                   "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
+                  @click="
+                    (forms.department.fields.id = row.item.id),
+                      (showModalConfirmation = true)
+                  "
+                  :disabled="showModalConfirmation"
                 >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.DepartmentPermissions.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible($options.DepartmentPermissions.DELETE.id)
-                    "
-                    @click="
-                      (forms.department.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.department.from }} to
-                {{ paginations.department.to }} of
-                {{ paginations.department.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.department.page"
-                  :total-rows="paginations.department.totalRows"
-                  :per-page="paginations.department.perPage"
-                  size="sm"
-                  align="end"
-                  @input="recordDetails(paginations.department)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end table -->
-      </div>
-    </Card>
+                  Delete
+                </b-dropdown-item>
+              </b-dropdown>
+            </template>
+          </b-table>
+          <b-row>
+            <b-col md="6">
+              Showing {{ paginations.department.from }} to
+              {{ paginations.department.to }} of
+              {{ paginations.department.totalRows }} records.
+            </b-col>
+            <b-col md="6">
+              <b-pagination
+                class="c-pagination"
+                v-model="paginations.department.page"
+                :total-rows="paginations.department.totalRows"
+                :per-page="paginations.department.perPage"
+                size="sm"
+                align="end"
+                @input="recordDetails(paginations.department)"
+              />
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+      <!-- end table -->
+    </div>
+
     <!-- Modal Entry -->
     <b-modal
       v-model="showModalEntry"
@@ -228,7 +250,8 @@
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
-  </div>
+    </template>
+  </PageContent>
 </template>
 <script>
 const departmentFields = {
@@ -249,16 +272,19 @@ import Tables from '../../helpers/tables';
 import { DepartmentPermissions } from '../../helpers/enum';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
+import PageContent from '../components/PageContainer/PageContent'
 
 export default {
   name: 'department',
   mixins: [DepartmentApi, Tables, Access],
   components: {
     Card,
+    PageContent
   },
   DepartmentPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',
@@ -404,6 +430,7 @@ export default {
       department.isLoading = false;
     },
     setCreate() {
+      console.log('click')
       const { department } = this.forms;
       this.showModalEntry = true;
       department.isLoading = true;

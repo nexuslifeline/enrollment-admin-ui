@@ -1,32 +1,27 @@
 <template>
-  <div class="c-page-content">
-    <Card title="School Year Management">
+  <PageContent title="School Year Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadSchoolYear"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.SchoolYearPermissions.ADD.id)">
+     <template v-slot:filters>
+      <b-form-input
+        v-model="filters.schoolYear.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+      <!-- <b-button
+        v-if="isAccessible($options.SchoolYearPermissions.ADD.id)"
+        variant="primary"
+        class="w-100 mt-2"
+        @click="setCreate()"
+      ><v-icon name="plus-circle" /> ADD NEW SCHOOL YEAR
+      </b-button> -->
+    </template>
+    <template v-slot:content>
       <div>
-        <!-- add button and search -->
-        <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button
-                  v-if="isAccessible($options.SchoolYearPermissions.ADD.id)"
-                  variant="outline-primary"
-                  @click="setCreate()"
-                >
-                  <v-icon name="plus-circle" /> ADD NEW SCHOOL YEAR
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.schoolYear.criteria"
-                  type="text"
-                  placeholder="Search"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end add button and search -->
         <!-- table -->
         <b-row>
           <b-col md="12">
@@ -123,8 +118,8 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
+
+      <!-- Modal Entry -->
     <b-modal
       v-model="showModalEntry"
       :noCloseOnEsc="true"
@@ -245,7 +240,8 @@
       </div>
     </b-modal>
     <!-- End Modal Confirmation -->
-  </div>
+    </template>
+  </PageContent>
 </template>
 
 <script>
@@ -261,6 +257,7 @@ import { copyValue } from '../../helpers/extractor';
 import { SchoolYearPermissions } from '../../helpers/enum';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 const schoolYearFields = {
   id: null,
@@ -275,10 +272,12 @@ export default {
   mixins: [Tables, SchoolYearApi, Access],
   components: {
     Card,
+    PageContent
   },
   SchoolYearPermissions,
   data() {
     return {
+      isFilterVisible: true,
       entryMode: 'Add',
       showModalEntry: false,
       showModalConfirmation: false,

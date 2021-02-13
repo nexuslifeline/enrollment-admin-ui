@@ -1,8 +1,21 @@
 <template>
-  <div class="c-page-content">
-    <Card title="E-Wallet Account Management">
+  <PageContent
+    title="E-Wallet Account Management"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadEWalletAccounts"
+    :filterVisible="isFilterVisible"
+    @create="setCreate()">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.eWalletAccount.criteria"
+        debounce="500"
+        type="text"
+        placeholder="Search"
+      />
+    </template>
+    <template v-slot:content>
       <div>
-        <b-row class="mb-3">
+        <!-- <b-row class="mb-3">
           <b-col md="12">
             <b-row>
               <b-col md="8">
@@ -21,7 +34,7 @@
               </b-col>
             </b-row>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
         <b-row>
@@ -100,129 +113,129 @@
         </b-row>
         <!-- end table -->
       </div>
-    </Card>
-    <!-- Modal Entry -->
-    <b-modal
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <!-- Modal Entry -->
+      <b-modal
+        v-model="showModalEntry"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          E-Wallet Account- {{ entryMode }}
+        </div>
         <!-- modal title -->
-        E-Wallet Account- {{ entryMode }}
-      </div>
-      <!-- modal title -->
-      <!-- modal body -->
-      <b-overlay :show="forms.eWalletAccount.isLoading" rounded="sm">
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Provider</label>
-              <b-form-input
-                ref="name"
-                v-model="forms.eWalletAccount.fields.provider"
-                :state="forms.eWalletAccount.states.provider"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.eWalletAccount.errors.provider }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Account Name</label>
-              <b-form-input
-                v-model="forms.eWalletAccount.fields.accountName"
-                :state="forms.eWalletAccount.states.accountName"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.eWalletAccount.errors.accountName }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Account Id</label>
-              <b-form-input
-                v-model="forms.eWalletAccount.fields.accountId"
-                :state="forms.eWalletAccount.states.accountId"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.eWalletAccount.errors.accountId }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-overlay>
-      <!-- end modal body -->
-      <div slot="modal-footer" class="w-100">
+        <!-- modal body -->
+        <b-overlay :show="forms.eWalletAccount.isLoading" rounded="sm">
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Provider</label>
+                <b-form-input
+                  ref="name"
+                  v-model="forms.eWalletAccount.fields.provider"
+                  :state="forms.eWalletAccount.states.provider"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.eWalletAccount.errors.provider }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Account Name</label>
+                <b-form-input
+                  v-model="forms.eWalletAccount.fields.accountName"
+                  :state="forms.eWalletAccount.states.accountName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.eWalletAccount.errors.accountName }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="12">
+              <b-form-group>
+                <label class="required">Account Id</label>
+                <b-form-input
+                  v-model="forms.eWalletAccount.fields.accountId"
+                  :state="forms.eWalletAccount.states.accountId"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.eWalletAccount.errors.accountId }}
+                </b-form-invalid-feedback>
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-overlay>
+        <!-- end modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalEntry = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="forms.eWalletAccount.isProcessing"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onEWalletAccountEntry()"
+          >
+            <v-icon
+              v-if="forms.eWalletAccount.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Save
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.eWalletAccount.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onEWalletAccountEntry()"
-        >
-          <v-icon
-            v-if="forms.eWalletAccount.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- End Modal Entry -->
+      </b-modal>
+      <!-- End Modal Entry -->
 
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete E-Wallet Account
-      </div>
-      Are you sure you want to delete this E-Wallet Account?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="forms.eWalletAccount.isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onEWalletAccountDelete()"
-        >
-          <v-icon
-            v-if="forms.eWalletAccount.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
-  </div>
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete E-Wallet Account
+        </div>
+        Are you sure you want to delete this E-Wallet Account?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="forms.eWalletAccount.isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onEWalletAccountDelete()"
+          >
+            <v-icon
+              v-if="forms.eWalletAccount.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+    </template>
+  </PageContent>
 </template>
 <script>
 const eWalletAccountFields = {
@@ -242,15 +255,18 @@ import {
 import { copyValue } from '../../helpers/extractor';
 import Tables from '../../helpers/tables';
 import Card from '../components/Card';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'eWalletAccount',
   mixins: [EWalletAccountApi, Tables],
   components: {
     Card,
+    PageContent
   },
   data() {
     return {
+      isFilterVisible: true,
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',
