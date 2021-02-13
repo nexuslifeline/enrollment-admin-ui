@@ -13,7 +13,7 @@
       <slot name="option" v-bind="data"></slot>
     </template>
     <template #list-footer>
-      <li ref="load" class="loader__container">
+      <li ref="load" v-if="hasNextPage" class="loader__container">
         <slot name="loader"></slot>
       </li>
     </template>
@@ -59,7 +59,7 @@ export default {
     },
     debounceSearch: debounce(function(v) {
       this.searchOption(v);
-    }, 500),
+    }, 400),
     searchOption(q) {
       this.searchQuery = q;
       //change search to criteria

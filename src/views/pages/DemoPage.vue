@@ -3,8 +3,12 @@
     <div class="login__container">
       <SelectPaginated v-model="selectedStudent" :fetchData="getStudentList">
         <template slot="option" slot-scope="data">
-          <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
-           {{ data.name }}
+          <!-- <div class="">
+            <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
+            <div>{{ data.name }}</div>
+            <div>{{ data.email }}</div>
+          </div> -->
+          <StudentDropdown :data="data" />
         </template>
         <template slot="loader">
           <b-spinner label="Loading..." class="loader"></b-spinner>
@@ -66,7 +70,8 @@ import ScheduleViewer from '../components/ScheduleViewer'
 import AttachmentList from '../components/Attachment/AttachmentList'
 import StudentApi from '../../mixins/api/Student';
 import { debounce } from 'lodash';
-import SelectPaginated from '../components/SelectPaginated'
+import SelectPaginated from '../components/SelectPaginated';
+import StudentDropdown from '../components/DropdownItems/StudentItem';
 
 export default {
   name: 'Login',
@@ -74,7 +79,8 @@ export default {
     Toggle,
     ScheduleViewer,
     AttachmentList,
-    SelectPaginated
+    SelectPaginated,
+    StudentDropdown,
   },
   mixins: [StudentApi],
   data() {
