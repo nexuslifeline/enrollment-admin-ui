@@ -1,8 +1,54 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Payment Transactions">
+  <PageContent
+    title="Payment Transactions"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadPayments"
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="showAddButton && isAccessible($options.PaymentPermissions.ADD.id)"
+    @create="$router.push(`/finance/payment/add`)">
+    <template v-slot:filters>
+      <b-form-input
+        type="text"
+        placeholder="Search"
+        debounce="500"
+        class="search-input"
+        v-model="filters.payment.criteria"
+        @update="loadPayments()"
+      />
+      <div class="mt-2">FROM</div>
+      <b-form-datepicker
+        :date-format-options="{
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          weekday: 'short',
+        }"
+        class="date-pickers mt-1"
+        v-model="filters.payment.dateFrom"
+        @input="loadPayments"
+      />
+      <div class="mt-2">TO</div>
+      <b-form-datepicker
+        :date-format-options="{
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          weekday: 'short',
+        }"
+        class="date-pickers mt-2"
+        v-model="filters.payment.dateTo"
+        @input="loadPayments"
+      />
+      <b-button
+        v-if="showPrintPreviewButton"
+        class="print-preview mt-3 w-100"
+        variant="outline-primary"
+        @click="previewCollection()"
+        ><v-icon name="print" /> PRINT PREVIEW</b-button>
+    </template>
+    <template v-slot:content>
       <div class="search-filter-container">
-        <b-button
+        <!-- <b-button
           v-if="
             showAddButton && isAccessible($options.PaymentPermissions.ADD.id)
           "
@@ -10,8 +56,8 @@
           :to="`/finance/payment/add`"
         >
           <v-icon name="plus-circle" /> ADD NEW PAYMENT
-        </b-button>
-        <b-button
+        </b-button> -->
+        <!-- <b-button
           v-if="showPrintPreviewButton"
           class="print-preview"
           variant="outline-primary"
@@ -52,7 +98,7 @@
           v-model="filters.payment.criteria"
           @update="loadPayments()"
         >
-        </b-form-input>
+        </b-form-input> -->
       </div>
       <b-row class="mt-3">
         <b-col md="12">
@@ -74,7 +120,7 @@
               </div>
             </template>
             <template v-slot:cell(student)="data">
-              <b-media>
+              <!-- <b-media>
                 <template v-slot:aside>
                   <b-avatar
                     rounded
@@ -108,7 +154,11 @@
                       : ''
                   }}
                 </small>
-              </b-media>
+              </b-media> -->
+              <StudentColumn
+                :data="data.item"
+                :callback="{ loadDetails: () => null }"
+              />
             </template>
             <template v-slot:cell(action)="row">
               <b-dropdown
@@ -156,43 +206,43 @@
           </b-row>
         </b-col>
       </b-row>
-    </Card>
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Cancel Payment
-      </div>
-      Are you sure you want to cancel this Payment ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onCancelPayment()"
-        >
-          <v-icon v-if="isProcessing" name="sync" spin class="mr-2" />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <FileViewer
-      :show="showModalPreview"
-      :file="file"
-      :owner="file.owner"
-      :isBusy="file.isLoading"
-      @close="showModalPreview = false"
-    />
-  </div>
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Cancel Payment
+        </div>
+        Are you sure you want to cancel this Payment ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onCancelPayment()"
+          >
+            <v-icon v-if="isProcessing" name="sync" spin class="mr-2" />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <FileViewer
+        :show="showModalPreview"
+        :file="file"
+        :owner="file.owner"
+        :isBusy="file.isLoading"
+        @close="showModalPreview = false"
+      />
+    </template>
+  </PageContent>
 </template>
 
 <script>
@@ -203,12 +253,16 @@ import FileViewer from '../../components/FileViewer';
 import { PaymentStatuses, PaymentPermissions } from '../../../helpers/enum';
 import Card from '../../components/Card';
 import Access from '../../../mixins/utils/Access';
+import PageContent from "../../components/PageContainer/PageContent";
+import { StudentColumn } from "../../components/ColumnDetails";
 
 export default {
   mixins: [PaymentApi, ReportApi, Access],
   components: {
     FileViewer,
     Card,
+    PageContent,
+    StudentColumn
   },
   props: {
     showAddButton: {
@@ -227,6 +281,7 @@ export default {
   PaymentPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showModalPreview: false,
       isLoading: false,
       showModalEntry: false,
@@ -243,6 +298,7 @@ export default {
       },
       tables: {
         payments: {
+          isBusy: false,
           fields: [
             {
               key: 'student',
@@ -318,6 +374,7 @@ export default {
     },
     loadPayments() {
       const { payments } = this.tables;
+       payments.isBusy = true;
       const { criteria, dateFrom, dateTo } = this.filters.payment;
       const {
         payment,
@@ -332,8 +389,6 @@ export default {
         dateTo,
         paymentStatusId: PaymentStatuses.APPROVED.id,
       };
-
-      payments.isBusy = true;
 
       this.getPaymentList(params).then(({ data }) => {
         payments.items = data.data;

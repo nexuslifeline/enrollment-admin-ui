@@ -1,189 +1,202 @@
 <template>
-  <div class="c-page-content">
-    <Card title="Rate Sheet Management">
-      <SchoolCategoryTabs
-        :showAll="false"
-        @loadSchoolCategoryId="loadLevelsOfSchoolCategoryList($event)"
-        @click="loadLevelsOfSchoolCategoryList($event)"
-      />
-      <div>
-        <b-overlay :show="isLoaded" rounded="sm">
-          <b-card>
-            <b-card-body>
-              <!-- <h4>Rate Sheet</h4>
-              <p>Details about the Fees of Student within current Academic Year.</p> -->
-              <b-row class="mb-3">
-                <b-col md="2">
-                  <!-- <h5>Student Fees - {{ levelName }}</h5>  -->
-                </b-col>
-                <b-col md="8">
-                  <b-row v-show="options.courses.items.length > 0">
-                    <b-col md="8">
-                      <b-form-select
-                        v-model="forms.rateSheet.fields.courseId"
-                        @change="loadFeesOfLevel()"
-                      >
-                        <template v-slot:first>
-                          <b-form-select-option :value="null" disabled
-                            >-- Course --</b-form-select-option
-                          >
-                        </template>
-                        <b-form-select-option
-                          v-for="course in options.courses.items"
-                          :key="course.id"
-                          :value="course.id"
+    <PageContent
+      title="Rate Sheeet Management"
+      @toggleFilter="isFilterVisible = !isFilterVisible"
+      @refresh="loadFeesOfLevel"
+      :filterVisible="isFilterVisible"
+      :createButtonVisible="checkIfHasSchoolCategoryAccess()"
+      @create="showModalFees = true">
+      <template v-slot:filters>
+        <v-select
+          :options="options.schoolCategories.values"
+          :value="filters.rateSheet.schoolCategoryItem"
+          @input="onCategoryFilterChange"
+          label="name"
+          placeholder="School Category"
+          class="mt-2"
+          :clearable="false"
+          :searchable="false"
+          :selectable="option => checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        />
+        <v-select
+          :options="options.levels.fixItems"
+          :value="filters.rateSheet.levelItem"
+          @input="onLevelFilterChange"
+          label="name"
+          placeholder="Level"
+          class="mt-2"
+          :clearable="false"
+          :searchable="false"
+        />
+        <v-select
+          v-if="isCourseVisible"
+          :options="options.courses.fixItems"
+          :value="filters.rateSheet.courseItem"
+          @input="onCourseFilterChange"
+          label="name"
+          placeholder="Course"
+          class="mt-2"
+          :clearable="false"
+          :searchable="false"
+        />
+        <v-select
+          v-if="isCourseVisible"
+          :options="options.semesters.values"
+          :value="filters.rateSheet.semesterItem"
+          @input="onSemesterFilterChange"
+          label="name"
+          placeholder="Semester"
+          class="mt-2"
+          :clearable="false"
+          :searchable="false"
+        />
+      </template>
+      <template v-slot:content>
+        <!-- <SchoolCategoryTabs
+          :showAll="false"
+          @loadSchoolCategoryId="loadLevelsOfSchoolCategoryList($event)"
+          @click="loadLevelsOfSchoolCategoryList($event)"
+        /> -->
+        <div v-if="checkIfHasSchoolCategoryAccess()">
+          <b-overlay :show="isLoaded" rounded="sm">
+            <b-card>
+              <b-card-body>
+                <!-- <b-row class="mb-3">
+                  <b-col md="2">
+                  </b-col>
+                  <b-col md="8">
+                    <b-row v-show="options.courses.items.length > 0">
+                      <b-col md="8">
+                        <b-form-select
+                          v-model="forms.rateSheet.fields.courseId"
+                          @change="loadFeesOfLevel()"
                         >
-                          {{ course.description }}
-                          {{ course.major ? `(${course.major})` : '' }}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </b-col>
-                    <b-col md="4">
-                      <b-form-select
-                        v-model="forms.rateSheet.fields.semesterId"
-                        @change="loadFeesOfLevel()"
-                      >
-                        <template v-slot:first>
-                          <b-form-select-option :value="null" disabled
-                            >-- Semester --</b-form-select-option
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled
+                              >-- Course --</b-form-select-option
+                            >
+                          </template>
+                          <b-form-select-option
+                            v-for="course in options.courses.items"
+                            :key="course.id"
+                            :value="course.id"
                           >
-                        </template>
-                        <b-form-select-option
-                          v-for="semester in options.semesters.values"
-                          :key="semester.id"
-                          :value="semester.id"
+                            {{ course.description }}
+                            {{ course.major ? `(${course.major})` : '' }}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </b-col>
+                      <b-col md="4">
+                        <b-form-select
+                          v-model="forms.rateSheet.fields.semesterId"
+                          @change="loadFeesOfLevel()"
                         >
-                          {{ semester.name }}
-                        </b-form-select-option>
-                      </b-form-select>
-                    </b-col>
-                  </b-row>
-                </b-col>
-                <b-col md="2">
-                  <b-button
-                    class="float-right"
-                    variant="primary"
-                    @click="showModalFees = true"
-                  >
-                    <v-icon name="plus-circle" /> ADD NEW ITEM</b-button
-                  >
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col md="2">
-                  <b-tabs
-                    class="c-tab-pills-vertical"
-                    pills
-                    vertical
-                    v-model="levelIndex"
-                  >
-                    <b-tab
-                      v-for="level in options.levels.items"
-                      :key="level.id"
-                      @click="loadCoursesOfLevelList(level.id)"
-                      :title="level.name"
-                    />
-                  </b-tabs>
-                </b-col>
-                <b-col md="10">
-                  <b-table
-                    responsive
-                    small
-                    hover
-                    outlined
-                    show-empty
-                    :items.sync="forms.rateSheet.fields.fees"
-                    :fields="tables.rateSheetFees.fields"
-                    :busy="tables.rateSheetFees.isBusy"
-                  >
-                    <template v-slot:table-busy>
-                      <div class="text-center my-2">
-                        <v-icon name="spinner" spin class="mr-2" />
-                        <strong>Loading...</strong>
-                      </div>
-                    </template>
-                    <template v-slot:cell(pivot.isInitialFee)="row">
-                      <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
-                      <b-form-checkbox
-                        value="1"
-                        unchecked-value="0"
-                        v-model="row.item.pivot.isInitialFee"
+                          <template v-slot:first>
+                            <b-form-select-option :value="null" disabled
+                              >-- Semester --</b-form-select-option
+                            >
+                          </template>
+                          <b-form-select-option
+                            v-for="semester in options.semesters.values"
+                            :key="semester.id"
+                            :value="semester.id"
+                          >
+                            {{ semester.name }}
+                          </b-form-select-option>
+                        </b-form-select>
+                      </b-col>
+                    </b-row>
+                  </b-col>
+                  <b-col md="2">
+                    <b-button
+                      class="float-right"
+                      variant="primary"
+                      @click="showModalFees = true"
+                    >
+                      <v-icon name="plus-circle" /> ADD NEW ITEM</b-button
+                    >
+                  </b-col>
+                </b-row> -->
+                <b-row>
+                  <!-- <b-col md="2">
+                    <b-tabs
+                      class="c-tab-pills-vertical"
+                      pills
+                      vertical
+                      v-model="levelIndex"
+                    >
+                      <b-tab
+                        v-for="level in options.levels.items"
+                        :key="level.id"
+                        @click="loadCoursesOfLevelList(level.id)"
+                        :title="level.name"
                       />
-                    </template>
-                    <template v-slot:head(isComputedByUnits)>
-                      COMPUTED BY UNITS
-                      <v-icon
-                        name="info-circle"
-                        class="icon-tooltip"
-                        v-b-tooltip.hover="{
-                          variant: 'info',
-                          title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
-                      />
-                    </template>
-                     <template v-slot:head(pivot.isInitialFee)>
-                      INITIAL FEE
-                      <v-icon
-                        name="info-circle"
-                        class="icon-tooltip"
-                        v-b-tooltip.hover="{
-                          variant: 'info',
-                          title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
-                      />
-                    </template>
-                    <template v-slot:cell(isComputedByUnits)="row">
-                      <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
-                      <b-form-checkbox
-                        v-if="row.item.id === fees.TUITION_FEE.id"
-                        v-model="forms.rateSheet.fields.isComputedByUnits"
-                        :value="1"
-                        :unchecked-value="0"
-                        @input="$event ? (row.item.pivot.amount = 0) : ''"
-                      />
-                    </template>
-                    <template v-slot:cell(pivot.amount)="row">
-                      <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
-                      <vue-autonumeric
-                        :disabled="
-                          forms.rateSheet.fields.isComputedByUnits === 1 &&
-                            row.item.id === fees.TUITION_FEE.id
-                        "
-                        v-model="row.item.pivot.amount"
-                        class="form-control text-right"
-                        :options="[
-                          {
-                            minimumValue: 0,
-                            modifyValueOnWheel: false,
-                            emptyInputBehavior: 0,
-                          },
-                        ]"
-                      >
-                      </vue-autonumeric>
-                    </template>
-                    <template v-slot:cell(pivot.notes)="row">
-                      <b-form-input v-model="row.item.pivot.notes" />
-                    </template>
-                    <template v-slot:cell(action)="row">
-                      <b-button
-                        @click="removeFee(row)"
-                        size="sm"
-                        variant="danger"
-                        ><v-icon name="trash"
-                      /></b-button>
-                    </template>
-                  </b-table>
-                  <hr />
-                  <b-row>
-                    <b-col md="4">
-                      <b-form-group
-                        label="INITIAL FEE TOTAL"
-                        label-for="enrollmentFee"
-                        label-class="font-weight-bold"
-                        label-cols="4"
-                      >
+                    </b-tabs>
+                  </b-col> -->
+                  <b-col md="12">
+                    <b-table
+                      responsive
+                      small
+                      hover
+                      outlined
+                      show-empty
+                      :items.sync="forms.rateSheet.fields.fees"
+                      :fields="tables.rateSheetFees.fields"
+                      :busy="tables.rateSheetFees.isBusy"
+                    >
+                      <template v-slot:table-busy>
+                        <div class="text-center my-2">
+                          <v-icon name="spinner" spin class="mr-2" />
+                          <strong>Loading...</strong>
+                        </div>
+                      </template>
+                      <template v-slot:cell(pivot.isInitialFee)="row">
+                        <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
+                        <b-form-checkbox
+                          value="1"
+                          unchecked-value="0"
+                          v-model="row.item.pivot.isInitialFee"
+                        />
+                      </template>
+                      <template v-slot:head(isComputedByUnits)>
+                        COMPUTED BY UNITS
+                        <v-icon
+                          name="info-circle"
+                          class="icon-tooltip"
+                          v-b-tooltip.hover="{
+                            variant: 'info',
+                            title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                        />
+                      </template>
+                      <template v-slot:head(pivot.isInitialFee)>
+                        INITIAL FEE
+                        <v-icon
+                          name="info-circle"
+                          class="icon-tooltip"
+                          v-b-tooltip.hover="{
+                            variant: 'info',
+                            title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}"
+                        />
+                      </template>
+                      <template v-slot:cell(isComputedByUnits)="row">
+                        <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
+                        <b-form-checkbox
+                          v-if="row.item.id === fees.TUITION_FEE.id"
+                          v-model="forms.rateSheet.fields.isComputedByUnits"
+                          :value="1"
+                          :unchecked-value="0"
+                          @input="$event ? (row.item.pivot.amount = 0) : ''"
+                        />
+                      </template>
+                      <template v-slot:cell(pivot.amount)="row">
+                        <!-- <b-form-input v-model="row.item.pivot.amount" style="text-align: right"/> -->
                         <vue-autonumeric
-                          id="enrollmentFee"
-                          v-model="initialFeeTotal"
-                          class="form-control text-right w-75"
+                          :disabled="
+                            forms.rateSheet.fields.isComputedByUnits === 1 &&
+                              row.item.id === fees.TUITION_FEE.id
+                          "
+                          v-model="row.item.pivot.amount"
+                          class="form-control text-right"
                           :options="[
                             {
                               minimumValue: 0,
@@ -193,132 +206,168 @@
                           ]"
                         >
                         </vue-autonumeric>
-                        <!-- <b-form-input id="enrollmentFee" v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input> -->
-                      </b-form-group>
-                    </b-col>
-                    <b-col offset-md="2" md="6">
-                      <b-row>
-                        <b-col sm="9">
-                          <h6 class="font-weight-bold pt-1 float-right">
-                            TOTAL :
-                          </h6>
-                        </b-col>
-                        <b-col sm="3">
-                          <h6 class="font-weight-bold pt-1 float-right">
-                            {{ totalAmount }}
-                          </h6>
-                        </b-col>
-                      </b-row>
-                    </b-col>
-                  </b-row>
+                      </template>
+                      <template v-slot:cell(pivot.notes)="row">
+                        <b-form-input v-model="row.item.pivot.notes" />
+                      </template>
+                      <template v-slot:cell(action)="row">
+                        <b-button
+                          @click="removeFee(row)"
+                          size="sm"
+                          variant="danger"
+                          ><v-icon name="trash"
+                        /></b-button>
+                      </template>
+                    </b-table>
+                    <hr />
+                    <b-row>
+                      <b-col md="4">
+                        <b-form-group
+                          label="INITIAL FEE TOTAL"
+                          label-for="enrollmentFee"
+                          label-class="font-weight-bold"
+                          label-cols="4"
+                        >
+                          <vue-autonumeric
+                            id="enrollmentFee"
+                            v-model="initialFeeTotal"
+                            class="form-control text-right w-75"
+                            :options="[
+                              {
+                                minimumValue: 0,
+                                modifyValueOnWheel: false,
+                                emptyInputBehavior: 0,
+                              },
+                            ]"
+                          >
+                          </vue-autonumeric>
+                          <!-- <b-form-input id="enrollmentFee" v-model="forms.rateSheet.fields.enrollmentFee"></b-form-input> -->
+                        </b-form-group>
+                      </b-col>
+                      <b-col offset-md="2" md="6">
+                        <b-row>
+                          <b-col sm="9">
+                            <h6 class="font-weight-bold pt-1 float-right">
+                              TOTAL :
+                            </h6>
+                          </b-col>
+                          <b-col sm="3">
+                            <h6 class="font-weight-bold pt-1 float-right">
+                              {{ totalAmount }}
+                            </h6>
+                          </b-col>
+                        </b-row>
+                      </b-col>
+                    </b-row>
+                  </b-col>
+                </b-row>
+              </b-card-body>
+              <template v-slot:footer>
+                <b-button
+                  v-if="isAccessible($options.RateSheetPermissions.UPDATE.id)"
+                  :disabled="forms.rateSheet.isProcessing"
+                  class="float-right btn-save"
+                  variant="outline-primary"
+                  @click="createUpdateRateSheet()"
+                >
+                  <v-icon
+                    v-if="forms.rateSheet.isProcessing"
+                    name="sync"
+                    spin
+                    class="mr-2"
+                  />
+                  Save
+                </b-button>
+              </template>
+            </b-card>
+          </b-overlay>
+        </div>
+        <!-- MODAL FEES -->
+        <b-modal
+          v-model="showModalFees"
+          :noCloseOnEsc="true"
+          :noCloseOnBackdrop="true"
+          size="xl"
+        >
+          <div slot="modal-title">
+            <!-- modal title -->
+            School Fees
+          </div>
+          <!-- modal title -->
+          <b-row>
+            <!-- modal body -->
+            <b-col md="12">
+              <b-row class="mb-2">
+                <b-col offset-md="8" md="4">
+                  <b-form-input
+                    v-model="filters.fee.criteria"
+                    type="text"
+                    placeholder="Search"
+                    debounce="500"
+                  >
+                  </b-form-input>
                 </b-col>
               </b-row>
-            </b-card-body>
-            <template v-slot:footer>
-              <b-button
-                v-if="isAccessible($options.RateSheetPermissions.UPDATE.id)"
-                :disabled="forms.rateSheet.isProcessing"
-                class="float-right btn-save"
-                variant="outline-primary"
-                @click="createUpdateRateSheet()"
-              >
-                <v-icon
-                  v-if="forms.rateSheet.isProcessing"
-                  name="sync"
-                  spin
-                  class="mr-2"
-                />
-                Save
-              </b-button>
-            </template>
-          </b-card>
-        </b-overlay>
-      </div>
-    </Card>
-    <!-- MODAL FEES -->
-    <b-modal
-      v-model="showModalFees"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-      size="xl"
-    >
-      <div slot="modal-title">
-        <!-- modal title -->
-        School Fees
-      </div>
-      <!-- modal title -->
-      <b-row>
-        <!-- modal body -->
-        <b-col md="12">
-          <b-row class="mb-2">
-            <b-col offset-md="8" md="4">
-              <b-form-input
-                v-model="filters.fee.criteria"
-                type="text"
-                placeholder="Search"
-                debounce="500"
-              >
-              </b-form-input>
-            </b-col>
-          </b-row>
-          <b-table
-            small
-            hover
-            outlined
-            show-empty
-            :items.sync="tables.fees.items"
-            :fields="tables.fees.fields"
-            :filter="filters.fee.criteria"
-            :busy="tables.fees.isBusy2"
-            :current-page="paginations.fee.page"
-            :per-page="paginations.fee.perPage"
-            @filtered="onFiltered($event, paginations.fee)"
-          >
-            <template v-slot:cell(action)="row">
-              <b-button @click="addFee(row)" size="sm" variant="success"
-                ><v-icon name="plus"
-              /></b-button>
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.fee.from }} to {{ paginations.fee.to }} of
-              {{ paginations.fee.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                v-model="paginations.fee.page"
-                :total-rows="paginations.fee.totalRows"
+              <b-table
+                small
+                hover
+                outlined
+                show-empty
+                :items.sync="tables.fees.items"
+                :fields="tables.fees.fields"
+                :filter="filters.fee.criteria"
+                :busy="tables.fees.isBusy2"
+                :current-page="paginations.fee.page"
                 :per-page="paginations.fee.perPage"
-                size="sm"
-                align="end"
-                @input="recordDetails(paginations.fee)"
-              />
+                @filtered="onFiltered($event, paginations.fee)"
+              >
+                <template v-slot:cell(action)="row">
+                  <b-button @click="addFee(row)" size="sm" variant="success"
+                    ><v-icon name="plus"
+                  /></b-button>
+                </template>
+                <template v-slot:table-busy>
+                  <div class="text-center my-2">
+                    <v-icon name="spinner" spin class="mr-2" />
+                    <strong>Loading...</strong>
+                  </div>
+                </template>
+              </b-table>
+              <b-row>
+                <b-col md="6">
+                  Showing {{ paginations.fee.from }} to {{ paginations.fee.to }} of
+                  {{ paginations.fee.totalRows }} records.
+                </b-col>
+                <b-col md="6">
+                  <b-pagination
+                    v-model="paginations.fee.page"
+                    :total-rows="paginations.fee.totalRows"
+                    :per-page="paginations.fee.perPage"
+                    size="sm"
+                    align="end"
+                    @input="recordDetails(paginations.fee)"
+                  />
+                </b-col>
+              </b-row>
             </b-col>
           </b-row>
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
-        <b-button
-          class="float-right"
-          variant="outline-danger"
-          @click="showModalFees = false"
-        >
-          Close
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-  </div>
-  <!-- main container -->
+          <!-- modal body -->
+          <div slot="modal-footer" class="w-100">
+            <!-- modal footer buttons -->
+            <b-button
+              class="float-right"
+              variant="outline-danger"
+              @click="showModalFees = false"
+            >
+              Close
+            </b-button>
+          </div>
+          <!-- modal footer buttons -->
+        </b-modal>
+        <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
+      </template>
+    </PageContent>
+    <!-- main container -->
 </template>
 <script>
 import {
@@ -341,7 +390,8 @@ import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
-
+import PageContent from "../components/PageContainer/PageContent";
+import NoAccess from "../components/NoAccess";
 export default {
   name: 'RateSheet',
   mixins: [
@@ -357,10 +407,13 @@ export default {
   components: {
     SchoolCategoryTabs,
     Card,
+    PageContent,
+    NoAccess
   },
   RateSheetPermissions,
   data() {
     return {
+      isFilterVisible: true,
       isLoaded: false,
       showModalFees: false,
       fees: Fees,
@@ -464,14 +517,24 @@ export default {
         fee: {
           criteria: null,
         },
+        rateSheet: {
+          schoolCategoryId: null,
+          schoolCategoryItem: null,
+          levelId: null,
+          levelItem: null,
+          courseId: null,
+          courseItem: null
+        }
       },
       options: {
         schoolCategories: SchoolCategories,
         levels: {
           items: [],
+          fixItems: []
         },
         courses: {
           items: [],
+          fixItems: []
         },
         semesters: Semesters,
       },
@@ -481,9 +544,16 @@ export default {
     };
   },
   created() {
-    //this.loadRateSheetList()
-    // this.checkRights()
-    this.loadFees();
+    const { rateSheet } = this.filters
+    console.log(this.getDefaultSchoolCategory())
+    rateSheet.schoolCategoryId = this.getDefaultSchoolCategory()?.id
+    rateSheet.schoolCategoryItem = this.getDefaultSchoolCategory()
+    this.loadLevels()
+    this.loadCourses()
+    this.loadFees()
+    setTimeout(() => {
+      this.loadFeesOfLevel()
+    }, 1000);
   },
   computed: {
     initialFeeTotal: {
@@ -521,6 +591,15 @@ export default {
       if (level) {
         return level.name;
       }
+    },
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.rateSheet;
+      const { schoolCategories } = this.options;
+      return [
+        schoolCategories.SENIOR_HIGH_SCHOOL.id,
+        schoolCategories.COLLEGE.id,
+        schoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
     },
   },
   methods: {
@@ -572,11 +651,13 @@ export default {
     loadFeesOfLevel() {
       const { rateSheetFees } = this.tables;
       const { rateSheet } = this.forms;
+      const { levelId, courseId, semesterId } = this.filters.rateSheet;
+
       const params = {
-        levelId: rateSheet.fields.levelId,
-        courseId: rateSheet.fields.courseId,
-        semesterId: rateSheet.fields.semesterId,
-      };
+          levelId: this.filters.rateSheet.levelId,
+          courseId: this.filters.rateSheet.courseId,
+          semesterId: this.filters.rateSheet.semesterId
+        }
 
       rateSheetFees.isBusy = true;
       rateSheet.fields.id = null; //clear id of rate sheet field
@@ -591,6 +672,11 @@ export default {
           rateSheet.fields.enrollmentFee = data.data[0].enrollmentFee;
           rateSheet.fields.isComputedByUnits = data.data[0].isComputedByUnits;
           rateSheet.fields.fees = data.data[0].fees;
+        }
+        else {
+          rateSheet.fields.levelId = levelId
+          rateSheet.fields.courseId = courseId;
+          rateSheet.fields.semesterId = semesterId;
         }
         rateSheetFees.isBusy = false;
       });
@@ -679,6 +765,7 @@ export default {
         });
       });
 
+
       if (fields.id === null) {
         this.addRateSheet(data)
           .then(({ data }) => {
@@ -717,6 +804,66 @@ export default {
         this.userGroupId = UserGroups.SUPER_USER.id;
       }
       this.loadLevelsOfSchoolCategoryList(this.schoolCategoryId);
+    },
+    onCategoryFilterChange(item) {
+      const { rateSheet } = this.filters;
+      rateSheet.schoolCategoryId = item?.id || 0;
+      rateSheet.schoolCategoryItem = item;
+      rateSheet.courseId = null
+      rateSheet.courseItem = null
+      rateSheet.semesterId = null
+      rateSheet.semesterItem = null
+      rateSheet.levelId = null
+      rateSheet.levelItem = null
+      this.loadLevels()
+      this.loadCourses()
+      setTimeout(() => {
+        this.loadFeesOfLevel();
+      }, 500);
+    },
+    onLevelFilterChange(item) {
+      const { rateSheet } = this.filters;
+      rateSheet.levelId = item?.id || 0;
+      rateSheet.levelItem = item;
+      this.loadFeesOfLevel();
+    },
+    onCourseFilterChange(item) {
+      const { rateSheet } = this.filters;
+      rateSheet.courseId = item?.id || 0;
+      rateSheet.courseItem = item;
+      this.loadFeesOfLevel();
+    },
+     onSemesterFilterChange(item) {
+      const { rateSheet } = this.filters;
+      rateSheet.semesterId = item?.id || 0;
+      rateSheet.semesterItem = item;
+      this.loadFeesOfLevel();
+    },
+    loadCourses() {
+      const params = { paginate: false };
+      const { courses } = this.options;
+      this.getCourseList(params).then(({ data }) => {
+        courses.fixItems = data;
+        if(this.isCourseVisible) {
+          const course = courses.fixItems[0] ? courses.fixItems[0] : null
+          this.filters.rateSheet.courseId = course?.id
+          this.filters.rateSheet.courseItem = course
+
+          this.filters.rateSheet.semesterId = this.options.semesters.FIRST_SEM.id
+          this.filters.rateSheet.semesterItem = this.options.semesters.FIRST_SEM
+        }
+      });
+    },
+    loadLevels() {
+      const params = { paginate: false };
+      const { schoolCategoryId } = this.filters.rateSheet
+      const { levels } = this.options;
+      this.getLevelList(params).then(({ data }) => {
+        levels.fixItems = schoolCategoryId ? data.filter(e=> e.schoolCategoryId === schoolCategoryId) : data;
+        const level = levels.fixItems[0] ? levels.fixItems[0] : null
+        this.filters.rateSheet.levelId = level?.id
+        this.filters.rateSheet.levelItem = level
+      });
     },
   },
 };

@@ -1,7 +1,50 @@
 <template>
-  <div class="c-page-content">
-    <Card v-if="!showEntry" title="Manual Enrollment" :showRefresh="true" @onRefresh="loadAcademicRecord()">
-      <div>
+  <PageContent title="Manual Enrollment"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadAcademicRecord"
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="isAccessible($options.ManualEnrollmentPermissions.ADD.id) && checkIfHasSchoolCategoryAccess()"
+    @create="setCreate()">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.academicRecord.criteria"
+        debounce="500"
+        @update="loadAcademicRecord()"
+        type="text"
+        placeholder="Search"
+      >
+      </b-form-input>
+      <v-select
+        :options="$options.SchoolCategories.values"
+        :value="filters.academicRecord.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.items"
+        :value="filters.academicRecord.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
+        :options="$options.ManualSteps.values"
+        :value="filters.academicRecord.manualStepItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
+      <!-- <div>
         <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="
@@ -18,214 +61,169 @@
               (filters.academicRecord.courseId = null),
               loadAcademicRecord()
           "
-        />
-        <div>
-          <b-row class="mb-2">
-            <b-col md="6">
-              <b-form-radio-group
-                @input="loadAcademicRecord()"
-                v-model="filters.academicRecord.manualStepId"
-              >
-                <b-form-radio :value="null">Show All</b-form-radio>
-                <b-form-radio
-                  v-for="step in $options.ManualSteps.values"
-                  :value="step.id"
-                  :key="step.id"
-                  v-if="
-                    step.id !== $options.ManualSteps.COMPLETED.id &&
-                      step.id !== $options.ManualSteps.STUDENT_REGISTRATION.id
-                  "
-                >
-                  {{ step.name }}
-                </b-form-radio>
-              </b-form-radio-group>
-            </b-col>
-          </b-row>
-          <b-row class="mb-2">
-            <!-- row button and search input -->
-            <b-col md="6">
-              <b-btn
-                variant="outline-primary"
-                @click="setCreate()"
-                v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
-                >Add New Record</b-btn
-              >
-            </b-col>
-            <b-col md="3">
-              <b-form-select
+        /> -->
+      <div v-if="!showEntry && checkIfHasSchoolCategoryAccess()">
+        <!-- <b-row class="mb-2">
+          <b-col md="6">
+            <b-form-radio-group
+              @input="loadAcademicRecord()"
+              v-model="filters.academicRecord.manualStepId"
+            >
+              <b-form-radio :value="null">Show All</b-form-radio>
+              <b-form-radio
+                v-for="step in $options.ManualSteps.values"
+                :value="step.id"
+                :key="step.id"
                 v-if="
+                  step.id !== $options.ManualSteps.COMPLETED.id &&
+                    step.id !== $options.ManualSteps.STUDENT_REGISTRATION.id
+                "
+              >
+                {{ step.name }}
+              </b-form-radio>
+            </b-form-radio-group>
+          </b-col>
+        </b-row>
+        <b-row class="mb-2">
+          <b-col md="6">
+            <b-btn
+              variant="outline-primary"
+              @click="setCreate()"
+              v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
+              >Add New Record</b-btn
+            >
+          </b-col>
+          <b-col md="3">
+            <b-form-select
+              v-if="
+                filters.academicRecord.schoolCategoryId ===
+                  $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
                   filters.academicRecord.schoolCategoryId ===
-                    $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id ||
-                    filters.academicRecord.schoolCategoryId ===
-                      $options.SchoolCategories.COLLEGE.id ||
-                    filters.academicRecord.schoolCategoryId ===
-                      $options.SchoolCategories.GRADUATE_SCHOOL.id
-                "
-                @change="loadAcademicRecord()"
-                v-model="filters.academicRecord.courseId"
-                class="float-right"
-              >
-                <template v-slot:first>
-                  <b-form-select-option :value="null" disabled
-                    >-- Course --</b-form-select-option
-                  >
-                </template>
-                <b-form-select-option :value="null">None</b-form-select-option>
-                <b-form-select-option
-                  v-for="course in options.courses.items"
-                  :key="course.id"
-                  :value="course.id"
+                    $options.SchoolCategories.COLLEGE.id ||
+                  filters.academicRecord.schoolCategoryId ===
+                    $options.SchoolCategories.GRADUATE_SCHOOL.id
+              "
+              @change="loadAcademicRecord()"
+              v-model="filters.academicRecord.courseId"
+              class="float-right"
+            >
+              <template v-slot:first>
+                <b-form-select-option :value="null" disabled
+                  >-- Course --</b-form-select-option
                 >
-                  {{ course.description }}
-                  {{ course.major ? `(${course.major})` : '' }}
-                </b-form-select-option>
-              </b-form-select>
-            </b-col>
-            <b-col md="3">
-              <b-form-input
-                v-model="filters.academicRecord.criteria"
-                debounce="500"
-                @update="loadAcademicRecord()"
-                type="text"
-                placeholder="Search"
+              </template>
+              <b-form-select-option :value="null">None</b-form-select-option>
+              <b-form-select-option
+                v-for="course in options.courses.items"
+                :key="course.id"
+                :value="course.id"
               >
-              </b-form-input>
-            </b-col>
-          </b-row>
-          <!-- row button and search input -->
-          <b-table
-            class="c-table"
-            hover
-            outlined
-            small
-            show-empty
-            :fields="tables.academicRecords.fields"
-            :items="tables.academicRecords.items"
-            :busy="tables.academicRecords.isBusy"
-          >
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(name)="data">
-              <b-media>
-                <template v-slot:aside>
-                  <b-avatar
-                    rounded
-                    blank
-                    size="64"
-                    :text="
-                      data.item.student.firstName.charAt(0) +
-                        '' +
-                        data.item.student.lastName.charAt(0)
-                    "
-                    :src="avatar(data.item.student)"
-                  />
-                </template>
-                <span
-                  ><b-link @click="setResume(data)">{{
-                    data.item.student.name
-                  }}</b-link></span
-                ><br />
-                <small
-                  >Student no.:
-                  {{
-                    data.item.student.studentNo
-                      ? data.item.student.studentNo
-                      : 'Awaiting Confirmation'
-                  }}</small
-                ><br />
-                <small
-                  >Address :
-                  {{
-                    data.item.student.address
-                      ? data.item.student.address.currentCompleteAddress
-                      : ''
-                  }}
-                </small>
-              </b-media>
-            </template>
-            <template v-slot:cell(contact)="data">
-              Email : {{ data.item.student.email }} <br />
-              <small>Phone : {{ data.item.student.phoneNo }}</small> <br />
-              <small>Mobile : {{ data.item.student.mobileNo }}</small> <br />
-            </template>
-            <template v-slot:cell(education)="data">
-              <span>{{
-                getName(data.item, 'level') +
-                  ' ' +
-                  getName(data.item, 'semester') +
-                  ' ' +
-                  getName(data.item, 'studentType')
-              }}</span
-              ><br />
-              <small v-if="data.item.course"
-                >{{ data.item.course.description }}
-                {{
-                  data.item.course.major ? `(${data.item.course.major})` : ''
-                }}</small
-              >
-            </template>
-            <template v-slot:cell(step)="data">
-              <b-badge
-                :variant="
-                  data.item.manualStepId === $options.ManualSteps.EVALUATION.id
-                    ? 'warning'
-                    : 'primary'
-                "
-              >
-                {{ $options.ManualSteps.getEnum(data.item.manualStepId).name }}
-              </b-badge>
-            </template>
-            <template v-slot:cell(action)="row">
-              <!-- Rights to be added -->
-              <b-dropdown
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret
-                v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
-              >
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item @click="setResume(row)">
-                  Resume
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.academicRecord.from }} to
-              {{ paginations.academicRecord.to }} of
-              {{ paginations.academicRecord.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.academicRecord.page"
-                :total-rows="paginations.academicRecord.totalRows"
-                :per-page="paginations.academicRecord.perPage"
-                size="sm"
-                align="end"
-                @input="loadAcademicRecord()"
-              />
-            </b-col>
-          </b-row>
-        </div>
+                {{ course.description }}
+                {{ course.major ? `(${course.major})` : '' }}
+              </b-form-select-option>
+            </b-form-select>
+          </b-col>
+          <b-col md="3">
+            <b-form-input
+              v-model="filters.academicRecord.criteria"
+              debounce="500"
+              @update="loadAcademicRecord()"
+              type="text"
+              placeholder="Search"
+            >
+            </b-form-input>
+          </b-col>
+        </b-row> -->
+        <!-- row button and search input -->
+        <b-table
+          class="c-table"
+          hover
+          outlined
+          small
+          show-empty
+          :fields="tables.academicRecords.fields"
+          :items="tables.academicRecords.items"
+          :busy="tables.academicRecords.isBusy"
+        >
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="data">
+            <StudentColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => setResume(data) }"
+            />
+          </template>
+          <template v-slot:cell(contact)="data">
+            Email : {{ data.item.student.email }} <br />
+            <small>Phone : {{ data.item.student.phoneNo }}</small> <br />
+            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br />
+          </template>
+          <template v-slot:cell(education)="data">
+            <EducationColumn :data="data.item" />
+          </template>
+          <template v-slot:cell(step)="data">
+            <b-badge
+              :variant="
+                data.item.manualStepId === $options.ManualSteps.EVALUATION.id
+                  ? 'warning'
+                  : 'primary'
+              "
+            >
+              {{ $options.ManualSteps.getEnum(data.item.manualStepId).name }}
+            </b-badge>
+          </template>
+          <template v-slot:cell(action)="row">
+            <!-- Rights to be added -->
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
+            >
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <b-dropdown-item @click="setResume(row)">
+                Resume
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+        <b-row>
+          <b-col md="6">
+            Showing {{ paginations.academicRecord.from }} to
+            {{ paginations.academicRecord.to }} of
+            {{ paginations.academicRecord.totalRows }} records.
+          </b-col>
+          <b-col md="6">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.academicRecord.page"
+              :total-rows="paginations.academicRecord.totalRows"
+              :per-page="paginations.academicRecord.perPage"
+              size="sm"
+              align="end"
+              @input="loadAcademicRecord()"
+            />
+          </b-col>
+        </b-row>
       </div>
-    </Card>
-    <AcademicRecordApplicationEntry
-      @onBack="showEntry = false"
-      @onCompleted="onCompleted()"
-      :entryMode="entryMode"
-      :forms="forms"
-      :showEntry="showEntry"
-    />
-  </div>
+      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
+
+      <AcademicRecordApplicationEntry
+        @onBack="showEntry = false"
+        @onCompleted="onCompleted()"
+        :entryMode="entryMode"
+        :forms="forms"
+        :showEntry="showEntry"
+      />
+    </template>
+  </PageContent>
   <!-- main container -->
 </template>
 <script>
@@ -241,6 +239,9 @@ import { AcademicRecordApi, CourseApi } from '../../../mixins/api';
 import { clearFields, showNotification } from '../../../helpers/forms';
 import { copyValue } from '../../../helpers/extractor';
 import Access from '../../../mixins/utils/Access';
+import PageContent from '../../components/PageContainer/PageContent'
+import NoAccess from '../../components/NoAccess'
+import { StudentColumn, EducationColumn } from "../../components/ColumnDetails";
 
 const studentFields = {
   id: null,
@@ -319,6 +320,10 @@ export default {
     SchoolCategoryTabs,
     AcademicRecordApplicationEntry,
     Card,
+    PageContent,
+    NoAccess,
+    StudentColumn,
+    EducationColumn
   },
   mixins: [AcademicRecordApi, CourseApi, Access],
   ManualSteps,
@@ -326,6 +331,7 @@ export default {
   ManualEnrollmentPermissions,
   data() {
     return {
+      isFilterVisible: true,
       showEntry: false,
       entryMode: 'Add',
       forms: {
@@ -413,8 +419,11 @@ export default {
         academicRecord: {
           criteria: null,
           schoolCategoryId: null,
+          schoolCategoryItem: null,
           courseId: null,
-          manualStepId: null,
+          courseItem: null,
+          manualStepId: this.$options.ManualSteps.EVALUATION.id,
+          manualStepItem: this.$options.ManualSteps.EVALUATION,
         },
       },
       options: {
@@ -425,6 +434,11 @@ export default {
     };
   },
   created() {
+    const { student } = this.filters
+    if (!this.checkIfSuperUser()) {
+      student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      student.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
     this.loadAcademicRecord();
     this.loadCourses();
   },
@@ -504,6 +518,35 @@ export default {
       this.loadAcademicRecord();
       showNotification(this, 'success', 'Successfully Registered');
     },
+    onCategoryFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.schoolCategoryId = item?.id || 0;
+      academicRecord.schoolCategoryItem = item;
+      this.loadAcademicRecord();
+    },
+    onStatusFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.manualStepId = item?.id || 0;
+      academicRecord.manualStepItem = item;
+      this.loadAcademicRecord();
+    },
+    onCourseFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.courseId = item?.id || 0;
+      academicRecord.courseItem = item;
+      this.loadAcademicRecord();
+    },
   },
+  computed: {
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.academicRecord;
+      const { SchoolCategories } = this.$options;
+      return [
+        SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+        SchoolCategories.COLLEGE.id,
+        SchoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    },
+  }
 };
 </script>

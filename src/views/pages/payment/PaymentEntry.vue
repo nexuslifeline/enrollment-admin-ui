@@ -1,5 +1,5 @@
 <template>
-  <div class="c-page-content">
+  <div class="payment-list__container">
     <b-overlay :show="isLoading" rounded="sm">
       <div class="page-content__title-container">
         <h4 class="page-content__title">Payment Entry</h4>
@@ -896,7 +896,11 @@ export default {
 
 <style lang="scss">
 @import '../../../assets/scss/_shared.scss';
-
+.payment-list__container {
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+}
 .payment-entry__body {
   width: 100%;
   height: 100%;

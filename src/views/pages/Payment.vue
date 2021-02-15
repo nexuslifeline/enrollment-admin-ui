@@ -1,13 +1,30 @@
 <template>
-  <div class="c-app">
-    <Card
-      title="Payment Transactions"
-      :showRefresh="true"
-      @onRefresh="loadPaymentList()"
-    >
+  <PageContent
+    title="Payment Transactions"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadPaymentList"
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.payment.criteria"
+        debounce="500"
+        @update="loadPaymentList()"
+        type="text"
+        placeholder="Search"
+      />
+      <v-select
+        :options="paymentStatuses.values"
+        :value="filters.payment.paymentStatusItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+    </template>
+    <template v-slot:content>
       <div>
-        <b-row class="mb-2">
-          <!-- row button and search input -->
+        <!-- <b-row class="mb-2">
           <b-col md="8">
             <b-form-radio-group
               @input="loadPaymentList()"
@@ -33,7 +50,7 @@
             >
             </b-form-input>
           </b-col>
-        </b-row>
+        </b-row> -->
         <!-- row button and search input -->
         <b-table
           class="c-table"
@@ -425,243 +442,243 @@
           </b-col>
         </b-row>
       </div>
-    </Card>
-    <!-- Modal Preview -->
-    <FileViewer
-      :show="fileViewer.paymentFile.show"
-      :file="file"
-      :isBusy="file.isLoading"
-      :owner="file.owner"
-      @close="fileViewer.paymentFile.show = false"
-      @onNavLeft="onFileNavLeft"
-      @onNavRight="onFileNavRight"
-      :navCount="fileViewer.paymentFile.activeNavCount"
-      :navActiveIndex="fileViewer.paymentFile.activeNavIndex"
-      :enableArrowNav="fileViewer.paymentFile.isActiveNavEnabled"
-    />
-    <FileViewer
-      :show="fileViewer.paymentReceiptFile.show"
-      :file="file"
-      :isBusy="file.isLoading"
-      :owner="file.owner"
-      @close="fileViewer.paymentReceiptFile.show = false"
-      @onNavLeft="onPaymentReceiptFileNavLeft"
-      @onNavRight="onPaymentReceiptFileNavRight"
-      :navCount="fileViewer.paymentReceiptFile.activeNavCount"
-      :navActiveIndex="fileViewer.paymentReceiptFile.activeNavIndex"
-      :enableArrowNav="fileViewer.paymentReceiptFile.isActiveNavEnabled"
-    />
-    <!-- Modal Preview -->
-    <!-- Modal Approval Confirmation -->
-    <b-modal
-      v-model="showModalApproval"
-      centered
-      header-bg-variant="success"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      <!-- Modal Preview -->
+      <FileViewer
+        :show="fileViewer.paymentFile.show"
+        :file="file"
+        :isBusy="file.isLoading"
+        :owner="file.owner"
+        @close="fileViewer.paymentFile.show = false"
+        @onNavLeft="onFileNavLeft"
+        @onNavRight="onFileNavRight"
+        :navCount="fileViewer.paymentFile.activeNavCount"
+        :navActiveIndex="fileViewer.paymentFile.activeNavIndex"
+        :enableArrowNav="fileViewer.paymentFile.isActiveNavEnabled"
+      />
+      <FileViewer
+        :show="fileViewer.paymentReceiptFile.show"
+        :file="file"
+        :isBusy="file.isLoading"
+        :owner="file.owner"
+        @close="fileViewer.paymentReceiptFile.show = false"
+        @onNavLeft="onPaymentReceiptFileNavLeft"
+        @onNavRight="onPaymentReceiptFileNavRight"
+        :navCount="fileViewer.paymentReceiptFile.activeNavCount"
+        :navActiveIndex="fileViewer.paymentReceiptFile.activeNavIndex"
+        :enableArrowNav="fileViewer.paymentReceiptFile.isActiveNavEnabled"
+      />
+      <!-- Modal Preview -->
+      <!-- Modal Approval Confirmation -->
+      <b-modal
+        v-model="showModalApproval"
+        centered
+        header-bg-variant="success"
+        header-text-variant="light"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Finalize Approval
+        </div>
         <!-- modal title -->
-        Finalize Approval
-      </div>
-      <!-- modal title -->
-      <b-row class="mb-2">
-        <!-- modal body -->
-        <b-col md="12">
-          <h5>
-            Attach Official or Acknowledge Receipt
-          </h5>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="12">
-          <div class="file-uploader-container">
-            <FileUploader
-              @onFileChange="onPaymentReceiptFileUpload"
-              @onFileDrop="onPaymentReceiptFileUpload"
-            />
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="12">
-          <div class="file-item-container">
-            <FileItem
-              v-for="(item, index) of paymentReceiptFiles"
-              :key="index"
-              :title="item.name"
-              :description="item.notes"
-              :fileIndex="index"
-              @onFileItemSelect="onPaymentReceiptFileItemSelect"
-              @onFileItemRemove="onDeletePaymentReceiptFile"
-              @onFileItemPreview="previewPaymentReceiptFile"
-              :isBusy="item.isBusy"
-            />
-          </div>
-        </b-col>
-      </b-row>
-      <b-row class="mt-3">
-        <b-col md="6">
-          <b-form-group>
-            <label class="required">
-              Reference No
-              <v-icon
-                name="info-circle"
-                class="icon-tooltip"
-                v-b-tooltip.hover="{
-                  variant: 'info',
-                  title:
-                    'OR number of the receipt or any transaction number that can be use for tracking.',
-                }"
+        <b-row class="mb-2">
+          <!-- modal body -->
+          <b-col md="12">
+            <h5>
+              Attach Official or Acknowledge Receipt
+            </h5>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <div class="file-uploader-container">
+              <FileUploader
+                @onFileChange="onPaymentReceiptFileUpload"
+                @onFileDrop="onPaymentReceiptFileUpload"
               />
-            </label>
-            <b-form-input
-              v-model="forms.payment.fields.referenceNo"
-              :state="forms.payment.states.referenceNo"
+            </div>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <div class="file-item-container">
+              <FileItem
+                v-for="(item, index) of paymentReceiptFiles"
+                :key="index"
+                :title="item.name"
+                :description="item.notes"
+                :fileIndex="index"
+                @onFileItemSelect="onPaymentReceiptFileItemSelect"
+                @onFileItemRemove="onDeletePaymentReceiptFile"
+                @onFileItemPreview="previewPaymentReceiptFile"
+                :isBusy="item.isBusy"
+              />
+            </div>
+          </b-col>
+        </b-row>
+        <b-row class="mt-3">
+          <b-col md="6">
+            <b-form-group>
+              <label class="required">
+                Reference No
+                <v-icon
+                  name="info-circle"
+                  class="icon-tooltip"
+                  v-b-tooltip.hover="{
+                    variant: 'info',
+                    title:
+                      'OR number of the receipt or any transaction number that can be use for tracking.',
+                  }"
+                />
+              </label>
+              <b-form-input
+                v-model="forms.payment.fields.referenceNo"
+                :state="forms.payment.states.referenceNo"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.payment.errors.referenceNo }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="12">
+            <label>Notes</label>
+            <b-textarea v-model="forms.payment.fields.approvalNotes" rows="7" />
+          </b-col>
+        </b-row>
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button class="float-left" @click="showModalApproval = false">
+            Cancel
+          </b-button>
+          <b-button
+            @click="onApproval()"
+            class="float-right"
+            variant="outline-primary"
+            :disabled="isProcessing"
+          >
+            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
+            Confirm
+          </b-button>
+        </div>
+        <!-- modal footer buttons -->
+      </b-modal>
+      <!-- Modal Approval Confirmation -->
+      <!-- Modal Reject -->
+      <b-modal
+        v-model="showModalRejection"
+        centered
+        header-bg-variant="danger"
+        header-text-variant="light"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Confirm Rejection
+        </div>
+        <!-- modal title -->
+        <b-row>
+          <!-- modal body -->
+          <b-col md="12">
+            <label>Reason</label>
+            <b-textarea
+              v-model="forms.payment.fields.disapprovalNotes"
+              rows="7"
+            />
+          </b-col>
+        </b-row>
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button class="float-left" @click="showModalRejection = false">
+            Cancel
+          </b-button>
+          <b-button
+            @click="onDisapproval()"
+            class="float-right"
+            variant="outline-primary"
+            :disabled="isProcessing"
+          >
+            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
+            Confirm
+          </b-button>
+        </div>
+        <!-- modal footer buttons -->
+      </b-modal>
+      <!-- Modal Reject -->
+      <b-modal
+        v-model="showPaymentReceiptFileModal"
+        centered
+        header-bg-variant="success"
+        header-text-variant="light"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Payment Receipt File
+        </div>
+        <!-- modal title -->
+        <b-row>
+          <!-- modal body -->
+          <b-col md="12">
+            <label>Notes</label>
+            <b-textarea
+              v-model="forms.paymentReceiptFile.fields.notes"
+              :state="forms.paymentReceiptFile.states.notes"
+              rows="7"
+              debounce="500"
             />
             <b-form-invalid-feedback>
-              {{ forms.payment.errors.referenceNo }}
+              {{ forms.paymentReceiptFile.errors.notes }}
             </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="12">
-          <label>Notes</label>
-          <b-textarea v-model="forms.payment.fields.approvalNotes" rows="7" />
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
-        <b-button class="float-left" @click="showModalApproval = false">
-          Cancel
-        </b-button>
-        <b-button
-          @click="onApproval()"
-          class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- Modal Approval Confirmation -->
-    <!-- Modal Reject -->
-    <b-modal
-      v-model="showModalRejection"
-      centered
-      header-bg-variant="danger"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        <!-- modal title -->
-        Confirm Rejection
-      </div>
-      <!-- modal title -->
-      <b-row>
+          </b-col>
+        </b-row>
         <!-- modal body -->
-        <b-col md="12">
-          <label>Reason</label>
-          <b-textarea
-            v-model="forms.payment.fields.disapprovalNotes"
-            rows="7"
-          />
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            class="float-left"
+            @click="onDeletePaymentReceiptFile(selectedPaymentReceiptFileIndex)"
+            variant="outline-danger"
+          >
+            <v-icon
+              v-if="forms.paymentReceiptFile.isDeleting"
+              name="sync"
+              class="mr-2"
+              spin
+            />
+            Delete
+          </b-button>
+          <b-button
+            @click="onUpdatePaymentReceiptFile()"
+            class="float-right"
+            variant="outline-primary"
+          >
+            <v-icon
+              v-if="forms.paymentReceiptFile.isUpdating"
+              name="sync"
+              class="mr-2"
+              spin
+            />
+            Update
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button class="float-left" @click="showModalRejection = false">
-          Cancel
-        </b-button>
-        <b-button
-          @click="onDisapproval()"
-          class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- Modal Reject -->
-    <b-modal
-      v-model="showPaymentReceiptFileModal"
-      centered
-      header-bg-variant="success"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        <!-- modal title -->
-        Payment Receipt File
-      </div>
-      <!-- modal title -->
-      <b-row>
-        <!-- modal body -->
-        <b-col md="12">
-          <label>Notes</label>
-          <b-textarea
-            v-model="forms.paymentReceiptFile.fields.notes"
-            :state="forms.paymentReceiptFile.states.notes"
-            rows="7"
-            debounce="500"
-          />
-          <b-form-invalid-feedback>
-            {{ forms.paymentReceiptFile.errors.notes }}
-          </b-form-invalid-feedback>
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
-        <b-button
-          class="float-left"
-          @click="onDeletePaymentReceiptFile(selectedPaymentReceiptFileIndex)"
-          variant="outline-danger"
-        >
-          <v-icon
-            v-if="forms.paymentReceiptFile.isDeleting"
-            name="sync"
-            class="mr-2"
-            spin
-          />
-          Delete
-        </b-button>
-        <b-button
-          @click="onUpdatePaymentReceiptFile()"
-          class="float-right"
-          variant="outline-primary"
-        >
-          <v-icon
-            v-if="forms.paymentReceiptFile.isUpdating"
-            name="sync"
-            class="mr-2"
-            spin
-          />
-          Update
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <FileViewer
-      :show="fileViewer.show"
-      :file="file"
-      :owner="file.owner"
-      :isBusy="file.isLoading"
-      @close="fileViewer.show = false"
-    />
-  </div>
+      </b-modal>
+      <FileViewer
+        :show="fileViewer.show"
+        :file="file"
+        :owner="file.owner"
+        :isBusy="file.isLoading"
+        @close="fileViewer.show = false"
+      />
+    </template>
+  </PageContent>
   <!-- main container -->
 </template>
 <script>
@@ -712,6 +729,7 @@ import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
+import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'Payment',
@@ -738,11 +756,13 @@ export default {
     ActiveViewItem,
     ActiveViewLinks,
     AvatarMaker,
+    PageContent
   },
   format,
   StudentPaymentPermissions,
   data() {
     return {
+      isFilterVisible: true,
       fileViewer: {
         paymentFile: {
           isActiveNavEnabled: false,
@@ -932,6 +952,7 @@ export default {
         payment: {
           criteria: null,
           paymentStatusId: PaymentStatuses.SUBMITTED.id,
+          paymentStatusItem: PaymentStatuses.SUBMITTED,
         },
       },
       isProcessing: false,
@@ -1303,6 +1324,12 @@ export default {
           this.file.isLoading = false;
         });
       }
+    },
+    onStatusFilterChange(item) {
+      const { payment } = this.filters;
+      payment.paymentStatusId = item?.id || 0;
+      payment.paymentStatusItem = item;
+      this.loadPaymentList();
     },
   },
 };

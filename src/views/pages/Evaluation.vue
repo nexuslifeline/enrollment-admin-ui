@@ -3,7 +3,8 @@
     title="Evaluation and Admission Records"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadEvaluation"
-    :filterVisible="isFilterVisible">
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
@@ -20,6 +21,9 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
       />
       <v-select
         v-if="isCourseVisible"
@@ -43,7 +47,7 @@
       <!-- <div class="mb-2">
         <FilterButton />
       </div> -->
-      <div>
+      <div v-if="checkIfHasSchoolCategoryAccess()">
         <b-table
           class="c-table"
           outlined
@@ -1138,7 +1142,8 @@
           </b-col>
         </b-row>
       </div>
-       <FileViewer
+      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
+      <FileViewer
       :show="fileViewer.show"
       :file="file"
       :owner="file.owner"
@@ -1278,6 +1283,7 @@ import Card from '../components/Card';
 import { StudentColumn, EducationColumn, AddressColumn } from '../components/ColumnDetails';
 import PageContent from '../components/PageContainer/PageContent';
 import FilterButton from '../components/PageContainer/FilterButton';
+import NoAccess from '../components/NoAccess';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1320,6 +1326,7 @@ export default {
     AddressColumn,
     PageContent,
     FilterButton,
+    NoAccess
   },
   EvaluationAndAdmissionPermissions,
   data() {
@@ -1550,7 +1557,7 @@ export default {
       filters: {
         student: {
           criteria: null,
-          schoolCategoryId: 0,
+          schoolCategoryId: null,
           schoolCategoryItem: null,
           courseItem: null,
           courseId: null,
@@ -1582,6 +1589,12 @@ export default {
   },
   created() {
     // this.checkRights()
+    // to prevent show all evaluation with filtered school category
+    const { student } = this.filters
+    if (!this.checkIfSuperUser()) {
+      student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      student.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
     this.loadEvaluation();
     this.loadCourseList();
   },
@@ -2120,7 +2133,7 @@ export default {
         schoolCategories.COLLEGE.id,
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
-    }
+    },
   },
 };
 </script>

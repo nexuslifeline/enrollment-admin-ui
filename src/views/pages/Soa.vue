@@ -1,7 +1,59 @@
 <template>
-  <div class="c-page-content">
-    <Card v-if="!showEntry && !showBatchEntry" title="Statement of Account">
-      <div>
+  <PageContent
+    title="Statement of Account"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="loadBillings()"
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
+    <template v-slot:filters>
+      <b-form-input
+        v-model="filters.billing.criteria"
+        debounce="500"
+        @update="loadBillings()"
+        type="text"
+        placeholder="Search"
+      >
+      </b-form-input>
+      <v-select
+        :options="$options.SchoolCategories.values"
+        :value="filters.billing.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
+      />
+      <v-select
+        :options="$options.BillingStatuses.values"
+        :value="filters.billing.billingStatusItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="Status"
+        class="mt-2"
+      />
+      <b-dropdown
+        v-if="
+          isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
+        "
+        variant="primary"
+        class="w-100 mt-2"
+      >
+        <template v-slot:button-content>
+          <v-icon name="plus-circle" />
+          Generate SOA
+        </template>
+        <b-dropdown-item @click="setCreateSoa(), showBatchEntry=false"
+          >Generate Single SOA</b-dropdown-item
+        >
+        <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false"
+          >Generate Batch SOA</b-dropdown-item
+        >
+      </b-dropdown>
+    </template>
+    <template v-slot:content>
+      <!-- <div>
         <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="
@@ -10,163 +62,162 @@
           @clickAll="(filters.billing.schoolCategoryId = null), loadBillings()"
           @click="(filters.billing.schoolCategoryId = $event), loadBillings()"
         />
-      </div>
-      <div>
-        <b-row class="mb-2">
-          <!-- row button and search input -->
-          <b-col md="8">
-            <b-form-radio-group
-              @input="loadBillings()"
-              v-model="filters.billing.billingStatusId"
+      </div> -->
+    <div v-if="!showEntry && !showBatchEntry && checkIfHasSchoolCategoryAccess()" >
+      <!-- <b-row class="mb-2">
+        <b-col md="8">
+          <b-form-radio-group
+            @input="loadBillings()"
+            v-model="filters.billing.billingStatusId"
+          >
+            <b-form-radio :value="null">Show All</b-form-radio>
+            <b-form-radio
+              v-for="status in $options.BillingStatuses.values"
+              :value="status.id"
+              :key="status.id"
             >
-              <b-form-radio :value="null">Show All</b-form-radio>
-              <b-form-radio
-                v-for="status in $options.BillingStatuses.values"
-                :value="status.id"
-                :key="status.id"
-              >
-                {{ status.name }}
-              </b-form-radio>
-            </b-form-radio-group>
-          </b-col>
-          <b-col md="4"> </b-col>
-        </b-row>
-        <b-row class="mb-2">
-          <b-col md="8">
-            <b-dropdown
+              {{ status.name }}
+            </b-form-radio>
+          </b-form-radio-group>
+        </b-col>
+        <b-col md="4"> </b-col>
+      </b-row>
+      <b-row class="mb-2">
+        <b-col md="8">
+          <b-dropdown
+            v-if="
+              isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
+            "
+            variant="primary"
+          >
+            <template v-slot:button-content>
+              <v-icon name="plus-circle" />
+              Generate SOA
+            </template>
+            <b-dropdown-item @click="setCreateSoa()"
+              >Generate Single SOA</b-dropdown-item
+            >
+            <b-dropdown-item @click="setCreateBatchSoa()"
+              >Generate Batch SOA</b-dropdown-item
+            >
+          </b-dropdown>
+        </b-col>
+        <b-col md="4">
+          <b-form-input
+            v-model="filters.billing.criteria"
+            debounce="500"
+            @update="loadBillings()"
+            type="text"
+            placeholder="Search"
+          >
+          </b-form-input>
+        </b-col>
+      </b-row> -->
+      <b-table
+        details-td-class="table-secondary"
+        hover
+        outlined
+        small
+        show-empty
+        responsive
+        :fields="tables.billings.fields"
+        :items="tables.billings.items"
+        :busy="tables.billings.isBusy"
+      >
+        <template v-slot:table-busy>
+          <div class="text-center my-2">
+            <v-icon name="spinner" spin class="mr-2" />
+            <strong>Loading...</strong>
+          </div>
+        </template>
+        <template v-slot:cell(name)="data">
+          <StudentColumn
+            :data="data.item"
+            :callback="{ loadDetails: () => previewBilling(data.item.id) }"
+          />
+        </template>
+        <template v-slot:cell(education)="data">
+          <EducationColumn :data="data.item.student.latestAcademicRecord" />
+        </template>
+        <template v-slot:cell(billingStatusId)="{ value }">
+          <b-badge
+            :variant="
+              value === $options.BillingStatuses.UNPAID.id
+                ? 'danger'
+                : 'success'
+            "
+          >
+            {{ $options.BillingStatuses.getEnum(value).name }}
+          </b-badge>
+        </template>
+        <template v-slot:cell(action)="{ item: { id } }">
+          <b-dropdown
+            v-if="
+              isAccessible([
+                $options.StatementOfAccountPermissions.PREVIEW.id,
+                $options.StatementOfAccountPermissions.EDIT.id,
+                $options.StatementOfAccountPermissions.DELETE.id,
+              ])
+            "
+            boundary="window"
+            right
+            variant="link"
+            toggle-class="text-decoration-none"
+            no-caret
+          >
+            <template v-slot:button-content>
+              <v-icon name="ellipsis-v" />
+            </template>
+            <b-dropdown-item
               v-if="
-                isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
+                isAccessible(
+                  $options.StatementOfAccountPermissions.PREVIEW.id
+                )
               "
-              variant="primary"
+              @click="previewBilling(id)"
             >
-              <template v-slot:button-content>
-                <v-icon name="plus-circle" />
-                Generate SOA
-              </template>
-              <b-dropdown-item @click="setCreateSoa()"
-                >Generate Single SOA</b-dropdown-item
-              >
-              <b-dropdown-item @click="setCreateBatchSoa()"
-                >Generate Batch SOA</b-dropdown-item
-              >
-            </b-dropdown>
-          </b-col>
-          <b-col md="4">
-            <b-form-input
-              v-model="filters.billing.criteria"
-              debounce="500"
-              @update="loadBillings()"
-              type="text"
-              placeholder="Search"
-            >
-            </b-form-input>
-          </b-col>
-        </b-row>
-        <b-table
-          details-td-class="table-secondary"
-          hover
-          outlined
-          small
-          show-empty
-          responsive
-          :fields="tables.billings.fields"
-          :items="tables.billings.items"
-          :busy="tables.billings.isBusy"
-        >
-          <template v-slot:table-busy>
-            <div class="text-center my-2">
-              <v-icon name="spinner" spin class="mr-2" />
-              <strong>Loading...</strong>
-            </div>
-          </template>
-          <template v-slot:cell(name)="data">
-            <StudentColumn
-              :data="data.item"
-              :callback="{ loadDetails: () => previewBilling(data.item.id) }"
-            />
-          </template>
-          <template v-slot:cell(education)="data">
-            <EducationColumn :data="data.item.student.latestAcademicRecord" />
-          </template>
-          <template v-slot:cell(billingStatusId)="{ value }">
-            <b-badge
-              :variant="
-                value === $options.BillingStatuses.UNPAID.id
-                  ? 'danger'
-                  : 'success'
-              "
-            >
-              {{ $options.BillingStatuses.getEnum(value).name }}
-            </b-badge>
-          </template>
-          <template v-slot:cell(action)="{ item: { id } }">
-            <b-dropdown
+              <v-icon name="file-pdf" /> Preview
+            </b-dropdown-item>
+            <b-dropdown-item
               v-if="
-                isAccessible([
-                  $options.StatementOfAccountPermissions.PREVIEW.id,
-                  $options.StatementOfAccountPermissions.EDIT.id,
-                  $options.StatementOfAccountPermissions.DELETE.id,
-                ])
+                isAccessible($options.StatementOfAccountPermissions.EDIT.id)
               "
-              boundary="window"
-              right
-              variant="link"
-              toggle-class="text-decoration-none"
-              no-caret
+              @click="setUpdateSoa(id)"
             >
-              <template v-slot:button-content>
-                <v-icon name="ellipsis-v" />
-              </template>
-              <b-dropdown-item
-                v-if="
-                  isAccessible(
-                    $options.StatementOfAccountPermissions.PREVIEW.id
-                  )
-                "
-                @click="previewBilling(id)"
-              >
-                <v-icon name="file-pdf" /> Preview
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-if="
-                  isAccessible($options.StatementOfAccountPermissions.EDIT.id)
-                "
-                @click="setUpdateSoa(id)"
-              >
-                <v-icon name="pen" /> Edit
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-if="
-                  isAccessible($options.StatementOfAccountPermissions.DELETE.id)
-                "
-                @click="
-                  (forms.billing.fields.id = id), (showModalConfirmation = true)
-                "
-              >
-                <v-icon name="trash" /> Delete
-              </b-dropdown-item>
-            </b-dropdown>
-          </template>
-        </b-table>
-        <b-row>
-          <b-col md="6">
-            Showing {{ paginations.billing.from }} to
-            {{ paginations.billing.to }} of
-            {{ paginations.billing.totalRows }} records.
-          </b-col>
-          <b-col md="6">
-            <b-pagination
-              v-model="paginations.billing.page"
-              :total-rows="paginations.billing.totalRows"
-              :per-page="paginations.billing.perPage"
-              size="sm"
-              align="end"
-              @input="loadBillings()"
-            />
-          </b-col>
-        </b-row>
-      </div>
-    </Card>
+              <v-icon name="pen" /> Edit
+            </b-dropdown-item>
+            <b-dropdown-item
+              v-if="
+                isAccessible($options.StatementOfAccountPermissions.DELETE.id)
+              "
+              @click="
+                (forms.billing.fields.id = id), (showModalConfirmation = true)
+              "
+            >
+              <v-icon name="trash" /> Delete
+            </b-dropdown-item>
+          </b-dropdown>
+        </template>
+      </b-table>
+      <b-row>
+        <b-col md="6">
+          Showing {{ paginations.billing.from }} to
+          {{ paginations.billing.to }} of
+          {{ paginations.billing.totalRows }} records.
+        </b-col>
+        <b-col md="6">
+          <b-pagination
+            v-model="paginations.billing.page"
+            :total-rows="paginations.billing.totalRows"
+            :per-page="paginations.billing.perPage"
+            size="sm"
+            align="end"
+            @input="loadBillings()"
+          />
+        </b-col>
+      </b-row>
+    </div>
+    <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
     <!-- SINGLE ENTRY -->
     <Card
       v-if="showEntry"
@@ -736,9 +787,9 @@
       :file="file"
       :owner="file.owner"
       :isBusy="file.isLoading"
-      @close="fileViewer.show = false"
-    />
-  </div>
+      @close="fileViewer.show = false"/>
+    </template>
+  </PageContent>
 </template>
 <script>
 import FileViewer from '../components/FileViewer';
@@ -774,6 +825,8 @@ import { debounce } from 'lodash';
 import tables from '../../helpers/tables';
 import { copyValue } from '../../helpers/extractor';
 import Access from '../../mixins/utils/Access';
+import PageContent from "../components/PageContainer/PageContent";
+import NoAccess from '../components/NoAccess'
 
 const billingFields = {
   id: null,
@@ -812,6 +865,8 @@ export default {
     FileViewer,
     StudentColumn,
     EducationColumn,
+    PageContent,
+    NoAccess
   },
   mixins: [
     TermApi,
@@ -831,6 +886,7 @@ export default {
   StatementOfAccountPermissions,
   data() {
     return {
+      isFilterVisible: true,
       formatNumber: formatNumber,
       fileViewer: {
         isActiveNavEnabled: false,
@@ -1022,7 +1078,9 @@ export default {
         billing: {
           criteria: null,
           schoolCategoryId: null,
-          billingStatusId: null,
+          schoolCategoryItem: null,
+          billingStatusId: this.$options.BillingStatuses.UNPAID.id,
+          billingStatusItem: this.$options.BillingStatuses.UNPAID,
         },
         fee: {
           criteria: null,
@@ -1045,6 +1103,12 @@ export default {
     };
   },
   created() {
+    const { billing } = this.filters
+    if (!this.checkIfSuperUser()) {
+      billing.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      billing.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
+
     this.loadBillings();
     this.loadLevels();
     this.loadFees();
@@ -1405,6 +1469,18 @@ export default {
         reader.readAsDataURL(file);
         this.file.isLoading = false;
       });
+    },
+    onCategoryFilterChange(item) {
+      const { billing } = this.filters;
+      billing.schoolCategoryId = item?.id || 0;
+      billing.schoolCategoryItem = item;
+      this.loadBillings();
+    },
+    onStatusFilterChange(item) {
+      const { billing } = this.filters;
+      billing.billingStatusId = item?.id || 0;
+      billing.billingStatusItem = item;
+      this.loadBillings();
     },
   },
   watch: {

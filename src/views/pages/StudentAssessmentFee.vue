@@ -3,8 +3,8 @@
     title="Student Assessment Fee"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
-    :filterVisible="isFilterVisible">
-
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
       <!-- <SchoolCategoryTabs
         :showAll="true"
         @loadSchoolCategoryId="
@@ -21,7 +21,7 @@
             loadAcademicRecord()
         "
       /> -->
-      <template v-slot:filters>
+    <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
         debounce="500"
@@ -37,6 +37,9 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
       />
       <v-select
         v-if="isCourseVisible"
@@ -57,8 +60,8 @@
         class="mt-2"
       />
     </template>
-      <template v-slot:content>
-      <div>
+    <template v-slot:content>
+      <div v-if="checkIfHasSchoolCategoryAccess()">
         <!-- <b-row class="mb-2">
           <b-col md="6">
             <b-form-radio-group
@@ -574,7 +577,8 @@
           </b-col>
         </b-row>
       </div>
-      </template>
+      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
+    </template>
     <!-- MODAL FEES -->
     <b-modal
       v-model="showModalFees"
@@ -743,6 +747,7 @@ import FileViewer from '../components/FileViewer';
 import { format } from 'date-fns';
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from "../components/PageContainer/FilterButton";
+import NoAccess from "../components/NoAccess";
 
 export default {
   name: 'StudentFee',
@@ -771,7 +776,8 @@ export default {
     AvatarMaker,
     FileViewer,
     PageContent,
-    FilterButton
+    FilterButton,
+    NoAccess
   },
   StudentFeePermissions,
   data() {
@@ -1006,6 +1012,11 @@ export default {
   },
   created() {
     // this.checkRights()
+    const { student } = this.filters
+    if (!this.checkIfSuperUser()) {
+      student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      student.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
     this.loadCourseList();
     this.loadFees();
   },

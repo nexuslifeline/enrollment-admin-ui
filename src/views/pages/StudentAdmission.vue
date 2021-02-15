@@ -3,7 +3,8 @@
     title="Subject Enlistment"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
-    :filterVisible="isFilterVisible">
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
@@ -20,6 +21,9 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
       />
       <v-select
         v-if="isCourseVisible"
@@ -61,7 +65,7 @@
             loadAcademicRecord()
         "
       /> -->
-      <div>
+      <div v-if="checkIfHasSchoolCategoryAccess()">
         <!-- <b-row class="mb-2">
           <b-col md="6">
             <b-form-radio-group
@@ -606,6 +610,7 @@
           </b-col>
         </b-row>
       </div>
+      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
     <!-- </Card> -->
 
     <!-- Modal Preview -->
@@ -973,6 +978,7 @@ import AttachmentList from '../components/Attachment/AttachmentList';
 import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from '../components/PageContainer/FilterButton';
+import NoAccess from "../components/NoAccess";
 
 
 const acdemicRecordFields = {
@@ -1018,7 +1024,8 @@ export default {
     ActiveViewItems,
     ActiveViewItem,
     PageContent,
-    FilterButton
+    FilterButton,
+    NoAccess
   },
   StudentSubjectPermissions,
   data() {
@@ -1400,11 +1407,18 @@ export default {
   },
   created() {
     // this.checkRights()
+    const { student } = this.filters
+    if (!this.checkIfSuperUser()) {
+      student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      student.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
+
     this.loadCourseList();
     // this.loadDepartmentList()
     this.loadSections();
     // this.filters.student.academicRecordStatusId = this.AcademicRecordStatuses.DRAFT.id
     // this.filters.student.academicRecordStatusItem = this.AcademicRecordStatuses.DRAFT
+    this.loadAcademicRecord()
   },
   methods: {
     setApproval(row) {
