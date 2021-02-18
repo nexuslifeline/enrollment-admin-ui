@@ -5,7 +5,7 @@
     @refresh="loadCurriculums"
     :filterVisible="isFilterVisible"
     @create="setCreate()"
-    :createButtonVisible="isAccessible($options.CurriculumPermissions.ADD.id)">
+    :createButtonVisible="isAccessible($options.CurriculumPermissions.ADD.id) && checkIfHasSchoolCategoryAccess()">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.curriculum.criteria"
@@ -20,6 +20,9 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
       />
       <v-select
         :options="options.levels.fixItems"
@@ -58,7 +61,7 @@
             loadCourseList()
         "
       /> -->
-      <div v-show="!showEntry">
+      <div v-show="!showEntry && checkIfHasSchoolCategoryAccess()" >
         <div>
           <!-- <b-row class="mb-3">
             <b-col md="12">
@@ -407,251 +410,413 @@
           </b-row>
         </div>
       </div>
-      <div v-show="showEntry">
-      <div>
-        <b-overlay blur="blur" :show="forms.curriculum.isLoading" rounded="sm">
-          <b-row>
-            <b-col md="12">
-              <b-card>
-                <h5 slot="header">
-                  <span>
-                    Curriculum - {{ entryMode }} <br />
-                    <small
-                      >Details about the subjects comprising the Course or
-                      Program.</small
-                    >
-                  </span>
-                </h5>
-                <b-card-body>
-                  <b-row>
-                    <b-col md="6">
-                      <b-form-group>
-                        <label class="required">Name</label>
-                        <b-form-input
-                          v-model="forms.curriculum.fields.name"
-                          :state="forms.curriculum.states.name"
-                        >
-                        </b-form-input>
-                        <b-form-invalid-feedback>
-                          {{ forms.curriculum.errors.name }}
-                        </b-form-invalid-feedback>
-                      </b-form-group>
-                      <b-form-group>
-                        <label>Description</label>
-                        <b-form-textarea
-                          debounce="500"
-                          cols="3"
-                          v-model="forms.curriculum.fields.description"
-                          :state="forms.curriculum.states.description"
-                        >
-                        </b-form-textarea>
-                        <b-form-invalid-feedback>
-                          {{ forms.curriculum.errors.description }}
-                        </b-form-invalid-feedback>
-                      </b-form-group>
-                      <b-form-group>
-                        <label>Notes</label>
-                        <b-form-textarea
-                          debounce="500"
-                          cols="3"
-                          v-model="forms.curriculum.fields.notes"
-                          :state="forms.curriculum.states.notes"
-                        >
-                        </b-form-textarea>
-                        <b-form-invalid-feedback>
-                          {{ forms.curriculum.errors.notes }}
-                        </b-form-invalid-feedback>
-                      </b-form-group>
-                    </b-col>
-                    <b-col md="6">
-                      <b-row>
-                        <b-col md="6">
-                          <b-form-group>
-                            <label class="required">School Category</label>
-                            <b-form-select
-                              @change="
-                                loadLevelsOfSchoolCategoryList(),
-                                  (forms.curriculum.fields.courseId = null),
-                                  (forms.curriculum.fields.levelId = null)
-                              "
-                              v-model="forms.curriculum.fields.schoolCategoryId"
-                              :state="forms.curriculum.states.schoolCategoryId"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- School Category --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="category in options.schoolCategories
-                                  .values"
-                                :key="category.id"
-                                :value="category.id"
-                              >
-                                {{ category.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.curriculum.errors.schoolCategoryId }}
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-                          <b-form-group>
-                            <label>
-                              Course
-                              <v-icon
-                                v-if="options.courses.isLoading"
-                                name="spinner"
-                                spin
-                              />
-                            </label>
-                            <b-form-select
-                              :disabled="
-                                (!checkSchoolCategory() &&
-                                  !checkSchoolCategory(true)) ||
-                                  forms.curriculum.fields.schoolCategoryId ==
-                                    null ||
-                                  options.courses.isLoading
-                              "
-                              @change="loadLevelsOfCourse()"
-                              v-model="forms.curriculum.fields.courseId"
-                              :state="forms.curriculum.states.courseId"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- Course --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="course in options.courses.items"
-                                :key="course.id"
-                                :value="course.id"
-                              >
-                                {{ course.description }}
-                                {{ course.major ? `(${course.major})` : '' }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.curriculum.errors.courseId }}
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-                        </b-col>
-                        <b-col md="6">
-                          <b-form-group>
-                            <label class="required">Effective Year</label>
-                            <b-form-input
-                              no-wheel
-                              debounce="500"
-                              type="number"
-                              v-model="forms.curriculum.fields.effectiveYear"
-                              :state="forms.curriculum.states.effectiveYear"
-                            >
-                            </b-form-input>
-                            <b-form-invalid-feedback>
-                              {{ forms.curriculum.errors.effectiveYear }}
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-                          <b-form-group>
-                            <label>
-                              Level
-                              <v-icon
-                                v-if="options.levels.isLoading"
-                                name="spinner"
-                                spin
-                              />
-                            </label>
-                            <b-form-select
-                              :disabled="
-                                checkSchoolCategory() ||
-                                  forms.curriculum.fields.schoolCategoryId ==
-                                    null ||
-                                  options.levels.isLoading
-                              "
-                              @change="getSelectedLevel()"
-                              v-model="forms.curriculum.fields.levelId"
-                              :state="forms.curriculum.states.levelId"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- Level --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="level in options.levels.items"
-                                :key="level.id"
-                                :value="level.id"
-                              >
-                                {{ level.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.curriculum.errors.levelId }}
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-                          <b-form-group>
-                            <b-form-checkbox
-                              v-model="forms.curriculum.fields.active"
-                              :value="1"
-                              :unchecked-value="0"
-                            >
-                              New
-                            </b-form-checkbox>
-                          </b-form-group>
-                        </b-col>
-                      </b-row>
-                    </b-col>
-                  </b-row>
-                  <b-overlay :show="isLoading" rounded="sm">
+      <div v-show="showEntry && checkIfHasSchoolCategoryAccess()">
+        <div>
+          <b-overlay blur="blur" :show="forms.curriculum.isLoading" rounded="sm">
+            <b-row>
+              <b-col md="12">
+                <b-card>
+                  <h5 slot="header">
+                    <span>
+                      Curriculum - {{ entryMode }} <br />
+                      <small
+                        >Details about the subjects comprising the Course or
+                        Program.</small
+                      >
+                    </span>
+                  </h5>
+                  <b-card-body>
                     <b-row>
-                      <b-col md="12">
-                        <b-list-group>
-                          <b-list-group-item
-                            v-for="level in levels"
-                            :key="level.id"
+                      <b-col md="6">
+                        <b-form-group>
+                          <label class="required">Name</label>
+                          <b-form-input
+                            v-model="forms.curriculum.fields.name"
+                            :state="forms.curriculum.states.name"
                           >
-                            <div
-                              v-b-toggle="'level' + level.id"
-                              class="d-flex justify-content-between align-items-center"
-                            >
-                              <h5>{{ level.name }}</h5>
-                              <span class="when-open">
-                                <v-icon name="caret-down" />
-                              </span>
-                              <span class="when-closed">
-                                <v-icon name="caret-left" />
-                              </span>
-                            </div>
-                            <b-collapse
-                              :id="'level' + level.id"
-                              class="mt-2"
-                              role="tabpanel"
+                          </b-form-input>
+                          <b-form-invalid-feedback>
+                            {{ forms.curriculum.errors.name }}
+                          </b-form-invalid-feedback>
+                        </b-form-group>
+                        <b-form-group>
+                          <label>Description</label>
+                          <b-form-textarea
+                            debounce="500"
+                            cols="3"
+                            v-model="forms.curriculum.fields.description"
+                            :state="forms.curriculum.states.description"
+                          >
+                          </b-form-textarea>
+                          <b-form-invalid-feedback>
+                            {{ forms.curriculum.errors.description }}
+                          </b-form-invalid-feedback>
+                        </b-form-group>
+                        <b-form-group>
+                          <label>Notes</label>
+                          <b-form-textarea
+                            debounce="500"
+                            cols="3"
+                            v-model="forms.curriculum.fields.notes"
+                            :state="forms.curriculum.states.notes"
+                          >
+                          </b-form-textarea>
+                          <b-form-invalid-feedback>
+                            {{ forms.curriculum.errors.notes }}
+                          </b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-col>
+                      <b-col md="6">
+                        <b-row>
+                          <b-col md="6">
+                            <b-form-group>
+                              <label class="required">School Category</label>
+                              <b-form-select
+                                @change="
+                                  loadLevelsOfSchoolCategoryList(),
+                                    (forms.curriculum.fields.courseId = null),
+                                    (forms.curriculum.fields.levelId = null)
+                                "
+                                v-model="forms.curriculum.fields.schoolCategoryId"
+                                :state="forms.curriculum.states.schoolCategoryId"
+                              >
+                                <template v-slot:first>
+                                  <b-form-select-option :value="null" disabled
+                                    >-- School Category --</b-form-select-option
+                                  >
+                                </template>
+                                <b-form-select-option
+                                  v-for="category in options.schoolCategories
+                                    .values"
+                                  :key="category.id"
+                                  :value="category.id"
+                                >
+                                  {{ category.name }}
+                                </b-form-select-option>
+                              </b-form-select>
+                              <b-form-invalid-feedback>
+                                {{ forms.curriculum.errors.schoolCategoryId }}
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+                            <b-form-group>
+                              <label>
+                                Course
+                                <v-icon
+                                  v-if="options.courses.isLoading"
+                                  name="spinner"
+                                  spin
+                                />
+                              </label>
+                              <b-form-select
+                                :disabled="
+                                  (!checkSchoolCategory() &&
+                                    !checkSchoolCategory(true)) ||
+                                    forms.curriculum.fields.schoolCategoryId ==
+                                      null ||
+                                    options.courses.isLoading
+                                "
+                                @change="loadLevelsOfCourse()"
+                                v-model="forms.curriculum.fields.courseId"
+                                :state="forms.curriculum.states.courseId"
+                              >
+                                <template v-slot:first>
+                                  <b-form-select-option :value="null" disabled
+                                    >-- Course --</b-form-select-option
+                                  >
+                                </template>
+                                <b-form-select-option
+                                  v-for="course in options.courses.items"
+                                  :key="course.id"
+                                  :value="course.id"
+                                >
+                                  {{ course.description }}
+                                  {{ course.major ? `(${course.major})` : '' }}
+                                </b-form-select-option>
+                              </b-form-select>
+                              <b-form-invalid-feedback>
+                                {{ forms.curriculum.errors.courseId }}
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+                          </b-col>
+                          <b-col md="6">
+                            <b-form-group>
+                              <label class="required">Effective Year</label>
+                              <b-form-input
+                                no-wheel
+                                debounce="500"
+                                type="number"
+                                v-model="forms.curriculum.fields.effectiveYear"
+                                :state="forms.curriculum.states.effectiveYear"
+                              >
+                              </b-form-input>
+                              <b-form-invalid-feedback>
+                                {{ forms.curriculum.errors.effectiveYear }}
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+                            <b-form-group>
+                              <label>
+                                Level
+                                <v-icon
+                                  v-if="options.levels.isLoading"
+                                  name="spinner"
+                                  spin
+                                />
+                              </label>
+                              <b-form-select
+                                :disabled="
+                                  checkSchoolCategory() ||
+                                    forms.curriculum.fields.schoolCategoryId ==
+                                      null ||
+                                    options.levels.isLoading
+                                "
+                                @change="getSelectedLevel()"
+                                v-model="forms.curriculum.fields.levelId"
+                                :state="forms.curriculum.states.levelId"
+                              >
+                                <template v-slot:first>
+                                  <b-form-select-option :value="null" disabled
+                                    >-- Level --</b-form-select-option
+                                  >
+                                </template>
+                                <b-form-select-option
+                                  v-for="level in options.levels.items"
+                                  :key="level.id"
+                                  :value="level.id"
+                                >
+                                  {{ level.name }}
+                                </b-form-select-option>
+                              </b-form-select>
+                              <b-form-invalid-feedback>
+                                {{ forms.curriculum.errors.levelId }}
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+                            <b-form-group>
+                              <b-form-checkbox
+                                v-model="forms.curriculum.fields.active"
+                                :value="1"
+                                :unchecked-value="0"
+                              >
+                                New
+                              </b-form-checkbox>
+                            </b-form-group>
+                          </b-col>
+                        </b-row>
+                      </b-col>
+                    </b-row>
+                    <b-overlay :show="isLoading" rounded="sm">
+                      <b-row>
+                        <b-col md="12">
+                          <b-list-group>
+                            <b-list-group-item
+                              v-for="level in levels"
+                              :key="level.id"
                             >
                               <div
-                                v-if="
-                                  checkSchoolCategory() &&
-                                    forms.curriculum.fields.courseId !== null
-                                "
+                                v-b-toggle="'level' + level.id"
+                                class="d-flex justify-content-between align-items-center"
                               >
-                                <b-form-checkbox
-                                  class="mb-2"
-                                  @input="getSemesters(level, $event)"
+                                <h5>{{ level.name }}</h5>
+                                <span class="when-open">
+                                  <v-icon name="caret-down" />
+                                </span>
+                                <span class="when-closed">
+                                  <v-icon name="caret-left" />
+                                </span>
+                              </div>
+                              <b-collapse
+                                :id="'level' + level.id"
+                                class="mt-2"
+                                role="tabpanel"
+                              >
+                                <div
+                                  v-if="
+                                    checkSchoolCategory() &&
+                                      forms.curriculum.fields.courseId !== null
+                                  "
                                 >
-                                  Show All Semesters
-                                </b-form-checkbox>
-                                <b-card
-                                  v-for="semester in filterSemester(level)"
-                                  :key="semester.id"
-                                >
+                                  <b-form-checkbox
+                                    class="mb-2"
+                                    @input="getSemesters(level, $event)"
+                                  >
+                                    Show All Semesters
+                                  </b-form-checkbox>
+                                  <b-card
+                                    v-for="semester in filterSemester(level)"
+                                    :key="semester.id"
+                                  >
+                                    <b-row>
+                                      <b-col md="9">
+                                        <h6>{{ semester.name }}</h6>
+                                      </b-col>
+                                      <b-col md="3">
+                                        <b-button
+                                          class="float-right mb-2"
+                                          variant="outline-primary"
+                                          @click="
+                                            onAddSubject(level.id, semester.id)
+                                          "
+                                        >
+                                          <v-icon name="plus-circle" /> ADD NEW
+                                          SUBJECT
+                                        </b-button>
+                                      </b-col>
+                                    </b-row>
+                                    <b-row>
+                                      <b-col md="12">
+                                        <b-table
+                                          responsive
+                                          small
+                                          hover
+                                          outlined
+                                          show-empty
+                                          :items="
+                                            filterSubjects(level.id, semester.id)
+                                          "
+                                          :fields="tables.subjects.fields"
+                                          :busy="tables.subjects.isBusy"
+                                        >
+                                          <template v-slot:table-busy>
+                                            <div class="text-center my-2">
+                                              <v-icon
+                                                name="spinner"
+                                                spin
+                                                class="mr-2"
+                                              />
+                                              <strong>Loading...</strong>
+                                            </div>
+                                          </template>
+                                          <template v-slot:cell(labs)="row">
+                                            {{
+                                              forms.curriculum.fields
+                                                .schoolCategoryId ===
+                                              options.schoolCategories.VOCATIONAL
+                                                .id
+                                                ? 'N/A'
+                                                : row.item.labs
+                                            }}
+                                          </template>
+                                          <template v-slot:cell(units)="row">
+                                            {{
+                                              forms.curriculum.fields
+                                                .schoolCategoryId ===
+                                              options.schoolCategories.VOCATIONAL
+                                                .id
+                                                ? 'N/A'
+                                                : row.item.units
+                                            }}
+                                          </template>
+                                          <template
+                                            v-slot:cell(prerequisites)="row"
+                                          >
+                                            <!-- <Select2
+                                              class="w-100"
+                                              multiple
+                                              v-model="row.item.prerequisites"
+                                              :disabled="isLoading"
+                                              :allowClear="false">
+                                              <option
+                                                v-for="subject in tables.subjects.items"
+                                                :key="subject.id"
+                                                :value="subject.id">
+                                                {{subject.name}}
+                                              </option>
+                                            </Select2> -->
+                                            <v-select
+                                              v-model="row.item.prerequisites"
+                                              :reduce="(item) => item.id"
+                                              multiple
+                                              label="name"
+                                              :options="tables.subjects.items"
+                                            />
+                                          </template>
+                                          <template v-slot:custom-foot>
+                                            <b-tr class="font-weight-bold">
+                                              <b-td
+                                                colspan="3"
+                                                class="text-right"
+                                              >
+                                                <span class="text-danger"
+                                                  >Total Units
+                                                </span>
+                                              </b-td>
+                                              <b-td class="text-center">
+                                                <span class="text-danger">
+                                                  {{
+                                                    forms.curriculum.fields
+                                                      .schoolCategoryId ===
+                                                    options.schoolCategories
+                                                      .VOCATIONAL.id
+                                                      ? 'N/A'
+                                                      : totalUnits(
+                                                          filterSubjects(
+                                                            level.id,
+                                                            semester.id
+                                                          ),
+                                                          'labs'
+                                                        )
+                                                  }}
+                                                </span>
+                                              </b-td>
+                                              <b-td class="text-center">
+                                                <span class="text-danger">
+                                                  {{
+                                                    forms.curriculum.fields
+                                                      .schoolCategoryId ===
+                                                    options.schoolCategories
+                                                      .VOCATIONAL.id
+                                                      ? 'N/A'
+                                                      : totalUnits(
+                                                          filterSubjects(
+                                                            level.id,
+                                                            semester.id
+                                                          ),
+                                                          'units'
+                                                        )
+                                                  }}
+                                                </span>
+                                              </b-td>
+                                              <b-td class="text-center">
+                                                <span class="text-danger">
+                                                  {{
+                                                    forms.curriculum.fields
+                                                      .schoolCategoryId ===
+                                                    options.schoolCategories
+                                                      .VOCATIONAL.id
+                                                      ? 'N/A'
+                                                      : totalUnits(
+                                                          filterSubjects(
+                                                            level.id,
+                                                            semester.id
+                                                          ),
+                                                          'totalUnits'
+                                                        )
+                                                  }}
+                                                </span>
+                                              </b-td>
+                                              <b-td></b-td>
+                                            </b-tr>
+                                          </template>
+                                          <template v-slot:cell(action)="row">
+                                            <b-button
+                                              @click="removeSubject(row)"
+                                              size="sm"
+                                              variant="danger"
+                                            >
+                                              <v-icon name="trash" />
+                                            </b-button>
+                                          </template>
+                                        </b-table>
+                                      </b-col>
+                                    </b-row>
+                                  </b-card>
+                                </div>
+                                <b-card v-else>
                                   <b-row>
-                                    <b-col md="9">
-                                      <h6>{{ semester.name }}</h6>
-                                    </b-col>
-                                    <b-col md="3">
+                                    <b-col md="3" offset-md="9">
                                       <b-button
                                         class="float-right mb-2"
                                         variant="outline-primary"
-                                        @click="
-                                          onAddSubject(level.id, semester.id)
-                                        "
+                                        @click="onAddSubject(level.id)"
                                       >
                                         <v-icon name="plus-circle" /> ADD NEW
                                         SUBJECT
@@ -666,9 +831,7 @@
                                         hover
                                         outlined
                                         show-empty
-                                        :items="
-                                          filterSubjects(level.id, semester.id)
-                                        "
+                                        :items="filterSubjects(level.id)"
                                         :fields="tables.subjects.fields"
                                         :busy="tables.subjects.isBusy"
                                       >
@@ -686,8 +849,7 @@
                                           {{
                                             forms.curriculum.fields
                                               .schoolCategoryId ===
-                                            options.schoolCategories.VOCATIONAL
-                                              .id
+                                            options.schoolCategories.VOCATIONAL.id
                                               ? 'N/A'
                                               : row.item.labs
                                           }}
@@ -696,8 +858,7 @@
                                           {{
                                             forms.curriculum.fields
                                               .schoolCategoryId ===
-                                            options.schoolCategories.VOCATIONAL
-                                              .id
+                                            options.schoolCategories.VOCATIONAL.id
                                               ? 'N/A'
                                               : row.item.units
                                           }}
@@ -728,10 +889,7 @@
                                         </template>
                                         <template v-slot:custom-foot>
                                           <b-tr class="font-weight-bold">
-                                            <b-td
-                                              colspan="3"
-                                              class="text-right"
-                                            >
+                                            <b-td colspan="3" class="text-right">
                                               <span class="text-danger"
                                                 >Total Units
                                               </span>
@@ -745,10 +903,7 @@
                                                     .VOCATIONAL.id
                                                     ? 'N/A'
                                                     : totalUnits(
-                                                        filterSubjects(
-                                                          level.id,
-                                                          semester.id
-                                                        ),
+                                                        filterSubjects(level.id),
                                                         'labs'
                                                       )
                                                 }}
@@ -763,10 +918,7 @@
                                                     .VOCATIONAL.id
                                                     ? 'N/A'
                                                     : totalUnits(
-                                                        filterSubjects(
-                                                          level.id,
-                                                          semester.id
-                                                        ),
+                                                        filterSubjects(level.id),
                                                         'units'
                                                       )
                                                 }}
@@ -781,10 +933,7 @@
                                                     .VOCATIONAL.id
                                                     ? 'N/A'
                                                     : totalUnits(
-                                                        filterSubjects(
-                                                          level.id,
-                                                          semester.id
-                                                        ),
+                                                        filterSubjects(level.id),
                                                         'totalUnits'
                                                       )
                                                 }}
@@ -806,188 +955,43 @@
                                     </b-col>
                                   </b-row>
                                 </b-card>
-                              </div>
-                              <b-card v-else>
-                                <b-row>
-                                  <b-col md="3" offset-md="9">
-                                    <b-button
-                                      class="float-right mb-2"
-                                      variant="outline-primary"
-                                      @click="onAddSubject(level.id)"
-                                    >
-                                      <v-icon name="plus-circle" /> ADD NEW
-                                      SUBJECT
-                                    </b-button>
-                                  </b-col>
-                                </b-row>
-                                <b-row>
-                                  <b-col md="12">
-                                    <b-table
-                                      responsive
-                                      small
-                                      hover
-                                      outlined
-                                      show-empty
-                                      :items="filterSubjects(level.id)"
-                                      :fields="tables.subjects.fields"
-                                      :busy="tables.subjects.isBusy"
-                                    >
-                                      <template v-slot:table-busy>
-                                        <div class="text-center my-2">
-                                          <v-icon
-                                            name="spinner"
-                                            spin
-                                            class="mr-2"
-                                          />
-                                          <strong>Loading...</strong>
-                                        </div>
-                                      </template>
-                                      <template v-slot:cell(labs)="row">
-                                        {{
-                                          forms.curriculum.fields
-                                            .schoolCategoryId ===
-                                          options.schoolCategories.VOCATIONAL.id
-                                            ? 'N/A'
-                                            : row.item.labs
-                                        }}
-                                      </template>
-                                      <template v-slot:cell(units)="row">
-                                        {{
-                                          forms.curriculum.fields
-                                            .schoolCategoryId ===
-                                          options.schoolCategories.VOCATIONAL.id
-                                            ? 'N/A'
-                                            : row.item.units
-                                        }}
-                                      </template>
-                                      <template
-                                        v-slot:cell(prerequisites)="row"
-                                      >
-                                        <!-- <Select2
-                                          class="w-100"
-                                          multiple
-                                          v-model="row.item.prerequisites"
-                                          :disabled="isLoading"
-                                          :allowClear="false">
-                                          <option
-                                            v-for="subject in tables.subjects.items"
-                                            :key="subject.id"
-                                            :value="subject.id">
-                                            {{subject.name}}
-                                          </option>
-                                        </Select2> -->
-                                        <v-select
-                                          v-model="row.item.prerequisites"
-                                          :reduce="(item) => item.id"
-                                          multiple
-                                          label="name"
-                                          :options="tables.subjects.items"
-                                        />
-                                      </template>
-                                      <template v-slot:custom-foot>
-                                        <b-tr class="font-weight-bold">
-                                          <b-td colspan="3" class="text-right">
-                                            <span class="text-danger"
-                                              >Total Units
-                                            </span>
-                                          </b-td>
-                                          <b-td class="text-center">
-                                            <span class="text-danger">
-                                              {{
-                                                forms.curriculum.fields
-                                                  .schoolCategoryId ===
-                                                options.schoolCategories
-                                                  .VOCATIONAL.id
-                                                  ? 'N/A'
-                                                  : totalUnits(
-                                                      filterSubjects(level.id),
-                                                      'labs'
-                                                    )
-                                              }}
-                                            </span>
-                                          </b-td>
-                                          <b-td class="text-center">
-                                            <span class="text-danger">
-                                              {{
-                                                forms.curriculum.fields
-                                                  .schoolCategoryId ===
-                                                options.schoolCategories
-                                                  .VOCATIONAL.id
-                                                  ? 'N/A'
-                                                  : totalUnits(
-                                                      filterSubjects(level.id),
-                                                      'units'
-                                                    )
-                                              }}
-                                            </span>
-                                          </b-td>
-                                          <b-td class="text-center">
-                                            <span class="text-danger">
-                                              {{
-                                                forms.curriculum.fields
-                                                  .schoolCategoryId ===
-                                                options.schoolCategories
-                                                  .VOCATIONAL.id
-                                                  ? 'N/A'
-                                                  : totalUnits(
-                                                      filterSubjects(level.id),
-                                                      'totalUnits'
-                                                    )
-                                              }}
-                                            </span>
-                                          </b-td>
-                                          <b-td></b-td>
-                                        </b-tr>
-                                      </template>
-                                      <template v-slot:cell(action)="row">
-                                        <b-button
-                                          @click="removeSubject(row)"
-                                          size="sm"
-                                          variant="danger"
-                                        >
-                                          <v-icon name="trash" />
-                                        </b-button>
-                                      </template>
-                                    </b-table>
-                                  </b-col>
-                                </b-row>
-                              </b-card>
-                            </b-collapse>
-                          </b-list-group-item>
-                        </b-list-group>
-                      </b-col>
-                    </b-row>
-                  </b-overlay>
-                </b-card-body>
-                <template v-slot:footer>
-                  <b-button
-                    class="float-right btn-save ml-2"
-                    @click="showEntry = false"
-                    variant="outline-danger"
-                  >
-                    Close
-                  </b-button>
-                  <b-button
-                    :disabled="forms.curriculum.isProcessing"
-                    class="float-right btn-save"
-                    @click="onCurriculumEntry()"
-                    variant="outline-primary"
-                  >
-                    <v-icon
-                      v-if="forms.curriculum.isProcessing"
-                      name="sync"
-                      spin
-                      class="mr-2"
-                    />
-                    Save
-                  </b-button>
-                </template>
-              </b-card>
-            </b-col>
-          </b-row>
-        </b-overlay>
+                              </b-collapse>
+                            </b-list-group-item>
+                          </b-list-group>
+                        </b-col>
+                      </b-row>
+                    </b-overlay>
+                  </b-card-body>
+                  <template v-slot:footer>
+                    <b-button
+                      class="float-right btn-save ml-2"
+                      @click="showEntry = false"
+                      variant="outline-danger"
+                    >
+                      Close
+                    </b-button>
+                    <b-button
+                      :disabled="forms.curriculum.isProcessing"
+                      class="float-right btn-save"
+                      @click="onCurriculumEntry()"
+                      variant="outline-primary"
+                    >
+                      <v-icon
+                        v-if="forms.curriculum.isProcessing"
+                        name="sync"
+                        spin
+                        class="mr-2"
+                      />
+                      Save
+                    </b-button>
+                  </template>
+                </b-card>
+              </b-col>
+            </b-row>
+          </b-overlay>
+        </div>
       </div>
-    </div>
+      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
     <!-- MODAL SUBJECT -->
     <b-modal
       v-model="showModalSubjects"
@@ -1140,6 +1144,7 @@ import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
 import PageContent from '../components/PageContainer/PageContent'
+import NoAccess from "../components/NoAccess";
 
 const curriculumFields = {
   id: null,
@@ -1170,7 +1175,8 @@ export default {
   components: {
     SchoolCategoryTabs,
     Card,
-    PageContent
+    PageContent,
+    NoAccess
   },
   CurriculumPermissions,
   data() {
@@ -1494,6 +1500,11 @@ export default {
     };
   },
   created() {
+    const { curriculum } = this.filters
+    if (!this.checkIfSuperUser()) {
+      curriculum.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      curriculum.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
     this.loadLevelList();
     this.loadCourseList();
     this.loadCurriculums()

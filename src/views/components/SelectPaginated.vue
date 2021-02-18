@@ -8,6 +8,7 @@
     @search="debounceSearch"
     :value="value"
     @input="onInputSelect"
+    :placeholder="placeholder"
   >
     <template slot="option" slot-scope="data">
       <slot name="option" v-bind="data"></slot>
@@ -34,6 +35,10 @@ export default {
       type: [String],
       default: 'name',
     },
+    placeholder: {
+      type: [String],
+      default: '',
+    }
   },
   data() {
     return {

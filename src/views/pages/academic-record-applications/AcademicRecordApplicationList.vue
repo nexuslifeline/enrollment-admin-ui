@@ -434,10 +434,10 @@ export default {
     };
   },
   created() {
-    const { student } = this.filters
+    const { academicRecord } = this.filters
     if (!this.checkIfSuperUser()) {
-      student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
-      student.schoolCategoryItem =  this.getDefaultSchoolCategory()
+      academicRecord.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      academicRecord.schoolCategoryItem =  this.getDefaultSchoolCategory()
     }
     this.loadAcademicRecord();
     this.loadCourses();

@@ -264,8 +264,10 @@ export default {
       const { personnel, user } = this.forms;
       copyValue(personnelData, personnel.fields);
       copyValue(data, user.fields);
-      this.personnelPhotoUrl =
-        process.env.VUE_APP_PUBLIC_PHOTO_URL + personnelData.photo.hashName;
+      if (photo) {
+        this.personnelPhotoUrl =
+        process.env.VUE_APP_PUBLIC_PHOTO_URL + photo.hashName;
+      }
     });
   },
   methods: {

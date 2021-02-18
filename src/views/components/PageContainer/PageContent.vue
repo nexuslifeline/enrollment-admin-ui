@@ -16,6 +16,7 @@
         <FilterButton class="ml-auto" :isExpanded="filterVisible" @toggle="$emit('toggleFilter')" />
         <RefreshButton @reload="$emit('refresh')" class="ml-1" />
         <CreateButton @create="$emit('create')" class="ml-1" v-if="createButtonVisible"/>
+        <slot name="extra-buttons"></slot>
       </div>
       <div class="content-list__actions">
         <slot name="actions"></slot>

@@ -73,8 +73,8 @@ export default {
       filters: {
         payment: {
           criteria: null,
-          dateFrom: null,
-          dateTo: null,
+          dateFrom: new Date(),
+          dateTo: new Date(),
         },
       },
     };

@@ -4,7 +4,7 @@
     @refresh="loadSubjects"
     :filterVisible="isFilterVisible"
     @create="onCreate()"
-    :createButtonVisible="isAccessible($options.SubjectPermissions.ADD.id)">
+    :createButtonVisible="isAccessible($options.SubjectPermissions.ADD.id) && checkIfHasSchoolCategoryAccess()">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.subject.criteria"
@@ -20,10 +20,13 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
       />
     </template>
     <template v-slot:content>
-      <div>
+      <div v-if="checkIfHasSchoolCategoryAccess()">
         <!-- add button and search -->
         <!-- <b-row class="mb-3">
           <b-col md="12">
@@ -164,6 +167,7 @@
           </b-col>
         </b-row>
       </div>
+      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <!-- Modal Entry -->
       <b-modal
         v-model="showModalEntry"
@@ -541,12 +545,14 @@ import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
 import PageContent from '../components/PageContainer/PageContent.vue';
+import NoAccess from "../components/NoAccess";
 
 export default {
   name: 'Subject',
   components: {
     Card,
-    PageContent
+    PageContent,
+    NoAccess
   },
   mixins: [SubjectApi, DepartmentApi, Tables, Access],
   // components: { Select2 },
@@ -696,6 +702,11 @@ export default {
     };
   },
   created() {
+    const { subject } = this.filters
+    if (!this.checkIfSuperUser()) {
+      subject.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      subject.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
     this.loadSubjects();
     // this.loadDepartments()
   },

@@ -32,22 +32,22 @@
         placeholder="Status"
         class="mt-2"
       />
-      <b-dropdown
-        v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
-        variant="primary"
-        class="w-100 mt-2"
-      >
-        <template v-slot:button-content>
-          <v-icon name="plus-circle" />
-          Generate Other Billing
-        </template>
-        <b-dropdown-item @click="setCreateOtherFee(), showBatchEntry = false"
-          >Generate Other Billing</b-dropdown-item
+    </template>
+     <template v-slot:extra-buttons>
+      <div class="ml-1 drop-down__container" >
+         <b-dropdown
+          v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
+          variant="primary"
+          class="other__drop-down"
         >
-        <b-dropdown-item @click="setCreateBatchOtherFee(), showEntry = false"
-          >Batch Generate Other Billing</b-dropdown-item
-        >
-      </b-dropdown>
+          <b-dropdown-item @click="setCreateOtherFee(), showBatchEntry = false"
+            >Generate Other Billing</b-dropdown-item
+          >
+          <b-dropdown-item @click="setCreateBatchOtherFee(), showEntry = false"
+            >Batch Generate Other Billing</b-dropdown-item
+          >
+        </b-dropdown>
+      </div>
     </template>
     <template v-slot:content>
         <!-- <SchoolCategoryTabs
@@ -1336,3 +1336,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .drop-down__container {
+    display: flex;
+
+  }
+
+  .other__drop-down {
+    height: 24px;
+  }
+</style>

@@ -33,24 +33,24 @@
         placeholder="Status"
         class="mt-2"
       />
-      <b-dropdown
-        v-if="
-          isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
-        "
-        variant="primary"
-        class="w-100 mt-2"
-      >
-        <template v-slot:button-content>
-          <v-icon name="plus-circle" />
-          Generate SOA
-        </template>
-        <b-dropdown-item @click="setCreateSoa(), showBatchEntry=false"
-          >Generate Single SOA</b-dropdown-item
+    </template>
+    <template v-slot:extra-buttons>
+      <div class="ml-1 drop-down__container" >
+         <b-dropdown
+          v-if="
+            isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
+          "
+          variant="primary"
+          class="soa__drop-down"
         >
-        <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false"
-          >Generate Batch SOA</b-dropdown-item
-        >
-      </b-dropdown>
+          <b-dropdown-item @click="setCreateSoa(), showBatchEntry=false"
+            >Generate Single SOA</b-dropdown-item
+          >
+          <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false"
+            >Generate Batch SOA</b-dropdown-item
+          >
+        </b-dropdown>
+      </div>
     </template>
     <template v-slot:content>
       <!-- <div>
@@ -1514,3 +1514,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .drop-down__container {
+    display: flex;
+    align-items: center;
+  }
+
+  .soa__drop-down {
+    height: 24px;
+  }
+</style>

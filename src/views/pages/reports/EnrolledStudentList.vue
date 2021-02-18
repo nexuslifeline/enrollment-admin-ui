@@ -1,5 +1,5 @@
 <template>
-  <div class="enrolled_main-container">
+  <!-- <div class="enrolled_main-container">
     <div class="c-page-content">
       <b-overlay :show="isLoading" rounded="sm">
         <Card title="Enrolled Student List">
@@ -185,7 +185,76 @@
         @close="showModalPreview = false"
       />
     </div>
-  </div>
+  
+  </div> -->
+  <ReportContent
+    title="Enrolled List Report"
+    @toggleFilter="isFilterVisible = !isFilterVisible"
+    @refresh="onPreviewEnrolledList"
+    :isBusy="isLoading"
+    :showPlaceholder="!isFileReady"
+    :filterVisible="isFilterVisible">
+    <template v-slot:filters>
+      <v-select
+        :options="options.schoolYears.items"
+        :value="filters.academicRecord.schoolYearItem"
+        @input="onSchoolYearFilterChange"
+        label="name"
+        placeholder="School Year"
+        class="mt-2"
+        :clearable="false"
+      />
+      <v-select
+        :options="SchoolCategories.values"
+        :value="filters.academicRecord.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+        :searchable="true"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="false"
+      />
+      <v-select
+        :options="options.levels.items"
+        :value="filters.academicRecord.levelItem"
+        @input="onLevelFilterChange"
+        label="name"
+        placeholder="Level"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.items"
+        :value="filters.academicRecord.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
+          v-if="isCourseVisible"
+          :options="options.semesters.items"
+          :value="filters.academicRecord.semesterItem"
+          @input="onSemesterFilterChange"
+          label="name"
+          placeholder="Semester"
+          class="mt-2"
+          :clearable="false"
+          :searchable="false"
+        />
+      <b-button
+        class="mt-4"
+        variant="outline-primary"
+        size="sm"
+        block
+        @click="onPreviewEnrolledList"
+        ><v-icon name="print" /> Preview</b-button>
+    </template>
+    <template v-slot:content>
+      <ReportViewer v-if="isFileReady" :file="file" />
+    </template>
+  </ReportContent>
 </template>
 
 <script>
@@ -194,6 +263,9 @@ import Card from '../../components/Card';
 import FileViewer from '../../components/FileViewer';
 import StudentColumn from '../../components/ColumnDetails/StudentColumn';
 import EducationColumn from '../../components/ColumnDetails/EducationColumn';
+import ReportContent from "../../components/PageContainer/ReportContainer";
+import ReportViewer from "../../components/ReportViewer/ReportViewer";
+
 import {
   AcademicRecordStatuses,
   SchoolCategories,
@@ -206,6 +278,7 @@ import {
   ReportApi,
   SchoolYearApi,
 } from '../../../mixins/api';
+import Access from '../../../mixins/utils/Access';
 
 export default {
   components: {
@@ -214,10 +287,14 @@ export default {
     StudentColumn,
     EducationColumn,
     FileViewer,
+    ReportContent,
+    ReportViewer
   },
-  mixins: [SchoolYearApi, LevelApi, CourseApi, AcademicRecordApi, ReportApi],
+  mixins: [SchoolYearApi, LevelApi, CourseApi, AcademicRecordApi, ReportApi, Access],
   data() {
     return {
+      isFilterVisible: true,
+      isFileReady: false,
       isLoading: false,
       Semesters: Semesters,
       SchoolCategories: SchoolCategories,
@@ -253,10 +330,14 @@ export default {
       filters: {
         academicRecord: {
           schoolYearId: null,
+          schoolYearItem: null,
           schoolCategoryId: SchoolCategories.PRE_SCHOOL.id,
           levelId: null,
+          levelItem: null,
           courseId: null,
+          courseItem: null,
           semesterId: null,
+          semesterItem: null,
         },
       },
       options: {
@@ -290,12 +371,18 @@ export default {
     const params = { paginate: false };
     const { schoolYears, levels, courses, semesters } = this.options;
     const { schoolCategoryId } = this.filters.academicRecord;
+    const { academicRecord } = this.filters
+
+    academicRecord.schoolCategoryId =  this.checkIfSuperUser() ? this.SchoolCategories.PRE_SCHOOL.id : this.getDefaultSchoolCategory()?.id
+    academicRecord.schoolCategoryItem =  this.checkIfSuperUser() ? this.SchoolCategories.PRE_SCHOOL : this.getDefaultSchoolCategory()
 
     await this.getSchoolYearList(params).then(({ data }) => {
       schoolYears.items = data;
-      this.filters.academicRecord.schoolYearId = schoolYears.items.find(
+      const activeSchoolYear = schoolYears.items.find(
         (e) => e.isActive == 1
-      ).id;
+      );
+      academicRecord.schoolYearId = activeSchoolYear?.id
+      academicRecord.schoolYearItem = activeSchoolYear
     });
 
     await this.getCourseList(params).then(({ data }) => {
@@ -377,6 +464,7 @@ export default {
       this.file.isLoading = true;
       this.file.owner = null;
       this.file.name = 'Enrolled Student List';
+      this.isFileReady = false;
 
       this.showModalPreview = true;
       // const { dateFrom, dateTo, criteria } = this.filters.payment
@@ -388,9 +476,53 @@ export default {
         reader.onload = (e) => (this.file.src = e.target.result);
         reader.readAsDataURL(file);
         this.file.isLoading = false;
+        this.isFileReady = true;
       });
     },
+    onSchoolYearFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.schoolYearId = item?.id || 0;
+      academicRecord.schoolYearItem = item;
+    },
+    onCategoryFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.schoolCategoryId = item?.id || 0;
+      academicRecord.schoolCategoryItem = item;
+      academicRecord.levelId = null,
+      academicRecord.levelItem = null,
+      academicRecord.courseId = null
+      academicRecord.courseItem = null
+      academicRecord.semesterId = null
+      academicRecord.semesterItem = null
+      this.loadLevels()
+    },
+    onLevelFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.levelId = item?.id || 0;
+      academicRecord.levelItem = item;
+    },
+    onCourseFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.courseId = item?.id || 0;
+      academicRecord.courseItem = item;
+    },
+    onSemesterFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.semesterId = item?.id || 0;
+      academicRecord.semesterItem = item;
+    },
   },
+  computed: {
+    isCourseVisible() {
+      const { schoolCategoryId } = this.filters.academicRecord;
+      return [
+        this.SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+        this.SchoolCategories.COLLEGE.id,
+        this.SchoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
+    }
+  }
+
 };
 </script>
 

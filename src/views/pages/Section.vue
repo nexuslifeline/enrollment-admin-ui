@@ -5,7 +5,7 @@
     @refresh="loadSections"
     :filterVisible="isFilterVisible"
     @create="setCreate()"
-    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id)">
+    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess()">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.section.criteria"
@@ -20,6 +20,9 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
       />
       <v-select
         :options="options.levels.fixItems"
@@ -49,7 +52,7 @@
       />
     </template>
     <template  v-slot:content>
-      <div v-show="!showEntry">
+      <div v-show="!showEntry && checkIfHasSchoolCategoryAccess()">
         <!-- <SchoolCategoryTabs
           :showAll="true"
           @loadSchoolCategoryId="
@@ -295,7 +298,7 @@
         </b-row>
         <!-- end table -->
       </div>
-      <div v-show="showEntry">
+      <div v-show="showEntry && checkIfHasSchoolCategoryAccess()">
         <b-overlay :show="forms.section.isLoading" rounded="sm">
           <b-row>
             <b-col md="12">
@@ -595,6 +598,7 @@
           </b-row>
         </b-overlay>
      </div>
+     <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <!-- Modal Confirmation -->
       <b-modal
         v-model="showModalConfirmation"
@@ -830,6 +834,7 @@ import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
 import { differenceInMinutes, addMinutes } from 'date-fns';
 import PageContent from '../components/PageContainer/PageContent'
+import NoAccess from "../components/NoAccess";
 
 export default {
   name: 'ClassSection',
@@ -848,7 +853,8 @@ export default {
     ScheduleViewer,
     SchoolCategoryTabs,
     Card,
-    PageContent
+    PageContent,
+    NoAccess
   },
   SectionAndSchedulePermissions,
   Days,
@@ -985,6 +991,11 @@ export default {
     };
   },
   created() {
+    const { section } = this.filters
+    if (!this.checkIfSuperUser()) {
+      section.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
+      section.schoolCategoryItem =  this.getDefaultSchoolCategory()
+    }
     this.loadSchoolYears();
     this.loadCourses();
     this.loadLevels();
