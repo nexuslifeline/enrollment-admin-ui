@@ -22,6 +22,9 @@ export default {
     },
     deletePhoto(id){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${id}/photos`)
-    }
+    },
+    getSectionsOfPersonnel(params, id) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${id}/sections`, { params: params });
+    },
   }
 }
