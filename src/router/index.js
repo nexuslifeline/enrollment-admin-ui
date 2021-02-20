@@ -67,6 +67,8 @@ const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
 const TranscriptRecord = () => import('@/views/pages/TranscriptRecord')
 const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentList')
 
+const StudentGrade = () => import('@/views/pages/StudentGrade')
+
 
 
 Vue.use(Router)
@@ -432,6 +434,12 @@ function configRoutes () {
                 }
                 // add academic records route here
               ]
+            },
+            {
+              path: 'student-grade',
+              name: 'Student Grade',
+              component: StudentGrade,
+              meta: { requiresAuth: true }
             }
           ]
         },

@@ -189,6 +189,12 @@ export default [
         label: 'Personnel',
         to: '/master-files/user',
         permissionIds: PersonnelPermissions.getIds()
+      },
+      {
+        label: 'Student Grade',
+        to: '/master-files/student-grade',
+        // permissionIds: PersonnelPermissions.getIds()
+        // to do permission
       }
     ]
   },
