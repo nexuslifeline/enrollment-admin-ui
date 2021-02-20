@@ -6,9 +6,9 @@
         <span class="header__top-bar-title">
           Overview
         </span>
-        <span class="header__top-bar-action" @click.stop="logout">
+        <span class="header__top-bar-action" @click.stop="$emit('onLogout')">
           <v-icon
-            v-if="isLoading"
+            v-if="isLoggingOut"
             name="spinner"
             spin
             class="mr-2"
@@ -73,7 +73,8 @@ export default {
     ProfileMaker
   },
   props: {
-    user: Object
+    user: Object,
+    isLoggingOut: false
   },
   data() {
     return {
@@ -87,6 +88,17 @@ export default {
         (userable && userable.photo && userable.photo.hashName) || '';
       return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
     },
+  },
+  mounted() {
+    window.addEventListener('click', this.hideDropdownItems);
+  },
+  beforeDestroy() {
+    window.removeEventListener('click', this.hideDropdownItems);
+  },
+  methods: {
+    hideDropdownItems() {
+      this.isOverviewOpen = false;
+    }
   }
 }
 </script>

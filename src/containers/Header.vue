@@ -67,7 +67,7 @@
         <div class="header__secondary-account-name">
           {{ user.userable.name }}
         </div>
-        <OverviewDropdown :user="user" />
+        <OverviewDropdown :user="user" @onLogout="logout" :isLoggingOut="isLoading" />
       </div>
     </div>
     <div class="header__account-details">
