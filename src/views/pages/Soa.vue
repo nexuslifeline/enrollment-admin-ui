@@ -37,18 +37,19 @@
     <template v-slot:extra-buttons>
       <div class="ml-1 drop-down__container" >
          <b-dropdown
-          v-if="
-            isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
-          "
-          variant="primary"
+          v-if="isAccessible($options.StatementOfAccountPermissions.GENERATE.id)"
+          text="Generate"
+          variant="outline-primary"
+          split-variant="outline-primary"
           class="soa__drop-down"
-        >
-          <b-dropdown-item @click="setCreateSoa(), showBatchEntry=false"
-            >Generate Single SOA</b-dropdown-item
-          >
-          <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false"
-            >Generate Batch SOA</b-dropdown-item
-          >
+          split>
+          <b-dropdown-item
+            @click="setCreateSoa(), showBatchEntry=false">
+            Single SOA
+          </b-dropdown-item>
+          <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false">
+            Batch SOA
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </template>
@@ -1520,8 +1521,14 @@ export default {
     display: flex;
     align-items: center;
   }
-
+</style>
+<style lang="scss">
   .soa__drop-down {
     height: 24px;
+
+    .btn-outline-primary {
+      display: flex;
+      align-items: center;
+    }
   }
 </style>
