@@ -540,6 +540,14 @@ export default {
       //background-color: $white;
     }
 
+    .header__menu-item {
+      &.active {
+        &:after {
+          border-color: transparent transparent $white transparent;
+        }
+      }
+    }
+
     .header__account-details {
       position: fixed;
       top: 45px;
