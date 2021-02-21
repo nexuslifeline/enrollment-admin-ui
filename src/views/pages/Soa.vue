@@ -224,7 +224,7 @@
       :title="`Statement of Account - Generate (${entryMode})`"
     >
       <b-overlay :show="forms.billing.isLoading">
-        <b-row v-if="entryMode !== 'Edit'">
+        <!-- <b-row v-if="entryMode !== 'Edit'">
           <b-col md="6">
             <b-form-group>
               <label class="required">Student</label>
@@ -250,15 +250,44 @@
               </vue-bootstrap-typeahead>
             </b-form-group>
           </b-col>
-        </b-row>
+        </b-row> -->
         <b-row>
           <b-col md="6">
-            <b-form-group>
-              <label>Student No.</label>
-              <b-form-input
+            <b-form-group
+              :state="forms.billing.states.studentId"
+              :invalid-feedback="forms.billing.errors.studentId">
+              <label class="required">Student No.</label>
+              <div class="search-container">
+                <SelectPaginated
+                  class="select-paginated"
+                  label='studentNo'
+                  @input="getStudentInfo($event)"
+                  :value="forms.billing.fields.student"
+                  :fetchData="getStudentList"
+                >
+                  <template slot="option" slot-scope="data">
+                    <div class="select-option">
+                      <div class="select-option__avatar">
+                        <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
+                      </div>
+                      <div class="select-option__info">
+                        <span>{{
+                          data.studentNo ? data.studentNo : 'Awaiting Confirmation'
+                        }}</span>
+                        <span>{{ data.name }}</span>
+                        <span>{{ data.email }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <template slot="loader">
+                    <b-spinner label="Loading..." class="loader"></b-spinner>
+                  </template>
+                </SelectPaginated>
+              </div>
+              <!-- <b-form-input
                 disabled
                 v-model="forms.billing.fields.student.studentNo"
-              />
+              /> -->
             </b-form-group>
             <b-form-group>
               <label>Name</label>
@@ -369,74 +398,41 @@
             </b-form-group>
           </b-col>
         </b-row>
-        <b-row class="mb-3">
-          <b-col md="4">
-            <h5 class="pt-2">OTHER FEES</h5>
-          </b-col>
-          <b-col md="4"> </b-col>
-          <b-col md="4">
-            <b-button
-              @click="showModalFees = true"
-              variant="outline-primary"
-              class="float-right"
-            >
-              <v-icon name="plus-circle" /> New Item
-            </b-button>
-          </b-col>
-        </b-row>
-        <b-table
-          details-td-class="table-secondary"
-          hover
-          outlined
-          small
-          show-empty
-          :fields="tables.billingItems.fields"
-          :items="forms.billing.fields.billingItems"
-          :busy="tables.billingItems.isBusy"
-        >
-          <template v-slot:cell(action)="row">
-            <b-button @click="removeFee(row)" size="sm" variant="danger">
-              <v-icon name="trash" />
-            </b-button>
-          </template>
-          <template v-slot:cell(amount)="row">
-            <vue-autonumeric
-              v-model="row.item.amount"
-              class="form-control text-right"
-              :options="[
-                {
-                  modifyValueOnWheel: false,
-                  emptyInputBehavior: 0,
-                },
-              ]"
-            >
-            </vue-autonumeric>
-          </template>
-          <template v-slot:custom-foot>
-            <b-tr>
-              <b-td colspan="2" class="text-right">
-                <span class="text-danger font-weight-bold">Total Amount </span>
-              </b-td>
-              <b-td class="text-right">
-                <span class="text-danger font-weight-bold">
-                  {{ totalAmount }}
-                </span>
-              </b-td>
-              <b-td></b-td>
-            </b-tr>
-          </template>
-        </b-table>
-        <b-row>
-          <b-col md="6" offset-md="6">
-            <b-form-group
-              label-cols="6"
-              label="Total Amount Due :"
-              label-class="text-right font-weight-bold"
-            >
-              <!-- <label>Total Amount Due :</label> -->
+        <b-link @click="showOtherFees = !showOtherFees">{{ showOtherFees ? 'Hide' : 'Post' }} Other Fees</b-link>
+        <div v-if="showOtherFees">
+          <b-row class="mb-3">
+            <b-col md="4">
+              <h5 class="pt-2">OTHER FEES</h5>
+            </b-col>
+            <b-col md="4"> </b-col>
+            <b-col md="4">
+              <b-button
+                @click="showModalFees = true"
+                variant="outline-primary"
+                class="float-right"
+              >
+                <v-icon name="plus-circle" /> New Item
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-table
+            details-td-class="table-secondary"
+            hover
+            outlined
+            small
+            show-empty
+            :fields="tables.billingItems.fields"
+            :items="forms.billing.fields.billingItems"
+            :busy="tables.billingItems.isBusy"
+          >
+            <template v-slot:cell(action)="row">
+              <b-button @click="removeFee(row)" size="sm" variant="danger">
+                <v-icon name="trash" />
+              </b-button>
+            </template>
+            <template v-slot:cell(amount)="row">
               <vue-autonumeric
-                v-model="forms.billing.fields.totalAmount"
-                disabled
+                v-model="row.item.amount"
                 class="form-control text-right"
                 :options="[
                   {
@@ -446,9 +442,45 @@
                 ]"
               >
               </vue-autonumeric>
-            </b-form-group>
-          </b-col>
-        </b-row>
+            </template>
+            <template v-slot:custom-foot>
+              <b-tr>
+                <b-td colspan="2" class="text-right">
+                  <span class="text-danger font-weight-bold">Total Amount </span>
+                </b-td>
+                <b-td class="text-right">
+                  <span class="text-danger font-weight-bold">
+                    {{ totalAmount }}
+                  </span>
+                </b-td>
+                <b-td></b-td>
+              </b-tr>
+            </template>
+          </b-table>
+          <b-row>
+            <b-col md="6" offset-md="6">
+              <b-form-group
+                label-cols="6"
+                label="Total Amount Due :"
+                label-class="text-right font-weight-bold"
+              >
+                <!-- <label>Total Amount Due :</label> -->
+                <vue-autonumeric
+                  v-model="forms.billing.fields.totalAmount"
+                  disabled
+                  class="form-control text-right"
+                  :options="[
+                    {
+                      modifyValueOnWheel: false,
+                      emptyInputBehavior: 0,
+                    },
+                  ]"
+                >
+                </vue-autonumeric>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          </div>
         <hr />
         <b-row>
           <b-col md="12">
@@ -591,63 +623,66 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <b-row class="mb-3">
-        <b-col md="4">
-          <h5 class="pt-2">OTHER FEES</h5>
-        </b-col>
-        <b-col md="4"> </b-col>
-        <b-col md="4">
-          <b-button
-            @click="showModalFees = true"
-            variant="outline-primary"
-            class="float-right"
+      <b-link @click="showOtherFees = !showOtherFees">{{ showOtherFees ? 'Hide' : 'Post' }} Other Fees</b-link>
+        <div v-if="showOtherFees">
+          <b-row class="mb-3">
+            <b-col md="4">
+              <h5 class="pt-2">OTHER FEES</h5>
+            </b-col>
+            <b-col md="4"> </b-col>
+            <b-col md="4">
+              <b-button
+                @click="showModalFees = true"
+                variant="outline-primary"
+                class="float-right"
+              >
+                <v-icon name="plus-circle" /> New Item
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-table
+            details-td-class="table-secondary"
+            hover
+            outlined
+            small
+            show-empty
+            :fields="tables.billingItems.fields"
+            :items="forms.batchBilling.fields.billingItems"
+            :busy="tables.billingItems.isBusy"
           >
-            <v-icon name="plus-circle" /> New Item
-          </b-button>
-        </b-col>
-      </b-row>
-      <b-table
-        details-td-class="table-secondary"
-        hover
-        outlined
-        small
-        show-empty
-        :fields="tables.billingItems.fields"
-        :items="forms.batchBilling.fields.billingItems"
-        :busy="tables.billingItems.isBusy"
-      >
-        <template v-slot:cell(action)="row">
-          <b-button @click="removeFee(row)" size="sm" variant="danger">
-            <v-icon name="trash" />
-          </b-button>
-        </template>
-        <template v-slot:cell(amount)="row">
-          <vue-autonumeric
-            v-model="row.item.amount"
-            class="form-control text-right"
-            :options="[
-              {
-                modifyValueOnWheel: false,
-                emptyInputBehavior: 0,
-              },
-            ]"
-          >
-          </vue-autonumeric>
-        </template>
-        <template v-slot:custom-foot>
-          <b-tr>
-            <b-td colspan="2" class="text-right">
-              <span class="text-danger font-weight-bold">Total Amount </span>
-            </b-td>
-            <b-td class="text-right">
-              <span class="text-danger font-weight-bold">
-                {{ batchTotalAmount }}
-              </span>
-            </b-td>
-            <b-td></b-td>
-          </b-tr>
-        </template>
-      </b-table>
+            <template v-slot:cell(action)="row">
+              <b-button @click="removeFee(row)" size="sm" variant="danger">
+                <v-icon name="trash" />
+              </b-button>
+            </template>
+            <template v-slot:cell(amount)="row">
+              <vue-autonumeric
+                v-model="row.item.amount"
+                class="form-control text-right"
+                :options="[
+                  {
+                    modifyValueOnWheel: false,
+                    emptyInputBehavior: 0,
+                  },
+                ]"
+              >
+              </vue-autonumeric>
+            </template>
+            <template v-slot:custom-foot>
+              <b-tr>
+                <b-td colspan="2" class="text-right">
+                  <span class="text-danger font-weight-bold">Total Amount </span>
+                </b-td>
+                <b-td class="text-right">
+                  <span class="text-danger font-weight-bold">
+                    {{ batchTotalAmount }}
+                  </span>
+                </b-td>
+                <b-td></b-td>
+              </b-tr>
+            </template>
+          </b-table>
+        </div>
       <hr />
       <b-row>
         <b-col md="12">
@@ -794,6 +829,7 @@
 <script>
 import FileViewer from '../components/FileViewer';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
+import SelectPaginated from '../components/SelectPaginated';
 import {
   SchoolCategories,
   Semesters,
@@ -866,7 +902,8 @@ export default {
     StudentColumn,
     EducationColumn,
     PageContent,
-    NoAccess
+    NoAccess,
+    SelectPaginated
   },
   mixins: [
     TermApi,
@@ -1100,6 +1137,7 @@ export default {
         },
       },
       activeSchoolYear: [],
+      showOtherFees: false,
     };
   },
   created() {
@@ -1115,6 +1153,10 @@ export default {
     this.loadActiveSchoolYear();
   },
   methods: {
+    getPhoto(option) {
+      const photo = (option && option.photo && option.photo.hashName) || '';
+      return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
+    },
     loadBillings() {
       const {
         schoolCategoryId,
@@ -1417,6 +1459,7 @@ export default {
       fields.billingItems = [];
       this.options.terms.items = [];
       this.showEntry = true;
+      this.showOtherFees = false;
     },
     setUpdateSoa(id) {
       const {
@@ -1426,6 +1469,7 @@ export default {
       reset(billing);
       clearFields(fields);
       this.showEntry = true;
+      this.showOtherFees = false;
       this.entryMode = 'Edit';
       fields.billingItems = [];
       billing.isLoading = true;
@@ -1454,6 +1498,7 @@ export default {
       fields.termId = null;
       fields.billingItems = [];
       this.showBatchEntry = true;
+      this.showOtherFees = false;
     },
     previewBilling(id) {
       this.file.type = null;
@@ -1516,12 +1561,43 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .drop-down__container {
-    display: flex;
-    align-items: center;
-  }
+@import '../../assets/scss/_shared.scss';
+.drop-down__container {
+  display: flex;
+  align-items: center;
+}
 
-  .soa__drop-down {
-    height: 24px;
+.soa__drop-down {
+  height: 24px;
+}
+  
+.search-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .select-paginated {
+    width: 100%;
+
+    @include for-size(phone-only) {
+      width: 100%;
+    }
+    .select-option {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .select-option__avatar {
+        width: auto;
+      }
+
+      .select-option__info {
+        flex: 1;
+        margin-left: 10px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
   }
+}
 </style>

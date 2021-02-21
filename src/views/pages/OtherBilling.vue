@@ -218,7 +218,7 @@
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <Card v-if="showEntry" :title="`Other Billing Entry - ${entryMode}`">
         <b-overlay :show="forms.billing.isLoading">
-          <b-row>
+          <!-- <b-row>
             <b-col md="6">
               <b-form-group>
                 <label class="required">Student</label>
@@ -244,19 +244,44 @@
                 </vue-bootstrap-typeahead>
               </b-form-group>
             </b-col>
-          </b-row>
+          </b-row> -->
           <b-row>
             <b-col md="6">
-              <b-form-group>
-                <label>Student No.</label>
-                <b-form-input
+              <b-form-group
+                :state="forms.billing.states.studentId"
+                :invalid-feedback="forms.billing.errors.studentId">
+                <label class="required">Student No.</label>
+                <div class="search-container">
+                  <SelectPaginated
+                    class="select-paginated"
+                    label='studentNo'
+                    @input="getStudentInfo($event)"
+                    :value="forms.billing.fields.student"
+                    :fetchData="getStudentList"
+                  >
+                    <template slot="option" slot-scope="data">
+                      <div class="select-option">
+                        <div class="select-option__avatar">
+                          <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
+                        </div>
+                        <div class="select-option__info">
+                          <span>{{
+                            data.studentNo ? data.studentNo : 'Awaiting Confirmation'
+                          }}</span>
+                          <span>{{ data.name }}</span>
+                          <span>{{ data.email }}</span>
+                        </div>
+                      </div>
+                    </template>
+                    <template slot="loader">
+                      <b-spinner label="Loading..." class="loader"></b-spinner>
+                    </template>
+                  </SelectPaginated>
+                </div>
+                <!-- <b-form-input
                   disabled
-                  :state="forms.billing.states.studentId"
                   v-model="forms.billing.fields.student.studentNo"
-                />
-                <b-form-invalid-feedback>
-                  {{ forms.billing.errors.studentId }}
-                </b-form-invalid-feedback>
+                /> -->
               </b-form-group>
               <b-form-group>
                 <label>Name</label>
@@ -738,6 +763,7 @@ import Access from '../../mixins/utils/Access';
 import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 import PageContent  from '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
+import SelectPaginated from '../components/SelectPaginated';
 
 const billingFields = {
   id: null,
@@ -772,7 +798,8 @@ export default {
     StudentColumn,
     EducationColumn,
     PageContent,
-    NoAccess
+    NoAccess,
+    SelectPaginated
   },
   mixins: [
     TermApi,
@@ -981,6 +1008,10 @@ export default {
     this.loadCourses();
   },
   methods: {
+    getPhoto(option) {
+      const photo = (option && option.photo && option.photo.hashName) || '';
+      return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
+    },
     loadBillings() {
       const {
         schoolCategoryId,
@@ -1338,6 +1369,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../assets/scss/_shared.scss';
   .drop-down__container {
     display: flex;
 
@@ -1345,5 +1377,34 @@ export default {
 
   .other__drop-down {
     height: 24px;
+  }
+  .search-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .select-paginated {
+      width: 100%;
+
+      @include for-size(phone-only) {
+        width: 100%;
+      }
+      .select-option {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .select-option__avatar {
+          width: auto;
+        }
+
+        .select-option__info {
+          flex: 1;
+          margin-left: 10px;
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
   }
 </style>
