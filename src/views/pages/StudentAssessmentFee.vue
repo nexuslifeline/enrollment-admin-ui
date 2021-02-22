@@ -1019,6 +1019,7 @@ export default {
     }
     this.loadCourseList();
     this.loadFees();
+    this.loadAcademicRecord()
   },
   methods: {
     setApproveFees(row) {
