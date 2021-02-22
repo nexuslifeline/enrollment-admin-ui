@@ -578,134 +578,135 @@
         </b-row>
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
-    </template>
-    <!-- MODAL FEES -->
-    <b-modal
-      v-model="showModalFees"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-      size="xl"
-    >
-      <div slot="modal-title">
+      <!-- MODAL FEES -->
+      <b-modal
+        v-model="showModalFees"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+        size="xl"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          School Fees
+        </div>
         <!-- modal title -->
-        School Fees
-      </div>
-      <!-- modal title -->
-      <b-row>
+        <b-row>
+          <!-- modal body -->
+          <b-col md="12">
+            <b-row class="mb-2">
+              <b-col offset-md="8" md="4">
+                <b-form-input
+                  v-model="filters.fee.criteria"
+                  type="text"
+                  placeholder="Search"
+                >
+                </b-form-input>
+              </b-col>
+            </b-row>
+            <b-table
+              small
+              hover
+              outlined
+              show-empty
+              :items.sync="tables.fees.items"
+              :fields="tables.fees.fields"
+              :filter="filters.fee.criteria"
+              :busy="tables.fees.isBusy2"
+              :current-page="paginations.fee.page"
+              :per-page="paginations.fee.perPage"
+              @filtered="onFiltered($event, paginations.fee)"
+            >
+              <template v-slot:cell(action)="row">
+                <b-button @click="addFee(row)" size="sm" variant="success">
+                  <v-icon name="plus" />
+                </b-button>
+              </template>
+              <template v-slot:table-busy>
+                <div class="text-center my-2">
+                  <v-icon name="spinner" spin class="mr-2" />
+                  <strong>Loading...</strong>
+                </div>
+              </template>
+            </b-table>
+            <b-row>
+              <b-col md="6">
+                Showing {{ paginations.fee.from }} to {{ paginations.fee.to }} of
+                {{ paginations.fee.totalRows }} records.
+              </b-col>
+              <b-col md="6">
+                <b-pagination
+                  v-model="paginations.fee.page"
+                  :total-rows="paginations.fee.totalRows"
+                  :per-page="paginations.fee.perPage"
+                  size="sm"
+                  align="end"
+                  @input="recordDetails()"
+                />
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
         <!-- modal body -->
-        <b-col md="12">
-          <b-row class="mb-2">
-            <b-col offset-md="8" md="4">
-              <b-form-input
-                v-model="filters.fee.criteria"
-                type="text"
-                placeholder="Search"
-              >
-              </b-form-input>
-            </b-col>
-          </b-row>
-          <b-table
-            small
-            hover
-            outlined
-            show-empty
-            :items.sync="tables.fees.items"
-            :fields="tables.fees.fields"
-            :filter="filters.fee.criteria"
-            :busy="tables.fees.isBusy2"
-            :current-page="paginations.fee.page"
-            :per-page="paginations.fee.perPage"
-            @filtered="onFiltered($event, paginations.fee)"
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            class="float-right"
+            variant="outline-danger"
+            @click="showModalFees = false"
           >
-            <template v-slot:cell(action)="row">
-              <b-button @click="addFee(row)" size="sm" variant="success">
-                <v-icon name="plus" />
-              </b-button>
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.fee.from }} to {{ paginations.fee.to }} of
-              {{ paginations.fee.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                v-model="paginations.fee.page"
-                :total-rows="paginations.fee.totalRows"
-                :per-page="paginations.fee.perPage"
-                size="sm"
-                align="end"
-                @input="recordDetails()"
-              />
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+            Close
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button
-          class="float-right"
-          variant="outline-danger"
-          @click="showModalFees = false"
-        >
-          Close
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- Modal Approval -->
-    <b-modal
-      v-model="showModalApproval"
-      centered
-      header-bg-variant="success"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
+      </b-modal>
+      <!-- Modal Approval -->
+      <b-modal
+        v-model="showModalApproval"
+        centered
+        header-bg-variant="success"
+        header-text-variant="light"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          Finalize Approval
+        </div>
         <!-- modal title -->
-        Finalize Approval
-      </div>
-      <!-- modal title -->
-      <b-row>
+        <b-row>
+          <!-- modal body -->
+          <b-col md="12">
+            <label>Notes</label>
+            <b-textarea v-model="approvalNotes" rows="7" />
+          </b-col>
+        </b-row>
         <!-- modal body -->
-        <b-col md="12">
-          <label>Notes</label>
-          <b-textarea v-model="approvalNotes" rows="7" />
-        </b-col>
-      </b-row>
-      <!-- modal body -->
-      <div slot="modal-footer" class="w-100">
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button class="float-left" @click="showModalApproval = false">
+            Cancel
+          </b-button>
+          <b-button
+            @click="approveFees()"
+            class="float-right"
+            variant="outline-primary"
+          >
+            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
+            Confirm
+          </b-button>
+        </div>
         <!-- modal footer buttons -->
-        <b-button class="float-left" @click="showModalApproval = false">
-          Cancel
-        </b-button>
-        <b-button
-          @click="approveFees()"
-          class="float-right"
-          variant="outline-primary"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- Modal Approval -->
-    <FileViewer
-      :show="fileViewer.show"
-      :file="file"
-      :owner="file.owner"
-      :isBusy="file.isLoading"
-      @close="fileViewer.show = false"
-    />
+      </b-modal>
+      <!-- Modal Approval -->
+      <FileViewer
+        :show="fileViewer.show"
+        :file="file"
+        :owner="file.owner"
+        :isBusy="file.isLoading"
+        @close="fileViewer.show = false"
+      />
+    </template>
+    
   </PageContent>
   <!-- main container -->
 </template>
@@ -1019,6 +1020,7 @@ export default {
     }
     this.loadCourseList();
     this.loadFees();
+    this.loadAcademicRecord()
   },
   methods: {
     setApproveFees(row) {
