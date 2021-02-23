@@ -259,6 +259,16 @@
                     :value="forms.billing.fields.student"
                     :fetchData="getStudentList"
                   >
+                    <template v-slot:selected-option="data">
+                      <div class="select-option">
+                        <div class="select-option__avatar">
+                          <b-avatar v-if="data.name" variant="info" :src="getPhoto(data)" size="20px" />
+                        </div>
+                        <div class="d-flex w-100">
+                          <span class="ml-2">{{ data.name }}</span>
+                        </div>
+                      </div>
+                    </template>
                     <template slot="option" slot-scope="data">
                       <div class="select-option">
                         <div class="select-option__avatar">
@@ -283,7 +293,7 @@
                   v-model="forms.billing.fields.student.studentNo"
                 /> -->
               </b-form-group>
-              <b-form-group>
+              <!-- <b-form-group>
                 <label>Name</label>
                 <b-form-input
                   disabled
@@ -293,7 +303,7 @@
                 <b-form-invalid-feedback>
                   {{ forms.billing.errors.studentId }}
                 </b-form-invalid-feedback>
-              </b-form-group>
+              </b-form-group> -->
               <b-form-group>
                 <label class="required">Due Date</label>
                 <b-form-datepicker

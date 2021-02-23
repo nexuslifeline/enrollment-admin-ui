@@ -10,6 +10,9 @@
     @input="onInputSelect"
     :placeholder="placeholder"
   >
+    <template slot="selected-option" slot-scope="data">
+      <slot name="selected-option" v-bind="data"></slot>
+    </template>
     <template slot="option" slot-scope="data">
       <slot name="option" v-bind="data"></slot>
     </template>

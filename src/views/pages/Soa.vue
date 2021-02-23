@@ -37,18 +37,19 @@
     <template v-slot:extra-buttons>
       <div class="ml-1 drop-down__container" >
          <b-dropdown
-          v-if="
-            isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
-          "
-          variant="primary"
+          v-if="isAccessible($options.StatementOfAccountPermissions.GENERATE.id)"
+          text="Generate"
+          variant="outline-primary"
+          split-variant="outline-primary"
           class="soa__drop-down"
-        >
-          <b-dropdown-item @click="setCreateSoa(), showBatchEntry=false"
-            >Generate Single SOA</b-dropdown-item
-          >
-          <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false"
-            >Generate Batch SOA</b-dropdown-item
-          >
+          split>
+          <b-dropdown-item
+            @click="setCreateSoa(), showBatchEntry=false">
+            Single SOA
+          </b-dropdown-item>
+          <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false">
+            Batch SOA
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </template>
@@ -265,7 +266,17 @@
                   :value="forms.billing.fields.student"
                   :fetchData="getStudentList"
                 >
-                  <template slot="option" slot-scope="data">
+                  <template v-slot:selected-option="data">
+                    <div class="select-option">
+                      <div class="select-option__avatar">
+                        <b-avatar v-if="data.name" variant="info" :src="getPhoto(data)" size="20px" />
+                      </div>
+                      <div class="d-flex w-100">
+                        <span class="ml-2">{{ data.name }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-slot:option="data">
                     <div class="select-option">
                       <div class="select-option__avatar">
                         <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
@@ -289,13 +300,13 @@
                 v-model="forms.billing.fields.student.studentNo"
               /> -->
             </b-form-group>
-            <b-form-group>
+            <!-- <b-form-group>
               <label>Name</label>
               <b-form-input
                 disabled
                 v-model="forms.billing.fields.student.name"
               />
-            </b-form-group>
+            </b-form-group> -->
             <b-form-group>
               <label>Level</label>
               <b-form-input
@@ -862,7 +873,9 @@ import tables from '../../helpers/tables';
 import { copyValue } from '../../helpers/extractor';
 import Access from '../../mixins/utils/Access';
 import PageContent from "../components/PageContainer/PageContent";
-import NoAccess from '../components/NoAccess'
+import NoAccess from '../components/NoAccess';
+import SelectedOption from '../components/DropdownSlots/SelectedOption';
+import ProfileMaker from '../components/ProfileMaker.vue';
 
 const billingFields = {
   id: null,
@@ -903,7 +916,9 @@ export default {
     EducationColumn,
     PageContent,
     NoAccess,
-    SelectPaginated
+    SelectPaginated,
+    SelectedOption,
+    ProfileMaker
   },
   mixins: [
     TermApi,
@@ -1153,6 +1168,7 @@ export default {
     this.loadActiveSchoolYear();
   },
   methods: {
+    // move to utils
     getPhoto(option) {
       const photo = (option && option.photo && option.photo.hashName) || '';
       return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
@@ -1567,10 +1583,6 @@ export default {
   align-items: center;
 }
 
-.soa__drop-down {
-  height: 24px;
-}
-  
 .search-container {
   display: flex;
   align-items: center;
@@ -1600,4 +1612,14 @@ export default {
     }
   }
 }
+</style>
+<style lang="scss">
+  .soa__drop-down {
+    height: 24px;
+
+    .btn-outline-primary {
+      display: flex;
+      align-items: center;
+    }
+  }
 </style>
