@@ -97,10 +97,10 @@
               </div>
             </template>
             <template v-slot:cell(terms)="{ item }">
-              <div class="cell-term" v-if="item.details">
+              <div class="cell-term" v-if="item.grades">
                 <vue-autonumeric
                   v-for="term in terms"
-                  v-model="item.details.find(d => d.id === term.id).pivot.grade"
+                  v-model="item.grades.find(d => d.id === term.id).pivot.grade"
                   :key="term.id"
                   class="form-control text-right cell-term-input"
                   :options="[
@@ -150,7 +150,7 @@
 <script>
 import PageContent from "../components/PageContainer/PageContent";
 import { SchoolCategories, Semesters } from "../../helpers/enum"
-import { SchoolYearApi, PersonnelApi, SubjectApi, StudentApi, TermApi, StudentGradeApi } from '../../mixins/api';
+import { SchoolYearApi, PersonnelApi, SubjectApi, StudentApi, TermApi, AcademicRecordApi } from '../../mixins/api';
 import { StudentColumn } from '../components/ColumnDetails';
 import { showNotification } from '../../helpers/forms';
 export default {
@@ -159,7 +159,7 @@ export default {
     PageContent,
     StudentColumn
   },
-  mixins: [ SchoolYearApi, SubjectApi, PersonnelApi, StudentApi, TermApi, StudentGradeApi ],
+  mixins: [ SchoolYearApi, SubjectApi, PersonnelApi, StudentApi, TermApi, AcademicRecordApi ],
   SchoolCategories, Semesters,
   data() {
     return {
@@ -231,9 +231,9 @@ export default {
       const { subjectId, sectionId, criteria } = this.filters.student
       const { student, student: { perPage, page } } = this.paginations
       const { students } = this.tables
-      const params = { paginate: true, perPage, page, subjectId, sectionId, criteria }
+      const params = { paginate: true, perPage, page, criteria }
       students.isBusy = true;
-      this.getStudentGradeList(params).then(({ data }) => {
+      this.getGradesOfAcademicRecords(subjectId, sectionId, params).then(({ data }) => {
         students.items = data.data;
         student.from = data.meta.from;
         student.to = data.meta.to;
@@ -294,18 +294,16 @@ export default {
     onSaveStudentGrade() {
       this.isProcessing = true
       const { students } = this.tables
-      const { user } = this.$store.state
+      
       const data = students.items.map(student => {
         return {
           id: student.id,
-          studentId: student.studentId,
           sectionId: student.sectionId,
-          subjectId: student.subjectId,
-          details: student.details.map(detail => {
+          subjectId: this.filters.student.subjectId,
+          grades: student.grades.map(grade => {
             return {
-              termId: detail.id,
-              personnelId: user.id,
-              grade: detail.pivot.grade
+              termId: grade.id,
+              grade: grade.pivot.grade
             }
           })
         }

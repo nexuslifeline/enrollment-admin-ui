@@ -19,6 +19,12 @@ export default {
     },
     getApprovalCount() {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/approval-count`)
-    }
+    },
+    getGradesOfAcademicRecords(subjectId, sectionId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/subjects/${subjectId}/sections/${sectionId}`, { params: params });
+    },
+    batchUpdateStudentGrade(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/grade-batch-updates`, data);
+    },
   }
 }
