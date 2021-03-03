@@ -466,7 +466,6 @@ function configRoutes () {
               path: 'settings',
               name: 'Settings',
               component: Setting,
-              redirect: { name: 'GeneralSetting' },
               children: [
                 {
                   path: 'general-setting',
@@ -499,7 +498,6 @@ function configRoutes () {
         {
           path: 'report',
           name: 'Report',
-          redirect: { name: 'Collections' },
           component: { render(c) { return c('router-view') } },
           children: [
             {

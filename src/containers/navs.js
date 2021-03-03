@@ -24,7 +24,12 @@ import {
   StatementOfAccountPermissions,
   OtherBillingPermissions,
   TranscriptRecordPermissions,
-  DocumentTypePermission
+  DocumentTypePermission,
+  CollectionReportPermissions,
+  StudentLedgerReportPermissions,
+  ClassMasterlistReportPermissions,
+  StudentGradePermissions,
+  SettingPermissions
 } from '../helpers/enum';
 
 export default [
@@ -43,6 +48,9 @@ export default [
       {
         label: 'Settings',
         to: '/home/settings',
+        permissionIds: [
+          ...SettingPermissions.getIds(),
+        ],
       },
     ]
   },
@@ -172,7 +180,8 @@ export default [
     permissionIds: [
       ...StudentPermissions.getIds(),
       ...PersonnelPermissions.getIds(),
-      ...TranscriptRecordPermissions.getIds()
+      ...TranscriptRecordPermissions.getIds(),
+      ...StudentGradePermissions.getIds()
     ],
     children: [
       {
@@ -193,14 +202,22 @@ export default [
       {
         label: 'Student Grade',
         to: '/master-files/student-grade',
-        // permissionIds: PersonnelPermissions.getIds()
-        // to do permission
+        permissionIds: StudentGradePermissions.getIds()
       }
     ]
   },
   {
     label: 'Maintenance',
     to: '/maintenance',
+    permissionIds: [
+      ...DepartmentPermissions.getIds(),
+      ...SchoolYearPermissions.getIds(),
+      ...UserGroupPermissions.getIds(),
+      ...BankAccountPermissions.getIds(),
+      ...PeraPadalaAccountPermissions.getIds(),
+      ...EWalletAccountPermissions.getIds(),
+      ...DocumentTypePermission.getIds(),
+    ],
     children: [
       {
         label: 'Department',
@@ -250,24 +267,29 @@ export default [
   {
     label: 'Reports',
     to: '/report',
+    permissionIds: [
+      ...CollectionReportPermissions.getIds(),
+      ...StudentLedgerReportPermissions.getIds(),
+      ...ClassMasterlistReportPermissions.getIds(),
+    ],
     children: [
       {
         label: 'Collections',
         description: 'Gives an overview of the state of the collection activities within the school.',
         to: '/report/collection',
-        //permissionIds: BankAccountPermissions.getIds()
+        permissionIds: CollectionReportPermissions.getIds()
       },
       {
         label: 'Student Ledger',
         description: 'The student ledger card is the document that summarizes the financial transactions pertaining to each student\'s attendance at the institution including a listing of all costs charged to the student and all fees received from the student or any other funding source on behalf of the student.',
         to: '/report/student-ledger',
-        //permissionIds: BankAccountPermissions.getIds()
+        permissionIds: StudentLedgerReportPermissions.getIds()
       },
       {
         label: 'Class Masterlist',
         description: 'This report provides a list of all students currently enrolled in class.',
         to: '/report/enrolled-list',
-        //permissionIds: BankAccountPermissions.getIds()
+        permissionIds: ClassMasterlistReportPermissions.getIds()
       }
     ]
   }

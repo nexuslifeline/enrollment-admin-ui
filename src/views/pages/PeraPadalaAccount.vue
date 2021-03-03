@@ -4,7 +4,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPeraPadalaAccounts"
     :filterVisible="isFilterVisible"
-    @create="setCreate()">
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.PeraPadalaAccountPermissions.ADD.id)">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.peraPadalaAccount.criteria"
@@ -69,7 +70,7 @@
                 </div>
               </template>
               <template v-slot:cell(provider)="{ item, value }">
-                <b-link @click="setUpdate(item)">{{ value }} </b-link>
+                <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.PeraPadalaAccountPermissions.EDIT.id)">{{ value }} </b-link>
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
@@ -82,12 +83,14 @@
                     <v-icon name="ellipsis-v" />
                   </template>
                   <b-dropdown-item
+                    v-if="isAccessible($options.PeraPadalaAccountPermissions.EDIT.id)"
                     @click="setUpdate(row.item)"
                     :disabled="showModalEntry"
                   >
                     Edit
                   </b-dropdown-item>
                   <b-dropdown-item
+                    v-if="isAccessible($options.PeraPadalaAccountPermissions.DELETE.id)"
                     @click="
                       (forms.peraPadalaAccount.fields.id = row.item.id),
                         (showModalConfirmation = true)
@@ -264,10 +267,13 @@ import { copyValue } from '../../helpers/extractor';
 import Tables from '../../helpers/tables';
 import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
+import { PeraPadalaAccountPermissions } from '../../helpers/enum'
+import Access from '../../mixins/utils/Access';
 
 export default {
   name: 'PeraPadalaAccount',
-  mixins: [PeraPadalaAccountApi, Tables],
+  mixins: [PeraPadalaAccountApi, Tables, Access ],
+  PeraPadalaAccountPermissions,
   components: {
     Card,
     PageContent

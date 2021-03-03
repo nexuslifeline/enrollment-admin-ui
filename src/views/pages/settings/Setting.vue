@@ -5,10 +5,11 @@
         <p class="sub-nav__title">{{$options.subNav.title}}</p>
         <ul class="sub-nav">
           <li
-            v-for="(item, idx) in $options.subNav.items"
+            v-for="(item, idx) in accessibleNav"
             :key="idx"
             class="sub-nav__item"
-            :class="{ active: $route.path.includes(item.to)}">
+            :class="{ active: $route.path.includes(item.to)}"
+            >
             <router-link
               class="sub-nav__link"
               :to="`/home/settings${item.to}`">
@@ -27,15 +28,31 @@
 
 <script>
 import subNav from './data/subNav';
+import Access from '../../../mixins/utils/Access'
 export default {
   subNav,
+  mixins: [ Access ],
   data() {
     return {
 
     }
   },
   created() {
-
+   this.loadDefaultNav()
+  },
+  methods: {
+    loadDefaultNav() {
+      const defaultNav = this.accessibleNav[0] ? this.accessibleNav[0] : null
+      if(defaultNav) {
+        this.$router.push(`/home/settings${defaultNav.to}`)
+      }
+    }
+  },
+  computed: {
+    accessibleNav() {
+      const { items } = this.$options.subNav
+      return items.filter(e => this.isAccessible(e.permissionId))
+    }
   }
 }
 </script>
