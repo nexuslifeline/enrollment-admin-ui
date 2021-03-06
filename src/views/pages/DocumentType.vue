@@ -6,7 +6,7 @@
     :filterVisible="isFilterVisible"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.DocumentTypePermission.ADD.id)">
-    <template v-slot:filters>
+  <template v-slot:filters>
       <b-form-input
         v-model="filters.documentType.criteria"
         debounce="500"

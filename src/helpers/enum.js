@@ -652,3 +652,26 @@ export const DocumentTypePermission = new Enum({
   EDIT: { id: 332, name: 'Edit' },
   DELETE: { id: 333, name: 'Delete' }
 });
+
+export const StudentGradePermissions = new Enum({
+  EDIT: { id: 341, name: 'Edit' },
+});
+
+export const CollectionReportPermissions = new Enum({
+  COLLECTION: { id: 351, name: 'Collection' },
+});
+
+export const StudentLedgerReportPermissions = new Enum({
+  STUDENT_LEDGER: { id: 352, name: 'Student Ledger' },
+});
+
+export const ClassMasterlistReportPermissions = new Enum({
+  CLASS_MASTERLIST: { id: 353, name: 'Class Masterlist' },
+});
+
+export const SettingPermissions = new Enum({
+  GENERAL: { id: 361, name: 'General Settings' },
+  ORGANIZATION: { id: 362, name: 'General Settings' },
+  TERM: { id: 363, name: 'Terms Settings' },
+  REQUIREMENT: { id: 364, name: 'Requirements Settings' },
+});

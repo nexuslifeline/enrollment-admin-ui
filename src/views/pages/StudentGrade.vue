@@ -3,7 +3,8 @@
     title="Student Grade"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadStudents()"
-    :filterVisible="isFilterVisible">
+    :filterVisible="isFilterVisible"
+    :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"

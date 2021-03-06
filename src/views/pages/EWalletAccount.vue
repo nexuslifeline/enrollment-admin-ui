@@ -4,7 +4,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadEWalletAccounts"
     :filterVisible="isFilterVisible"
-    @create="setCreate()">
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.EWalletAccountPermissions.ADD.id)">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.eWalletAccount.criteria"
@@ -61,7 +62,7 @@
                 </div>
               </template>
               <template v-slot:cell(provider)="{ item, value }">
-                <b-link @click="setUpdate(item)">{{ value }} </b-link>
+                <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.EWalletAccountPermissions.EDIT.id)">{{ value }} </b-link>
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
@@ -74,12 +75,22 @@
                     <v-icon name="ellipsis-v" />
                   </template>
                   <b-dropdown-item
+                    v-if="
+                      isAccessible(
+                        $options.EWalletAccountPermissions.EDIT.id
+                      )
+                    "
                     @click="setUpdate(row.item)"
                     :disabled="showModalEntry"
                   >
                     Edit
                   </b-dropdown-item>
                   <b-dropdown-item
+                    v-if="
+                      isAccessible(
+                        $options.EWalletAccountPermissions.DELETE.id
+                      )
+                    "
                     @click="
                       (forms.eWalletAccount.fields.id = row.item.id),
                         (showModalConfirmation = true)
@@ -256,10 +267,13 @@ import { copyValue } from '../../helpers/extractor';
 import Tables from '../../helpers/tables';
 import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
+import { EWalletAccountPermissions } from '../../helpers/enum'
+import Access from '../../mixins/utils/Access';
 
 export default {
   name: 'eWalletAccount',
-  mixins: [EWalletAccountApi, Tables],
+  mixins: [ EWalletAccountApi, Tables, Access ],
+  EWalletAccountPermissions,
   components: {
     Card,
     PageContent

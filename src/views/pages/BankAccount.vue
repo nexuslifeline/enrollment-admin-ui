@@ -4,7 +4,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadBankAccounts"
     :filterVisible="isFilterVisible"
-    @create="setCreate()">
+    @create="setCreate()"
+    :createButtonVisible="isAccessible($options.BankAccountPermissions.ADD.id)">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.bankAccount.criteria"
@@ -68,7 +69,7 @@
                 </div>
               </template>
               <template v-slot:cell(bank)="{ item, value }">
-                <b-link @click="setUpdate(item)">{{ value }} </b-link>
+                <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.BankAccountPermissions.EDIT.id)">{{ value }} </b-link>
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
@@ -81,12 +82,22 @@
                     <v-icon name="ellipsis-v" />
                   </template>
                   <b-dropdown-item
+                    v-if="
+                      isAccessible(
+                        $options.BankAccountPermissions.EDIT.id
+                      )
+                    "
                     @click="setUpdate(row.item)"
                     :disabled="showModalEntry"
                   >
                     Edit
                   </b-dropdown-item>
                   <b-dropdown-item
+                    v-if="
+                      isAccessible(
+                        $options.BankAccountPermissions.DELETE.id
+                      )
+                    "
                     @click="
                       (forms.bankAccount.fields.id = row.item.id),
                         (showModalConfirmation = true)
@@ -262,10 +273,14 @@ import { copyValue } from '../../helpers/extractor';
 import Tables from '../../helpers/tables';
 import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
+import { BankAccountPermissions } from '../../helpers/enum'
+import Access from '../../mixins/utils/Access';
+
 
 export default {
   name: 'BankAccount',
-  mixins: [BankAccountApi, Tables],
+  mixins: [BankAccountApi, Tables, Access],
+  BankAccountPermissions,
   components: {
     Card,
     PageContent
