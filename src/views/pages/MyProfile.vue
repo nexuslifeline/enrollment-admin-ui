@@ -30,98 +30,138 @@
             </div>
             <div class="profile-info__container">
               <b-row>
-                <b-col md="4">
-                  <b-form-group
-                    class="profile-info__name"
-                    label="Firstname"
-                    labelClass="required"
-                  >
-                    <b-form-input
-                      debounce="500"
-                      v-model="forms.personnel.fields.firstName"
-                      :state="forms.personnel.states.firstName"
-                    />
-                    <b-form-invalid-feedback>
-                      {{ forms.personnel.errors.firstName }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-                <b-col md="4">
-                  <b-form-group class="profile-info__name" label="Middlename">
-                    <b-form-input
-                      debounce="500"
-                      v-model="forms.personnel.fields.middleName"
-                      :state="forms.personnel.states.middleName"
-                    />
-                    <b-form-invalid-feedback>
-                      {{ forms.personnel.errors.middleName }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-                <b-col md="4">
-                  <b-form-group
-                    class="profile-info__name"
-                    label="Lastname"
-                    labelClass="required"
-                  >
-                    <b-form-input
-                      debounce="500"
-                      v-model="forms.personnel.fields.lastName"
-                      :state="forms.personnel.states.lastName"
-                    />
-                    <b-form-invalid-feedback>
-                      {{ forms.personnel.errors.lastName }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col md="4">
-                  <b-form-group
-                    class="profile-info__other"
-                    label="Birthdate"
-                    labelClass="required"
-                  >
-                    <b-form-input
-                      type="date"
-                      v-model="forms.personnel.fields.birthDate"
-                      :state="forms.personnel.states.birthDate"
-                    />
-                    <b-form-invalid-feedback>
-                      {{ forms.personnel.errors.birthDate }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-                <b-col md="4">
-                  <b-form-group class="profile-info__other" label="Mobile No">
-                    <b-form-input
-                      v-model="forms.personnel.fields.mobileNo"
-                      :state="forms.personnel.states.mobileNo"
-                    />
-                    <b-form-invalid-feedback>
-                      {{ forms.personnel.errors.mobileNo }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col md="8">
-                  <b-form-group
-                    class="profile-info__complete-address"
-                    label="Complete Address"
-                    labelClass="required"
-                  >
-                    <b-textarea
-                      v-model="forms.personnel.fields.completeAddress"
-                      :state="forms.personnel.states.completeAddress"
-                      rows="3"
-                    />
-                    <b-form-invalid-feedback>
-                      {{ forms.personnel.errors.completeAddress }}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-              </b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <label class="required">Firstname</label>
+                  <b-form-input
+                    ref="firstName"
+                    v-model="forms.personnel.fields.firstName"
+                    :state="forms.personnel.states.firstName"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.firstName }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <b-form-group>
+                  <label>Middlename</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.middleName"
+                    :state="forms.personnel.states.middleName"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.middleName }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <b-form-group>
+                  <label class="required">Lastname</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.lastName"
+                    :state="forms.personnel.states.lastName"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.lastName }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <label class="required">Job Title</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.jobTitle"
+                    :state="forms.personnel.states.jobTitle"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.jobTitle }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <b-form-group>
+                  <label class="required">Birthdate</label>
+                  <b-form-input
+                    type="date"
+                    v-model="forms.personnel.fields.birthDate"
+                    :state="forms.personnel.states.birthDate"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.birthDate }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                <b-form-group>
+                  <label>Mobile No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.mobileNo"
+                    :state="forms.personnel.states.mobileNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.mobileNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group>
+                  <label>Phone No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.phoneNo"
+                    :state="forms.personnel.states.phoneNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.phoneNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=4>
+                <b-form-group>
+                  <label>Emergency Mobile No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.emergencyMobileNo"
+                    :state="forms.personnel.states.emergencyMobileNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.emergencyMobileNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group>
+                  <label>Emergency Phone No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.emergencyPhoneNo"
+                    :state="forms.personnel.states.emergencyPhoneNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.emergencyPhoneNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md="12">
+                <b-form-group>
+                  <label class="required">Complete Address</label>
+                  <b-textarea
+                    v-model="forms.personnel.fields.completeAddress"
+                    rows="3"
+                    :state="forms.personnel.states.completeAddress"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.completeAddress }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
             </div>
           </div>
         </div>
@@ -204,8 +244,12 @@ const personnelFields = {
   middleName: null,
   lastName: null,
   birthDate: null,
-  mobileNo: null,
   completeAddress: null,
+  jobTitle: null,
+  mobileNo: null,
+  phoneNo: null,
+  emergencyMobileNo: null,
+  emergencyPhoneNo: null,
 };
 
 const userFields = {
