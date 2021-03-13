@@ -35,5 +35,7 @@ export { default as ReportApi } from './Report';
 export { default as TranscriptRecordApi } from './TranscriptRecord';
 export { default as StudentFileApi } from './StudentFile';
 export { default as DocumentTypeApi } from './DocumentType';
+export { default as StudentGradeApi } from './StudentGrade';
+export { default as StudentClearanceApi } from './StudentClearance';
 // export { default as StudentGradeApi } from './StudentGrade';
 // export { default as StudentFileApi } from './StudentFile';

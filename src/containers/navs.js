@@ -203,6 +203,12 @@ export default [
         label: 'Student Grade',
         to: '/master-files/student-grade',
         permissionIds: StudentGradePermissions.getIds()
+      },
+      {
+        label: 'Clearance',
+        to: '/master-files/clearance',
+        // permissionIds: StudentGradePermissions.getIds()
+        // to do add permission
       }
     ]
   },
