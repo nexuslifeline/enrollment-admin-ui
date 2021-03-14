@@ -304,13 +304,14 @@ export default {
   },
   created() {
     this.getAuthenticatedUser().then(({ data }) => {
-      const { userable: personnelData, photo } = data;
+      const { userable: personnelData } = data;
       const { personnel, user } = this.forms;
       copyValue(personnelData, personnel.fields);
       copyValue(data, user.fields);
-      if (photo) {
+
+      if (personnelData.photo) {
         this.personnelPhotoUrl =
-        process.env.VUE_APP_PUBLIC_PHOTO_URL + photo.hashName;
+        process.env.VUE_APP_PUBLIC_PHOTO_URL + personnelData.photo.hashName;
       }
     });
   },
