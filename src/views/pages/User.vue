@@ -16,33 +16,6 @@
     </template>
     <template v-slot:content >
       <div>
-        <!-- add button and search -->
-        <!-- <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button
-                  v-if="isAccessible($options.PersonnelPermissions.ADD.id)"
-                  variant="primary"
-                  @click="setCreate()"
-                >
-                  <v-icon name="plus-circle" /> ADD NEW USER
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.user.criteria"
-                  type="text"
-                  placeholder="Search"
-                  debounce="500"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
         <b-row>
           <b-col md="12">
             <b-table
@@ -62,7 +35,7 @@
               <template v-slot:cell(photo)="data">
                 <b-media>
                   <template v-slot:aside>
-                    <b-avatar
+                    <!-- <b-avatar
                       rounded
                       blank
                       size="64"
@@ -72,6 +45,21 @@
                           data.item.lastName.charAt(0)
                       "
                       :src="avatar(data.item)"
+                    /> -->
+
+                    <AvatarMaker
+                      :avatarId="data.item.id"
+                      :size="33"
+                      :text="
+                        `${data.item.firstName.charAt(0)}${data.item.lastName.charAt(
+                          0
+                        )}`
+                      "
+                      :src="
+                        $options.getFilePath(
+                          (data.item.photo && data.item.photo.hashName) || ''
+                        )
+                      "
                     />
                   </template>
                 </b-media>
@@ -210,7 +198,6 @@
                   </b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
-
               <b-col md="4">
                 <b-form-group>
                   <label class="required">Password</label>
@@ -308,6 +295,43 @@
             <b-row>
               <b-col md="4">
                 <b-form-group>
+                  <label class="required">Job Title</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.jobTitle"
+                    :state="forms.personnel.states.jobTitle"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.jobTitle }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group>
+                  <label class="required">Department</label>
+                  <b-form-select
+                    v-model="forms.personnel.fields.departmentId"
+                    :state="forms.personnel.states.departmentId"
+                  >
+                    <template v-slot:first>
+                      <b-form-select-option :value="null" disabled
+                        >-- Select Department --</b-form-select-option
+                      >
+                    </template>
+                    <b-form-select-option
+                      v-for="department in options.departments.items"
+                      :key="department.id"
+                      :value="department.id"
+                    >
+                      {{ department.name }}
+                    </b-form-select-option>
+                  </b-form-select>
+                  <b-form-invalid-feedback>
+                    {{ forms.user.errors.departmentId }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <b-form-group>
                   <label class="required">Birthdate</label>
                   <b-form-input
                     type="date"
@@ -316,6 +340,83 @@
                   />
                   <b-form-invalid-feedback>
                     {{ forms.personnel.errors.birthDate }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Mobile No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.mobileNo"
+                    :state="forms.personnel.states.mobileNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.mobileNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Phone No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.phoneNo"
+                    :state="forms.personnel.states.phoneNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.phoneNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Emergency Mobile No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.emergencyMobileNo"
+                    :state="forms.personnel.states.emergencyMobileNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.emergencyMobileNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Emergency Phone No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.emergencyPhoneNo"
+                    :state="forms.personnel.states.emergencyPhoneNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.user.errors.emergencyPhoneNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+               <b-col md="4">
+                <b-form-group>
+                  <label class="required">Status</label>
+                  <b-form-select
+                    v-model="forms.personnel.fields.personnelStatusId"
+                    :state="forms.personnel.states.personnelStatusId"
+                  >
+                    <template v-slot:first>
+                      <b-form-select-option :value="null" disabled
+                        >-- Select Status --</b-form-select-option
+                      >
+                    </template>
+                    <b-form-select-option
+                      v-for="personnelStatus in options.personnelStatuses.items"
+                      :key="personnelStatus.id"
+                      :value="personnelStatus.id"
+                    >
+                      {{ personnelStatus.name }}
+                    </b-form-select-option>
+                  </b-form-select>
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.personnelStatusId }}
                   </b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
@@ -368,7 +469,7 @@
       v-model="showModalUpdatePersonnel"
       :noCloseOnEsc="true"
       :noCloseOnBackdrop="true"
-      size="lg"
+      size="xl"
     >
       <div slot="modal-title">
         <!-- modal title -->
@@ -439,6 +540,43 @@
             <b-row>
               <b-col md="4">
                 <b-form-group>
+                  <label class="required">Job Title</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.jobTitle"
+                    :state="forms.personnel.states.jobTitle"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.jobTitle }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=4>
+                <b-form-group>
+                  <label class="required">Department</label>
+                  <b-form-select
+                    v-model="forms.personnel.fields.departmentId"
+                    :state="forms.personnel.states.departmentId"
+                  >
+                    <template v-slot:first>
+                      <b-form-select-option :value="null" disabled
+                        >-- Select Department --</b-form-select-option
+                      >
+                    </template>
+                    <b-form-select-option
+                      v-for="department in options.departments.items"
+                      :key="department.id"
+                      :value="department.id"
+                    >
+                      {{ department.name }}
+                    </b-form-select-option>
+                  </b-form-select>
+                  <b-form-invalid-feedback>
+                    {{ forms.user.errors.departmentId }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md="4">
+                <b-form-group>
                   <label class="required">Birthdate</label>
                   <b-form-input
                     type="date"
@@ -452,13 +590,94 @@
               </b-col>
             </b-row>
             <b-row>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Mobile No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.mobileNo"
+                    :state="forms.personnel.states.mobileNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.mobileNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Phone No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.phoneNo"
+                    :state="forms.personnel.states.phoneNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.phoneNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Emergency Mobile No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.emergencyMobileNo"
+                    :state="forms.personnel.states.emergencyMobileNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.emergencyMobileNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+              <b-col md=3>
+                <b-form-group>
+                  <label>Emergency Phone No</label>
+                  <b-form-input
+                    v-model="forms.personnel.fields.emergencyPhoneNo"
+                    :state="forms.personnel.states.emergencyPhoneNo"
+                  />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.emergencyPhoneNo }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
+               <b-col md="4">
+                <b-form-group>
+                  <label class="required">Status</label>
+                  <b-form-select
+                    v-model="forms.personnel.fields.personnelStatusId"
+                    :state="forms.personnel.states.personnelStatusId"
+                  >
+                    <template v-slot:first>
+                      <b-form-select-option :value="null" disabled
+                        >-- Select Status --</b-form-select-option
+                      >
+                    </template>
+                    <b-form-select-option
+                      v-for="personnelStatus in options.personnelStatuses.items"
+                      :key="personnelStatus.id"
+                      :value="personnelStatus.id"
+                    >
+                      {{ personnelStatus.name }}
+                    </b-form-select-option>
+                  </b-form-select>
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.personnelStatusId }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            <b-row>
               <b-col md="12">
                 <b-form-group>
                   <label class="required">Complete Address</label>
                   <b-textarea
                     v-model="forms.personnel.fields.completeAddress"
                     rows="3"
+                    :state="forms.personnel.states.completeAddress"
                   />
+                  <b-form-invalid-feedback>
+                    {{ forms.personnel.errors.completeAddress }}
+                  </b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
             </b-row>
@@ -628,7 +847,6 @@
     </b-modal>
     <!-- End Modal Confirmation -->
     </template>
-    
   </PageContent>
 </template>
 <script>
@@ -652,9 +870,16 @@ const personnelFields = {
   lastName: null,
   birthDate: null,
   completeAddress: null,
+  departmentId: null,
+  jobTitle: null,
+  mobileNo: null,
+  phoneNo: null,
+  emergencyMobileNo: null,
+  emergencyPhoneNo: null,
+  personnelStatusId: null,
 };
 
-import { PersonnelApi, UserGroupApi } from '../../mixins/api';
+import { DepartmentApi, PersonnelApi, UserGroupApi } from '../../mixins/api';
 import {
   validate,
   reset,
@@ -665,17 +890,23 @@ import PhotoViewer from '../components/PhotoViewer';
 import Tables from '../../helpers/tables';
 import Personnel from '../../mixins/api/Personnel';
 import Access from '../../mixins/utils/Access';
-import { PersonnelPermissions } from '../../helpers/enum';
+import { PersonnelPermissions, PersonnelStatuses } from '../../helpers/enum';
 import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
+import { copyValue } from '../../helpers/extractor';
+import { getFilePath } from '../../helpers/utils';
+import AvatarMaker from "../components/AvatarMaker";
 
 export default {
   name: 'Personnel',
-  mixins: [PersonnelApi, UserGroupApi, Tables, Access],
+  mixins: [PersonnelApi, UserGroupApi, Tables, Access, DepartmentApi],
+  PersonnelStatuses,
+  getFilePath,
   components: {
     PhotoViewer,
     Card,
-    PageContent
+    PageContent,
+    AvatarMaker
   },
   PersonnelPermissions,
   data() {
@@ -768,6 +999,12 @@ export default {
         userGroups: {
           items: [],
         },
+        departments: {
+          items: []
+        },
+        personnelStatuses: {
+          items: this.$options.PersonnelStatuses.values
+        }
       },
     };
   },
@@ -775,6 +1012,10 @@ export default {
     this.loadPersonnels();
     this.getUserGroupList({ paginate: false }).then(({ data }) => {
       this.options.userGroups.items = data;
+    });
+
+    this.getDepartmentList({ paginate: false }).then(({ data }) => {
+      this.options.departments.items = data;
     });
   },
   methods: {
@@ -905,12 +1146,7 @@ export default {
       personnel.isLoading = true;
       clearFields(fields);
       reset(personnel);
-      fields.id = item.id;
-      fields.firstName = item.firstName;
-      fields.middleName = item.middleName;
-      fields.lastName = item.lastName;
-      fields.birthDate = item.birthDate;
-      fields.completeAddress = item.completeAddress;
+      copyValue(item, fields)
 
       if (item.photo)
         this.personnelPhotoUrl =
@@ -928,7 +1164,9 @@ export default {
       reset(personnel);
       clearFields(user.fields);
       clearFields(personnel.fields);
-      user.userGroupId = null;
+      personnel.fields.personnelStatusId = this.$options.PersonnelStatuses.ACTIVE.id
+      user.fields.userGroupId = null;
+      console.log(personnel)
       this.entryMode = 'Add';
       personnel.isLoading = false;
     },

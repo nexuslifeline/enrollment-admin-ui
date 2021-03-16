@@ -675,3 +675,8 @@ export const SettingPermissions = new Enum({
   TERM: { id: 363, name: 'Terms Settings' },
   REQUIREMENT: { id: 364, name: 'Requirements Settings' },
 });
+
+export const PersonnelStatuses = new Enum({
+  ACTIVE: { id: 1, name: 'Active' },
+  INACTIVE: { id: 2, name: 'Inactive' },
+});
