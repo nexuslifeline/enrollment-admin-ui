@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Personnel Management"
+    title="User Management"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPersonnels"
     :filterVisible="isFilterVisible"
@@ -114,6 +114,12 @@
                     :disabled="showModalConfirmation"
                   >
                     Edit Account Info
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    @click="setChangePasword(row)"
+                    :disabled="showModalChangePassword"
+                  >
+                    Change Password
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
@@ -397,7 +403,7 @@
             <b-row>
                <b-col md="4">
                 <b-form-group>
-                  <label class="required">Status</label>
+                  <label>Status</label>
                   <b-form-select
                     v-model="forms.personnel.fields.personnelStatusId"
                     :state="forms.personnel.states.personnelStatusId"
@@ -424,7 +430,7 @@
             <b-row>
               <b-col md="12">
                 <b-form-group>
-                  <label class="required">Complete Address</label>
+                  <label >Complete Address</label>
                   <b-textarea
                     v-model="forms.personnel.fields.completeAddress"
                     rows="3"
@@ -642,7 +648,7 @@
             <b-row>
                <b-col md="4">
                 <b-form-group>
-                  <label class="required">Status</label>
+                  <label>Status</label>
                   <b-form-select
                     v-model="forms.personnel.fields.personnelStatusId"
                     :state="forms.personnel.states.personnelStatusId"
@@ -669,7 +675,7 @@
             <b-row>
               <b-col md="12">
                 <b-form-group>
-                  <label class="required">Complete Address</label>
+                  <label>Complete Address</label>
                   <b-textarea
                     v-model="forms.personnel.fields.completeAddress"
                     rows="3"
@@ -740,24 +746,6 @@
               </b-form-invalid-feedback>
             </b-form-group>
             <b-form-group>
-              <label class="required">Password</label>
-              <b-form-input
-                type="password"
-                v-model="forms.user.fields.password"
-                :state="forms.user.states.userPassword"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.user.errors.userPassword }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label class="required">Confirm Password</label>
-              <b-form-input
-                type="password"
-                v-model="forms.user.fields.passwordConfirmation"
-              />
-            </b-form-group>
-            <b-form-group>
               <label class="required">User Group</label>
               <b-form-select
                 v-model="forms.user.fields.userGroupId"
@@ -811,6 +799,70 @@
       <!-- modal footer buttons -->
     </b-modal>
     <!-- End Modal Entry Edit User info -->
+    <b-modal
+      @shown="$refs.password.focus()"
+      v-model="showModalChangePassword"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+    >
+      <div slot="modal-title">
+        <!-- modal title -->
+        User Account - Change Password
+      </div>
+      <!-- modal title -->
+      <!-- modal body -->
+      <b-overlay :show="forms.user.isLoading" rounded="sm">
+        <b-row>
+          <b-col md="12">
+            <b-form-group>
+              <label class="required">Password</label>
+              <b-form-input
+                ref="password"
+                type="password"
+                v-model="forms.user.fields.password"
+                :state="forms.user.states.userPassword"
+              />
+              <b-form-invalid-feedback>
+                {{ forms.user.errors.userPassword }}
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group>
+              <label class="required">Confirm Password</label>
+              <b-form-input
+                type="password"
+                v-model="forms.user.fields.passwordConfirmation"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-overlay>
+      <!-- modal body -->
+      <div slot="modal-footer" class="w-100">
+        <!-- modal footer buttons -->
+        <b-button
+          variant="outline-danger"
+          class="float-left btn-close"
+          @click="showModalUpdateUser = false"
+        >
+          Close
+        </b-button>
+        <b-button
+          :disabled="forms.user.isProcessing"
+          variant="outline-primary"
+          class="float-right btn-save"
+          @click="onUserEntry()"
+        >
+          <v-icon
+            v-if="forms.user.isProcessing"
+            name="sync"
+            spin
+            class="mr-2"
+          />
+          Save
+        </b-button>
+      </div>
+      <!-- modal footer buttons -->
+    </b-modal>
     <!-- Modal Confirmation -->
     <b-modal
       v-model="showModalConfirmation"
@@ -915,6 +967,7 @@ export default {
       showModalEntry: false,
       showModalUpdatePersonnel: false,
       showModalUpdateUser: false,
+      showModalChangePassword: false,
       showModalConfirmation: false,
       isProfilePhotoBusy: false,
       selectedPhoto: null,
@@ -1040,6 +1093,14 @@ export default {
         personnel: {
           fields: { id },
         },
+        user: {
+          fields: {
+            username,
+            password,
+            passwordConfirmation,
+            userGroupId
+          }
+        }
       } = this.forms;
       const { users } = this.tables;
       user.isProcessing = true;
@@ -1085,13 +1146,27 @@ export default {
             validate(personnel, errors);
           });
       } else if (this.entryMode == 'Edit User') {
-        const data = { user: user.fields, id: personnel.fields.id };
+        const data = { user: { username, userGroupId }, id: personnel.fields.id };
         this.updatePersonnel(data, id)
           .then(({ data }) => {
             this.updateRow(users, data);
             user.isProcessing = false;
             showNotification(this, 'success', 'User updated successfully.');
             this.showModalUpdateUser = false;
+          })
+          .catch((error) => {
+            const errors = error.response.data.errors;
+            user.isProcessing = false;
+            validate(user, errors);
+          });
+      } else if (this.entryMode == 'Change Password') {
+        const data = { user: { password, passwordConfirmation }, id: personnel.fields.id };
+        this.updatePersonnel(data, id)
+          .then(({ data }) => {
+            this.updateRow(users, data);
+            user.isProcessing = false;
+            showNotification(this, 'success', 'Change Password successfully.');
+            this.showModalChangePassword = false;
           })
           .catch((error) => {
             const errors = error.response.data.errors;
@@ -1117,7 +1192,6 @@ export default {
       });
     },
     setUpdateUser(row) {
-      this.showModalUpdateUser = true;
       const {
         personnel,
         user,
@@ -1133,6 +1207,26 @@ export default {
       fields.userGroupId = item.user.userGroupId;
 
       this.entryMode = 'Edit User';
+      this.showModalUpdateUser = true;
+      user.isLoading = false;
+    },
+    setChangePasword(row) {
+      const {
+        personnel,
+        user,
+        user: { fields },
+      } = this.forms;
+      user.isLoading = true;
+      const { item } = row;
+      clearFields(fields);
+      reset(user);
+
+      personnel.fields.id = item.id;
+      fields.username = item.user.username;
+      fields.userGroupId = item.user.userGroupId;
+
+      this.entryMode = 'Change Password';
+      this.showModalChangePassword = true;
       user.isLoading = false;
     },
     setUpdatePersonnel(row) {
@@ -1166,7 +1260,6 @@ export default {
       clearFields(personnel.fields);
       personnel.fields.personnelStatusId = this.$options.PersonnelStatuses.ACTIVE.id
       user.fields.userGroupId = null;
-      console.log(personnel)
       this.entryMode = 'Add';
       personnel.isLoading = false;
     },

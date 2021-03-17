@@ -6,7 +6,7 @@
         <ul class="sub-nav">
           <li
             v-for="(item, idx) in items"
-            @click="selectedIndex = idx"
+            @click="onSelectedIndexChange(idx)"
             :key="idx"
             class="sub-nav__item"
             :class="{ active: idx === selectedIndex }"
@@ -150,7 +150,7 @@
             <b-row>
               <b-col md="12">
                 <b-form-group>
-                  <label class="required">Complete Address</label>
+                  <label>Complete Address</label>
                   <b-textarea
                     v-model="forms.personnel.fields.completeAddress"
                     rows="3"
@@ -359,6 +359,7 @@ export default {
         this.updatePersonnel(data, fields.id)
           .then(({ data }) => {
             this.isProcessing = false;
+            this.selectedIndex = 0
             showNotification(this, 'success', 'Profile updated successfully.');
           })
           .catch((error) => {
@@ -368,6 +369,13 @@ export default {
           });
       }
     },
+    onSelectedIndexChange(idx) {
+      this.selectedIndex = idx
+      const { fields } = this.forms.user
+      fields.password = null
+      fields.oldPassword = null
+      fields.passwordConfirmation = null
+    }
   },
 };
 </script>

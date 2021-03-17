@@ -195,7 +195,7 @@ export default [
         permissionIds: TranscriptRecordPermissions.getIds()
       },
       {
-        label: 'Personnel',
+        label: 'User',
         to: '/master-files/user',
         permissionIds: PersonnelPermissions.getIds()
       },
