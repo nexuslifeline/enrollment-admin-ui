@@ -39,6 +39,9 @@ const mutations = {
   },
   SET_APPROVAL_COUNT (state, data) {
     state.approvalCount = data
+  },
+  SET_SCHOOL_YEAR_ID (state, data) {
+    state.schoolYearId = data
   }
 }
 

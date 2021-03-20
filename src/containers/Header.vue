@@ -52,7 +52,8 @@
           </li>
         </template>
       </ul>
-      <div v-if="!isHome" class="header__secondary-account-details">
+      <YearDropdown />
+      <div class="header__secondary-account-details">
         <img
           class="header__secondary-account-photo"
           v-if="!!userPhoto"
@@ -91,7 +92,7 @@
             <p class="header__account-name">{{ user.userable.name }}</p>
             <p class="header__account-group">{{ userGroup }}</p>
           </div>
-          <div class="header__account-actions">
+          <!--<div class="header__account-actions">
             <div class="header__school-year">
               <b-form-select
                 v-model="$store.state.schoolYearId"
@@ -135,7 +136,7 @@
                 </ul>
               </div>
             </button>
-          </div>
+          </div>-->
         </template>
       </div>
       <div class="header__sub-menus-container">
@@ -233,6 +234,7 @@ import WaveBackground from '../views/components/WaveMaker';
 import Access from '../mixins/utils/Access';
 import { createLimiter } from '../helpers/utils';
 import OverviewDropdown from './OverviewDropdown';
+import YearDropdown from './YearDropdown';
 
 const MAIN_NAV_LIMIT = 8;
 const SUB_NAV_LIMIT = 6;
@@ -243,6 +245,7 @@ export default {
     ProfileMaker,
     WaveBackground,
     OverviewDropdown,
+    YearDropdown
   },
   mixins: [AuthApi, SchoolYearApi, Access],
   navItems,
@@ -889,7 +892,6 @@ export default {
 
 .header__secondary-account-details {
   display: flex;
-  margin-left: auto;
   align-items: center;
   margin-right: -50px;
 }

@@ -76,10 +76,14 @@ import {
   BIconFunnelFill,
   BIconChevronLeft,
   BIconChevronRight,
+  BIconChevronDown,
+  BIconChevronUp,
   BIconArrowRepeat,
   BIconPerson,
   BIconTelephone
-} from 'bootstrap-vue'
+} from 'bootstrap-vue';
+Vue.component('BIconChevronUp', BIconChevronUp);
+Vue.component('BIconChevronDown', BIconChevronDown);
 Vue.component('BIconTelephone', BIconTelephone);
 Vue.component('BIconGeo', BIconGeo);
 Vue.component('BIconPerson', BIconPerson);
