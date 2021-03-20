@@ -244,6 +244,10 @@
                 isAccessible($options.StudentPaymentPermissions.APPROVAL.id) &&
                   data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
               "
+              :showActionBar="
+                isAccessible($options.StudentPaymentPermissions.APPROVAL.id) &&
+                  data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
+              "
               :options="[
                 {
                   label: 'Approve',
@@ -418,6 +422,19 @@
                     @onAttachmentItemView="(file) => previewFile(file, data)"
                     @onAttachmentItemDownload="(file) => onDownloadFile(file)"
                   />
+                </div>
+              </template>
+
+              <template v-slot:actionBar>
+                <div class="float-right">
+                  <b-button
+                    @click="setApproval(data)"
+                    class="mr-2" variant="outline-primary"
+                    v-if="isAccessible($options.StudentPaymentPermissions.APPROVAL.id)"> Approve</b-button>
+                  <b-button variant="outline-danger"
+                    @click="setDisapproval(data)"
+                    v-if="isAccessible(
+                    $options.StudentPaymentPermissions.DISAPPROVAL.id)"> Reject</b-button>
                 </div>
               </template>
             </ActiveRowViewer>

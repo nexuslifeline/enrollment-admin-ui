@@ -115,7 +115,7 @@ export default [
       //   to: '/registrar/schedule'
       // },
       {
-        label: 'Section',
+        label: 'Section & Schedule',
         to: '/registrar/section',
         permissionIds: SectionAndSchedulePermissions.getIds()
       },
