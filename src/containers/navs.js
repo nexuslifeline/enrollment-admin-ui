@@ -210,6 +210,12 @@ export default [
         label: 'Clearance',
         to: '/master-files/clearance',
         permissionIds: EClearancePermissions.getIds()
+      },
+      {
+        label: 'Clearance Clearing',
+        to: '/master-files/clearance-clearing',
+        // permissionIds: StudentGradePermissions.getIds()
+        // to do add permission
       }
     ]
   },

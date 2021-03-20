@@ -69,6 +69,8 @@ const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentL
 
 const StudentGrade = () => import('@/views/pages/StudentGrade')
 const Clearance = () => import('@/views/pages/Clearance')
+const ClearanceClearing = () => import('@/views/pages/ClearanceClearing')
+
 
 
 
@@ -446,6 +448,12 @@ function configRoutes () {
               path: 'clearance',
               name: 'Clearance',
               component: Clearance,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'clearance-clearing',
+              name: 'Clearance Clearing',
+              component: ClearanceClearing,
               meta: { requiresAuth: true }
             },
           ]
