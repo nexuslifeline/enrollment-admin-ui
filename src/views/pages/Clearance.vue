@@ -84,7 +84,8 @@
           text="Create"
           variant="outline-primary"
           split-variant="outline-primary"
-          class="clearance_drop-down">
+          class="clearance_drop-down"
+          v-if="isAccessible($options.EClearancePermissions.ADD.id)">
           <!-- <b-dropdown-item
             @click="showBatchEntry=false">
             Create Clearance
@@ -139,10 +140,12 @@
                 </template>
                 <b-dropdown-item
                   @click="setUpdateClearance(id)"
+                  v-if="isAccessible($options.EClearancePermissions.EDIT.id)"
                 >
                   <v-icon name="pen" /> Edit
                 </b-dropdown-item>
                 <b-dropdown-item
+                  v-if="isAccessible($options.EClearancePermissions.DELETE.id)"
                   @click="
                     (forms.clearance.fields.id = id), (showModalConfirmation = true)
                   "
@@ -503,7 +506,7 @@ const clearanceFields = {
   },
   signatories: null
 }
-import { SchoolCategories, Semesters } from '../../helpers/enum'
+import { SchoolCategories, Semesters, EClearancePermissions } from '../../helpers/enum'
 import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 import Access from '../../mixins/utils/Access'
 import PageContent from "../components/PageContainer/PageContent";
@@ -511,10 +514,12 @@ import { CourseApi, LevelApi, PersonnelApi, SchoolYearApi, SectionApi, StudentCl
 import Card from '../components/Card';
 import { clearFields, reset, showNotification, validate } from '../../helpers/forms';
 import { copyValue } from '../../helpers/extractor';
+
 // import SelectPaginated from '../components/SelectPaginated';
 export default {
   SchoolCategories,
   Semesters,
+  EClearancePermissions,
   mixins: [Access, SchoolYearApi, CourseApi, LevelApi, SectionApi, StudentClearanceApi, PersonnelApi],
   components: {
     PageContent,

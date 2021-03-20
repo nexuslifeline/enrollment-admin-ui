@@ -86,6 +86,7 @@
                       $options.PersonnelPermissions.EDIT.id,
                       $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id,
                       $options.PersonnelPermissions.DELETE.id,
+                      $options.PersonnelPermissions.CHANGE_PASSWORD.id,
                     ])
                   "
                   right
@@ -118,6 +119,7 @@
                   <b-dropdown-item
                     @click="setChangePasword(row)"
                     :disabled="showModalChangePassword"
+                    v-if="isAccessible($options.PersonnelPermissions.CHANGE_PASSWORD.id)"
                   >
                     Change Password
                   </b-dropdown-item>

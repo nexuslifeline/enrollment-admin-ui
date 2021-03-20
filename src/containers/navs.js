@@ -29,7 +29,8 @@ import {
   StudentLedgerReportPermissions,
   ClassMasterlistReportPermissions,
   StudentGradePermissions,
-  SettingPermissions
+  SettingPermissions,
+  EClearancePermissions
 } from '../helpers/enum';
 
 export default [
@@ -181,7 +182,8 @@ export default [
       ...StudentPermissions.getIds(),
       ...PersonnelPermissions.getIds(),
       ...TranscriptRecordPermissions.getIds(),
-      ...StudentGradePermissions.getIds()
+      ...StudentGradePermissions.getIds(),
+      ...EClearancePermissions.getIds()
     ],
     children: [
       {
@@ -207,8 +209,7 @@ export default [
       {
         label: 'Clearance',
         to: '/master-files/clearance',
-        // permissionIds: StudentGradePermissions.getIds()
-        // to do add permission
+        permissionIds: EClearancePermissions.getIds()
       }
     ]
   },

@@ -59,10 +59,10 @@
         placeholder="Subject"
         class="mt-2"
       />
-      <b-button 
+      <b-button
         :disabled="tables.students.items.length == 0"
         block
-        class="mt-5" @click="onSaveStudentGrade()" 
+        class="mt-5" @click="onSaveStudentGrade()"
         variant="primary">
         <v-icon v-if="isProcessing" name="spinner" spin />
         Save

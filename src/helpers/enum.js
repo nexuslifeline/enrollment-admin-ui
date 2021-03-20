@@ -530,7 +530,8 @@ export const PersonnelPermissions = new Enum({
   ADD: { id: 151, name: 'Add' },
   EDIT: { id: 152, name: 'Edit' },
   UPDATE_PERSONNEL_ACCOUNT: { id: 153, name: 'Update Personnel Account' },
-  DELETE: { id: 154, name: 'Delete' }
+  DELETE: { id: 154, name: 'Delete' },
+  CHANGE_PASSWORD: { id: 155, name: 'Change Password' }
 });
 
 export const RateSheetPermissions = new Enum({
@@ -679,4 +680,15 @@ export const SettingPermissions = new Enum({
 export const PersonnelStatuses = new Enum({
   ACTIVE: { id: 1, name: 'Active' },
   INACTIVE: { id: 2, name: 'Inactive' },
+});
+
+export const EClearancePermissions = new Enum({
+  ADD: { id: 371, name: 'Add' },
+  EDIT: { id: 372, name: 'Edit' },
+  DELETE: { id: 373, name: 'Delete' },
+});
+
+
+export const EClearanceClearingPermissions = new Enum({
+  CLEARING_E_CLEARANCE: { id: 381, name: 'Clearing E-Clearance' },
 });
