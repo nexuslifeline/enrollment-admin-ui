@@ -1,6 +1,6 @@
 <template>
   <div class="year-dropdown__menu-container">
-    <button class="year-dropdown__menu" @click="isShown = !isShown">
+    <button class="year-dropdown__menu" @click.stop="isShown = !isShown">
       {{schoolYearName}}
       <BIconChevronUp v-if="isShown" class="ml-2" />
       <BIconChevronDown v-else class="ml-2" />
@@ -25,6 +25,7 @@
           class="year-dropdown__item"
           :class="{ active: item.id === $store.state.schoolYearId}">
           {{item.name}}
+          <span v-if="item.isActive" class="text-active">(Open)</span>
         </div>
       </div>
     </div>
@@ -59,7 +60,7 @@ export default {
     },
     visibleSchoolYearItems() {
       const { search, options: { schoolYears: { items } } } = this;
-      return search 
+      return search
         ? items.filter(v => [v?.name, v?.description].join(' ').toLowerCase().includes(search))
         : items;
     }
@@ -78,10 +79,19 @@ export default {
     onSchoolYearSelect({ id }) {
       this.$store.commit('SET_SCHOOL_YEAR_ID', id);
       this.isShown = false;
+    },
+    hideSchoolYearDropdown() {
+      this.isShown = false;
     }
   },
   created() {
     this.loadSchoolYearList();
+  },
+  mounted() {
+    window.addEventListener('click', this.hideSchoolYearDropdown);
+  },
+  beforeDestroy() {
+    window.removeEventListener('click', this.hideSchoolYearDropdown);
   },
 };
 </script>
@@ -159,8 +169,14 @@ export default {
   min-height: 70px;
   height: auto;
   overflow: auto;
-  padding: 3px 10px;
+  padding: 3px 7px;
   margin-top: 5px;
+}
+
+.text-active {
+  margin-left: 10px;
+  font-size: 13px;
+  padding: 0;
 }
 
 .year-dropdown__item {
