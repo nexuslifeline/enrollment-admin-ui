@@ -212,6 +212,15 @@
                   : data.item.admission.applicationStatusId ===
                     applicationStatuses.SUBMITTED.id
               "
+              :showActionBar="
+                !isAccessible($options.StudentFeePermissions.APPROVAL.id)
+                  ? false
+                  : data.item.applicationId
+                  ? data.item.application.applicationStatusId ===
+                    applicationStatuses.SUBMITTED.id
+                  : data.item.admission.applicationStatusId ===
+                    applicationStatuses.SUBMITTED.id
+              "
               :options="[
                 {
                   label: 'Approve',
@@ -553,6 +562,15 @@
                       </h5>
                     </b-col>
                   </b-row>
+                </div>
+              </template>
+
+              <template v-slot:actionBar>
+                <div class="float-right">
+                  <b-button
+                    @click="setApproveFees(data)"
+                    class="mr-2" variant="outline-primary"
+                    v-if="isAccessible($options.StudentFeePermissions.APPROVAL.id)"> Approve</b-button>
                 </div>
               </template>
             </ActiveRowViewer>

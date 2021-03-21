@@ -196,6 +196,10 @@
                 data.item.academicRecordStatusId ===
                   AcademicRecordStatuses.DRAFT.id
               "
+              :showActionBar="
+                data.item.academicRecordStatusId ===
+                  AcademicRecordStatuses.DRAFT.id
+              "
               :options="[
                 {
                   label: 'Approve',
@@ -413,6 +417,18 @@
                       </b-tr>
                     </template>
                   </b-table>
+                </div>
+              </template>
+              <template v-slot:actionBar>
+                <div class="float-right">
+                  <b-button
+                    @click="setApproval(data)"
+                    class="mr-2" variant="outline-primary"
+                    v-if="isAccessible($options.StudentSubjectPermissions.APPROVAL.id)"> Approve</b-button>
+                  <b-button variant="outline-danger"
+                    @click="setDisapproval(data)"
+                    v-if="isAccessible(
+                    $options.StudentSubjectPermissions.DISAPPROVAL.id)"> Reject</b-button>
                 </div>
               </template>
             </ActiveRowViewer>

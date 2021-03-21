@@ -36,6 +36,9 @@
           <slot name="content"></slot>
         </div>
       </div>
+      <div v-if="showActionBar" class="active-view__action-bar">
+        <slot name="actionBar"></slot>
+      </div>
     </b-overlay>
   </div>
 </template>
@@ -61,6 +64,10 @@
       },
       options: {
         type: [Array],
+      },
+      showActionBar: {
+        type: [Boolean],
+        default: true
       }
     },
     mounted() {
@@ -152,6 +159,7 @@
     display: flex;
     overflow: auto;
     margin-top: 69px;
+    position: relative;
   }
 
   .active-view__side-nav {
@@ -170,6 +178,7 @@
     padding: 40px;
     border-left: 1px solid $brand-border-color;
     background-color: $light-gray;
+    position: relative;
   }
 
   .active-view__right-action {
@@ -216,4 +225,16 @@
     }
   }
 
+  .active-view__action-bar {
+    height: 60px;
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    width: 100%;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 15px;
+  }
 </style>

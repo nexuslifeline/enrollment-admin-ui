@@ -160,6 +160,11 @@
                 data.item.evaluationStatusId ===
                   evaluationStatuses.SUBMITTED.id
               "
+              :showActionBar="
+                data.item.evaluationStatusId ===
+                  evaluationStatuses.SUBMITTED.id
+              "
+
               :options="[
                 {
                   label: 'Approve',
@@ -929,6 +934,19 @@
                       </b-col>
                     </b-row>
                   </div>
+                </div>
+              </template>
+
+              <template v-slot:actionBar>
+                <div class="float-right">
+                  <b-button
+                    @click="setApproval(data)"
+                    class="mr-2" variant="outline-primary"
+                    v-if="isAccessible($options.EvaluationAndAdmissionPermissions.APPROVAL.id)"> Approve</b-button>
+                  <b-button variant="outline-danger"
+                    @click="setDisapproval(data)"
+                    v-if="isAccessible(
+                    $options.EvaluationAndAdmissionPermissions.DISAPPROVAL.id)"> Reject</b-button>
                 </div>
               </template>
 
