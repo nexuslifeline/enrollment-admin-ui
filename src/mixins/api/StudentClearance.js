@@ -20,5 +20,11 @@ export default {
     batchCreateStudentClearance(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-clearances/batch-store`, data);
     },
+    getSignatoryList(params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/signatories`, { params: params });
+    },
+    batchUpdateSignatories(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/signatories/update`, data);
+    }
   }
 }
