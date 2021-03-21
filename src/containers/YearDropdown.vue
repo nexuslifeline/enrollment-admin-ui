@@ -15,6 +15,7 @@
           type="text"
           placeholder="Search School Year"
           class="year-dropdown__search-filter"
+          @click.stop="() => false"
         />
       </div>
       <div class="year-dropdown__items-list">
