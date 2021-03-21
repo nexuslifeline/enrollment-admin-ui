@@ -7,14 +7,19 @@
     </button>
     <div v-if="isShown" class="year-dropdown__items-container">
       <p class="year-dropdown__items-title">
-        Select School Year
+        School Year
       </p>
       <div class="year-dropdown__items-search">
-        <input type="text" placeholder="Search School Year" class="year-dropdown__search-filter" />
+        <input
+          v-model="search"
+          type="text"
+          placeholder="Search School Year"
+          class="year-dropdown__search-filter"
+        />
       </div>
       <div class="year-dropdown__items-list">
         <div
-          v-for="item in options.schoolYears.items"
+          v-for="item in visibleSchoolYearItems"
           :key="item.id"
           @click="onSchoolYearSelect(item)"
           class="year-dropdown__item"
@@ -37,6 +42,7 @@ export default {
   mixins: [SchoolYearApi],
   data() {
     return {
+      search: '',
       options: {
         schoolYears: {
           items: [],
@@ -50,6 +56,12 @@ export default {
       const { schoolYearId } = this.$store.state;
       const item = this.options?.schoolYears?.items.find((v) => v.id === schoolYearId)
       return item?.name || 'No School Year';
+    },
+    visibleSchoolYearItems() {
+      const { search, options: { schoolYears: { items } } } = this;
+      return search 
+        ? items.filter(v => [v?.name, v?.description].join(' ').toLowerCase().includes(search))
+        : items;
     }
   },
   methods: {
@@ -90,6 +102,22 @@ export default {
   border: 0;
   outline: 0;
   background: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+
+  &:before {
+    position: absolute;
+    content: ' ';
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    border: 1px solid $green;
+    left: 0;
+    margin: 0 3px 0 0;
+    background-color: $green;
+  }
 }
 
 .year-dropdown__items-container {
@@ -131,13 +159,17 @@ export default {
   min-height: 70px;
   height: auto;
   overflow: auto;
-  padding: 5px 10px;
+  padding: 3px 10px;
   margin-top: 5px;
 }
 
 .year-dropdown__item {
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 5px 10px 5px 25px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
 
   &:hover {
     background-color: $light-gray-100;
@@ -145,6 +177,18 @@ export default {
 
   &.active {
     background-color: $light-gray-100;
+
+    &:before {
+      position: absolute;
+      content: ' ';
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      border: 1px solid $green;
+      left: 10px;
+      margin: 0 3px 0 0;
+      background-color: $green;
+    }
   }
 }
 
