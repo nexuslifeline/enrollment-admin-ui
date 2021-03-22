@@ -262,7 +262,7 @@ export default {
       student.sectionId = null
       if (schoolCategoryId && schoolYearId && (this.isCourseVisible ? student.semesterId : true)) {
         const params = { schoolCategoryId, schoolYearId, semesterId: student.semesterId }
-        const { id } = this.$store.state.user
+        const { id } = this.$store.state.user.userable
         const { sections } = this.options
         this.getSectionsOfPersonnel(params, id).then(({ data }) => {
           sections.items = data

@@ -23,7 +23,7 @@
         class="mt-2"
       />
       <v-select
-        @input="loadSectionsOfPersonnel(), loadSections()"
+        @input="loadSections()"
         :options="options.schoolYears.items"
         v-model="filters.clearance.schoolYearId"
         :reduce="(item) => item.id"

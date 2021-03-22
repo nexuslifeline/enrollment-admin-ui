@@ -30,7 +30,8 @@ import {
   ClassMasterlistReportPermissions,
   StudentGradePermissions,
   SettingPermissions,
-  EClearancePermissions
+  EClearancePermissions,
+  EClearanceClearingPermissions
 } from '../helpers/enum';
 
 export default [
@@ -214,7 +215,7 @@ export default [
       {
         label: 'Clearance Clearing',
         to: '/master-files/clearance-clearing',
-        // permissionIds: StudentGradePermissions.getIds()
+        permissionIds: EClearanceClearingPermissions.getIds()
         // to do add permission
       }
     ]
