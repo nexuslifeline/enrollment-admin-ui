@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Clearance Clearing"
+    title="Clearance"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"
