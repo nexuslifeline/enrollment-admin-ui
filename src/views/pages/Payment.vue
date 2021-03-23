@@ -21,6 +21,33 @@
         placeholder="Status"
         class="mt-2"
       />
+      <div class="mt-2">FROM</div>
+       <b-form-datepicker
+        :date-format-options="{
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          weekday: 'short',
+        }"
+        class="date-pickers mt-1"
+        v-model="filters.payment.dateFrom"
+        @input="loadPaymentList()"
+        boundary="window"
+      />
+      <div class="mt-2">TO</div>
+      <b-form-datepicker
+        :date-format-options="{
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          weekday: 'short',
+        }"
+        class="date-pickers mt-2"
+        v-model="filters.payment.dateTo"
+        @input="loadPaymentList()"
+        boundary="window"
+        :min="filters.payment.dateFrom"
+      />
     </template>
     <template v-slot:content>
       <div>
@@ -970,6 +997,8 @@ export default {
           criteria: null,
           paymentStatusId: PaymentStatuses.SUBMITTED.id,
           paymentStatusItem: PaymentStatuses.SUBMITTED,
+          dateFrom: new Date(),
+          dateTo: new Date()
         },
       },
       isProcessing: false,
@@ -986,7 +1015,7 @@ export default {
         payment,
         payment: { perPage, page },
       } = this.paginations;
-      const { paymentStatusId, criteria } = this.filters.payment;
+      const { paymentStatusId, criteria, dateFrom, dateTo } = this.filters.payment;
       const orderBy = 'submitted_date';
       const sort = 'DESC';
       payments.isBusy = true;
@@ -998,6 +1027,8 @@ export default {
         orderBy,
         sort,
         criteria,
+        dateFrom,
+        dateTo
       };
 
       this.getPaymentList(params).then(({ data }) => {

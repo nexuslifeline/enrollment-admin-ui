@@ -6,7 +6,7 @@
     <div>
       {{ data && data.course ? $options.getPropValue(data.course) : '' }} {{ data && data.semester ? $options.getPropValue(data.semester) : '' }}
     </div>
-    <div>
+    <div v-if="showSchoolYear">
       {{ data && data.schoolYear ? $options.getPropValue(data.schoolYear): '' }}
     </div>
   </div>
@@ -19,6 +19,10 @@
     props: {
       data: {
         type: [Object]
+      },
+      showSchoolYear: {
+        type: [Boolean],
+        default: true
       }
     }
   }

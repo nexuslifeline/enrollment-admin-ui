@@ -102,7 +102,7 @@
                     @click="setUpdatePersonnel(row)"
                     :disabled="showModalEntry"
                   >
-                    Edit Personnel Info
+                    Edit Profile
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -114,7 +114,7 @@
                     @click="setUpdateUser(row)"
                     :disabled="showModalConfirmation"
                   >
-                    Edit Account Info
+                    Edit Account
                   </b-dropdown-item>
                   <b-dropdown-item
                     @click="setChangePasword(row)"

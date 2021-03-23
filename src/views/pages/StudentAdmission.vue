@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Subject Enlistment"
+    :title="`Subject Enlistment (${selectedSchoolYear? selectedSchoolYear.name : ''})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"
@@ -151,8 +151,11 @@
             <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
             <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
           </template> -->
+          <template v-slot:cell(address)="data">
+            <AddressColumn :data="data.item" />
+          </template>
           <template v-slot:cell(education)="data">
-            <EducationColumn :data="data.item" />
+            <EducationColumn :data="data.item" :showSchoolYear="false"/>
           </template>
           <template v-slot:cell(status)="data">
             <b-badge
@@ -969,6 +972,7 @@ import {
   SubjectApi,
   DepartmentApi,
   SectionApi,
+  SchoolYearApi
 } from '../../mixins/api';
 import {
   SchoolCategories,
@@ -991,7 +995,7 @@ import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
-import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
+import { StudentColumn,AddressColumn , EducationColumn } from '../components/ColumnDetails';
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from "../components/NoAccess";
@@ -1028,6 +1032,7 @@ export default {
     SectionApi,
     Tables,
     Access,
+    SchoolYearApi
   ],
   components: {
     SchoolCategoryTabs,
@@ -1041,7 +1046,8 @@ export default {
     ActiveViewItem,
     PageContent,
     FilterButton,
-    NoAccess
+    NoAccess,
+    AddressColumn
   },
   StudentSubjectPermissions,
   data() {
@@ -1086,7 +1092,7 @@ export default {
               key: 'name',
               label: 'Name',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '25%' },
               // formatter: (value, key, item) => {
               // 	if(!item.student.middleName){
               // 		item.student.middleName = ""
@@ -1094,18 +1100,18 @@ export default {
               // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
               // }
             },
-            // {
-            // 	key: "contact",
-            // 	label: "Contact",
-            // 	tdClass: "align-middle",
-            // 	thStyle: { width: "30%" },
+            {
+            	key: "address",
+            	label: "ADDRESS",
+            	tdClass: "align-middle",
+            	thStyle: { width: '30%' },
 
-            // },
+            },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '30%' },
             },
             {
               key: 'status',
@@ -1412,6 +1418,9 @@ export default {
         sections: {
           items: [],
         },
+        schoolYears: {
+          items: []
+        }
       },
       isProcessing: false,
       showDepartment: false,
@@ -1429,6 +1438,7 @@ export default {
       student.schoolCategoryItem =  this.getDefaultSchoolCategory()
     }
 
+    this.loaSchoolYears();
     this.loadCourseList();
     // this.loadDepartmentList()
     this.loadSections();
@@ -1437,6 +1447,13 @@ export default {
     this.loadAcademicRecord()
   },
   methods: {
+    loaSchoolYears() {
+      const params = { paginate: false}
+      const { schoolYears } = this.options
+      this.getSchoolYearList(params).then(({data}) => {
+        schoolYears.items = data
+      })
+    },
     setApproval(row) {
       this.forms.applicationAdmission.fields.approvalNotes = null;
       if (!row.item.subjects) {
@@ -1876,6 +1893,11 @@ export default {
         schoolCategories.COLLEGE.id,
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
+    },
+    selectedSchoolYear() {
+      const { schoolYearId } = this.$store.state
+      const { schoolYears } = this.options
+      return schoolYears.items.find(sy => sy.id ===  schoolYearId)
     }
   },
   watch: {
