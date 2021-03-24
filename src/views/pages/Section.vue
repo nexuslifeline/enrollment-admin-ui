@@ -5,7 +5,7 @@
     @refresh="loadSections"
     :filterVisible="isFilterVisible"
     @create="setCreate()"
-    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess()">
+    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess() && isOpenSelectedSchoolYear">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.section.criteria"
@@ -1617,6 +1617,19 @@ export default {
         schoolCategories.COLLEGE.id,
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
+    },
+    activeSchoolYear() {
+      const { schoolYears } = this.options
+      return schoolYears.items.find((d) => d.isActive === 1);
+    },
+    isOpenSelectedSchoolYear() {
+      const { schoolYearId } = this.$store.state
+      if(this.activeSchoolYear) {
+        if(this.activeSchoolYear.id === schoolYearId) {
+          return true
+        }
+      }
+      return false
     }
   }
 };
