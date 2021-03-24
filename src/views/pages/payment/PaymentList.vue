@@ -26,6 +26,7 @@
         class="date-pickers mt-1"
         v-model="filters.payment.dateFrom"
         @input="loadPayments"
+        boundary="window"
       />
       <div class="mt-2">TO</div>
       <b-form-datepicker
@@ -38,6 +39,8 @@
         class="date-pickers mt-2"
         v-model="filters.payment.dateTo"
         @input="loadPayments"
+        boundary="window"
+        :min="filters.payment.dateFrom"
       />
       <b-button
         v-if="showPrintPreviewButton"

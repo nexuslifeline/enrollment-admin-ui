@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Student Assessment Fee"
+    :title="`Student Assessment Fee (${selectedSchoolYear? selectedSchoolYear.name : ''})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"
@@ -142,8 +142,11 @@
               :callback="{ loadDetails: () => loadDetails(data) }"
             />
           </template>
+          <template v-slot:cell(address)="data">
+            <AddressColumn :data="data.item" />
+          </template>
           <template v-slot:cell(education)="data">
-            <EducationColumn :data="data.item" />
+            <EducationColumn :data="data.item" :showSchoolYear="false"/>
           </template>
           <template v-slot:cell(status)="data">
             <b-badge
@@ -736,6 +739,7 @@ import {
   RateSheetApi,
   SchoolFeeApi,
   ReportApi,
+  SchoolYearApi,
 } from '../../mixins/api';
 import {
   SchoolCategories,
@@ -753,7 +757,7 @@ import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
-import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, AddressColumn } from '../components/ColumnDetails';
 
 import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
@@ -779,6 +783,7 @@ export default {
     ReportApi,
     Tables,
     Access,
+    SchoolYearApi
   ],
   format,
   components: {
@@ -796,7 +801,8 @@ export default {
     FileViewer,
     PageContent,
     FilterButton,
-    NoAccess
+    NoAccess,
+    AddressColumn
   },
   StudentFeePermissions,
   data() {
@@ -826,13 +832,19 @@ export default {
               key: 'name',
               label: 'Name',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '25%' },
+            },
+            {
+              key: 'address',
+              label: 'Address',
+              tdClass: 'align-middle',
+              thStyle: { width: '30%' },
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '30%' },
             },
             {
               key: 'status',
@@ -1023,6 +1035,9 @@ export default {
           items: [],
         },
         schoolCategories: SchoolCategories,
+        schoolYears: {
+          items: []
+        }
       },
       schoolCategoryId: null,
       studentFees: [],
@@ -1036,11 +1051,19 @@ export default {
       student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
       student.schoolCategoryItem =  this.getDefaultSchoolCategory()
     }
+    this.loaSchoolYears()
     this.loadCourseList();
     this.loadFees();
     this.loadAcademicRecord()
   },
   methods: {
+    loaSchoolYears() {
+      const params = { paginate: false}
+      const { schoolYears } = this.options
+      this.getSchoolYearList(params).then(({data}) => {
+        schoolYears.items = data
+      })
+    },
     setApproveFees(row) {
       this.approvalNotes = null;
       this.row = row;
@@ -1381,6 +1404,11 @@ export default {
     },
   },
   computed: {
+    selectedSchoolYear() {
+      const { schoolYearId } = this.$store.state
+      const { schoolYears } = this.options
+      return schoolYears.items.find(sy => sy.id ===  schoolYearId)
+    },
     subjectsTotalAmount() {
       return (subjects) => {
         let amount = 0;
