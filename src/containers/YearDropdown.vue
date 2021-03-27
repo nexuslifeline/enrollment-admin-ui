@@ -1,7 +1,11 @@
 <template>
   <div class="year-dropdown__menu-container">
-    <button class="year-dropdown__menu" @click.stop="isShown = !isShown">
-      {{schoolYearName}}
+    <button
+      class="year-dropdown__menu"
+      :class="{ inactive: !schoolYear.isActive }"
+      @click.stop="isShown = !isShown">
+      <span v-if="!isLoading">{{schoolYear.name || 'No School Year'}}</span>
+      <BSpinner v-else small type="grow" />
       <BIconChevronUp v-if="isShown" class="ml-2" />
       <BIconChevronDown v-else class="ml-2" />
     </button>
@@ -24,23 +28,25 @@
           :key="item.id"
           @click="onSchoolYearSelect(item)"
           class="year-dropdown__item"
-          :class="{ active: item.id === $store.state.schoolYearId}">
+          :class="{ 
+            active: item.id === $store.state.schoolYearId && item.isActive,
+            inactive: item.id === $store.state.schoolYearId && !item.isActive
+          }">
           {{item.name}}
           <span v-if="item.isActive" class="text-active">(Open)</span>
         </div>
       </div>
+      <div class="year-dropdown__action-container">
+        <button class="year-dropdown__action-open" @click.stop="onSchoolYearOpen">
+          Open New School Year
+        </button>
+      </div>
     </div>
   </div>
 </template>
-
-<script>import { BIconChevronUp } from 'bootstrap-vue'
-
+<script>
 import { SchoolYearApi } from '../mixins/api';
 export default {
-  components: {
-    BIconChevronUp,
-
-  },
   mixins: [SchoolYearApi],
   data() {
     return {
@@ -50,14 +56,14 @@ export default {
           items: [],
         },
       },
-      isShown: false
+      isShown: false,
+      isLoading: false
     };
   },
   computed: {
-    schoolYearName() {
+    schoolYear() {
       const { schoolYearId } = this.$store.state;
-      const item = this.options?.schoolYears?.items.find((v) => v.id === schoolYearId)
-      return item?.name || 'No School Year';
+      return this.options?.schoolYears?.items.find((v) => v.id === schoolYearId) || {};
     },
     visibleSchoolYearItems() {
       const { search, options: { schoolYears: { items } } } = this;
@@ -69,12 +75,16 @@ export default {
   methods: {
     loadSchoolYearList() {
       const { schoolYears } = this.options;
+      this.isLoading = true;
       this.getSchoolYearList({ paginate: false }).then(({ data }) => {
+        this.isLoading = false;
         const activeSchoolYear = data.find((d) => d.isActive === 1);
         this.$store.state.schoolYearId = activeSchoolYear
           ? activeSchoolYear.id
           : null;
         schoolYears.items = data;
+      }).catch((error) => {
+        this.isLoading = false;
       });
     },
     onSchoolYearSelect({ id }) {
@@ -83,6 +93,9 @@ export default {
     },
     hideSchoolYearDropdown() {
       this.isShown = false;
+    },
+    onSchoolYearOpen() {
+
     }
   },
   created() {
@@ -128,6 +141,13 @@ export default {
     left: 0;
     margin: 0 3px 0 0;
     background-color: $green;
+  }
+
+  &.inactive {
+    &:before {
+      background-color: $yellow;
+      border-color: $yellow;
+    }
   }
 }
 
@@ -207,6 +227,40 @@ export default {
       background-color: $green;
     }
   }
+
+  &.inactive {
+    background-color: $light-gray-100;
+
+    &:before {
+      position: absolute;
+      content: ' ';
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      border: 1px solid $yellow;
+      left: 10px;
+      margin: 0 3px 0 0;
+      background-color: $yellow;
+    }
+  }
+}
+
+.year-dropdown__action-container {
+  display: flex;
+  flex-direction: row;
+  padding: 2px 10px;
+  margin-top: 10px;
+}
+
+.year-dropdown__action-open {
+  width: 100%;
+  height: 100%;
+  min-height: 30px;
+  background-color: $blue;
+  color: $white;
+  border: 0;
+  border-radius: 3px;
+  outline: none;
 }
 
 </style>

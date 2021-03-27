@@ -80,8 +80,10 @@ import {
   BIconChevronUp,
   BIconArrowRepeat,
   BIconPerson,
-  BIconTelephone
+  BIconTelephone,
+  BSpinner
 } from 'bootstrap-vue';
+Vue.component('BSpinner', BSpinner);
 Vue.component('BIconChevronUp', BIconChevronUp);
 Vue.component('BIconChevronDown', BIconChevronDown);
 Vue.component('BIconTelephone', BIconTelephone);

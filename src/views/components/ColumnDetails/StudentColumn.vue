@@ -4,33 +4,25 @@
       <AvatarMaker
         :avatarId="data.student.id"
         :size="33"
-        :text="
-          `${data.student.firstName.charAt(0)}${data.student.lastName.charAt(
-            0
-          )}`
-        "
-        :src="
-          $options.getFilePath(
-            (data.student.photo && data.student.photo.hashName) || ''
-          )
-        "
+        :text="avatarText"
+        :src="$options.getFilePath(photoHashName)"
       />
     </template>
-    <div>
+    <div class="student-name">
       <b-link @click="callback.loadDetails">
         {{ data.student && data.student.name }}
       </b-link>
+      <span
+        v-if="data.student.studentNo"
+        v-b-tooltip.hover
+        :title="`Student Number: ${data.student.studentNo}`"
+        class="label__student-no">
+        {{data.student.studentNo}}
+      </span>
     </div>
     <div class="text-muted">
       {{ data.student.email }}
     </div>
-    <!-- <div class="text-muted">
-      {{
-        data.student.currentAddress || data.student.address
-          ? data.student.currentAddress
-          : ''
-      }}
-    </div> -->
   </b-media>
 </template>
 
@@ -50,8 +42,39 @@ export default {
   components: {
     AvatarMaker,
   },
+  computed: {
+    avatarText() {
+      const { firstName, lastName } = this.data.student;
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+    },
+    photoHashName() {
+      const { photo } = this.data.student;
+      return photo?.hashName || '';
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/scss/shared.scss';
+
+.student-name {
+  display: flex;
+  position: relative;
+}
+
+.label__student-no {
+  font-size: 10px;
+  padding: 0 6px;
+  border-radius: 5px;
+  color: $dark-gray-300;
+  font-weight: 600;
+  border: 1px solid $dark-gray-100;
+  background-color: $light-gray-100;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+}
 </style>
