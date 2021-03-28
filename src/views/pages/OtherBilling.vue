@@ -1043,7 +1043,7 @@ export default {
         page,
         billingStatusId,
         billingTypeId: BillingTypes.BILLING.id,
-        schoolYearId: this.$store.state.schoolYearId,
+        schoolYearId: this.$store.state.schoolYear.id,
         orderBy,
         sort,
       };
@@ -1371,7 +1371,7 @@ export default {
     'forms.billing.studentQuery': debounce(function() {
       this.loadStudents();
     }, 500),
-    '$store.state.schoolYearId': function(newVal) {
+    '$store.state.schoolYear': function(newVal) {
       this.loadBillings();
     },
   },

@@ -7,7 +7,8 @@ const state = {
   sidebarMinimize: false,
   isLoggedIn: !!localStorage.getItem('adminAccessToken') ?? false,
   user: [],
-  schoolYearId: null,
+  // schoolYearId: null,
+  schoolYear: [],
   approvalCount: {
     assessment: 0,
     enlistment: 0,
@@ -40,8 +41,11 @@ const mutations = {
   SET_APPROVAL_COUNT (state, data) {
     state.approvalCount = data
   },
-  SET_SCHOOL_YEAR_ID (state, data) {
-    state.schoolYearId = data
+  // SET_SCHOOL_YEAR_ID (state, data) {
+  //   state.schoolYearId = data
+  // },
+  SET_SCHOOL_YEAR(state, data) {
+    state.schoolYear = data
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Clearance"
+    :title="`Clearance (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"
@@ -22,7 +22,7 @@
         placeholder="School Category"
         class="mt-2"
       />
-      <v-select
+      <!-- <v-select
         @input="loadSections()"
         :options="options.schoolYears.items"
         v-model="filters.clearance.schoolYearId"
@@ -30,7 +30,7 @@
         label="name"
         placeholder="School Year"
         class="mt-2"
-      />
+      /> -->
       <v-select
         v-if="isCourseVisible"
         @input="loadLevelsOfCourse(), loadSections(), loadClearances()"
@@ -301,7 +301,8 @@ export default {
       }
     },
     loadLevels() {
-      const { schoolCategoryId } = this.filters.clearance
+      const { clearance, clearance: { schoolCategoryId } } = this.filters
+      clearance.levelId = null
       if (!this.isCourseVisible) {
         const params = { paginate: false, schoolCategoryId }
         const { levels } = this.options
@@ -313,9 +314,10 @@ export default {
       }
     },
     loadLevelsOfCourse() {
-      const { courseId } = this.filters.clearance
+      const { clearance, clearance: { courseId } } = this.filters
       const params = { paginate: false }
       const { levels } = this.options
+      clearance.levelId = null
       this.getLevelsOfCourse(courseId, params).then(({ data }) => {
         levels.items = data
       }).catch(error => {
@@ -323,7 +325,8 @@ export default {
       })
     },
     loadSectionsOfPersonnel() {
-      const { clearance, clearance: { schoolCategoryId, schoolYearId } } = this.filters
+      const { clearance, clearance: { schoolCategoryId } } = this.filters
+      const { id: schoolYearId } = this.$store.state.schoolYear
       if(!this.isCourseVisible) {
         clearance.semesterId = null
       }
@@ -348,7 +351,8 @@ export default {
       subjects.items = section.subjects ?? []
     },
     loadTerms() {
-      const { schoolCategoryId, schoolYearId, semesterId } = this.filters.clearance
+      const { schoolCategoryId, semesterId } = this.filters.clearance
+      const { id: schoolYearId } = this.$store.state.schoolYear
       const params = {
         paginate: false,
         schoolCategoryId,
@@ -380,7 +384,8 @@ export default {
       })
     },
     loadSections() {
-      const { schoolCategoryId, schoolYearId, courseId, semesterId, levelId } = this.filters.clearance
+      const { schoolCategoryId, courseId, semesterId, levelId } = this.filters.clearance
+      const { id: schoolYearId } = this.$store.state.schoolYear
       const params = { paginate: false, schoolCategoryId, schoolYearId, courseId, semesterId, levelId }
       const { sections } = this.options
       this.getSectionList(params).then(({ data }) => {
@@ -400,7 +405,12 @@ export default {
         SchoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
-  }
+  },
+  watch: {
+    '$store.state.schoolYear': function(newVal) {
+      this.loadSections()
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

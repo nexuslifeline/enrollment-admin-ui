@@ -1025,7 +1025,7 @@ export default {
         courseId,
         levelId,
         semesterId,
-        schoolYearId: this.$store.state.schoolYearId,
+        schoolYearId: this.$store.state.schoolYear.id,
         criteria,
       };
       this.getSectionList(params).then(({ data }) => {
@@ -1604,7 +1604,7 @@ export default {
     },
   },
   watch: {
-    '$store.state.schoolYearId': function(newVal) {
+    '$store.state.schoolYear': function(newVal) {
       this.loadSections();
     },
   },

@@ -28,10 +28,7 @@
           :key="item.id"
           @click="onSchoolYearSelect(item)"
           class="year-dropdown__item"
-          :class="{ 
-            active: item.id === $store.state.schoolYearId && item.isActive,
-            inactive: item.id === $store.state.schoolYearId && !item.isActive
-          }">
+          :class="{ active: item.id === $store.state.schoolYear.id}">
           {{item.name}}
           <span v-if="item.isActive" class="text-active">(Open)</span>
         </div>
@@ -62,8 +59,8 @@ export default {
   },
   computed: {
     schoolYear() {
-      const { schoolYearId } = this.$store.state;
-      return this.options?.schoolYears?.items.find((v) => v.id === schoolYearId) || {};
+      const { id } = this.$store.state.schoolYear;
+      return this.options?.schoolYears?.items.find((v) => v.id === id) || {};
     },
     visibleSchoolYearItems() {
       const { search, options: { schoolYears: { items } } } = this;
@@ -79,16 +76,15 @@ export default {
       this.getSchoolYearList({ paginate: false }).then(({ data }) => {
         this.isLoading = false;
         const activeSchoolYear = data.find((d) => d.isActive === 1);
-        this.$store.state.schoolYearId = activeSchoolYear
-          ? activeSchoolYear.id
-          : null;
+        this.$store.state.schoolYear = activeSchoolYear ?? null
         schoolYears.items = data;
       }).catch((error) => {
         this.isLoading = false;
       });
     },
-    onSchoolYearSelect({ id }) {
-      this.$store.commit('SET_SCHOOL_YEAR_ID', id);
+    onSchoolYearSelect(schoolYear) {
+      // this.$store.commit('SET_SCHOOL_YEAR_ID', schoolYear.id);
+      this.$store.commit('SET_SCHOOL_YEAR', schoolYear);
       this.isShown = false;
     },
     hideSchoolYearDropdown() {

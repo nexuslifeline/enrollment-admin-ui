@@ -1598,7 +1598,7 @@ export default {
         schoolCategoryId,
         courseId,
         notApplicationStatusId,
-        schoolYearId: this.$store.state.schoolYearId,
+        schoolYearId: this.$store.state.schoolYear.id,
         orderBy,
         sort,
         criteria,
@@ -1901,7 +1901,7 @@ export default {
     }
   },
   watch: {
-    '$store.state.schoolYearId': function(newVal) {
+    '$store.state.schoolYear': function(newVal) {
       this.loadAcademicRecord();
     },
   },

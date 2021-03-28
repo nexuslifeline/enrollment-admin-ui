@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Student Grade"
+    :title="`Student Grade (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadStudents()"
     :filterVisible="isFilterVisible"
@@ -22,7 +22,7 @@
         placeholder="School Category"
         class="mt-2"
       />
-      <v-select
+      <!-- <v-select
         @input="loadSectionsOfPersonnel()"
         :options="options.schoolYears.items"
         v-model="filters.student.schoolYearId"
@@ -30,7 +30,7 @@
         label="name"
         placeholder="School Year"
         class="mt-2"
-      />
+      /> -->
       <v-select
         v-if="isCourseVisible"
         @input="loadSectionsOfPersonnel()"
@@ -205,7 +205,6 @@ export default {
         student: {
           criteria: null,
           schoolCategoryId: null,
-          schoolYearId: null,
           semesterId: null,
           sectionId: null,
           subjectId: null
@@ -225,7 +224,7 @@ export default {
     }
   },
   created() {
-    this.loadSchoolYears()
+    // this.loadSchoolYears()
   },
   methods: {
     loadStudents() {
@@ -242,20 +241,21 @@ export default {
         students.isBusy = false;
       })
     },
-    loadSchoolYears() {
-      const params = { paginate: false }
-      const { schoolYears } = this.options
-      const { student } = this.filters
-      this.getSchoolYearList(params).then(({ data }) => {
-        const activeSchoolYear = data.find(x => x.isActive)
-        student.schoolYearId = activeSchoolYear.id ?? null
-        schoolYears.items = data
-      }).catch(error => {
-        console.log(error)
-      })
-    },
+    // loadSchoolYears() {
+    //   const params = { paginate: false }
+    //   const { schoolYears } = this.options
+    //   const { student } = this.filters
+    //   this.getSchoolYearList(params).then(({ data }) => {
+    //     const activeSchoolYear = data.find(x => x.isActive)
+    //     student.schoolYearId = activeSchoolYear.id ?? null
+    //     schoolYears.items = data
+    //   }).catch(error => {
+    //     console.log(error)
+    //   })
+    // },
     loadSectionsOfPersonnel() {
-      const { student, student: { schoolCategoryId, schoolYearId } } = this.filters
+      const { student, student: { schoolCategoryId } } = this.filters
+      const { id: schoolYearId } = this.$store.state.schoolYear
       if(!this.isCourseVisible) {
         student.semesterId = null
       }
@@ -280,7 +280,8 @@ export default {
       subjects.items = section.subjects ?? []
     },
     loadTerms() {
-      const { schoolCategoryId, schoolYearId, semesterId } = this.filters.student
+      const { schoolCategoryId, semesterId } = this.filters.student
+      const { id: schoolYearId } = this.$store.state.schoolYear
       const params = {
         paginate: false,
         schoolCategoryId,
@@ -328,7 +329,12 @@ export default {
         SchoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
-  }
+  },
+  watch: {
+    '$store.state.schoolYear': function(newVal) {
+      this.loadSectionsOfPersonnel();
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

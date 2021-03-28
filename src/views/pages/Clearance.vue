@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Clearance"
+    :title="`Clearance (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"
@@ -26,7 +26,7 @@
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
       />
-      <v-select
+      <!-- <v-select
         :options="options.schoolYears.items"
         @input="loadSections(), loadClearances()"
         v-model="filters.clearance.schoolYearId"
@@ -34,7 +34,7 @@
         label="name"
         placeholder="School Year"
         class="mt-2"
-      />
+      /> -->
       <v-select
         v-if="isCourseVisible"
         @input="loadLevelsOfCourse($event), loadSections(), loadClearances()"
@@ -629,7 +629,7 @@ export default {
         clearance: {
           criteria: null,
           schoolCategoryId: null,
-          schoolYearId: null,
+          // schoolYearId: null,
           courseId: null,
           semesterId: null,
           levelId: null,
@@ -639,7 +639,7 @@ export default {
     }
   },
   created() {
-    this.loadSchoolYears()
+    // this.loadSchoolYears()
     this.loadClearances()
     this.loadPersonnels()
   },
@@ -648,12 +648,12 @@ export default {
       const {
         schoolCategoryId,
         criteria,
-        schoolYearId,
         courseId,
         semesterId,
         levelId,
         sectionId,
       } = this.filters.clearance;
+      const { id: schoolYearId } = this.$store.state.schoolYear
       const { clearances } = this.tables;
       const {
         clearance,
@@ -733,11 +733,13 @@ export default {
     loadLevels(schoolCategoryId, isFromForm = false) {
       const params = { paginate: false, schoolCategoryId }
       const { levels } = this.options
+      const { clearance } = this.filters
       this.getLevelList(params).then(({ data }) => {
         if (isFromForm) {
           levels.formItems = data
           return
         }
+        clearance.levelId = null
         levels.items = data
       }).catch(error => {
         console.log(error)
@@ -746,28 +748,30 @@ export default {
     loadLevelsOfCourse(courseId, isFromForm = false) {
       const params = { paginate: false }
       const { levels } = this.options
+      const { clearance } = this.filters
       this.getLevelsOfCourse(courseId, params).then(({ data }) => {
         if (isFromForm) {
           levels.formItems = data
           return
         }
+        clearance.levelId = null
         levels.items = data
       }).catch(error => {
         console.log(error)
       })
     },
-    loadSchoolYears() {
-      const params = { paginate: false }
-      const { schoolYears } = this.options
-      const { clearance } = this.filters
-      this.getSchoolYearList(params).then(({ data }) => {
-        const activeSchoolYear = data.find(x => x.isActive)
-        clearance.schoolYearId = activeSchoolYear.id ?? null
-        schoolYears.items = data
-      }).catch(error => {
-        console.log(error)
-      })
-    },
+    // loadSchoolYears() {
+    //   const params = { paginate: false }
+    //   const { schoolYears } = this.options
+    //   const { clearance } = this.filters
+    //   this.getSchoolYearList(params).then(({ data }) => {
+    //     const activeSchoolYear = data.find(x => x.isActive)
+    //     clearance.schoolYearId = activeSchoolYear.id ?? null
+    //     schoolYears.items = data
+    //   }).catch(error => {
+    //     console.log(error)
+    //   })
+    // },
     loadFormSections() {
       const { schoolCategoryId, schoolYearId, courseId, semesterId, levelId } = this.forms.batchClearance.fields
       const params = { paginate: false, schoolCategoryId, schoolYearId, courseId, semesterId, levelId }
@@ -779,9 +783,11 @@ export default {
       })
     },
     loadSections() {
-      const { schoolCategoryId, schoolYearId, courseId, semesterId, levelId } = this.filters.clearance
+      const { clearance, clearance: { schoolCategoryId, courseId, semesterId, levelId } } = this.filters
+      const { id: schoolYearId } = this.$store.state.schoolYear
       const params = { paginate: false, schoolCategoryId, schoolYearId, courseId, semesterId, levelId }
       const { sections } = this.options
+      clearance.sectionId = null
       this.getSectionList(params).then(({ data }) => {
         sections.items = data
       }).catch(error => {
@@ -927,7 +933,13 @@ export default {
         SchoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
-  }
+  },
+  watch: {
+    '$store.state.schoolYear': function(newVal) {
+      this.loadSections()
+      this.loadClearances()
+    },
+  },
 }
 </script>
 <style lang="scss">
