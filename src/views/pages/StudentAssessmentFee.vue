@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    :title="`Student Assessment Fee (${selectedSchoolYear? selectedSchoolYear.name : ''})`"
+    :title="`Student Assessment Fee (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"
@@ -1404,11 +1404,11 @@ export default {
     },
   },
   computed: {
-    selectedSchoolYear() {
-      const { schoolYearId } = this.$store.state
-      const { schoolYears } = this.options
-      return schoolYears.items.find(sy => sy.id ===  schoolYearId)
-    },
+    // selectedSchoolYear() {
+    //   const { schoolYearId } = this.$store.state
+    //   const { schoolYears } = this.options
+    //   return schoolYears.items.find(sy => sy.id ===  schoolYearId)
+    // },
     subjectsTotalAmount() {
       return (subjects) => {
         let amount = 0;

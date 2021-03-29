@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    :title="`Subject Enlistment (${selectedSchoolYear? selectedSchoolYear.name : ''})`"
+    :title="`Subject Enlistment (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"
@@ -1894,11 +1894,11 @@ export default {
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
-    selectedSchoolYear() {
-      const { schoolYearId } = this.$store.state
-      const { schoolYears } = this.options
-      return schoolYears.items.find(sy => sy.id ===  schoolYearId)
-    }
+    // selectedSchoolYear() {
+    //   const { schoolYearId } = this.$store.state
+    //   const { schoolYears } = this.options
+    //   return schoolYears.items.find(sy => sy.id ===  schoolYearId)
+    // }
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {
