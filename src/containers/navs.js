@@ -177,14 +177,33 @@ export default [
     ]
   },
   {
+    label: 'Instructor',
+    to: '/instructor',
+    permissionIds: [
+      ...StudentGradePermissions.getIds(),
+      ...EClearancePermissions.getIds()
+    ],
+    children: [
+      {
+        label: 'Clearance',
+        to: '/instructor/clearance',
+        permissionIds: EClearanceClearingPermissions.getIds()
+      },
+      {
+        label: 'Grade Sheet',
+        to: '/instructor/grade-sheet',
+        permissionIds: StudentGradePermissions.getIds()
+      },
+
+    ]
+  },
+  {
     label: 'Master Files',
     to: '/master-files',
     permissionIds: [
       ...StudentPermissions.getIds(),
       ...PersonnelPermissions.getIds(),
       ...TranscriptRecordPermissions.getIds(),
-      ...StudentGradePermissions.getIds(),
-      ...EClearancePermissions.getIds()
     ],
     children: [
       {
@@ -193,8 +212,8 @@ export default [
         permissionIds: StudentPermissions.getIds()
       },
       {
-        label: 'Grade Sheet',
-        to: '/master-files/grade-sheet',
+        label: 'Academic Transcript',
+        to: '/master-files/academic-transcript',
         permissionIds: TranscriptRecordPermissions.getIds()
       },
       {
@@ -203,21 +222,10 @@ export default [
         permissionIds: PersonnelPermissions.getIds()
       },
       {
-        label: 'Student Grade',
-        to: '/master-files/student-grade',
-        permissionIds: StudentGradePermissions.getIds()
-      },
-      {
-        label: 'Clearance',
-        to: '/master-files/clearance',
+        label: 'Clearance Signatories',
+        to: '/master-files/clearance-signatories',
         permissionIds: EClearancePermissions.getIds()
       },
-      {
-        label: 'Clearance Clearing',
-        to: '/master-files/clearance-clearing',
-        permissionIds: EClearanceClearingPermissions.getIds()
-        // to do add permission
-      }
     ]
   },
   {
@@ -252,7 +260,7 @@ export default [
         to: '/maintenance/school-category'
       },
       {
-        label: 'User Group',
+        label: 'Group & Permissions',
         to: '/maintenance/user-group',
         permissionIds: UserGroupPermissions.getIds()
       },

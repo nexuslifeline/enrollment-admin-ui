@@ -344,6 +344,26 @@ function configRoutes () {
           ]
         },
         {
+          path: 'instructor',
+          name: 'Instructor',
+          redirect: { name: 'Student List' },
+          component: { render(c) { return c('router-view') } },
+          children: [
+            {
+              path: 'grade-sheet',
+              name: 'Grade Sheet',
+              component: StudentGrade,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'clearance',
+              name: 'Clearance',
+              component: ClearanceClearing,
+              meta: { requiresAuth: true }
+            },
+          ]
+        },
+        {
           path: 'master-files',
           name: 'Masterfiles',
           redirect: { name: 'Student List' },
@@ -356,8 +376,8 @@ function configRoutes () {
               meta: { requiresAuth: true, userType: 0 }
             },
             {
-              path: 'grade-sheet',
-              name: 'Grade Sheet',
+              path: 'academic-transcript',
+              name: 'Academic Transript',
               component: TranscriptRecord,
               meta: { requiresAuth: true }
             },
@@ -439,21 +459,9 @@ function configRoutes () {
               ]
             },
             {
-              path: 'student-grade',
-              name: 'Student Grade',
-              component: StudentGrade,
-              meta: { requiresAuth: true }
-            },
-            {
-              path: 'clearance',
-              name: 'Clearance',
+              path: 'clearance-signatories',
+              name: 'Clearance Signatories',
               component: Clearance,
-              meta: { requiresAuth: true }
-            },
-            {
-              path: 'clearance-clearing',
-              name: 'Clearance Clearing',
-              component: ClearanceClearing,
               meta: { requiresAuth: true }
             },
           ]
