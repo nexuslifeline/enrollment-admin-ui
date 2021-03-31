@@ -288,7 +288,7 @@ export default {
         semesterId,
         schoolYearId,
       };
-      
+
       this.getTermList(params).then(({ data }) => {
         this.terms = data
       });
@@ -296,7 +296,7 @@ export default {
     onSaveStudentGrade() {
       this.isProcessing = true
       const { students } = this.tables
-      
+
       const data = students.items.map(student => {
         return {
           id: student.id,
