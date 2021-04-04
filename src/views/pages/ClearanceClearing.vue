@@ -65,16 +65,6 @@
         class="mt-2"
       />
       <v-select
-        v-if="isCourseVisible"
-        @input="loadSections(), loadClearances()"
-        :options="$options.Semesters.values"
-        v-model="filters.clearance.semesterId"
-        :reduce="(item) => item.id"
-        label="name"
-        placeholder="Semester"
-        class="mt-2"
-      />
-      <v-select
         @input="loadClearances()"
         :options="options.sections.items"
         v-model="filters.clearance.sectionId"
@@ -265,7 +255,7 @@ export default {
       const { schoolCategoryId, sectionId, schoolYearId, courseId, semesterId, levelId, criteria } = this.filters.clearance
       const { clearance, clearance: { perPage, page } } = this.paginations
       const { clearances } = this.tables
-      const personnelId = this.$store.state.user.id
+      const personnelId = this.$store.state.user.userable.id
       const params = { paginate: true, perPage, page, criteria, personnelId, schoolCategoryId, schoolYearId, sectionId, courseId, semesterId, levelId }
       clearances.isBusy = true;
       this.getSignatoryList(params).then(({ data }) => {
