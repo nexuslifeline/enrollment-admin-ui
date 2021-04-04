@@ -108,10 +108,13 @@
               <EducationColumn :data="item.studentClearance.academicRecord" />
             </template>
             <template v-slot:cell(isCleared)="{ item }">
-              <b-form-checkbox
+              <!-- <b-form-checkbox
                 :value=1
                 :unchecked-value=0
-                v-model="item.isCleared" />
+                v-model="item.isCleared" /> -->
+                <Toggle
+                  :value="item.isCleared"
+                  @input="item.isCleared = $event" />
             </template>
             <template v-slot:cell(remarks)="{ item }">
               <b-form-input
@@ -155,12 +158,14 @@ import { SchoolCategories, Semesters } from "../../helpers/enum"
 import { SchoolYearApi, StudentClearanceApi, CourseApi, LevelApi, SectionApi } from '../../mixins/api';
 import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
 import { showNotification } from '../../helpers/forms';
+import Toggle from "../components/Form/Toggle";
 export default {
   name: 'StudentGrade',
   components: {
     PageContent,
     StudentColumn,
-    EducationColumn
+    EducationColumn,
+    Toggle
   },
   mixins: [ SchoolYearApi, StudentClearanceApi, CourseApi, LevelApi, SectionApi ],
   SchoolCategories, Semesters,
@@ -349,7 +354,6 @@ export default {
         semesterId,
         schoolYearId,
       };
-      
       this.getTermList(params).then(({ data }) => {
         this.terms = data
       });
@@ -357,7 +361,6 @@ export default {
     onSaveClearance() {
       this.isProcessing = true
       const { clearances } = this.tables
-      
       const data = clearances.items.map(clearance => {
         return {
           id: clearance.id,

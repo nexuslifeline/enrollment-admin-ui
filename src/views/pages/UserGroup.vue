@@ -246,7 +246,6 @@
       </b-modal>
       <!-- End Modal Confirmation -->
     </template>
-
   </PageContent>
 </template>
 <script>

@@ -259,6 +259,12 @@ function configRoutes () {
           component: { render(c) { return c('router-view') } },
           children: [
             {
+              path: 'clearance-signatories',
+              name: 'Clearance Signatories',
+              component: Clearance,
+              meta: { requiresAuth: true }
+            },
+            {
               path: 'department',
               name: 'Department',
               component: Department,
@@ -457,12 +463,6 @@ function configRoutes () {
                 }
                 // add academic records route here
               ]
-            },
-            {
-              path: 'clearance-signatories',
-              name: 'Clearance Signatories',
-              component: Clearance,
-              meta: { requiresAuth: true }
             },
           ]
         },

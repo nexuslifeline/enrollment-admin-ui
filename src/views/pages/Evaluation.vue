@@ -109,7 +109,8 @@
             <b-badge
               :variant="
                 data.item.evaluationStatusId ===
-                evaluationStatuses.APPROVED.id
+                evaluationStatuses.APPROVED.id || data.item.evaluationStatusId ===
+                evaluationStatuses.COMPLETED.id
                   ? 'success'
                   : data.item.evaluationStatusId ===
                     evaluationStatuses.REJECTED.id
