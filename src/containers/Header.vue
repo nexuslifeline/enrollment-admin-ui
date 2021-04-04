@@ -54,16 +54,11 @@
       </ul>
       <YearDropdown />
       <div class="header__secondary-account-details">
-        <img
-          class="header__secondary-account-photo"
-          v-if="!!userPhoto"
+        <AvatarMaker
+          :avatarId="user.id"
+          :size="31"
+          :text="`${user.userable.firstName.charAt(0)}${user.userable.lastName.charAt(0)}`"
           :src="userPhoto"
-        />
-        <ProfileMaker
-          v-else
-          class="header__secondary-account-photo"
-          :initials="user.userable.name.charAt(0)"
-          :colorIndex="user.id % 8"
         />
         <div class="header__secondary-account-name">
           {{ user.userable.name }}
@@ -73,70 +68,21 @@
     </div>
     <div class="header__account-details">
       <WaveBackground v-if="isHome" />
-      <div class="header__account-details-row">
-        <template v-if="isHome">
+      <div v-if="isHome" class="header__account-details-row">
+        <template >
           <div class="header__account-photo-container">
-            <img
-              v-if="!!userPhoto"
+            <AvatarMaker
               class="header__account-photo"
+              :avatarId="user.id"
+              :size="95"
+              :text="`${user.userable.firstName.charAt(0)}${user.userable.lastName.charAt(0)}`"
               :src="userPhoto"
-            />
-            <ProfileMaker
-              v-else
-              class="header__account-photo"
-              :initials="user.userable.name.charAt(0)"
-              :colorIndex="user.id % 8"
             />
           </div>
           <div class="header__account-profile-details">
             <p class="header__account-name">{{ user.userable.name }}</p>
             <p class="header__account-group">{{ userGroup }}</p>
           </div>
-          <!--<div class="header__account-actions">
-            <div class="header__school-year">
-              <b-form-select
-                v-model="$store.state.schoolYearId"
-                class="float-right">
-                <b-form-select-option :value="null">
-                  ALL
-                </b-form-select-option>
-                <b-form-select-option
-                  v-for="schoolYear in options.schoolYears.items"
-                  :key="schoolYear.id"
-                  :value="schoolYear.id">
-                  {{ schoolYear.name }}
-                </b-form-select-option>
-              </b-form-select>
-            </div>
-            <button
-              @click.stop="showDropdown = !showDropdown"
-              type="button"
-              class="account-action__settings">
-              <v-icon name="cogs" scale="1.1" class="account-action__icon mr-2" />
-              <v-icon
-                name="caret-down"
-                class="account-action__icon"
-                scale=".85"
-              />
-              <div v-if="showDropdown" class="account-action__dropdown">
-                <ul class="account-action__dropdown-items">
-                  <li class="account-action__dropdown-item">
-                    <a href="#" class="account-action__dropdown-item-link">
-                      My Profile
-                    </a>
-                  </li>
-                  <li
-                    @click.prevent.stop="logout"
-                    class="account-action__dropdown-item">
-                    <a href="#" class="account-action__dropdown-item-link">
-                      Logout
-                      <v-icon v-if="isLoading" name="spinner" spin class="ml-2" />
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </button>
-          </div>-->
         </template>
       </div>
       <div class="header__sub-menus-container">
@@ -235,6 +181,7 @@ import Access from '../mixins/utils/Access';
 import { createLimiter } from '../helpers/utils';
 import OverviewDropdown from './OverviewDropdown';
 import YearDropdown from './YearDropdown';
+import AvatarMaker from '../views/components/AvatarMaker';
 
 const MAIN_NAV_LIMIT = 8;
 const SUB_NAV_LIMIT = 6;
@@ -245,7 +192,8 @@ export default {
     ProfileMaker,
     WaveBackground,
     OverviewDropdown,
-    YearDropdown
+    YearDropdown,
+    AvatarMaker
   },
   mixins: [AuthApi, SchoolYearApi, Access],
   navItems,
@@ -475,17 +423,15 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 18px;
-  color: $white;
+  //color: $white;
+  background-color: $white;
 
   &.active,
   &:hover {
     font-weight: 600;
     color: $dark-gray-500;
     background-color: $white;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    //border-radius-top-left: 3px;
-    //border-top: 3px solid $dark-blue;
+    border-bottom: 3px solid $brand-primary;
   }
 
   &:last-child {
@@ -522,6 +468,12 @@ export default {
       .header__sub-menus-container {
         margin-left: 15px;
         margin-top: 0;
+      }
+
+      .header__sub-menus {
+        max-width: none;
+        margin: 0;
+        padding-left: 15px;
       }
 
       .header__sub-menu-item {
@@ -562,6 +514,7 @@ export default {
 
     .header__sub-menus-container {
       height: 100%;
+      max-height: none;
       width: 100%;
       margin: 0;
       background-color: $light-gray-100;
@@ -576,6 +529,8 @@ export default {
       align-items: flex-start;
       padding: 15px 0;
       height: auto;
+      max-width: none;
+      margin: 0;
     }
 
     .header__sub-menu-item {
@@ -590,6 +545,7 @@ export default {
       border-radius: 3px;
       background-color: $white;
       margin: 3px 8px;
+      border-bottom: 0;
 
       &.active {
         color: $black;
@@ -648,15 +604,13 @@ export default {
 }
 
 .header__sub-menus-container {
-  height: 33px;
-  //width: 100%;
+  max-height: 38px;
   flex: 1;
   align-items: flex-end;
-  margin-left: 235px;
-  //padding: 0 230px;
-  //background-color: $brand-primary;
+  //margin-left: 235px;
   z-index: 1;
   transition: all .3s;
+  background-color: $white;
 
   @include for-size(tablet-portrait-down) {
     padding: 0 20px;
@@ -710,29 +664,36 @@ export default {
 }
 
 .header__account-details {
-  height: 130px;
+  height: 115px;
   background-color: #24a0d6;
   display: flex;
   flex-direction: column;
   position: relative;
   transition: all .3s;
+  justify-content: flex-end;
 }
 
 .header__account-details-row {
   display: flex;
   z-index: 1;
+  width: 100%;
+  max-width: $header-details-row-max-width;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .header__sub-menus {
   list-style: none;
   padding: 0;
-  margin: 0;
+  max-width: $header-details-row-max-width;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   font-size: 14px;
   height: 100%;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 20px 0 70px;
 
   @include for-size(tablet-portrait-down) {
     padding: 0;
@@ -740,9 +701,11 @@ export default {
 }
 
 .header__account-photo-container {
-  width: 235px;
+  position: absolute;
+  left: -40px;
+  bottom: -33px;
 
-  @include for-size(tablet-portrait-down) {
+  /*@include for-size(tablet-portrait-down) {
     padding: 15px;
     width: auto;
     display: flex;
@@ -750,7 +713,7 @@ export default {
     align-items: center;
     justify-content: center;
     height: 100%;
-  }
+  }*/
 }
 
 .header__account-profile-details {
@@ -758,7 +721,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 20px 30px;
+  padding: 20px 0 15px 75px;
 
   @include for-size(tablet-portrait-down) {
     padding: 10px;
@@ -767,37 +730,23 @@ export default {
 }
 
 .header__account-photo {
-  border-radius: 50%;
-  height: 150px;
-  width: 150px;
-  object-fit: cover;
-  position: absolute;
-  left: 40px;
-  top: 22%;
-  border: 5px solid $white;
-  font-size: 70px;
-
-  @include for-size(tablet-portrait-down) {
-    font-size: 30px;
-    position: static;
-    height: 70px;
-    width: 70px;
-  }
+  border: 3px solid $white;
 }
 
 .header__account-name {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
   color: $white;
   margin: 0;
 
   @include for-size(tablet-portrait-down) {
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 
 .header__account-group {
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 15px;
   margin: 0;
   color: $white;
 }

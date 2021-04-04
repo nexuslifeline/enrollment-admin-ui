@@ -1,11 +1,12 @@
 <template>
   <b-avatar
     blank
+    class="avatar-maker"
     :size="size"
     :text="text"
     :src="src"
     :style="{
-      backgroundColor: $options.colorFactory(
+      backgroundColor: src ? 'none' : $options.colorFactory(
         avatarId % $options.constants.COLOR_FACTORY_LENGTH
       ).bg,
       color: $options.colorFactory(
@@ -42,6 +43,9 @@
     }
   }
 </script>
-<style lang="scss" scoped>
-
+<style lang="scss">
+  .avatar-maker img {
+    border-radius: 50%;
+    object-fit: cover;
+  }
 </style>

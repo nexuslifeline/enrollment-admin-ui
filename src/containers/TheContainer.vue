@@ -5,7 +5,7 @@
       <div v-if="!isLoading" class="c-wrapper">
         <TheHeader />
         <div class="main-content" :class="{ shrink: !isHome && !isReport, report: isReport }">
-          <LeftPane />
+          <!-- <LeftPane /> -->
           <div class="c-body">
             <main class="c-main">
               <div class="container-fluid" :style="isReport ? { height: '100%' } : {}">
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import LeftPane from './ContentLeftPane';
+//import LeftPane from './ContentLeftPane';
 import TheHeader from './Header';
 import TheFooter from './TheFooter';
 import { AcademicRecordApi, AuthApi } from '../mixins/api';
@@ -30,7 +30,7 @@ export default {
   name: 'TheContainer',
   mixins: [AuthApi, AcademicRecordApi],
   components: {
-    LeftPane,
+    //LeftPane,
     TheHeader,
     TheFooter,
   },

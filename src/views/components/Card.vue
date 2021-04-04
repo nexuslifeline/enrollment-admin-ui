@@ -46,7 +46,9 @@ export default {
   padding: 0;
   border-radius: 3px;
   margin-bottom: 30px;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  //box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  width: 100%;
+  background-color: $white;
 }
 
 .c-card__header {
@@ -61,11 +63,13 @@ export default {
 
 .c-card__body {
   padding: 20px;
+  background-color: $white;
+  padding-bottom: 50px;
 }
 
 .c-card__header-title {
   margin: 0;
-  font-size: 21px;
+  font-size: 18px;
   flex: 1;
 }
 

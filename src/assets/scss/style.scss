@@ -425,7 +425,7 @@ legend.required:before {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: auto;
-  margin-left: 224px;
+  //margin-left: 224px;
 
   @include for-size(tablet-landscape-down) {
     margin-left: 0;

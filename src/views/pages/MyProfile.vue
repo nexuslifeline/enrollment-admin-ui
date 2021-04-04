@@ -1,233 +1,111 @@
 <template>
   <div class="c-page-content">
     <div class="main-container">
-      <div class="left-pane">
-        <p class="sub-nav__title">Profile</p>
-        <ul class="sub-nav">
-          <li
-            v-for="(item, idx) in items"
-            @click="onSelectedIndexChange(idx)"
-            :key="idx"
-            class="sub-nav__item"
-            :class="{ active: idx === selectedIndex }"
-          >
-            {{ item.label }}
-          </li>
-        </ul>
-      </div>
-      <div class="right-pane">
-        <div v-if="selectedIndex === 0">
-          <div class="personal-details">
-            <div class="profile-photo__container">
-              <div class="profile-photo">
-                <PhotoViewer
-                  @onPhotoChange="onPhotoChange"
-                  @onPhotoRemove="onPhotoRemove"
-                  :isBusy="isProfilePhotoBusy"
-                  :imageUrl="personnelPhotoUrl"
+      <Card title="About">
+        <template>
+          <InputGroup>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
                 />
-              </div>
-            </div>
-            <div class="profile-info__container">
-              <b-row>
-              <b-col md="4">
-                <b-form-group>
-                  <label class="required">Firstname</label>
-                  <b-form-input
-                    ref="firstName"
-                    v-model="forms.personnel.fields.firstName"
-                    :state="forms.personnel.states.firstName"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.firstName }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-form-group>
-                  <label>Middlename</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.middleName"
-                    :state="forms.personnel.states.middleName"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.middleName }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-form-group>
-                  <label class="required">Lastname</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.lastName"
-                    :state="forms.personnel.states.lastName"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.lastName }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="4">
-                <b-form-group>
-                  <label class="required">Job Title</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.jobTitle"
-                    :state="forms.personnel.states.jobTitle"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.jobTitle }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-form-group>
-                  <label class="required">Birthdate</label>
-                  <b-form-input
-                    type="date"
-                    v-model="forms.personnel.fields.birthDate"
-                    :state="forms.personnel.states.birthDate"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.birthDate }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md=4>
-                <b-form-group>
-                  <label>Mobile No</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.mobileNo"
-                    :state="forms.personnel.states.mobileNo"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.mobileNo }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-              <b-col md=4>
-                <b-form-group>
-                  <label>Phone No</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.phoneNo"
-                    :state="forms.personnel.states.phoneNo"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.phoneNo }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md=4>
-                <b-form-group>
-                  <label>Emergency Mobile No</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.emergencyMobileNo"
-                    :state="forms.personnel.states.emergencyMobileNo"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.emergencyMobileNo }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-              <b-col md=4>
-                <b-form-group>
-                  <label>Emergency Phone No</label>
-                  <b-form-input
-                    v-model="forms.personnel.fields.emergencyPhoneNo"
-                    :state="forms.personnel.states.emergencyPhoneNo"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.emergencyPhoneNo }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="12">
-                <b-form-group>
-                  <label>Complete Address</label>
-                  <b-textarea
-                    v-model="forms.personnel.fields.completeAddress"
-                    rows="3"
-                    :state="forms.personnel.states.completeAddress"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.personnel.errors.completeAddress }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <div class="account-details">
-            <b-row class="justify-content-md-center">
-              <b-col md="6">
-                <b-form-group label="Email" labelClass="required">
-                  <b-form-input
-                    debounce="500"
-                    v-model="forms.user.fields.username"
-                    :state="forms.user.states.userUsername"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.user.errors.username }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-                <b-form-group label="Old Password" labelClass="required">
-                  <b-form-input
-                    debounce="500"
-                    type="password"
-                    v-model="forms.user.fields.oldPassword"
-                    :state="forms.user.states.userOldPassword"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.user.errors.userOldPassword }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-                <b-form-group label="New Password" labelClass="required">
-                  <b-form-input
-                    debounce="500"
-                    type="password"
-                    v-model="forms.user.fields.password"
-                    :state="forms.user.states.userPassword"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.user.errors.userPassword }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-                <b-form-group label="Confirm Password" labelClass="required">
-                  <b-form-input
-                    type="password"
-                    debounce="500"
-                    v-model="forms.user.fields.passwordConfirmation"
-                    :state="forms.user.states.userPasswordConfirmation"
-                  />
-                  <b-form-invalid-feedback>
-                    {{ forms.user.errors.userPasswordConfirmation }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </div>
-        </div>
-        <div class="action-bar">
-          <b-button
-            class="btn-save float-right"
-            variant="outline-primary"
-            @click="onUpdateProfile"
-            :disabled="isProcessing"
-          >
-            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-            Save
-          </b-button>
-        </div>
-      </div>
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+          </InputGroup>
+          <InputGroup>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+          </InputGroup>
+          <InputGroup>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+          </InputGroup>
+        </template>
+      </Card>
+
+      <Card title="Contact">
+        <template>
+          <InputGroup>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+            <InputContainer>
+              <label class="required">Firstname</label>
+                <b-form-input
+                  ref="firstName"
+                  v-model="forms.personnel.fields.firstName"
+                  :state="forms.personnel.states.firstName"
+                />
+                <b-form-invalid-feedback>
+                  {{ forms.personnel.errors.firstName }}
+                </b-form-invalid-feedback>
+            </InputContainer>
+          </InputGroup>
+        </template>
+      </Card>
     </div>
   </div>
 </template>
@@ -237,6 +115,11 @@ import { copyValue } from '../../helpers/extractor';
 import { reset, showNotification, validate } from '../../helpers/forms';
 import { AuthApi, PersonnelApi } from '../../mixins/api';
 import PhotoViewer from '../components/PhotoViewer';
+import Card from '../components/Card';
+import InputGroup from '../components/InputGroup/InputGroup';
+import InputContainer from '../components/InputGroup/InputContainer';
+import CardItem from '../components/Card/CardItem';
+import CardCol from '../components/Card/CardColumn';
 
 const personnelFields = {
   id: null,
@@ -272,6 +155,11 @@ const userStatesAndErrors = {
 export default {
   components: {
     PhotoViewer,
+    Card,
+    InputGroup,
+    InputContainer,
+    CardCol,
+    CardItem
   },
   mixins: [PersonnelApi, AuthApi],
   data() {
@@ -385,7 +273,11 @@ export default {
 
 .main-container {
   height: 100%;
+  width: 100%;
+  max-width: calc(#{$header-details-row-max-width} + 70px);
+  margin: 0 auto;
   display: flex;
+  flex-direction: column;
   overflow: hidden;
   @include for-size(phone-only) {
     flex-direction: column;
