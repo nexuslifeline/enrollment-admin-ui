@@ -1,7 +1,7 @@
 <template>
   <div class="c-page-content">
     <div class="main-container">
-      <Card title="About">
+      <!-- <Card title="About">
         <template>
           <InputGroup>
             <InputContainer>
@@ -105,7 +105,7 @@
             </InputContainer>
           </InputGroup>
         </template>
-      </Card>
+      </Card> -->
     </div>
   </div>
 </template>

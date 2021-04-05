@@ -2,17 +2,17 @@
   <div class="header" :class="{ shrink: !isHome && !isReport, left: isReport }">
     <div class="header__menus-container">
       <ul class="header__menus">
-        <li v-for="(nav, idx) in $options.navItems.filter(
-            (v, i) => i < mainNavLimit
-          )"
-          v-if="isAccessible(nav.permissionIds)"
-          :key="idx"
-          class="header__menu-item"
-          :class="{ active: $route.path.startsWith(nav.to) }">
-          <a :href="`#${redirectTo(nav)}`" class="header__menu-link">
-            {{ nav.label }}
-          </a>
-        </li>
+        <template v-for="(nav, idx) in $options.navItems.filter((v, i) => i < mainNavLimit)">
+          <li
+            v-if="isAccessible(nav.permissionIds)"
+            :key="idx"
+            class="header__menu-item"
+            :class="{ active: $route.path.startsWith(nav.to) }">
+            <a :href="`#${redirectTo(nav)}`" class="header__menu-link">
+              {{ nav.label }}
+            </a>
+          </li>
+        </template>
         <template v-if="$options.navItems.length > mainNavLimit">
           <li
             class="header__menu-item header__menu-item-more"
@@ -67,24 +67,7 @@
       </div>
     </div>
     <div class="header__account-details">
-      <WaveBackground v-if="isHome" />
-      <div v-if="isHome" class="header__account-details-row">
-        <template >
-          <div class="header__account-photo-container">
-            <AvatarMaker
-              class="header__account-photo"
-              :avatarId="user.id"
-              :size="95"
-              :text="`${user.userable.firstName.charAt(0)}${user.userable.lastName.charAt(0)}`"
-              :src="userPhoto"
-            />
-          </div>
-          <div class="header__account-profile-details">
-            <p class="header__account-name">{{ user.userable.name }}</p>
-            <p class="header__account-group">{{ userGroup }}</p>
-          </div>
-        </template>
-      </div>
+      <HeaderProfileCard v-if="isHome" :user="user" />
       <div class="header__sub-menus-container">
         <template v-if="isReport" >
           <div class="header__left-panel-header">
@@ -182,6 +165,7 @@ import { createLimiter } from '../helpers/utils';
 import OverviewDropdown from './OverviewDropdown';
 import YearDropdown from './YearDropdown';
 import AvatarMaker from '../views/components/AvatarMaker';
+import HeaderProfileCard from './HeaderProfileCard';
 
 const MAIN_NAV_LIMIT = 8;
 const SUB_NAV_LIMIT = 6;
@@ -193,7 +177,8 @@ export default {
     WaveBackground,
     OverviewDropdown,
     YearDropdown,
-    AvatarMaker
+    AvatarMaker,
+    HeaderProfileCard
   },
   mixins: [AuthApi, SchoolYearApi, Access],
   navItems,
@@ -464,6 +449,7 @@ export default {
       height: 39px;
       background-color: $white;
       border-bottom: 1px solid $light-gray-10;
+      align-items: flex-start;
 
       .header__sub-menus-container {
         margin-left: 15px;
@@ -665,22 +651,13 @@ export default {
 
 .header__account-details {
   height: 115px;
-  background-color: #24a0d6;
+  //background-color: #24a0d6;
   display: flex;
   flex-direction: column;
   position: relative;
   transition: all .3s;
   justify-content: flex-end;
-}
-
-.header__account-details-row {
-  display: flex;
-  z-index: 1;
-  width: 100%;
-  max-width: $header-details-row-max-width;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  align-items: center;
 }
 
 .header__sub-menus {
@@ -700,22 +677,6 @@ export default {
   }
 }
 
-.header__account-photo-container {
-  position: absolute;
-  left: -40px;
-  bottom: -33px;
-
-  /*@include for-size(tablet-portrait-down) {
-    padding: 15px;
-    width: auto;
-    display: flex;
-    flex: 0;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-  }*/
-}
-
 .header__account-profile-details {
   flex: 1;
   display: flex;
@@ -727,10 +688,6 @@ export default {
     padding: 10px;
     justify-content: center;
   }
-}
-
-.header__account-photo {
-  border: 3px solid $white;
 }
 
 .header__account-name {
