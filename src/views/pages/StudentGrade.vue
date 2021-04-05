@@ -107,14 +107,13 @@
                   :options="[
                     {
                       minimumValue: 0,
-                      maximumValue: 5,
+                      maximumValue: 100,
                       modifyValueOnWheel: false,
                       emptyInputBehavior: 0,
                     },
                   ]"
                 />
               </div>
-              
             </template>
             <template v-slot:table-busy>
               <div class="text-center my-2">
@@ -122,7 +121,15 @@
                 <strong>Loading...</strong>
               </div>
             </template>
-            <template v-slot:cell(action)="row">
+            <template v-slot:cell(action)="{item}">
+              <b-btn
+                @click="onFinalizeGrade(item)"
+                :disabled="item.grades.some(d => d.pivot.grade === 0 || d.grade === null)"
+                size="sm"
+                variant="outline-primary">
+                <v-icon v-if="!item.isFinalizing" name="check" />
+                <v-icon v-else name="spinner" spin />
+              </b-btn>
             </template>
           </b-table>
           <b-row>
@@ -316,6 +323,25 @@ export default {
         this.isProcessing = false
       }).catch(error => {
         console.log(error)
+      })
+    },
+    onFinalizeGrade(item) {
+      const { id, grades } = item
+      this.$set(item, 'isFinalizing', true);
+      const data = {
+        id,
+        subjectId: this.filters.student.subjectId,
+        grades: grades.map(grade => {
+          return {
+            termId: grade.id,
+            grade: grade.pivot?.grade
+          }
+        })
+      }
+      this.finalizeGrade(data)
+      .then(({ data }) => {
+        showNotification(this, 'success', 'Finalized successfully.');
+        item.isFinalizing = false
       })
     }
   },

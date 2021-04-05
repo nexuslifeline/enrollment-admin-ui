@@ -26,5 +26,8 @@ export default {
     batchUpdateStudentGrade(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/grade-batch-updates`, data);
     },
+    finalizeGrade(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/finalize-grade`, data);
+    }
   }
 }
