@@ -4,7 +4,7 @@
     <b-overlay :show="isLoading" class="full-overlay-container">
       <div v-if="!isLoading" class="c-wrapper">
         <TheHeader />
-        <div class="main-content" :class="{ shrink: !isHome && !isReport, report: isReport }">
+        <div class="main-content" :class="{ shrink: !isHome && !isReport, report: isReport, home: isHome }">
           <!-- <LeftPane /> -->
           <div class="c-body">
             <main class="c-main">
@@ -101,6 +101,10 @@ export default {
     .c-body {
       margin-left: 0;
     }
+  }
+
+  &.home {
+    margin: 0;
   }
 }
 

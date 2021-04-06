@@ -1,7 +1,7 @@
 <template>
   <div class="header__account-main-card">
     <div class="header__main-card-cover">
-
+      <WaveBackground />
     </div>
     <div class="header__main-card-content">
       <div class="header__account-photo-container">
@@ -19,18 +19,33 @@
         <p class="header__account-address">San Jose, San Simon, Pampanga, Philippines</p>
       </div>
     </div>
+    <ul class="home-profile__menu">
+      <template v-for="menu in homeMenus">
+        <li class="home-profile__menu-item" :class="{ active: $route.path.startsWith(menu.to) }">
+          <a :href="`#${menu.to}`" class="home-profile__menu-item-link">{{ menu.label }}</a>
+        </li>
+      </template>
+    </ul>
   </div>
 </template>
 
 <script>
 import AvatarMaker from '../views/components/AvatarMaker';
+import WaveBackground from '../views/components/WaveMaker';
+import Navs from './navs';
 
 export default {
   props: {
     user: Object,
   },
+  data() {
+    return {
+      homeMenus: Navs.filter(v => v?.label === 'Home')?.[0]?.children,
+    }
+  },
   components: {
-    AvatarMaker
+    AvatarMaker,
+    WaveBackground
   },
   computed: {
     userPhoto() {
@@ -51,6 +66,38 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/scss/shared.scss';
 
+.home-profile__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0 35px;
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: flex-start;
+  border-top: 1px solid $light-gray-200;
+}
+
+.home-profile__menu-item {
+  display: flex;
+  align-items: center;
+  margin-right: 50px;
+  padding: 0 15px;
+  height: 100%;
+
+  &.active {
+    border-bottom: 3px solid $blue;
+
+    .home-profile__menu-item-link {
+      color: $dark-gray-500;
+      font-weight: 500;
+    }
+  }
+}
+
+.home-profile__menu-item-link {
+  color: $dark-gray-200;
+}
+
 .header__account-main-card {
   display: flex;
   flex-direction: column;
@@ -58,8 +105,6 @@ export default {
   width: 100%;
   max-width: $header-details-row-max-width;
   margin: 0 auto;
-  position: absolute;
-  top: 20px;
   min-height: 400px;
   z-index: 2;
   border: 1px solid $light-gray-200;
@@ -76,6 +121,7 @@ export default {
 }
 
 .header__main-card-cover {
+  position: relative;
   height: 180px;
   background-color: $blue;
   margin: 0;

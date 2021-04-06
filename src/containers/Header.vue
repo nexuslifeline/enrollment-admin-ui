@@ -67,7 +67,7 @@
       </div>
     </div>
     <div class="header__account-details">
-      <HeaderProfileCard v-if="isHome" :user="user" />
+      <!-- <HeaderProfileCard v-if="isHome" :user="user" /> -->
       <div class="header__sub-menus-container">
         <template v-if="isReport" >
           <div class="header__left-panel-header">
@@ -81,7 +81,7 @@
             ></b-form-input>
           </div>
         </template>
-        <ul class="header__sub-menus">
+        <ul v-if="!isHome" class="header__sub-menus">
           <template
             v-for="(subNav, idx) in visibleSubNavItems">
             <template v-if="isAccessible(subNav.permissionIds)">
