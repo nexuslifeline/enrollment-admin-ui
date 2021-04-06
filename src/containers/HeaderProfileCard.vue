@@ -112,6 +112,7 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   padding: 0;
+  margin-bottom: 30px;
 }
 
 .header__account-photo-container {

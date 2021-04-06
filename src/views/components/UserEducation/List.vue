@@ -1,6 +1,6 @@
 <template>
-  <Card title="Employment">
-    <div class="employment__list">
+  <Card title="Education">
+    <div class="education__list">
       
     </div>
   </Card>
@@ -23,7 +23,7 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/shared.scss";
 
-.employment__list {
+.education__list {
   width: 100%;
   min-height: 250px;
   background-color: $white;

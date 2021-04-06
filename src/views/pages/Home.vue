@@ -2,10 +2,13 @@
   <div class="c-page-content">
     <div class="main-container">
       <div class="main-container__content-area">
-        <HeaderProfileCard
-          :user="$store.state.user"
-        />
-        <div class="main-container__panel">
+        <div class="main-container__main-panel">
+          <HeaderProfileCard
+            :user="$store.state.user"
+          />
+          <router-view></router-view>
+        </div>
+        <div class="main-container__side-panel">
           <CoDepartmentList />
         </div>
       </div>
@@ -92,8 +95,8 @@ export default {
   flex-direction: row;
 }
 
-.main-container__panel {
-  width: 390px;
+.main-container__side-panel {
+  width: 320px;
   height: auto;
   margin-left: 15px;
 }
@@ -110,6 +113,12 @@ export default {
     flex-direction: column;
     padding: 20px 20px 0 20px;
   }
+}
+
+.main-container__main-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 </style>

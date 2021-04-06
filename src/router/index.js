@@ -19,7 +19,8 @@ const RequirementsSetting = () => import('@/views/pages/settings/RequirementsSet
 const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
-const MyProfile = () => import('@/views/pages/MyProfile')
+const Home = () => import('@/views/pages/Home')
+const Profile = () => import('@/views/pages/Profile')
 const MyActivity = () => import('@/views/pages/MyActivity')
 const Evaluation = () => import('@/views/pages/Evaluation')
 const StudentAdmission = () => import('@/views/pages/StudentAdmission')
@@ -470,50 +471,58 @@ function configRoutes () {
           path: 'home',
           name: 'Dashboard',
           component: Dashboard,
-          redirect: { name: 'MyProfile' },
+          redirect: { name: 'Home' },
           meta: { requiresAuth: true },
           children: [
             {
-              path: 'profile',
-              name: 'MyProfile',
-              component: MyProfile,
-              meta: { requiresAuth: true }
-            },
-            {
-              path: 'activity',
-              name: 'MyActivity',
-              component: MyActivity,
-              meta: { requiresAuth: true }
-            },
-            {
-              path: 'settings',
-              name: 'Settings',
-              component: Setting,
+              path: '/',
+              component: Home,
+              redirect: { name: 'Home' },
+              meta: { requiresAuth: true },
               children: [
                 {
-                  path: 'general-setting',
-                  name: 'GeneralSetting',
-                  component: GeneralSetting,
+                  path: 'profile',
+                  name: 'Profile',
+                  component: Profile,
                   meta: { requiresAuth: true }
                 },
                 {
-                  path: 'organization-setting',
-                  name: 'OrganizationSetting',
-                  component: OrganizationSetting,
+                  path: 'activity',
+                  name: 'MyActivity',
+                  component: MyActivity,
                   meta: { requiresAuth: true }
                 },
                 {
-                  path: 'terms-setting',
-                  name: 'TermsSetting',
-                  component: TermsSetting,
-                  meta: { requiresAuth: true }
-                },
-                {
-                  path: 'requirements-setting',
-                  name: 'Requirements Setting',
-                  component: RequirementsSetting,
-                  meta: { requiresAuth: true }
-                },
+                  path: 'settings',
+                  name: 'Settings',
+                  component: Setting,
+                  children: [
+                    {
+                      path: 'general-setting',
+                      name: 'GeneralSetting',
+                      component: GeneralSetting,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'organization-setting',
+                      name: 'OrganizationSetting',
+                      component: OrganizationSetting,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'terms-setting',
+                      name: 'TermsSetting',
+                      component: TermsSetting,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'requirements-setting',
+                      name: 'Requirements Setting',
+                      component: RequirementsSetting,
+                      meta: { requiresAuth: true }
+                    },
+                  ]
+                }
               ]
             }
           ]
