@@ -22,15 +22,6 @@
         placeholder="School Category"
         class="mt-2"
       />
-      <!-- <v-select
-        @input="loadSectionsOfPersonnel()"
-        :options="options.schoolYears.items"
-        v-model="filters.student.schoolYearId"
-        :reduce="(item) => item.id"
-        label="name"
-        placeholder="School Year"
-        class="mt-2"
-      /> -->
       <v-select
         v-if="isCourseVisible"
         @input="loadSectionsOfPersonnel()"

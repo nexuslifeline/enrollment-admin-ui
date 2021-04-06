@@ -14,6 +14,32 @@
         placeholder="Search"
         @update="loadStudents()"
       />
+      <v-select
+        :options="options.levels.items"
+        :value="filters.student.leveItem"
+        @input="onLevelFilterChange"
+        label="name"
+        placeholder="Level"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.courses.items"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+      />
+      <v-select
+        v-if="isCourseVisible"
+        :options="options.semesters.items"
+        :value="filters.student.semesterItem"
+        @input="onSemesterFilterChange"
+        label="name"
+        placeholder="Semester"
+        class="mt-2"
+      />
     </template>
     <template v-slot:content>
       <div class="content">
@@ -74,12 +100,9 @@
                 />
               </template>
               <template v-slot:cell(contact)="data">
-                Email : {{ data.item.email }} <br />
-                <small>Phone : {{ data.item.phoneNo }}</small> <br />
-                <small>Mobile : {{ data.item.mobileNo }}</small> <br />
+               <ContactColumn :data="data.item"/>
               </template>
               <template v-slot:cell(education)="data">
-                <!-- <div>School Year: {{ data.item.latestAcademicRecord ? data.item.latestAcademicRecord.schoolYearId : null }} </div> -->
                 <EducationColumn :data="data.item.latestAcademicRecord" />
               </template>
               <template v-slot:cell(requirementPercentage)="{ item, value }">
@@ -140,10 +163,21 @@
                         $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
                       ) & showRowActionButton
                     "
-                    @click="setUpdateUser(row)"
+                    @click="setUpdateUser(row), entryMode = 'Edit User', showModalUpdateUser = true"
                     :disabled="showModalUpdateUser"
                   >
-                    Edit Account
+                    Edit Username
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="
+                      isAccessible(
+                        $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
+                      ) & showRowActionButton
+                    "
+                    @click="setUpdateUser(row), entryMode = 'Change Password', showModalChangePassword = true"
+                    :disabled="showModalChangePassword"
+                  >
+                    Change Password
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="
@@ -198,14 +232,14 @@
       >
         <div slot="modal-title">
           <!-- modal title -->
-          User Account - Edit
+          User Account - Edit Username
         </div>
         <!-- modal title -->
         <!-- modal body -->
         <b-row>
           <b-col md="12">
             <b-form-group>
-              <label class="required">Email</label>
+              <label class="required">Username</label>
               <b-form-input
                 ref="username"
                 v-model="forms.user.fields.username"
@@ -216,6 +250,45 @@
                 {{ forms.user.errors.userUsername }}
               </b-form-invalid-feedback>
             </b-form-group>
+          </b-col>
+        </b-row>
+        <!-- modal body -->
+        <div slot="modal-footer" class="w-100">
+          <!-- modal footer buttons -->
+          <b-button
+            variant="outline-danger"
+            class="float-left btn-close"
+            @click="showModalUpdateUser = false"
+          >
+            Close
+          </b-button>
+          <b-button
+            :disabled="isUserSaving"
+            variant="outline-primary"
+            class="float-right btn-save"
+            @click="onStudentEntry()"
+          >
+            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
+            Save
+          </b-button>
+        </div>
+        <!-- modal footer buttons -->
+      </b-modal>
+
+      <b-modal
+        @shown="$refs.password.focus()"
+        v-model="showModalChangePassword"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          <!-- modal title -->
+          User Account - Change Password
+        </div>
+        <!-- modal title -->
+        <!-- modal body -->
+        <b-row>
+          <b-col md="12">
             <b-form-group>
               <label class="required">Password</label>
               <b-form-input
@@ -223,6 +296,7 @@
                 v-model="forms.user.fields.password"
                 :state="forms.user.states.userPassword"
                 debounce="500"
+                ref="password"
               />
               <b-form-invalid-feedback>
                 {{ forms.user.errors.userPassword }}
@@ -260,6 +334,7 @@
         </div>
         <!-- modal footer buttons -->
       </b-modal>
+
       <b-modal
         v-model="showModalConfirmation"
         :noCloseOnEsc="true"
@@ -362,6 +437,8 @@ import {
   UserGroupApi,
   ReportApi,
   SchoolYearApi,
+  LevelApi,
+  CourseApi,
 } from '../../../mixins/api';
 import {
   validate,
@@ -373,6 +450,8 @@ import {
   Countries,
   CivilStatuses,
   StudentPermissions,
+  Semesters,
+  SchoolCategories
 } from '../../../helpers/enum';
 import Tables from '../../../helpers/tables';
 import PhotoViewer from '../../components/PhotoViewer';
@@ -513,7 +592,9 @@ const userErrorFields = {
 export default {
   name: 'StudentList',
   getFilePath,
-  mixins: [StudentApi, Tables, Access, UserGroupApi, ReportApi, SchoolYearApi],
+  Semesters,
+  SchoolCategories,
+  mixins: [StudentApi, Tables, Access, UserGroupApi, ReportApi, SchoolYearApi, LevelApi, CourseApi ],
   components: {
     PhotoViewer,
     FileViewer,
@@ -548,6 +629,7 @@ export default {
       showModalFileViewer: false,
       showStudentEntry: false,
       showModalUpdateUser: false,
+      showModalChangePassword: false,
       showModalConfirmation: false,
       isProfilePhotoBusy: false,
       isProcessing: false,
@@ -676,6 +758,12 @@ export default {
       filters: {
         student: {
           criteria: null,
+          levelId: null,
+          levelItem: null,
+          courseId: null,
+          courseItem: null,
+          semesterId: null,
+          semesterItem: null
         },
         ledger: {
           schoolYearId: null,
@@ -692,17 +780,28 @@ export default {
         schoolYears: {
           items: [],
         },
+        levels: {
+          items: []
+        },
+        courses: {
+          items: []
+        },
+        semesters: {
+          items: this.$options.Semesters.values
+        }
       },
     };
   },
   created() {
     this.loadStudents();
     this.loadSchoolYears();
+    this.loadLevels()
+    this.loadCourses()
   },
   methods: {
     loadStudents() {
       const { students } = this.tables;
-      const { criteria } = this.filters.student;
+      const { criteria, levelId, courseId, semesterId } = this.filters.student;
       const {
         student,
         student: { perPage, page },
@@ -710,15 +809,29 @@ export default {
 
       students.isBusy = true;
 
-      let params = { paginate: true, perPage, page, criteria };
+      let params = { paginate: true, perPage, page, criteria, levelId, courseId, semesterId };
+      console.log(params)
       this.getStudentList(params).then(({ data }) => {
-        console.log(data);
         students.items = data.data;
         student.from = data.meta.from;
         student.to = data.meta.to;
         student.totalRows = data.meta.total;
         students.isBusy = false;
       });
+    },
+    loadLevels() {
+      const params = { paginate: false }
+      const { levels } = this.options
+      this.getLevelList(params).then(({ data }) => {
+        levels.items = data
+      })
+    },
+    loadCourses() {
+      const params = { paginate: false }
+      const { courses } = this.options
+      this.getCourseList(params).then(({ data }) => {
+        courses.items = data
+      })
     },
     onStudentEntry() {
       const {
@@ -770,10 +883,9 @@ export default {
         student.fields.email = user.fields.username;
         const data = {
           id: student.fields.id,
-          email: student.fields.email,
-          user: user.fields,
+          // email: student.fields.email,
+          user: { username: user.fields.username },
         };
-
         this.updateStudent(data, studentId)
           .then(({ data }) => {
             this.updateRow(students, data);
@@ -790,12 +902,35 @@ export default {
             validate(user, errors);
             this.isUserSaving = false;
           });
+      } else if (this.entryMode == 'Change Password') {
+        this.isUserSaving = true;
+        student.fields.email = user.fields.username;
+        const data = {
+          id: student.fields.id,
+          user: { password: user.fields.password, passwordConfirmation: user.fields.passwordConfirmation },
+        };
+
+        this.updateStudent(data, studentId)
+          .then(({ data }) => {
+            this.updateRow(students, data);
+            showNotification(
+              this,
+              'success',
+              "Student's Account is updated successfully."
+            );
+            this.showModalChangePassword = false;
+            this.isUserSaving = false;
+          })
+          .catch((error) => {
+            const errors = error.response.data.errors;
+            validate(user, errors);
+            this.isUserSaving = false;
+          });
       }
     },
     setUpdateUser(row) {
       const { student, user } = this.forms;
       const { item } = row;
-      this.showModalUpdateUser = true;
       this.isLoading = true;
       clearFields(user.fields);
       reset(user);
@@ -803,8 +938,6 @@ export default {
       copyValue(item, student.fields);
 
       if (row.item.user) user.fields.username = row.item.user.username;
-
-      this.entryMode = 'Edit User';
       this.isLoading = false;
     },
     onStudentDelete() {
@@ -882,6 +1015,28 @@ export default {
       this.filters.ledger.schoolYearId = this.getActiveSchoolYearId;
       this.filters.ledger.asOfDate = new Date();
     },
+    onLevelFilterChange(item) {
+      const { student } = this.filters;
+      student.levelId = item?.id || 0;
+      student.levelItem = item;
+      student.courseId = null
+      student.courseItem = null
+      student.semesterId = null
+      student.semesterItem = null
+      this.loadStudents();
+    },
+    onCourseFilterChange(item) {
+      const { student } = this.filters;
+      student.courseId = item?.id || 0;
+      student.courseItem = item;
+      this.loadStudents();
+    },
+    onSemesterFilterChange(item) {
+      const { student } = this.filters;
+      student.semesterId = item?.id || 0;
+      student.semesterItem = item;
+      this.loadStudents();
+    },
   },
   computed: {
     getActiveSchoolYearId() {
@@ -891,6 +1046,20 @@ export default {
       if (!schoolYear) return null;
 
       return schoolYear?.id;
+    },
+    isCourseVisible() {
+      const { SchoolCategories } = this.$options;
+      const { levelItem } = this.filters.student;
+      console.log(levelItem)
+      if(!levelItem) {
+        return false
+      }
+      const schoolCategoryId = levelItem?.schoolCategoryId
+      return [
+        SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+        SchoolCategories.COLLEGE.id,
+        SchoolCategories.GRADUATE_SCHOOL.id
+      ].includes(schoolCategoryId);
     },
   },
 };

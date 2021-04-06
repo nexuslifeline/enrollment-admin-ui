@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      {{ $options.formatAddress((data.student && data.student.address) || {}) }}
+      {{ $options.formatAddress((data.student && data.student.address) || null) }}
     </div>
   </div>
 </template>

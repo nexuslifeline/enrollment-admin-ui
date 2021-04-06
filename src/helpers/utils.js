@@ -28,7 +28,9 @@ export const createLimiter = (values) => {
 }
 
 export const formatAddress = (address) => {
-  console.log('formatAddress', address)
+
+  if(!address) return '' //return null
+
   const currentAddress = [
     address?.currentHouseNoStreet,
     address?.currentDistrict,
