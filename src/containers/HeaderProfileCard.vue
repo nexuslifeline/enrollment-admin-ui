@@ -105,7 +105,7 @@ export default {
   width: 100%;
   max-width: $header-details-row-max-width;
   margin: 0 auto;
-  min-height: 400px;
+  height: 400px;
   z-index: 2;
   border: 1px solid $light-gray-200;
   background-color: $white;

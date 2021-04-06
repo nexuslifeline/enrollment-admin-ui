@@ -69,7 +69,7 @@ export default {
 
 .c-card__header-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
   flex: 1;
 }
 
