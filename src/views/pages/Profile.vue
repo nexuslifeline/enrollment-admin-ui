@@ -1,7 +1,7 @@
 <template>
   <div>
-    <UserEmployments />
     <UserEducation />
+    <UserEmployments />
   </div>
 </template>
 

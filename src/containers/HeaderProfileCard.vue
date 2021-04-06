@@ -109,7 +109,7 @@ export default {
   z-index: 2;
   border: 1px solid $light-gray-200;
   background-color: $white;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   padding: 0;
   margin-bottom: 30px;

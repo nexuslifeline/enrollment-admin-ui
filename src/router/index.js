@@ -116,7 +116,7 @@ function configRoutes () {
   return [
   {
       path: '/',
-      redirect: { name: 'Dashboard' },
+      redirect: { name: 'Home' },
       name: 'Home',
       component: TheContainer,
       children: [
@@ -469,60 +469,52 @@ function configRoutes () {
         },
         {
           path: 'home',
-          name: 'Dashboard',
-          component: Dashboard,
-          redirect: { name: 'Home' },
+          name: 'Home',
+          component: Home,
+          redirect: { name: 'Profile' },
           meta: { requiresAuth: true },
           children: [
             {
-              path: '/',
-              component: Home,
-              redirect: { name: 'Home' },
-              meta: { requiresAuth: true },
+              path: 'profile',
+              name: 'Profile',
+              component: Profile,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'activity',
+              name: 'MyActivity',
+              component: MyActivity,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'settings',
+              name: 'Settings',
+              component: Setting,
               children: [
                 {
-                  path: 'profile',
-                  name: 'Profile',
-                  component: Profile,
+                  path: 'general-setting',
+                  name: 'GeneralSetting',
+                  component: GeneralSetting,
                   meta: { requiresAuth: true }
                 },
                 {
-                  path: 'activity',
-                  name: 'MyActivity',
-                  component: MyActivity,
+                  path: 'organization-setting',
+                  name: 'OrganizationSetting',
+                  component: OrganizationSetting,
                   meta: { requiresAuth: true }
                 },
                 {
-                  path: 'settings',
-                  name: 'Settings',
-                  component: Setting,
-                  children: [
-                    {
-                      path: 'general-setting',
-                      name: 'GeneralSetting',
-                      component: GeneralSetting,
-                      meta: { requiresAuth: true }
-                    },
-                    {
-                      path: 'organization-setting',
-                      name: 'OrganizationSetting',
-                      component: OrganizationSetting,
-                      meta: { requiresAuth: true }
-                    },
-                    {
-                      path: 'terms-setting',
-                      name: 'TermsSetting',
-                      component: TermsSetting,
-                      meta: { requiresAuth: true }
-                    },
-                    {
-                      path: 'requirements-setting',
-                      name: 'Requirements Setting',
-                      component: RequirementsSetting,
-                      meta: { requiresAuth: true }
-                    },
-                  ]
-                }
+                  path: 'terms-setting',
+                  name: 'TermsSetting',
+                  component: TermsSetting,
+                  meta: { requiresAuth: true }
+                },
+                {
+                  path: 'requirements-setting',
+                  name: 'Requirements Setting',
+                  component: RequirementsSetting,
+                  meta: { requiresAuth: true }
+                },
               ]
             }
           ]
@@ -552,30 +544,6 @@ function configRoutes () {
             },
           ]
         }
-        // {
-        //   path: 'evaluation',
-        //   name: 'Evaluation & Admission',
-        //   component: Evaluation,
-        //   meta: { requiresAuth: true, userType: 1 }
-        // },
-        // {
-        //   path: 'student-subject-enlisment',
-        //   name: 'Student Subject Enlistment',
-        //   component: StudentAdmission,
-        //   meta: { requiresAuth: true, userType: 1 }
-        // },
-        // {
-        //   path: 'student-assessment-fee',
-        //   name: 'Student Assessment Fee',
-        //   component: StudentAssessmentFee,
-        //   meta: { requiresAuth: true, userType: 2 }
-        // },
-        // {
-        //   path: 'payment',
-        //   name: 'Payment',
-        //   component: Payment,
-        //   meta: { requiresAuth: true, userType: 2 }
-        // },
       ]
     },
     {
