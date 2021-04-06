@@ -13,6 +13,22 @@
         type="text"
         placeholder="Search"
       />
+      <v-select
+        :options="options.userGroups.items"
+        :value="filters.user.userGroupItem"
+        @input="onUserGroupFilterChange"
+        label="name"
+        placeholder="User Group"
+        class="mt-2"
+      />
+      <v-select
+        :options="options.departments.items"
+        :value="filters.user.departmentItem"
+        @input="onDepartmentFilterChange"
+        label="name"
+        placeholder="Department"
+        class="mt-2"
+      />
     </template>
     <template v-slot:content >
       <div>
@@ -35,18 +51,6 @@
               <template v-slot:cell(photo)="data">
                 <b-media>
                   <template v-slot:aside>
-                    <!-- <b-avatar
-                      rounded
-                      blank
-                      size="64"
-                      :text="
-                        data.item.firstName.charAt(0) +
-                          '' +
-                          data.item.lastName.charAt(0)
-                      "
-                      :src="avatar(data.item)"
-                    /> -->
-
                     <AvatarMaker
                       :avatarId="data.item.id"
                       :size="33"
@@ -87,6 +91,7 @@
                       $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id,
                       $options.PersonnelPermissions.DELETE.id,
                       $options.PersonnelPermissions.CHANGE_PASSWORD.id,
+                      $options.UserGroupPermissions.SETUP_PERMISSION.id
                     ])
                   "
                   right
@@ -122,6 +127,12 @@
                     v-if="isAccessible($options.PersonnelPermissions.CHANGE_PASSWORD.id)"
                   >
                     Change Password
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    @click="$router.push({ path: `/maintenance/user-group/${row.item.user.userGroupId}/permissions` })"
+                    v-if="isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)"
+                  >
+                    Update Persimission
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
@@ -944,7 +955,7 @@ import PhotoViewer from '../components/PhotoViewer';
 import Tables from '../../helpers/tables';
 import Personnel from '../../mixins/api/Personnel';
 import Access from '../../mixins/utils/Access';
-import { PersonnelPermissions, PersonnelStatuses } from '../../helpers/enum';
+import { PersonnelPermissions, PersonnelStatuses, UserGroupPermissions } from '../../helpers/enum';
 import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
 import { copyValue } from '../../helpers/extractor';
@@ -955,6 +966,7 @@ export default {
   name: 'Personnel',
   mixins: [PersonnelApi, UserGroupApi, Tables, Access, DepartmentApi],
   PersonnelStatuses,
+  UserGroupPermissions,
   getFilePath,
   components: {
     PhotoViewer,
@@ -1024,7 +1036,13 @@ export default {
               key: 'user.userGroup.name',
               label: 'User Group',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '15%' },
+            },
+            {
+              key: 'department.name',
+              label: 'User Group',
+              tdClass: 'align-middle',
+              thStyle: { width: '15%' },
             },
             {
               key: 'action',
@@ -1048,6 +1066,10 @@ export default {
       filters: {
         user: {
           criteria: null,
+          userGroupId: null,
+          userGroupItem: null,
+          departmentId: null,
+          departmentItem: null,
         },
       },
       options: {
@@ -1077,10 +1099,11 @@ export default {
     loadPersonnels() {
       const { users } = this.tables;
       const { user } = this.paginations;
+      const { userGroupId, departmentId } = this.filters.user
 
       users.isBusy = true;
 
-      let params = { paginate: false };
+      const params = { paginate: false, userGroupId, departmentId };
       this.getPersonnelList(params).then(({ data }) => {
         users.items = data;
         user.totalRows = data.length;
@@ -1311,6 +1334,18 @@ export default {
         src = process.env.VUE_APP_PUBLIC_PHOTO_URL + personnel.photo.hashName;
       }
       return src;
+    },
+    onUserGroupFilterChange(item) {
+      const { user } = this.filters;
+      user.userGroupId = item?.id || 0;
+      user.userGroupItem = item;
+      this.loadPersonnels();
+    },
+    onDepartmentFilterChange(item) {
+      const { user } = this.filters;
+      user.departmentId = item?.id || 0;
+      user.departmentItem = item;
+      this.loadPersonnels();
     },
   },
 };

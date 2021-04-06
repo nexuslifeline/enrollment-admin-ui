@@ -17,8 +17,8 @@ export default {
     updateAcademicRecord(data, academicRecordId) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}`, data)
     },
-    getApprovalCount() {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/approval-count`)
+    getApprovalCount(params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/approval-count`, { params: params })
     },
     getGradesOfAcademicRecords(subjectId, sectionId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/subjects/${subjectId}/sections/${sectionId}`, { params: params });
@@ -26,5 +26,8 @@ export default {
     batchUpdateStudentGrade(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/grade-batch-updates`, data);
     },
+    finalizeGrade(data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/finalize-grade`, data);
+    }
   }
 }

@@ -221,11 +221,6 @@ export default [
         to: '/master-files/user',
         permissionIds: PersonnelPermissions.getIds()
       },
-      {
-        label: 'Clearance Signatories',
-        to: '/master-files/clearance-signatories',
-        permissionIds: EClearancePermissions.getIds()
-      },
     ]
   },
   {
@@ -239,8 +234,14 @@ export default [
       ...PeraPadalaAccountPermissions.getIds(),
       ...EWalletAccountPermissions.getIds(),
       ...DocumentTypePermission.getIds(),
+      ...EClearancePermissions.getIds()
     ],
     children: [
+      {
+        label: 'Clearance Signatories',
+        to: '/maintenance/clearance-signatories',
+        permissionIds: EClearancePermissions.getIds()
+      },
       {
         label: 'Department',
         to: '/maintenance/department',

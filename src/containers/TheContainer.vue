@@ -36,7 +36,7 @@ export default {
   },
   data() {
     return {
-      isLoading: true,
+      isLoading: true
     };
   },
   created() {
@@ -62,13 +62,21 @@ export default {
         })
         .catch((error) => {
           this.isLoading = false;
-          this.$router.push({ path: '/login' });
+          this.$router.push({ path: '/login' })
         });
     },
     loadApprovalCount() {
-      this.getApprovalCount().then(({ data }) => {
+       const params = {
+        schoolYearId: this.$store.state.schoolYear.id,
+      };
+      this.getApprovalCount(params).then(({ data }) => {
         this.$store.commit('SET_APPROVAL_COUNT', data);
       });
+    },
+  },
+  watch: {
+    '$store.state.schoolYear': function(newVal) {
+      this.loadApprovalCount();
     },
   },
 };

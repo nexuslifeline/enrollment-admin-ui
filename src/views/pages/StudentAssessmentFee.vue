@@ -727,7 +727,6 @@
         @close="fileViewer.show = false"
       />
     </template>
-    
   </PageContent>
   <!-- main container -->
 </template>
@@ -1178,7 +1177,7 @@ export default {
         schoolCategoryId,
         courseId,
         applicationStatusId,
-        schoolYearId: this.$store.state.schoolYear,
+        schoolYearId: this.$store.state.schoolYear.id,
         orderBy,
         sort,
         criteria,
