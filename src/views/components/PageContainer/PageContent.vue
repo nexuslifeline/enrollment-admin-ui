@@ -84,6 +84,7 @@ export default {
 }
 
 .c-page-content {
+
   &.filter-visible {
     .content-list__container {
       padding: 0;
@@ -120,6 +121,17 @@ export default {
 .content-list__actions {
   display: flex;
   flex-direction: row;
+}
+
+.action-bar__container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  height: 60px;
+  background-color: white;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 </style>

@@ -77,28 +77,6 @@
                     <b-link @click="isExisting = true"
                       ><u>Select Existing Student</u></b-link
                     >
-                    <!-- <vue-bootstrap-typeahead
-                      v-if="isExisting"
-                      v-model="studentQuery"
-                      :serializer="
-                        (s) => {
-                          return `${s.studentNo ? s.studentNo : 'N/A'} - ${
-                            s.name
-                          }`;
-                        }
-                      "
-                      :data="options.students.items"
-                      placeholder="Search student name or student number"
-                      @hit="getStudentInfo($event)"
-                      class="search-typeahead mt-1"
-                    >
-                      <template slot="suggestion" slot-scope="{ data }">
-                        <div>
-                          {{ data.studentNo ? data.studentNo : 'N/A' }}
-                        </div>
-                        <div>{{ data.name }}</div>
-                      </template>
-                    </vue-bootstrap-typeahead> -->
                     <SelectPaginated
                       v-if="isExisting"
                       class="select-paginate"
@@ -220,7 +198,7 @@
                 </div> -->
                 <div
                   v-if="
-                    forms.student.fields.id === null &&
+                    (forms.student.fields.id === null || forms.student.fields.id === 0) &&
                       forms.academicRecord.fields.manualStepId ===
                         $options.ManualSteps.STUDENT_REGISTRATION.id
                   "
@@ -230,7 +208,7 @@
                 </div>
                 <b-row
                   v-if="
-                    forms.student.fields.id === null &&
+                    (forms.student.fields.id === null || forms.student.fields.id === 0)  &&
                       forms.academicRecord.fields.manualStepId ===
                         $options.ManualSteps.STUDENT_REGISTRATION.id
                   "
@@ -2076,6 +2054,7 @@ export default {
       fields.schoolCategoryId = level.schoolCategoryId;
     },
     onSaveAcademicRecordApplication() {
+      const evaluationDraftStatus = 1; // evaluation status draft id
       this.isProcessing = true;
       const {
         student: { fields: student },
@@ -2144,7 +2123,7 @@ export default {
           },
           evaluation: {
             ...evaluation,
-            evaluationStatusId: EvaluationStatuses.APPROVED.id,
+            evaluationStatusId: evaluationDraftStatus,
           },
         };
         this.manualRegisterStudent(data)

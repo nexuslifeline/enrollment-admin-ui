@@ -750,6 +750,7 @@ const studentFields = {
   birthDate: null,
   civilStatusId: null,
   email: null,
+  isManual: null,
 }
 
 const addressFields = {
@@ -1030,6 +1031,7 @@ export default {
 
       if(this.entryMode == "Add"){
         this.isProcessing = true;
+        data.isManual = 1 //set is manual to true
 
         this.addStudent(data)
           .then(({ data }) => {

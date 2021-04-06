@@ -26,15 +26,6 @@
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
       />
-      <!-- <v-select
-        :options="options.schoolYears.items"
-        @input="loadSections(), loadClearances()"
-        v-model="filters.clearance.schoolYearId"
-        :reduce="(item) => item.id"
-        label="name"
-        placeholder="School Year"
-        class="mt-2"
-      /> -->
       <v-select
         v-if="isCourseVisible"
         @input="loadLevelsOfCourse($event), loadSections(), loadClearances()"

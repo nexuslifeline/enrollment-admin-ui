@@ -78,6 +78,7 @@
           </template>
           <template v-slot:cell(name)="data">
             <StudentColumn
+              :showIsManual="true"
               :data="data.item"
               :callback="{ loadDetails: () => loadDetails(data) }"
             />

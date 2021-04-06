@@ -370,12 +370,6 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
-              // formatter: (value, key, item) => {
-              // 	if(!item.student.middleName){
-              // 		item.student.middleName = ""
-              // 	}
-              // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-              // }
             },
             {
               key: 'contact',
@@ -511,6 +505,7 @@ export default {
       this.entryMode = 'Edit';
     },
     setCreate() {
+      this.entryMode = 'Add'
       this.showEntry = true;
     },
     onCompleted() {
