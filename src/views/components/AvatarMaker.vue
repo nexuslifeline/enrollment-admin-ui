@@ -6,7 +6,7 @@
     :text="text"
     :src="src"
     :style="{
-      backgroundColor: src ? 'none' : $options.colorFactory(
+      backgroundColor: $options.colorFactory(
         avatarId % $options.constants.COLOR_FACTORY_LENGTH
       ).bg,
       color: $options.colorFactory(

@@ -1,23 +1,23 @@
 <template>
-  <div class="co-department__list-item">
-    <AvatarMaker
-      :size="45"
-      :avatarId="data.id"
-      text="PR"
-    />
-    <div class="co-department__list-item-detail">
-      <p class="list-item__text-bold">{{data.name}}</p>
-      <p class="list-item__text-muted">{{data.group}}</p>
+  <div class="user-education__list-item">
+    <div class="item__content">
+      <p class="item__title">{{ data.title }}</p>
+      <p class="item__text">{{ data.address }}</p>
+      <p class="item__text">{{ data.period }}</p>
+    </div>
+    <div class="item__action">
+      <b-button type="button" variant="outline-primary">
+        Edit
+      </b-button>
     </div>
   </div>
 </template>
 <script>
-import Card from '../Card';
-import AvatarMaker from '../AvatarMaker';
+
+
 export default {
   components: {
-    Card,
-    AvatarMaker
+
   },
   props: {
     data: {
@@ -29,31 +29,39 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/shared.scss";
 
-.co-department__list-item {
+.user-education__list-item {
   display: flex;
+  flex-direction: row;
   padding: 0;
-  margin-bottom: 15px;
+  margin-top: 10px;
+  margin-bottom: 30px;
 
   &:last-child {
     margin-bottom: 0;
   }
 }
 
-.co-department__list-item-detail {
+.item__content {
   display: flex;
   flex-direction: column;
-  margin-left: 10px;
+  flex: 1;
 }
 
-.list-item__text-muted {
+.item__action {
+
+}
+
+.item__text {
   color: $dark-gray-200;
-  font-size: 13px;
+  font-size: 14px;
   margin: 0;
 }
 
-.list-item__text-bold {
+.item__title {
   font-weight: 500;
-  margin: 0;
+  color: $dark-gray-500;
+  font-size: 17px;
+  margin: 0 0 3px 0;
 }
 
 </style>

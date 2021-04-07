@@ -1,7 +1,7 @@
 <template>
   <div>
-    <UserEducation />
-    <UserEmployments />
+    <UserEducation :personnelId="personnelId" />
+    <UserEmployments :personnelId="personnelId" />
   </div>
 </template>
 
@@ -18,6 +18,11 @@ export default {
     return {
 
     };
+  },
+  computed: {
+    personnelId() {
+      return this.$store.state?.user?.userable?.id;
+    }
   },
   created() {
 

@@ -17,68 +17,20 @@
 </template>
 
 <script>
-import { copyValue } from '../../helpers/extractor';
-import { reset, showNotification, validate } from '../../helpers/forms';
-import { AuthApi, PersonnelApi } from '../../mixins/api';
-import PhotoViewer from '../components/PhotoViewer';
-import Card from '../components/Card';
-import InputGroup from '../components/InputGroup/InputGroup';
-import InputContainer from '../components/InputGroup/InputContainer';
-import CardItem from '../components/Card/CardItem';
-import CardCol from '../components/Card/CardColumn';
 import HeaderProfileCard from '../../containers/HeaderProfileCard';
 import CoDepartmentList from '../components/CoDepartment/List';
-
-const personnelFields = {
-  id: null,
-  firstName: null,
-  middleName: null,
-  lastName: null,
-  birthDate: null,
-  completeAddress: null,
-  jobTitle: null,
-  mobileNo: null,
-  phoneNo: null,
-  emergencyMobileNo: null,
-  emergencyPhoneNo: null,
-};
-
-const userFields = {
-  id: null,
-  username: null,
-  oldPassword: null,
-  password: null,
-  passwordConfirmation: null,
-  userGroupId: null,
-};
-
-const userStatesAndErrors = {
-  id: null,
-  userUsername: null,
-  userOldPassword: null,
-  userPassword: null,
-  userPasswordConfirmation: null,
-};
-
 export default {
   components: {
-    PhotoViewer,
-    Card,
-    InputGroup,
-    InputContainer,
-    CardCol,
-    CardItem,
     HeaderProfileCard,
     CoDepartmentList
   },
-  mixins: [PersonnelApi, AuthApi],
   data() {
     return {
 
     };
   },
   created() {
-
+    console.log(this.$store.state)
   },
   methods: {
 
@@ -99,6 +51,10 @@ export default {
   width: 320px;
   height: auto;
   margin-left: 15px;
+
+  @include for-size(tablet-landscape-down) {
+    display: none;
+  }
 }
 
 .main-container {

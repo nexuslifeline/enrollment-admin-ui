@@ -143,7 +143,7 @@ export default {
 }
 
 .header__account-name {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 500;
   color: $dark-gray-500;
   margin: 0;

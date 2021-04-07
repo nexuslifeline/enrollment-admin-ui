@@ -4,6 +4,9 @@
       <h4 class="c-card__header-title">
         {{ title }}
       </h4>
+      <b-button v-if="showAction" type="button" variant="primary">
+        {{ actionLabel }}
+      </b-button>
       <b-dropdown
         v-if="showRefresh"
         right
@@ -35,6 +38,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    showAction: {
+      type: Boolean,
+      default: false,
+    },
+    actionLabel: {
+      type: [String],
+      default: 'Create New'
+    },
   },
 };
 </script>
@@ -53,8 +64,10 @@ export default {
 
 .c-card__header {
   border-bottom: 1px solid $brand-border-color;
-  padding: 15px;
+  padding: 0 15px;
+  height: 58px;
   display: flex;
+  align-items: center;
 
   @include for-size(phone-only) {
     flex-direction: column;
@@ -69,7 +82,8 @@ export default {
 
 .c-card__header-title {
   margin: 0;
-  font-size: 17px;
+  font-size: 20px;
+  color: $dark-gray-500;
   flex: 1;
 }
 
