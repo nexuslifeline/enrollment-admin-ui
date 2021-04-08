@@ -1,5 +1,6 @@
 <template>
   <div>
+    <AccountSettings />
     <UserEducation :personnelId="personnelId" />
     <UserEmployments :personnelId="personnelId" />
   </div>
@@ -8,11 +9,13 @@
 <script>
 import UserEmployments from '../components/UserEmployments/List';
 import UserEducation from '../components/UserEducation/List';
+import AccountSettings from '../components/AccountSettings/List';
 
 export default {
   components: {
     UserEmployments,
-    UserEducation
+    UserEducation,
+    AccountSettings
   },
   data() {
     return {
