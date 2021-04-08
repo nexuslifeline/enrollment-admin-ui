@@ -66,7 +66,7 @@
         <OverviewDropdown :user="user" @onLogout="logout" :isLoggingOut="isLoading" />
       </div>
     </div>
-    <div class="header__account-details">
+    <div v-if="!isHome" class="header__account-details">
       <!-- <HeaderProfileCard v-if="isHome" :user="user" /> -->
       <div class="header__sub-menus-container">
         <template v-if="isReport" >
@@ -81,7 +81,7 @@
             ></b-form-input>
           </div>
         </template>
-        <ul v-if="!isHome" class="header__sub-menus">
+        <ul class="header__sub-menus">
           <template
             v-for="(subNav, idx) in visibleSubNavItems">
             <template v-if="isAccessible(subNav.permissionIds)">

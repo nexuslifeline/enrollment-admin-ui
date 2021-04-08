@@ -6,11 +6,13 @@
     <div class="header__main-card-content">
       <div class="header__account-photo-container">
         <AvatarMaker
-          class="header__main-card-photo"
+          @onPhotoChange="onPhotoChange"
           :avatarId="user.id"
           :size="110"
           :text="`${user.userable.firstName.charAt(0)}${user.userable.lastName.charAt(0)}`"
           :src="userPhoto"
+          :borderSize="3"
+          enableUpload
         />
       </div>
       <div class="header__account-profile-details">
@@ -59,6 +61,15 @@ export default {
       const name = (userGroup && userGroup.name) || 'System Administrator';
       return name;
     },
+  },
+  methods: {
+    onPhotoChange(file) {
+      const formData = new FormData();
+      formData.append('photo', file);
+
+      // http request here to send form data
+      console.log(file)
+    }
   }
 }
 </script>
@@ -131,10 +142,6 @@ export default {
 .header__main-card-content {
   flex: 1;
   position: relative;
-}
-
-.header__main-card-photo {
-  border: 3px solid $white;
 }
 
 .header__account-profile-details {

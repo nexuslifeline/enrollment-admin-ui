@@ -81,8 +81,12 @@ import {
   BIconArrowRepeat,
   BIconPerson,
   BIconTelephone,
-  BSpinner
+  BSpinner,
+  BIconCamera,
+  BIconCameraFill
 } from 'bootstrap-vue';
+Vue.component('BIconCameraFill', BIconCameraFill);
+Vue.component('BIconCamera', BIconCamera);
 Vue.component('BSpinner', BSpinner);
 Vue.component('BIconChevronUp', BIconChevronUp);
 Vue.component('BIconChevronDown', BIconChevronDown);
