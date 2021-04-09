@@ -3,13 +3,14 @@
     <AccountSettings />
     <UserEducation :personnelId="personnelId" />
     <UserEmployments :personnelId="personnelId" />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import UserEmployments from '../components/UserEmployments/List';
-import UserEducation from '../components/UserEducation/List';
-import AccountSettings from '../components/AccountSettings/List';
+import UserEmployments from '../../components/UserEmployments/List';
+import UserEducation from '../../components/UserEducation/List';
+import AccountSettings from '../../components/AccountSettings/List';
 
 export default {
   components: {
@@ -37,7 +38,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/scss/shared.scss';
+@import '../../../assets/scss/shared.scss';
 
 
 </style>

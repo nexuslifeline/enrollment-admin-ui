@@ -84,8 +84,10 @@ import {
   BIconTelephone,
   BSpinner,
   BIconCamera,
-  BIconCameraFill
+  BIconCameraFill,
+  BIconPencil
 } from 'bootstrap-vue';
+Vue.component('BIconPencil', BIconPencil);
 Vue.component('BIconCameraFill', BIconCameraFill);
 Vue.component('BIconCamera', BIconCamera);
 Vue.component('BSpinner', BSpinner);

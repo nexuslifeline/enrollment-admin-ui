@@ -9,7 +9,7 @@
         <vText size="s" weight="bold" type="p" align="right">chrisrueda14@yahoo.com</vText>
         <vText size="s" color="light" type="p" align="right">System Administrator</vText>
       </div>
-      <b-button type="button" variant="outline-primary">
+      <b-button @click="$router.push({ name: 'ChangeUsername' })" type="button" variant="outline-primary">
         Change
       </b-button>
     </div>

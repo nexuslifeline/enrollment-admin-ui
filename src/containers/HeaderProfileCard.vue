@@ -2,6 +2,11 @@
   <div class="header__account-main-card">
     <div class="header__main-card-cover">
       <WaveBackground />
+      <div class="action-container">
+        <button @click="$router.push({ name: 'EditProfile' })" class="action-edit">
+          <BIconPencil class="action-icon" /> Edit Profile
+        </button>
+      </div>
     </div>
     <div class="header__main-card-content">
       <div class="header__account-photo-container">
@@ -27,6 +32,7 @@
             {{ userable.mobileNo || userable.phoneNo }}
           </vText>
           <vText size="s" marginBottom="5" v-if="true">https://www.facebook.com/chrisrueda14/</vText>
+          <vText size="s" marginBottom="5" v-if="true">https://www.nexuslifeline.com/</vText>
         </div>
       </div>
     </div>
@@ -186,6 +192,33 @@ export default {
     margin: 30px 0;
     flex: 100%;
   }
+}
+
+.action-container {
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.action-edit {
+  margin: 10px 10px 10px 0;
+  padding: 5px 14px;
+  background-color: $light-gray;
+  border: 0;
+  border-radius: 5px;
+  outline: none;
+
+  &:hover {
+    background-color: $light-gray-200;
+  }
+}
+
+.action-icon {
+  margin-right: 3px;
 }
 
 </style>

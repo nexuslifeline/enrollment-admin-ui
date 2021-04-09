@@ -20,7 +20,10 @@ const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
 const Home = () => import('@/views/pages/Home')
-const Profile = () => import('@/views/pages/Profile')
+const Profile = () => import('@/views/pages/profile/Profile')
+const EditProfile = () => import('@/views/pages/profile/EditProfile')
+const ChangeUsername = () => import('@/views/pages/profile/ChangeUsername')
+const UpdatePassword = () => import('@/views/pages/profile/UpdatePassword')
 const MyActivity = () => import('@/views/pages/MyActivity')
 const Evaluation = () => import('@/views/pages/Evaluation')
 const StudentAdmission = () => import('@/views/pages/StudentAdmission')
@@ -117,7 +120,7 @@ function configRoutes () {
   {
       path: '/',
       redirect: { name: 'Home' },
-      name: 'Home',
+      name: 'Dashboard',
       component: TheContainer,
       children: [
         {
@@ -478,7 +481,24 @@ function configRoutes () {
               path: 'profile',
               name: 'Profile',
               component: Profile,
-              meta: { requiresAuth: true }
+              meta: { requiresAuth: true },
+              children: [
+                {
+                  path: 'edit',
+                  name: 'EditProfile',
+                  component: EditProfile,
+                },
+                {
+                  path: 'change-username',
+                  name: 'ChangeUsername',
+                  component: ChangeUsername,
+                },
+                {
+                  path: 'update-password',
+                  name: 'UpdatePassword',
+                  component: UpdatePassword,
+                }
+              ]
             },
             {
               path: 'activity',
