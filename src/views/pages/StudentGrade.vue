@@ -226,11 +226,13 @@ export default {
   },
   methods: {
     loadStudents() {
-      const { subjectId, sectionId, criteria } = this.filters.student
+      let { subjectId, sectionId, criteria } = this.filters.student
       const { student, student: { perPage, page } } = this.paginations
       const { students } = this.tables
       const params = { paginate: true, perPage, page, criteria }
       students.isBusy = true;
+      subjectId = subjectId ?? 0
+      sectionId = sectionId ?? 0
       this.getGradesOfAcademicRecords(subjectId, sectionId, params).then(({ data }) => {
         students.items = data.data;
         student.from = data.meta.from;
@@ -274,6 +276,11 @@ export default {
       const { sections, subjects } = this.options
       const { student, student: { sectionId } } = this.filters
       student.subjectId = null
+
+      if(!sectionId) {
+        subjects.items = []
+        return
+      }
       const section = sections.items.find(s => s.id === sectionId)
       subjects.items = section.subjects ?? []
     },

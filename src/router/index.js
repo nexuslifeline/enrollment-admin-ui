@@ -30,7 +30,8 @@ const Subject = () => import('@/views/pages/Subject')
 const Course = () => import('@/views/pages/Course')
 const SchoolFee = () => import('@/views/pages/SchoolFee')
 const UserGroup = () => import('@/views/pages/UserGroup')
-const User = () => import('@/views/pages/User')
+const User = () => import('@/views/pages/user/User')
+const UserEntry = () => import('@/views/pages/user/UserEntry')
 const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
@@ -378,8 +379,27 @@ function configRoutes () {
             {
               path: 'user',
               name: 'User',
-              component: User,
-              meta: { requiresAuth: true, userType: 0 }
+              component: { render(c) { return c('router-view') } },
+              children: [
+                {
+                  path: '/',
+                  name: 'User List',
+                  component: User,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+                {
+                  path: 'add',
+                  name: 'User Add',
+                  component: UserEntry,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+                {
+                  path: ':personnelId',
+                  name: 'User Edit',
+                  component: UserEntry,
+                  meta: { requiresAuth: true, userType: 0 }
+                },
+              ]
             },
             {
               path: 'academic-transcript',
