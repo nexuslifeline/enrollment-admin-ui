@@ -1,13 +1,13 @@
 <template>
   <div class="co-department__list-item">
     <AvatarMaker
-      :size="45"
+      :size="43"
       :avatarId="data.id"
       text="PR"
     />
     <div class="co-department__list-item-detail">
-      <p class="list-item__text-bold">{{data.name}}</p>
-      <p class="list-item__text-muted">{{data.group}}</p>
+      <vText size="s" weight="bold">{{ data.name }}</vText>
+      <vText size="s" color="light">{{ data.group }}</vText>
     </div>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
 .co-department__list-item {
   display: flex;
   padding: 0;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 
   &:last-child {
     margin-bottom: 0;

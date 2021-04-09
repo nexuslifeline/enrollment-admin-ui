@@ -1,13 +1,13 @@
 <template>
   <div class="item__row">
     <div class="item__content">
-      <p class="item__title">Change Email</p>
-      <p class="item__text">Lorem ipsum dolor itet non sa ba ke rui boa son di yu baka tiya lo rerem di sa.</p>
+      <vText size="m" weight="bold">Change Username</vText>
+      <vText color="light" size="s">It is important to use your existing email address as your username to properly linked your account.</vText>
     </div>
     <div class="item__action">
       <div class="item__details">
-        <p class="item__title r-align-text">chrisrueda14@yahoo.com</p>
-        <p class="item__text r-align-text">System Administrator</p>
+        <vText size="s" weight="bold" type="p" align="right">chrisrueda14@yahoo.com</vText>
+        <vText size="s" color="light" type="p" align="right">System Administrator</vText>
       </div>
       <b-button type="button" variant="outline-primary">
         Change

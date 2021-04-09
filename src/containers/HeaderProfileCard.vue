@@ -9,16 +9,25 @@
           @onPhotoChange="onPhotoChange"
           :avatarId="user.id"
           :size="110"
-          :text="`${user.userable.firstName.charAt(0)}${user.userable.lastName.charAt(0)}`"
+          :text="`${user.userable.firstName.charAt(0)}${userable.lastName.charAt(0)}`"
           :src="userPhoto"
           :borderSize="3"
           enableUpload
         />
       </div>
-      <div class="header__account-profile-details">
-        <p class="header__account-name">{{ user.userable.name }}</p>
-        <p class="header__account-group">{{ userGroup }}</p>
-        <p class="header__account-address">San Jose, San Simon, Pampanga, Philippines</p>
+      <div class="header__account-details__container">
+        <div class="header__account-details__column-left">
+          <vText size="xl" weight="bold">{{ userable.name }}</vText>
+          <vText size="m" weight="bold">{{ userGroup }}</vText>
+          <vText size="s">{{ userable.completeAddress }}</vText>
+        </div>
+        <div class="header__account-details__column-right">
+          <vText size="s" marginBottom="5">{{ user.username }}</vText>
+          <vText size="s" marginBottom="5" v-if="!!userable.mobileNo || !!userable.phoneNo">
+            {{ userable.mobileNo || userable.phoneNo }}
+          </vText>
+          <vText size="s" marginBottom="5" v-if="true">https://www.facebook.com/chrisrueda14/</vText>
+        </div>
       </div>
     </div>
     <ul class="home-profile__menu">
@@ -61,6 +70,12 @@ export default {
       const name = (userGroup && userGroup.name) || 'System Administrator';
       return name;
     },
+    userable() {
+      return this.$store.state?.user?.userable || {};
+    },
+  },
+  created() {
+    console.log(this.$store.state.user)
   },
   methods: {
     onPhotoChange(file) {
@@ -144,28 +159,33 @@ export default {
   position: relative;
 }
 
-.header__account-profile-details {
+.header__account-details__container {
+  display: flex;
+  justify-content: space-between;
   margin-top: 60px;
-  padding-left: 30px;
+  padding: 0 30px;
+  flex-wrap: wrap;
 }
 
-.header__account-name {
-  font-size: 24px;
-  font-weight: 500;
-  color: $dark-gray-500;
-  margin: 0;
+.header__account-details__column-left {
+  display: flex;
+  flex-direction: column;
+  flex: 60%;
+
+  @include for-size(tablet-portrait-down) {
+    flex: 100%;
+  }
 }
 
-.header__account-group {
-  font-size: 14px;
-  font-weight: 500;
-  color: $dark-gray-300;
-  margin: 0;
+.header__account-details__column-right {
+  display: flex;
+  flex-direction: column;
+  flex: 40%;
+
+  @include for-size(tablet-portrait-down) {
+    margin: 30px 0;
+    flex: 100%;
+  }
 }
 
-.header__account-address {
-  font-size: 14px;
-  color: $dark-gray-200;
-  margin: 0;
-}
 </style>

@@ -1,9 +1,9 @@
 <template>
   <div class="c-card">
     <div class="c-card__header">
-      <h4 class="c-card__header-title">
+      <vText :size="titleSize" flex="1" weight="bold">
         {{ title }}
-      </h4>
+      </vText>
       <b-button v-if="showAction" type="button" variant="primary">
         {{ actionLabel }}
       </b-button>
@@ -46,6 +46,10 @@ export default {
       type: [String],
       default: 'Create New'
     },
+    titleSize: {
+      type: [String],
+      default: 'xl'
+    },
   },
 };
 </script>
@@ -67,6 +71,7 @@ export default {
   padding: 0 15px;
   height: 58px;
   display: flex;
+  flex-direction: row;
   align-items: center;
 
   @include for-size(phone-only) {
@@ -78,13 +83,6 @@ export default {
   padding: 20px;
   background-color: $white;
   padding-bottom: 50px;
-}
-
-.c-card__header-title {
-  margin: 0;
-  font-size: 20px;
-  color: $dark-gray-500;
-  flex: 1;
 }
 
 .c-card__refresh-button {

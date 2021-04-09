@@ -600,7 +600,73 @@ legend.required:before {
 }
 
 
-// utilities
+// ************ utilities ***************
 .r-align-text {
   text-align: right;
+}
+
+.extra-large-2-text, .xxl-text {
+  font-size: 26px;
+  margin: 0;
+}
+
+.extra-large-text, .xl-text {
+  font-size: 24px;
+  margin: 0;
+}
+
+.large-text, .l-text {
+  font-size: 20px;
+  margin: 0;
+}
+
+.medium-text, .m-text {
+  font-size: 18px;
+  margin: 0;
+}
+
+.small-text, .sm-text {
+  font-size: 15px;
+  margin: 0;
+}
+
+.extra-small-text, .xs-text {
+  font-size: 13px;
+  margin: 0;
+}
+
+// text colors
+.dark-color {
+  color: $dark-gray-600;
+}
+
+.normal-color {
+  color: $dark-gray-500;
+}
+
+.light-color {
+  color: $dark-gray-200;
+}
+
+.lighter-color {
+  color: $dark-gray-100;
+}
+
+// font colors
+.bolder-weight {
+  font-weight: 600;
+}
+
+.bold-weight {
+  font-weight: 500;
+}
+
+.normal-weight {
+  font-weight: normal;
+}
+
+
+// margin
+.m-b-5 {
+  margin-bottom: 5px;
 }

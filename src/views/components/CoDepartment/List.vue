@@ -1,5 +1,5 @@
 <template>
-  <Card title="Co-Department Users">
+  <Card title="Co-Department Users" titleSize="m">
     <div class="co-department__list">
       <template v-for="item in [1, 2, 3, 4, 5]">
         <Item :data="{ id: item, name: 'Paul Christian Rueda', group: 'System Administrator' }" />

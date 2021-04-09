@@ -48,7 +48,7 @@ export default {
 }
 
 .main-container__side-panel {
-  width: 320px;
+  width: 300px;
   height: auto;
   margin-left: 15px;
 

@@ -1,11 +1,11 @@
 <template>
   <div class="user-education__list-item">
     <div class="item__content">
-      <p class="item__title">{{ data.title }}</p>
-      <p class="item__text">{{ data.address }}</p>
-      <p class="item__text">{{ data.period }}</p>
+      <vText size="m" weight="bold">{{ data.title }}</vText>
+      <vText size="s" color="light">{{ data.address }}</vText>
+      <vText size="s" color="light">{{ data.period }}</vText>
     </div>
-    <div class="item__action">
+    <div>
       <b-button type="button" variant="outline-primary">
         Edit
       </b-button>
@@ -46,22 +46,4 @@ export default {
   flex-direction: column;
   flex: 1;
 }
-
-.item__action {
-
-}
-
-.item__text {
-  color: $dark-gray-200;
-  font-size: 14px;
-  margin: 0;
-}
-
-.item__title {
-  font-weight: 500;
-  color: $dark-gray-500;
-  font-size: 17px;
-  margin: 0 0 3px 0;
-}
-
 </style>

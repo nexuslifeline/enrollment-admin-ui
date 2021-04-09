@@ -1,13 +1,13 @@
 <template>
   <div class="item__row">
     <div class="item__content">
-      <p class="item__title">Update Password</p>
-      <p class="item__text">We recommend to update your password every 3 months for a better security.</p>
+      <vText size="m" weight="bold">Update Password</vText>
+      <vText color="light" size="s">By changing your passwords regularly, you make it harder for someone to compromise your account.</vText>
     </div>
     <div class="item__action">
       <div class="item__details">
-        <p class="item__title r-align-text">**********</p>
-        <p class="item__text r-align-text">Last updated January 16, 2021</p>
+        <vText size="s" color="light" type="p" align="right">**********</vText>
+        <vText size="s" color="light" type="p" align="right">Last updated January 16, 2021</vText>
       </div>
       <b-button type="button" variant="outline-primary">
         Update

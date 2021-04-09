@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import vText from './views/components/Text';
 import vSelect from 'vue-select'
 import { AlertPlugin, BIconPlus } from 'bootstrap-vue';
 import { AvatarPlugin } from 'bootstrap-vue';
@@ -162,6 +163,8 @@ import Icon from 'vue-awesome/components/Icon'
 Vue.config.performance = true
 Vue.component('v-icon', Icon)
 Vue.component('v-select', vSelect)
+
+Vue.component('vText', vText);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
