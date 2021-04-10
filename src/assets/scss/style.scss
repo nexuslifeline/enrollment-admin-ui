@@ -141,6 +141,11 @@ h5, .h5 {
   font-size: 1.09375rem;
 }
 
+label {
+  margin-bottom: 5px;
+  color: $dark-gray-500;
+}
+
 .b-avatar .b-avatar-text {
   text-transform: uppercase;
   white-space: nowrap;
@@ -260,7 +265,7 @@ h5, .h5 {
   user-select: none;
   background-color: transparent;
   border: 1px solid transparent;
-  padding: 7px 20px;
+  padding: 6.5px 20px;
   font-size: 14px;
   line-height: 1.5;
   border-radius: 4px;
@@ -320,14 +325,12 @@ h5, .h5 {
   font-size: 1.2rem;
 }
 
-label.required:before {
-  content: '* ';
-  color: red;
+label.required::after {
+  content: ' *';
 }
 
 legend.required:before {
   content: '* ';
-  color: red;
 }
 
 .btn-save {
@@ -597,6 +600,23 @@ legend.required:before {
 
 .c-table tbody td {
   padding: 6px !important;
+}
+
+.modal-footer {
+  background-color: $light-gray-100;
+}
+
+.modal-title {
+  font-size: 22px;
+  color: $dark-gray-500;
+}
+
+.modal-body__container {
+  padding: 0 !important;
+}
+
+.form-group {
+  margin-bottom: 10px;
 }
 
 
