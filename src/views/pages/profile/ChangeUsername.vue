@@ -8,10 +8,10 @@
     bodyClass="modal-body__container"
     :centered="true"
     @hidden="$router.push({ name: 'Profile' })">
-    <div class="field-container">
+    <div class="modal-field-container">
       <b-form-group description="To ensure that we will properly linked your account its necessary to use your email address as your username.">
         <label class="required">Username</label>
-        <b-form-input />
+        <b-form-input v-model="account.username" />
         <b-form-invalid-feedback>
 
         </b-form-invalid-feedback>
@@ -35,7 +35,10 @@ export default {
   data() {
     return {
       isConfirmBusy: false,
-      isShown: true
+      isShown: true,
+      account: {
+        username: this.$store.state?.user?.username
+      }
     }
   },
   methods: {
@@ -46,11 +49,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .field-container {
-    display: flex;
-    flex-direction: column;
-    max-height: 68vh;
-    overflow: auto;
-    padding: 20px 30px;
-  }
+
 </style>

@@ -276,6 +276,9 @@ label {
   min-width: 100px !important;
 }
 
+.btn-dark {
+  border: 1px solid $dark-gray-200;
+}
 
 .btn.btn-primary {
   color: $white !important;
@@ -689,4 +692,12 @@ legend.required:before {
 // margin
 .m-b-5 {
   margin-bottom: 5px;
+}
+
+.modal-field-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 68vh;
+  overflow: auto;
+  padding: 20px 25px;
 }

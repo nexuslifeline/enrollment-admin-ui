@@ -1,19 +1,37 @@
 <template>
-  <Card title="Education" actionLabel="Add Education" showAction>
-    <div class="education__list">
-      <template v-for="(item, idx) in items">
-        <Item :data="item" :key="idx" />
-      </template>
-    </div>
-  </Card>
+  <div>
+    <Card
+      title="Education"
+      actionLabel="Add Education"
+      @onAddNew="selected = {}, isShown = true"
+      showAction>
+      <div v-if="items.length > 0" class="education__list">
+        <template v-for="(item, idx) in items">
+          <Item :data="item" :key="idx" @onEdit="onEditEducation" />
+        </template>
+      </div>
+      <div v-else>
+        <vText size="s" weight="light">No record(s) found.</vText>
+      </div>
+    </Card>
+    <EducationForm
+      :isShown.sync="isShown"
+      @onSave="onSaveEducation"
+      @onCreate="onCreateEducation"
+      @onDelete="onDeleteEducation"
+      :data="selected"
+    />
+  </div>
 </template>
 <script>
 import Card from '../Card';
 import Item from './Item';
+import EducationForm from './EducationForm';
 export default {
   components: {
     Card,
-    Item
+    Item,
+    EducationForm
   },
   props: {
     personnelId: {
@@ -22,22 +40,47 @@ export default {
   },
   data() {
     return {
+      isShown: false,
+      selected: {},
       items: [
         {
-          title: 'Bachelor of Science in Information Technology',
+          id: 1,
+          school: 'St. Nicolas College of Business and Administration',
+          field: 'Bachelor of Science in Information Technology',
           address: 'San Fernando City, Pampanga, PH',
-          period: 'Jan 2012 - Mar 2016',
+          start: '2016',
+          end: '2018',
         },
         {
-          title: 'Cansinal High School (Secondary)',
+          id: 2,
+          school: 'Cansinal High School (Secondary)',
+          field: 'Junior High School',
           address: 'Cansinala, Apalit, Pampanga, PH',
-          period: 'Jan 2012 - Mar 2016',
+          start: '2016',
+          end: '2018',
+          societies: 'Boyscout of the Philippines',
         }
       ]
     }
   },
   created() {
     // load user employments here
+  },
+  methods: {
+    onSaveEducation(id, data) {
+      alert(id)
+    },
+    onCreateEducation(data) {
+      alert('create education')
+    },
+    onDeleteEducation(id) {
+      this.items = this.items.filter(v => v?.id !== id);
+      this.isShown = false;
+    },
+    onEditEducation(item) {
+      this.selected = { ...item };
+      this.isShown = true;
+    }
   }
 };
 </script>

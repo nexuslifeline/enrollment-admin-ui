@@ -1,19 +1,23 @@
 <template>
   <div class="user-employment__list-item">
     <div class="item__content">
-      <vText size="m" weight="bold">{{ data.title }}</vText>
-      <vText size="s" color="light">{{ data.address }}</vText>
-      <vText size="s" color="light">{{ data.period }}</vText>
+      <vText size="m" weight="bold">{{ data.position }}</vText>
+      <vText size="s" color="light">{{ data.company }}</vText>
+      <vText size="s" color="light">
+        {{ `${$options.convertToMonth(data.startMonth)} ${data.startYear} - ${$options.convertToMonth(data.endMonth)} ${data.endYear}` }}
+      </vText>
     </div>
     <div>
-      <b-button type="button" variant="outline-primary">
+      <b-button @click="$emit('onEdit', data)" type="button" variant="outline-primary">
         Edit
       </b-button>
     </div>
   </div>
 </template>
 <script>
+import { convertToMonth } from '../../../helpers/utils';
 export default {
+  convertToMonth,
   components: {
 
   },

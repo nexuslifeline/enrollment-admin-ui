@@ -1,12 +1,13 @@
 <template>
   <div class="user-education__list-item">
     <div class="item__content">
-      <vText size="m" weight="bold">{{ data.title }}</vText>
+      <vText size="m" weight="bold">{{ data.school }}</vText>
+      <vText size="s" color="light">{{ data.field }}</vText>
       <vText size="s" color="light">{{ data.address }}</vText>
       <vText size="s" color="light">{{ data.period }}</vText>
     </div>
     <div>
-      <b-button type="button" variant="outline-primary">
+      <b-button @click="$emit('onEdit', data)" type="button" variant="outline-primary">
         Edit
       </b-button>
     </div>

@@ -179,6 +179,7 @@ export default {
   flex-direction: row;
   color: $dark-gray-100;
   font-size: 13px;
+  text-align: left;
 }
 
 .header__overview-photo {

@@ -4,7 +4,7 @@
       <vText :size="titleSize" flex="1" weight="bold">
         {{ title }}
       </vText>
-      <b-button v-if="showAction" type="button" variant="primary">
+      <b-button v-if="showAction" @click="$emit('onAddNew')" type="button" variant="primary">
         {{ actionLabel }}
       </b-button>
       <b-dropdown

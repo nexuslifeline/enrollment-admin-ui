@@ -51,3 +51,8 @@ export const formatAddress = (address) => {
 }
 
 export const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+
+export const convertToMonth = (idx) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[parseInt(idx) - 1];
+}

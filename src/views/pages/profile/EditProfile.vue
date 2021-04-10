@@ -8,35 +8,35 @@
     bodyClass="modal-body__container"
     :centered="true"
     @hidden="$router.push({ name: 'Profile' })">
-    <div class="field-container">
+    <div class="modal-field-container">
       <b-form-group>
         <label class="required">First Name</label>
-        <b-form-input />
+        <b-form-input v-model="profile.firstName" />
         <b-form-invalid-feedback>
 
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
-        <label>Middle Name</label>
+        <label v-model="profile.middleName">Middle Name</label>
         <b-form-input />
       </b-form-group>
       <b-form-group>
         <label class="required">Last Name</label>
-        <b-form-input />
+        <b-form-input v-model="profile.lastName" />
         <b-form-invalid-feedback>
 
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label class="required">Date of Birth</label>
-        <b-form-input type="date" />
+        <b-form-input type="date" v-model="profile.birthDate" />
         <b-form-invalid-feedback>
 
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label class="required">Address</label>
-        <b-form-textarea />
+        <b-form-textarea v-model="profile.completeAddress" />
         <b-form-invalid-feedback>
 
         </b-form-invalid-feedback>
@@ -45,27 +45,27 @@
         <template>
           <b-form-group>
             <label>Mobile Number</label>
-            <b-form-input />
+            <b-form-input v-model="profile.mobileNo" />
           </b-form-group>
           <b-form-group>
             <label>Phone Number</label>
-            <b-form-input />
+            <b-form-input v-model="profile.phoneNumber" />
           </b-form-group>
           <b-form-group>
             <label>Facebook:</label>
-            <b-form-input />
+            <b-form-input v-model="profile.facebook" />
           </b-form-group>
           <b-form-group>
             <label>Instagram:</label>
-            <b-form-input />
+            <b-form-input v-model="profile.instagram" />
           </b-form-group>
           <b-form-group>
-            <label>Twitter:</label>
+            <label v-model="profile.twitter">Twitter:</label>
             <b-form-input />
           </b-form-group>
           <b-form-group>
             <label>Website:</label>
-            <b-form-input />
+            <b-form-input v-model="profile.website" />
           </b-form-group>
         </template>
       </LinkVisibilityToggler>
@@ -90,7 +90,10 @@ export default {
   data() {
     return {
       isConfirmBusy: false,
-      isShown: true
+      isShown: true,
+      profile: {
+        ...this.$store.state.user?.userable
+      }
     }
   },
   methods: {
@@ -101,11 +104,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .field-container {
-    display: flex;
-    flex-direction: column;
-    max-height: 68vh;
-    overflow: auto;
-    padding: 20px 30px;
-  }
+
 </style>

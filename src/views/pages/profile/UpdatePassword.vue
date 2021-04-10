@@ -8,7 +8,7 @@
     bodyClass="modal-body__container"
     :centered="true"
     @hidden="$router.push({ name: 'Profile' })">
-    <div class="field-container">
+    <div class="modal-field-container">
       <b-form-group>
         <label class="required">Password</label>
         <b-form-input />
@@ -54,11 +54,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .field-container {
-    display: flex;
-    flex-direction: column;
-    max-height: 68vh;
-    overflow: auto;
-    padding: 20px 30px;
-  }
+
 </style>
