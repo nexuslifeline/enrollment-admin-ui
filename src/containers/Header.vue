@@ -105,8 +105,8 @@
                     v-b-tooltip.hover="{
                     variant: 'info',
                     title:
-                    `${$store.state.approvalCount[subNav.label.toLowerCase()]} Pending ${subNav.label}`,}">  
-                      ({{$store.state.approvalCount[subNav.label.toLowerCase()] }}) 
+                    `${$store.state.approvalCount[subNav.label.toLowerCase()]} Pending ${subNav.label}`,}">
+                      ({{$store.state.approvalCount[subNav.label.toLowerCase()] }})
                   </span>
                   </div>
                   <span v-if="isReport" class="header__menu-description">

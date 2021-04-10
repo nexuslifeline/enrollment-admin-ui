@@ -4,7 +4,7 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPersonnels"
     :filterVisible="isFilterVisible"
-    @create="setCreate()"
+    @create="$router.push(`/master-files/user/add`)"
     :createButtonVisible="isAccessible($options.PersonnelPermissions.ADD.id)">
     <template v-slot:filters>
       <b-form-input
@@ -76,7 +76,7 @@
               </template>
               <template v-slot:cell(user.username)="row">
                 <b-link
-                  @click="setUpdatePersonnel(row)"
+                  :to="`/master-files/user/${row.item.id}`"
                   :disabled="
                     !isAccessible($options.PersonnelPermissions.EDIT.id)
                   "
@@ -104,7 +104,7 @@
                   </template>
                   <b-dropdown-item
                     v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
-                    @click="setUpdatePersonnel(row)"
+                    :to="`/master-files/user/${row.item.id}`"
                     :disabled="showModalEntry"
                   >
                     Edit Profile
@@ -944,23 +944,23 @@ const personnelFields = {
   personnelStatusId: null,
 };
 
-import { DepartmentApi, PersonnelApi, UserGroupApi } from '../../mixins/api';
+import { DepartmentApi, PersonnelApi, UserGroupApi } from '../../../mixins/api';
 import {
   validate,
   reset,
   showNotification,
   clearFields,
-} from '../../helpers/forms';
-import PhotoViewer from '../components/PhotoViewer';
-import Tables from '../../helpers/tables';
-import Personnel from '../../mixins/api/Personnel';
-import Access from '../../mixins/utils/Access';
-import { PersonnelPermissions, PersonnelStatuses, UserGroupPermissions } from '../../helpers/enum';
-import Card from '../components/Card';
-import PageContent from "../components/PageContainer/PageContent";
-import { copyValue } from '../../helpers/extractor';
-import { getFilePath } from '../../helpers/utils';
-import AvatarMaker from "../components/AvatarMaker";
+} from '../../../helpers/forms';
+import PhotoViewer from '../../components/PhotoViewer';
+import Tables from '../../../helpers/tables';
+import Personnel from '../../../mixins/api/Personnel';
+import Access from '../../../mixins/utils/Access';
+import { PersonnelPermissions, PersonnelStatuses, UserGroupPermissions } from '../../../helpers/enum';
+import Card from '../../components/Card';
+import PageContent from "../../components/PageContainer/PageContent";
+import { copyValue } from '../../../helpers/extractor';
+import { getFilePath } from '../../../helpers/utils';
+import AvatarMaker from "../../components/AvatarMaker";
 
 export default {
   name: 'Personnel',
@@ -1011,7 +1011,7 @@ export default {
               key: 'photo',
               label: '',
               tdClass: 'align-middle',
-              thStyle: { width: '64px' },
+              thStyle: { width: '64px', maxWidth: '64px' },
             },
             {
               key: 'user.username',
@@ -1036,19 +1036,19 @@ export default {
               key: 'user.userGroup.name',
               label: 'User Group',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
+              thStyle: { width: '25%' },
             },
             {
               key: 'department.name',
               label: 'User Group',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
+              thStyle: { width: '25%' },
             },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle',
-              thStyle: { width: '40px' },
+              thStyle: { width: '40px', maxWidth: '40px' },
             },
           ],
           items: [],
@@ -1350,26 +1350,26 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-@import '../../assets/scss/shared.scss';
-.header-details {
-  font-weight: 600;
-  font-size: 14pt;
-  display: block;
-  border-bottom: solid 1px lightgray;
-}
+<style lang="scss">
+  @import '../../../assets/scss/shared.scss';
+  .header-details {
+    font-weight: 600;
+    font-size: 14pt;
+    display: block;
+    border-bottom: solid 1px lightgray;
+  }
 
-.profile-photo {
-  height: 200px;
-  width: 200px;
-}
+  .profile-photo {
+    height: 200px;
+    width: 200px;
+  }
 
-.profile-photo-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
+  .profile-photo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
 </style>

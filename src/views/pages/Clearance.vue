@@ -110,7 +110,7 @@
               />
             </template>
             <template v-slot:cell(education)="data">
-              <EducationColumn :data="data.item.academicRecord" />
+              <EducationColumn :data="data.item.academicRecord" :showSchoolYear="false"/>
             </template>
             <template v-slot:table-busy>
               <div class="text-center my-2">
@@ -179,7 +179,7 @@
               placeholder="School Category"
               class="mt-2"
             />
-            <v-select
+            <!-- <v-select
               @input="loadFormSections()"
               append-to-body
               :options="options.schoolYears.items"
@@ -188,7 +188,7 @@
               label="name"
               placeholder="School Year"
               class="mt-2"
-            />
+            /> -->
             <v-select
               v-if="isFormCourseVisible"
               @input="loadLevelsOfCourse($event, true), loadFormSections()"
@@ -276,12 +276,12 @@
             />
           </template>
           <template v-slot:cell(pivot.description)="data">
-            <b-form-input 
+            <b-form-input
               debounce="500"
               v-model="data.item.pivot.description" />
           </template>
           <template v-slot:cell(action)="{ index }">
-            <b-button 
+            <b-button
               @click="removeSignatory(index)"
               size="sm"
               variant="outline-danger">
