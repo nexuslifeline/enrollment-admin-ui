@@ -2,9 +2,9 @@
   <div class="c-page-content" :class="{ 'filter-visible': filterVisible }">
     <div v-if="filterVisible" class="c-side-filter__container">
       <div class="c-side-filter__container-header">
-        <span>
+        <vText size="xs" weight="bold" transform="uppercase">
           Filter
-        </span>
+        </vText>
       </div>
       <div class="c-side-filter__filter-body">
         <slot name="filters"></slot>
@@ -12,7 +12,9 @@
     </div>
     <div class="content-list__container">
       <div class="c-side-filter__title">
-        {{ title }}
+        <vText size="xs" weight="bold" transform="uppercase" flex="1">
+          {{ title }}
+        </vText>
         <FilterButton class="ml-auto" :isExpanded="filterVisible" @toggle="$emit('toggleFilter')" />
         <RefreshButton @reload="$emit('refresh')" class="ml-1" />
         <CreateButton @create="$emit('create')" class="ml-1" v-if="createButtonVisible"/>
@@ -71,11 +73,7 @@ export default {
 .c-side-filter__container-header {
   border-bottom: 1px solid $light-gray-10;
   padding: 7px 10px;
-  font-weight: 500;
   height: 36px;
-  text-transform: uppercase;
-  font-size: 13px;
-  color: $dark-gray-500;
 }
 
 .c-side-filter__content {
@@ -106,12 +104,8 @@ export default {
   padding: 8px 10px;
   width: 100%;
   background-color: $white;
-  font-weight: 500;
-  font-size: 13px;
   display: flex;
   height: 39px;
-  text-transform: uppercase;
-  color: $dark-gray-500;
 }
 
 .content-list__body {

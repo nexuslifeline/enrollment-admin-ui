@@ -12,9 +12,9 @@
       <div class="content-list__body">
         <div v-if="filterVisible" class="c-side-filter__container">
           <div class="c-side-filter__container-header">
-            <span>
+            <vText size="xs" weight="bold" transform="uppercase">
               Filter
-            </span>
+            </vText>
           </div>
           <div class="c-side-filter__filter-body">
             <slot name="filters"></slot>
@@ -74,7 +74,6 @@ export default {
 .c-side-filter__container-header {
   border-bottom: 1px solid $light-gray-10;
   padding: 7px 10px;
-  font-weight: 500;
 }
 
 .c-side-filter__content {

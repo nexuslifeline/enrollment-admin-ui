@@ -268,34 +268,37 @@ label {
   padding: 6.5px 20px;
   font-size: 14px;
   line-height: 1.5;
-  border-radius: 4px;
   -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-  min-width: 100px !important;
 }
 
-.btn-dark {
+// button.btn {
+//   padding: 6.5px 20px;
+//   min-width: 100px !important;
+// }
+
+button.btn-dark {
   border: 1px solid $dark-gray-200;
 }
 
-.btn.btn-primary {
+button.btn.btn-primary {
   color: $white !important;
 }
 
-.btn-primary {
+button.btn-primary {
   //color: $bluish-gray;
   background-color: $brand-primary;
   border-color: $brand-primary;
 }
 
-.btn-outline-primary {
+button.btn-outline-primary {
   color: $brand-primary;
   border-color: $brand-primary;
 }
 
-.btn-outline-danger {
+button.btn-outline-danger {
   color: $brand-danger;
   border-color: $brand-danger;
 }

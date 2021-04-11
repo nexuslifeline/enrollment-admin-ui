@@ -1,7 +1,7 @@
 <template>
   <component
     :is="type"
-    :style="`margin-bottom: ${marginBottom}px; flex: ${flex}; text-align: ${align};`"
+    :style="`margin-bottom: ${marginBottom}px; flex: ${flex}; text-align: ${align}; text-transform: ${transform}`"
     :class="`${size}-text ${color}-color ${weight}-weight`">
     <slot></slot>
   </component>
@@ -36,6 +36,10 @@ export default {
     flex: {
       type: [Number, String],
       default: 0
+    },
+    transform: {
+      type: [String],
+      default: 'none'
     }
   }
 }
