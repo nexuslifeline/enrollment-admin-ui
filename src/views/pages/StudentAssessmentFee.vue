@@ -62,63 +62,11 @@
     </template>
     <template v-slot:content>
       <div v-if="checkIfHasSchoolCategoryAccess()">
-        <!-- <b-row class="mb-2">
-          <b-col md="6">
-            <b-form-radio-group
-              @input="loadAcademicRecord()"
-              v-model="filters.student.applicationStatusId"
-            >
-              <b-form-radio :value="null">Show All</b-form-radio>
-              <b-form-radio :value="applicationStatuses.APPROVED.id">
-                Approved
-              </b-form-radio>
-              <b-form-radio :value="applicationStatuses.SUBMITTED.id">
-                Pending
-              </b-form-radio>
-            </b-form-radio-group>
-          </b-col>
-          <b-col md="3">
-            <b-form-select
-              v-if="
-                filters.student.schoolCategoryId ===
-                  options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-                  filters.student.schoolCategoryId ===
-                    options.schoolCategories.COLLEGE.id ||
-                  filters.student.schoolCategoryId ===
-                    options.schoolCategories.GRADUATE_SCHOOL.id
-              "
-              @change="loadAcademicRecord()"
-              v-model="filters.student.courseId"
-              class="float-right"
-            >
-              <template v-slot:first>
-                <b-form-select-option :value="null" disabled
-                  >-- Course --</b-form-select-option
-                >
-              </template>
-              <b-form-select-option :value="null">None</b-form-select-option>
-              <b-form-select-option
-                v-for="course in options.courses.items"
-                :key="course.id"
-                :value="course.id"
-              >
-                {{ course.description }}
-                {{ course.major ? `(${course.major})` : '' }}
-              </b-form-select-option>
-            </b-form-select>
-          </b-col>
-          <b-col md="3">
-            <b-form-input
-              v-model="filters.student.criteria"
-              debounce="500"
-              @update="loadAcademicRecord()"
-              type="text"
-              placeholder="Search"
-            >
-            </b-form-input>
-          </b-col>
-        </b-row> -->
-        <!-- row button and search input -->
+
+        <b-alert :show="showTermsAlert" variant="danger" class="mb-3">
+          No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/home/settings/terms-setting">here</router-link></span>.
+        </b-alert>
+
         <b-table
           class="c-table"
           hover
@@ -231,7 +179,7 @@
                   callback: () => setApproveFees(data),
                   isAllowed: isAccessible(
                     $options.StudentFeePermissions.APPROVAL.id
-                  ),
+                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
                 },
               ]"
             >
@@ -292,6 +240,9 @@
 
               <template v-slot:content>
                 <div>
+                  <b-alert :show="!hasTermsSchoolCategory(data.item)" variant="danger" class="mb-3">
+                    No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/home/settings/terms-setting">here</router-link></span>.
+                  </b-alert>
                   <ActiveViewHeader
                     id="header-current-application"
                     title="Review Application for current Academic Year"
@@ -574,7 +525,8 @@
                   <b-button
                     @click="setApproveFees(data)"
                     class="mr-2" variant="outline-primary"
-                    v-if="isAccessible($options.StudentFeePermissions.APPROVAL.id)"> Approve</b-button>
+                    v-if="isAccessible($options.StudentFeePermissions.APPROVAL.id)"
+                    :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"> Approve</b-button>
                 </div>
               </template>
             </ActiveRowViewer>
@@ -740,6 +692,7 @@ import {
   SchoolFeeApi,
   ReportApi,
   SchoolYearApi,
+  TermApi,
 } from '../../mixins/api';
 import {
   SchoolCategories,
@@ -751,6 +704,7 @@ import {
   BillingTypes,
   BillingStatuses,
   StudentFeePermissions,
+  SettingPermissions
 } from '../../helpers/enum';
 import { showNotification, formatNumber } from '../../helpers/forms';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
@@ -783,7 +737,8 @@ export default {
     ReportApi,
     Tables,
     Access,
-    SchoolYearApi
+    SchoolYearApi,
+    TermApi
   ],
   format,
   components: {
@@ -805,6 +760,7 @@ export default {
     AddressColumn
   },
   StudentFeePermissions,
+  SettingPermissions,
   data() {
     return {
       isFilterVisible: true,
@@ -824,6 +780,7 @@ export default {
       applicationStatuses: ApplicationStatuses,
       fees: Fees,
       isProcessing: false,
+      showTermsAlert: false,
       tables: {
         students: {
           isBusy: false,
@@ -1037,6 +994,9 @@ export default {
         schoolCategories: SchoolCategories,
         schoolYears: {
           items: []
+        },
+        terms: {
+          items: []
         }
       },
       schoolCategoryId: null,
@@ -1057,6 +1017,14 @@ export default {
     this.loadAcademicRecord()
   },
   methods: {
+    loadTerms() {
+      const { terms } = this.options
+      const params = { paginate: false, schoolYearId: this.$store.state.schoolYear.id }
+      this.getTermList(params).then(({ data }) => {
+        terms.items = data
+        this.showTermsAlert = terms.items.length > 0 ? false : true
+      })
+    },
     loaSchoolYears() {
       const params = { paginate: false}
       const { schoolYears } = this.options
@@ -1397,9 +1365,15 @@ export default {
       student.courseItem = item;
       this.loadAcademicRecord();
     },
+    hasTermsSchoolCategory(item) {
+      console.log(item)
+      const { terms } = this.options
+      return terms.items.find(term => term.schoolCategoryId === item.schoolCategoryId)
+    },
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {
+      this.loadTerms();
       this.loadAcademicRecord();
     },
   },
@@ -1468,7 +1442,7 @@ export default {
         e.id === this.applicationStatuses.REJECTED.id ||
         e.id === this.applicationStatuses.COMPLETED.id
       )
-    }
+    },
   },
 };
 </script>
