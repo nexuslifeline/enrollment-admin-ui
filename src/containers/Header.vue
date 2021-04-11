@@ -66,7 +66,7 @@
         <OverviewDropdown :user="user" @onLogout="logout" :isLoggingOut="isLoading" />
       </div>
     </div>
-    <div v-if="!isHome" class="header__account-details">
+    <div v-if="isVisibleSubNav" class="header__account-details">
       <!-- <HeaderProfileCard v-if="isHome" :user="user" /> -->
       <div class="header__sub-menus-container">
         <template v-if="isReport" >
@@ -205,6 +205,9 @@ export default {
     };
   },
   computed: {
+    isVisibleSubNav() {
+      return !this.$route.meta?.hideSubNav;
+    },
     visibleSubNavItems() {
       const { search, isReport, $options, subNavLimit, activeIndex } = this;
       const { children } = $options.navItems[activeIndex];

@@ -334,13 +334,13 @@ function configRoutes () {
                       path: 'permissions',
                       name: 'Permissions',
                       component: Permissions,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'school-categories',
                       name: 'SchoolCategories',
                       component: SchoolCategories,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                   ]
                 }
@@ -395,13 +395,13 @@ function configRoutes () {
                   path: 'add',
                   name: 'User Add',
                   component: UserEntry,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':personnelId',
                   name: 'User Edit',
                   component: UserEntry,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
               ]
             },
@@ -425,13 +425,13 @@ function configRoutes () {
                   path: 'add',
                   name: 'Student Add',
                   component: StudentEntry,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':studentId',
                   name: 'Student Edit',
                   component: StudentEntry,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':studentId/school-records',
@@ -445,25 +445,25 @@ function configRoutes () {
                       path: 'evaluations',
                       name: 'Evaluations',
                       component: SchoolRecordEvaluation,
-                      meta: { requiresAuth: true },
+                      meta: { requiresAuth: true, hideSubNav: true },
                     },
                     {
                       path: 'evaluations/:evaluationId',
                       name: 'Evaluation Entry',
                       component: SchoolRecordEvaluationEntry,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'enrollments',
                       name: 'Enrollments',
                       component: SchoolRecordEnrollments,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'enrollments/:academicRecordId',
                       name: 'Enrollment Entry',
                       component: SchoolRecordEnrollmentEntry,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     // {
                     //   path: 'assessment',
@@ -475,13 +475,13 @@ function configRoutes () {
                       path: 'requirements',
                       name: 'Requirements',
                       component: SchoolRecordRequirements,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'requirements/:evaluationId',
                       name: 'Requirement Entry',
                       component: SchoolRecordRequirementEntry,
-                      meta: { requiresAuth: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                   ]
                 }
@@ -501,7 +501,7 @@ function configRoutes () {
               path: 'profile',
               name: 'Profile',
               component: Profile,
-              meta: { requiresAuth: true },
+              meta: { requiresAuth: true, hideSubNav: true  },
               children: [
                 {
                   path: 'edit',
