@@ -524,7 +524,7 @@ function configRoutes () {
               path: 'activity',
               name: 'MyActivity',
               component: MyActivity,
-              meta: { requiresAuth: true }
+              meta: { requiresAuth: true, hideSubNav: true }
             },
             {
               path: 'settings',
@@ -535,25 +535,25 @@ function configRoutes () {
                   path: 'general-setting',
                   name: 'GeneralSetting',
                   component: GeneralSetting,
-                  meta: { requiresAuth: true }
+                  meta: { requiresAuth: true, hideSubNav: true }
                 },
                 {
                   path: 'organization-setting',
                   name: 'OrganizationSetting',
                   component: OrganizationSetting,
-                  meta: { requiresAuth: true }
+                  meta: { requiresAuth: true, hideSubNav: true }
                 },
                 {
                   path: 'terms-setting',
                   name: 'TermsSetting',
                   component: TermsSetting,
-                  meta: { requiresAuth: true }
+                  meta: { requiresAuth: true, hideSubNav: true }
                 },
                 {
                   path: 'requirements-setting',
                   name: 'Requirements Setting',
                   component: RequirementsSetting,
-                  meta: { requiresAuth: true }
+                  meta: { requiresAuth: true, hideSubNav: true }
                 },
               ]
             }
