@@ -44,86 +44,11 @@
       />
     </template>
     <template v-slot:content>
-    <!-- <Card
-      title="Subject Enlistment"
-      :showRefresh="true"
-      @onRefresh="loadAcademicRecord()"
-    > -->
-      <!-- <SchoolCategoryTabs
-        :showAll="true"
-        @loadSchoolCategoryId="
-          (filters.student.schoolCategoryId = $event), loadAcademicRecord()
-        "
-        @clickAll="
-          (filters.student.schoolCategoryId = null),
-            (filters.student.courseId = null),
-            loadAcademicRecord()
-        "
-        @click="
-          (filters.student.schoolCategoryId = $event),
-            (filters.student.courseId = null),
-            loadAcademicRecord()
-        "
-      /> -->
       <div v-if="checkIfHasSchoolCategoryAccess()">
-        <!-- <b-row class="mb-2">
-          <b-col md="6">
-            <b-form-radio-group
-              @input="loadAcademicRecord()"
-              v-model="filters.student.academicRecordStatusId"
-            >
-              <b-form-radio :value="null">Show All</b-form-radio>
-              <b-form-radio
-                v-for="status in AcademicRecordStatuses.values"
-                :value="status.id"
-                :key="status.id"
-              >
-                {{ status.name }}
-              </b-form-radio>
-            </b-form-radio-group>
-          </b-col>
-          <b-col md="3">
-            <b-form-select
-              v-if="
-                filters.student.schoolCategoryId ===
-                  options.schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-                  filters.student.schoolCategoryId ===
-                    options.schoolCategories.COLLEGE.id ||
-                  filters.student.schoolCategoryId ===
-                    options.schoolCategories.GRADUATE_SCHOOL.id
-              "
-              @change="loadAcademicRecord()"
-              v-model="filters.student.courseId"
-              class="float-right"
-            >
-              <template v-slot:first>
-                <b-form-select-option :value="null" disabled
-                  >-- Course --</b-form-select-option
-                >
-              </template>
-              <b-form-select-option :value="null">None</b-form-select-option>
-              <b-form-select-option
-                v-for="course in options.courses.items"
-                :key="course.id"
-                :value="course.id"
-              >
-                {{ course.description }}
-                {{ course.major ? `(${course.major})` : '' }}
-              </b-form-select-option>
-            </b-form-select>
-          </b-col>
-          <b-col md="3">
-            <b-form-input
-              v-model="filters.student.criteria"
-              debounce="500"
-              @update="loadAcademicRecord()"
-              type="text"
-              placeholder="Search"
-            >
-            </b-form-input>
-          </b-col>
-        </b-row> -->
-        <!-- row button and search input -->
+        <b-alert v-model="showTermsAlert" variant="danger" class="mb-3">
+          No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/home/settings/terms-setting">here</router-link></span>.
+        </b-alert>
+
         <b-table
           class="c-table"
           hover
@@ -210,7 +135,7 @@
                   callback: () => setApproval(data),
                   isAllowed: isAccessible(
                     $options.StudentSubjectPermissions.APPROVAL.id
-                  ),
+                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
                 },
                 {
                   label: 'Reject',
@@ -245,6 +170,10 @@
               </template>
               <template v-slot:content>
                 <div>
+                  <b-alert :show="!hasTermsSchoolCategory(data.item)" variant="danger" class="mb-3">
+                    No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/home/settings/terms-setting">here</router-link></span>.
+                  </b-alert>
+
                   <ActiveViewItems>
                     <ActiveViewItem label="Level: ">
                       <p>
@@ -357,39 +286,37 @@
                       </b-button>
                     </template>
                     <template v-slot:cell(section)="row">
-                      <span>{{
-                        row.item.section ? row.item.section.name : ''
-                      }}</span>
-                      <b-dropdown
-                        right
-                        variant="link"
-                        toggle-class="text-decoration-none"
-                        no-caret
-                      >
-                        <template v-slot:button-content>
-                          <v-icon name="ellipsis-v" />
-                        </template>
-                        <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
-                        <b-dropdown-item
-                          v-if="
-                            data.item.academicRecordStatusId ===
-                              AcademicRecordStatuses.DRAFT.id
-                          "
-                          @click.prevent="onShowModalSection(row.item, data)"
-                        >
-                          Change
-                        </b-dropdown-item>
-                        <b-dropdown-item
-                          @click.prevent="onSectionSubjectClear(row)"
-                        >
-                          Clear
-                        </b-dropdown-item>
-                      </b-dropdown>
-                      <!-- <span v-if="data.item.academicRecordStatusId === AcademicRecordStatuses.DRAFT.id">
-                        <a class="float-right" href="#" @click.prevent="onShowModalSection(row.item, data)">[Change]</a>
-                        <br>
-                        <a class="float-right" href="#" @click.prevent="onSectionSubjectClear(row)">[Clear]</a>
-                      </span> -->
+                      <div class="cell-section-container">
+                         <div class="cell-section">{{
+                            row.item.section ? row.item.section.name : ''
+                          }}</div>
+                          <b-dropdown
+                            right
+                            variant="link"
+                            toggle-class="text-decoration-none"
+                            no-caret
+                            class="cell-section-action"
+                          >
+                            <template v-slot:button-content>
+                              <v-icon name="ellipsis-v" />
+                            </template>
+                            <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+                            <b-dropdown-item
+                              v-if="
+                                data.item.academicRecordStatusId ===
+                                  AcademicRecordStatuses.DRAFT.id
+                              "
+                              @click.prevent="onShowModalSection(row.item, data)"
+                            >
+                              Change
+                            </b-dropdown-item>
+                            <b-dropdown-item
+                              @click.prevent="onSectionSubjectClear(row)"
+                            >
+                              Clear
+                            </b-dropdown-item>
+                          </b-dropdown>
+                      </div>
                     </template>
                     <template v-slot:table-busy>
                       <div class="text-center my-2">
@@ -428,7 +355,8 @@
                   <b-button
                     @click="setApproval(data)"
                     class="mr-2" variant="outline-primary"
-                    v-if="isAccessible($options.StudentSubjectPermissions.APPROVAL.id)"> Approve</b-button>
+                    v-if="isAccessible($options.StudentSubjectPermissions.APPROVAL.id)"
+                    :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"> Approve</b-button>
                   <b-button variant="outline-danger"
                     @click="setDisapproval(data)"
                     v-if="isAccessible(
@@ -554,33 +482,6 @@
                     </template>
                   </b-table>
                 </div>
-                <!-- <div v-if="data.item.admissionId">
-                  <h5>Files</h5>
-                  <b-table
-                    v-if="data.item.files"
-                    hover outlined small responsive show-empty
-                    :fields="tables.files.fields"
-                    :items="data.item.files"
-                    :busy="tables.files.isBusy">
-                    <template v-slot:cell(action)="row">
-                      <b-button
-                        @click="previewFile(row)"
-                        size="sm" variant="secondary">
-                        <v-icon
-                          name="search"/>
-                      </b-button>
-                    </template>
-                    <template v-slot:table-busy>
-                      <div class="text-center my-2">
-                        <v-icon
-                          name="spinner"
-                          spin
-                          class="mr-2" />
-                        <strong>Loading...</strong>
-                      </div>
-                    </template>
-                  </b-table>
-                </div> -->
               </b-card>
               <b-button
                 v-if="
@@ -973,7 +874,8 @@ import {
   SubjectApi,
   DepartmentApi,
   SectionApi,
-  SchoolYearApi
+  SchoolYearApi,
+  TermApi
 } from '../../mixins/api';
 import {
   SchoolCategories,
@@ -983,6 +885,7 @@ import {
   Days,
   UserGroups,
   StudentSubjectPermissions,
+  SettingPermissions
 } from '../../helpers/enum';
 import { showNotification, formatNumber } from '../../helpers/forms';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
@@ -1033,7 +936,8 @@ export default {
     SectionApi,
     Tables,
     Access,
-    SchoolYearApi
+    SchoolYearApi,
+    TermApi
   ],
   components: {
     SchoolCategoryTabs,
@@ -1051,6 +955,7 @@ export default {
     AddressColumn
   },
   StudentSubjectPermissions,
+  SettingPermissions,
   data() {
     return {
       isFilterVisible: true,
@@ -1063,6 +968,7 @@ export default {
       AcademicRecordStatuses: AcademicRecordStatuses,
       changeSection: false,
       days: Days,
+      showTermsAlert: false,
       file: {
         type: null,
         src: null,
@@ -1137,48 +1043,42 @@ export default {
               key: 'name',
               label: 'Subject Code',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '40%' },
             },
             {
               key: 'units',
               label: 'Lec Units',
               tdClass: 'align-middle text-center',
-              thClass: 'text-right text-center',
-              thStyle: { width: '8%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '15%' },
             },
             {
               key: 'labs',
               label: 'Lab Units',
               tdClass: 'align-middle text-center',
-              thClass: 'text-right',
-              thStyle: { width: '8%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '15%' },
             },
-            // {
-            // 	key: "amountPerLab",
-            // 	label: "Amount per Lab",
-            // 	tdClass: "align-middle text-right",
-            // 	thClass: "text-right",
-            // 	thStyle: {width: "13%"}
-            // },
             {
               key: 'totalUnits',
               label: 'Total Units',
               tdClass: 'align-middle text-center',
-              thClass: 'text-center',
-              thStyle: { width: '12%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '15%' },
             },
             {
               key: 'section',
               label: 'Section',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: '20%' },
+              thStyle: { width: '15%' },
             },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle text-center',
-              thStyle: { width: '5%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '30px' },
             },
           ],
           fields2: [
@@ -1186,40 +1086,41 @@ export default {
               key: 'name',
               label: 'Subject Code',
               tdClass: 'align-middle',
-              thStyle: { width: '12%' },
+              thStyle: { width: '35%%' },
             },
             {
               key: 'description',
               label: 'Description',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '10%' },
             },
             {
               key: 'units',
               label: 'Lec Units',
               tdClass: 'align-middle text-center',
-              thClass: 'text-right text-center',
-              thStyle: { width: '8%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '10%' },
             },
             {
               key: 'labs',
               label: 'Lab Units',
               tdClass: 'align-middle text-center',
-              thClass: 'text-right',
-              thStyle: { width: '8%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '10%' },
             },
             {
               key: 'totalUnits',
               label: 'Total Units',
               tdClass: 'align-middle text-center',
-              thClass: 'text-center',
-              thStyle: { width: '12%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '15%' },
             },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle text-center',
-              thStyle: { width: '5%' },
+              thClass: 'align middle text-center',
+              thStyle: { width: '30px%' },
             },
           ],
           items: [],
@@ -1421,6 +1322,9 @@ export default {
         },
         schoolYears: {
           items: []
+        },
+        terms: {
+          items: []
         }
       },
       isProcessing: false,
@@ -1443,11 +1347,20 @@ export default {
     this.loadCourseList();
     // this.loadDepartmentList()
     this.loadSections();
+    this.loadTerms()
     // this.filters.student.academicRecordStatusId = this.AcademicRecordStatuses.DRAFT.id
     // this.filters.student.academicRecordStatusItem = this.AcademicRecordStatuses.DRAFT
     this.loadAcademicRecord()
   },
   methods: {
+    loadTerms() {
+      const { terms } = this.options
+      const params = { paginate: false, schoolYearId: this.$store.state.schoolYear.id }
+      this.getTermList(params).then(({ data }) => {
+        terms.items = data
+        this.showTermsAlert = terms.items.length > 0 ? false : true
+      })
+    },
     loaSchoolYears() {
       const params = { paginate: false}
       const { schoolYears } = this.options
@@ -1875,17 +1788,21 @@ export default {
       student.courseItem = item;
       this.loadAcademicRecord();
     },
+    hasTermsSchoolCategory(item) {
+      const { terms } = this.options
+      return terms.items.find(term => term.schoolCategoryId === item.schoolCategoryId)
+    },
+    totalUnits(subjects, field) {
+     if(!subjects)
+      return 0
+
+     return subjects.reduce(( accumulator, currentValue ) =>
+          accumulator + Number(currentValue[field]),
+        0
+      )
+    },
   },
   computed: {
-    totalUnits() {
-      return (subjects, field) => {
-        let units = 0;
-        subjects.forEach((s) => {
-          units += Number(s[field]);
-        });
-        return units;
-      };
-    },
     isCourseVisible() {
       const { schoolCategoryId } = this.filters.student;
       const { schoolCategories } = this.options;
@@ -1903,6 +1820,7 @@ export default {
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {
+      this.loadTerms();
       this.loadAcademicRecord();
     },
   },
@@ -1972,5 +1890,18 @@ export default {
       width: 100%;
     }
   }
+}
+
+.cell-section-container {
+  display: flex;
+  align-items: center;
+}
+
+.cell-section {
+  flex: 1
+}
+
+.cell-section-action {
+  max-width: 20px;
 }
 </style>
