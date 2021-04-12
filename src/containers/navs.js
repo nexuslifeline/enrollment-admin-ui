@@ -129,7 +129,12 @@ export default [
         label: 'Course',
         to: '/registrar/course',
         permissionIds: CoursePermissions.getIds()
-      }
+      },
+      {
+        label: 'Academic Transcript',
+        to: '/registrar/academic-transcript',
+        permissionIds: TranscriptRecordPermissions.getIds()
+      },
     ]
   },
   {
@@ -210,11 +215,6 @@ export default [
         label: 'Student',
         to: '/master-files/student/', // added trailing slash here to satisfy the tab active check
         permissionIds: StudentPermissions.getIds()
-      },
-      {
-        label: 'Academic Transcript',
-        to: '/master-files/academic-transcript',
-        permissionIds: TranscriptRecordPermissions.getIds()
       },
       {
         label: 'User',
@@ -315,6 +315,30 @@ export default [
         permissionIds: ClassMasterlistReportPermissions.getIds()
       }
     ]
-  }
+  },
+  {
+    label: 'Settings',
+    to: '/setting',
+    permissionIds: [...SettingPermissions.getIds()],
+    children: [
+      {
+        label: 'General Setting',
+        to: '/setting/general-setting'
+      },
+      {
+        label: 'Organization Setting',
+        to: '/setting/organization-setting'
+      },
+      {
+        label: 'Terms Setting',
+        to: '/setting/terms-setting'
+      },
+      {
+        label: 'Requirements Setting',
+        to: '/setting/requirements-setting',
+        permissionIds: CoursePermissions.getIds()
+      }
+    ]
+  },
 
 ]

@@ -66,6 +66,7 @@ const DocumentType = () => import('@/views/pages/DocumentType');
 const Collection = () => import('@/views/pages/reports/Collection')
 const StudentLedger = () => import('@/views/pages/reports/StudentLedger')
 const TranscriptRecord = () => import('@/views/pages/TranscriptRecord')
+const ReviewTranscriptRecord = () => import('@/views/pages/ReviewTranscriptRecord')
 const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentList')
 
 const StudentGrade = () => import('@/views/pages/StudentGrade')
@@ -193,7 +194,19 @@ function configRoutes () {
               name: 'Course',
               component: Course,
               meta: { requiresAuth: true, userType: 1 }
-            }
+            },
+            {
+              path: 'academic-transcript',
+              name: 'Academic Transript',
+              component: TranscriptRecord,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'academic-transcript/:transcriptRecordId',
+              name: 'Review Academic Transript',
+              component: ReviewTranscriptRecord,
+              meta: { requiresAuth: true }
+            },
           ]
         },
         {
@@ -402,12 +415,6 @@ function configRoutes () {
               ]
             },
             {
-              path: 'academic-transcript',
-              name: 'Academic Transript',
-              component: TranscriptRecord,
-              meta: { requiresAuth: true }
-            },
-            {
               path: 'student',
               component: { render(c) { return c('router-view') } },
               children: [
@@ -505,37 +512,37 @@ function configRoutes () {
               component: MyActivity,
               meta: { requiresAuth: true }
             },
+          ]
+        },
+        {
+          path: 'setting',
+          name: 'Settings',
+          component: { render(c) { return c('router-view') } },
+          children: [
             {
-              path: 'settings',
-              name: 'Settings',
-              component: Setting,
-              children: [
-                {
-                  path: 'general-setting',
-                  name: 'GeneralSetting',
-                  component: GeneralSetting,
-                  meta: { requiresAuth: true }
-                },
-                {
-                  path: 'organization-setting',
-                  name: 'OrganizationSetting',
-                  component: OrganizationSetting,
-                  meta: { requiresAuth: true }
-                },
-                {
-                  path: 'terms-setting',
-                  name: 'TermsSetting',
-                  component: TermsSetting,
-                  meta: { requiresAuth: true }
-                },
-                {
-                  path: 'requirements-setting',
-                  name: 'Requirements Setting',
-                  component: RequirementsSetting,
-                  meta: { requiresAuth: true }
-                },
-              ]
-            }
+              path: 'general-setting',
+              name: 'GeneralSetting',
+              component: GeneralSetting,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'organization-setting',
+              name: 'OrganizationSetting',
+              component: OrganizationSetting,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'terms-setting',
+              name: 'TermsSetting',
+              component: TermsSetting,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'requirements-setting',
+              name: 'Requirements Setting',
+              component: RequirementsSetting,
+              meta: { requiresAuth: true }
+            },
           ]
         },
         {
