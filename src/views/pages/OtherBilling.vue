@@ -13,7 +13,7 @@
         placeholder="Search"
       >
       </b-form-input>
-      <v-select
+      <!--<v-select
         :options="$options.SchoolCategories.values"
         :value="filters.billing.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -23,6 +23,12 @@
         :searchable="checkIfAllowedAll() || checkIfSuperUser()"
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
+      />-->
+      <vSelectCategory
+        :value="filters.billing.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
       />
       <v-select
         :options="$options.BillingStatuses.values"

@@ -14,7 +14,7 @@
         placeholder="Search"
       >
       </b-form-input>
-      <v-select
+      <!--<v-select
         :options="$options.SchoolCategories.values"
         @input="loadSchoolCategoryInfo(), loadSections(), loadClearances()"
         v-model="filters.clearance.schoolCategoryId"
@@ -25,6 +25,13 @@
         :searchable="checkIfAllowedAll() || checkIfSuperUser()"
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
+      />-->
+      <vSelectCategory
+        @input="loadSchoolCategoryInfo(), loadSections(), loadClearances()"
+        v-model="filters.clearance.schoolCategoryId"
+        :reduce="item => item.id"
+        label="name"
+        placeholder="School Category"
       />
       <v-select
         v-if="isCourseVisible"
@@ -169,7 +176,7 @@
       <Card v-if="showBatchEntry" title="Clearance - Batch Create">
         <b-row class="mb-3">
           <b-col md="6">
-            <v-select
+            <!--<v-select
               @input="loadFormSchoolCategoryInfo(), loadFormSections()"
               append-to-body
               :options="$options.SchoolCategories.values"
@@ -178,6 +185,14 @@
               label="name"
               placeholder="School Category"
               class="mt-2"
+            />-->
+            <vSelectCategory
+              @input="loadFormSchoolCategoryInfo(), loadFormSections()"
+              append-to-body
+              v-model="forms.batchClearance.fields.schoolCategoryId"
+              :reduce="item => item.id"
+              label="name"
+              placeholder="School Category"
             />
             <!-- <v-select
               @input="loadFormSections()"

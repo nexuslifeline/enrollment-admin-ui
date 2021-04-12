@@ -204,7 +204,7 @@
         class="mt-2"
         :clearable="false"
       />
-      <v-select
+      <!--<v-select
         :options="SchoolCategories.values"
         :value="filters.academicRecord.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -213,6 +213,13 @@
         class="mt-2"
         :searchable="true"
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="false"
+      />-->
+       <vSelectCategory
+        :value="filters.academicRecord.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
         :clearable="false"
       />
       <v-select

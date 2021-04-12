@@ -13,14 +13,12 @@
         type="text"
         placeholder="Search"
       />
-      <v-select
+      <vSelectCategory
         @input="loadClearances(), loadCourses(), loadLevels()"
-        :options="$options.SchoolCategories.values"
         v-model="filters.clearance.schoolCategoryId"
         :reduce="(item) => item.id"
         label="name"
         placeholder="School Category"
-        class="mt-2"
       />
       <!-- <v-select
         @input="loadSections()"

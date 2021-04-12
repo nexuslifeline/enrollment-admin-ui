@@ -13,7 +13,7 @@
         placeholder="Search"
         @update="loadSubjects()"
       />
-      <v-select
+      <!--<v-select
         :options="options.schoolCategories.values"
         :value="filters.subject.schoolCategoryItem"
         @input="onStatusFilterChange"
@@ -23,6 +23,12 @@
         :searchable="checkIfAllowedAll() || checkIfSuperUser()"
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
+      />-->
+       <vSelectCategory
+        :value="filters.subject.schoolCategoryItem"
+        @input="onStatusFilterChange"
+        label="name"
+        placeholder="School Category"
       />
     </template>
     <template v-slot:content>

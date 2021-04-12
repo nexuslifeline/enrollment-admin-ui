@@ -12,7 +12,7 @@
         type="text"
         placeholder="Search"
       />
-      <v-select
+      <!--<v-select
         :options="$options.SchoolCategories.values"
         :value="filters.transcriptRecord.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -22,6 +22,12 @@
         :searchable="checkIfAllowedAll() || checkIfSuperUser()"
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
+      />-->
+      <vSelectCategory
+        :value="filters.transcriptRecord.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
       />
       <v-select
         :options="options.levels.items"

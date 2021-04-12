@@ -13,7 +13,7 @@
         type="text"
         placeholder="Search"
       />
-      <v-select
+      <!--<v-select
         @input="loadSectionsOfPersonnel()"
         :options="$options.SchoolCategories.values"
         v-model="filters.student.schoolCategoryId"
@@ -21,6 +21,13 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+      />-->
+      <vSelectCategory
+        @input="loadSectionsOfPersonnel()"
+        v-model="filters.student.schoolCategoryId"
+        :reduce="(item) => item.id"
+        label="name"
+        placeholder="School Category"
       />
       <v-select
         v-if="isCourseVisible"

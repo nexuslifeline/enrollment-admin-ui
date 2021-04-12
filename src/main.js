@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import vSelectCategory from './views/components/SelectCategory.vue';
 import vText from './views/components/Text';
 import vSelect from 'vue-select'
 import { AlertPlugin, BIconPlus } from 'bootstrap-vue';
@@ -169,6 +170,8 @@ Vue.component('v-icon', Icon)
 Vue.component('v-select', vSelect)
 
 Vue.component('vText', vText);
+Vue.component('vSelectCategory', vSelectCategory);
+
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)

@@ -30,7 +30,7 @@
         placeholder="Search"
       >
       </b-form-input>
-      <v-select
+      <!--<v-select
         :options="options.schoolCategories.values"
         :value="filters.student.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -40,6 +40,12 @@
         :searchable="checkIfAllowedAll() || checkIfSuperUser()"
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
+      />-->
+      <vSelectCategory
+        :value="filters.student.schoolCategoryItem"
+        @input="onCategoryFilterChange"
+        label="name"
+        placeholder="School Category"
       />
       <v-select
         v-if="isCourseVisible"

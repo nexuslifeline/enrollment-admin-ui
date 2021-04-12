@@ -7,7 +7,7 @@
       :createButtonVisible="checkIfHasSchoolCategoryAccess()"
       @create="showModalFees = true">
       <template v-slot:filters>
-        <v-select
+        <!--<v-select
           :options="options.schoolCategories.values"
           :value="filters.rateSheet.schoolCategoryItem"
           @input="onCategoryFilterChange"
@@ -17,6 +17,12 @@
           :clearable="false"
           :searchable="false"
           :selectable="option => checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        />-->
+        <vSelectCategory
+          :value="filters.rateSheet.schoolCategoryItem"
+          @input="onCategoryFilterChange"
+          label="name"
+          placeholder="School Category"
         />
         <v-select
           :options="options.levels.fixItems"
