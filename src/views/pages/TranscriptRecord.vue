@@ -1488,6 +1488,12 @@ export default {
           isBusy: false,
           filterIncludedFields: ['firstName', 'lastName'],
           fields: [
+             {
+              key: 'id',
+              label: 'ID',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
+            },
             {
               key: 'name',
               label: 'Name',
