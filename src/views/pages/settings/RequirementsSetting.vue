@@ -1,6 +1,24 @@
 <template>
-  <div class="terms_main-container">
-    <b-overlay :show="isLoading" rounded="sm">
+  <PageContent 
+    title="Requirements Setting"
+    @refresh="loadRequirements()"
+    :createButtonVisible="false">
+    <template v-slot:filters>
+      <v-select
+        :options="$options.SchoolCategories.values"
+        v-model="filters.requirement.schoolCategoryId"
+        @input="loadRequirements()"
+        :reduce="(item) => item.id"
+        label="name"
+        placeholder="School Category"
+        class="mt-2"
+        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
+        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
+        :clearable="checkIfAllowedAll()"
+      />
+    </template>
+    <template v-slot:content>
+      <b-overlay :show="isLoading" rounded="sm">
       <div class="title-container">
         <h4>REQUIREMENTS SETTINGS</h4>
         <p>
@@ -11,7 +29,7 @@
         </p>
       </div>
       <div class="tabs-container">
-        <SchoolCategoryTabs
+        <!-- <SchoolCategoryTabs
           :showAll="false"
           @loadSchoolCategoryId="
             (filters.requirement.schoolCategoryId = $event), loadRequirements()
@@ -19,7 +37,7 @@
           @click="
             (filters.requirement.schoolCategoryId = $event), loadRequirements()
           "
-        />
+        /> -->
         <div class="table-container">
           <div class="button-container">
             <button
@@ -68,54 +86,56 @@
           >
         </div>
       </div>
-    </b-overlay>
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete Requirement
-      </div>
-      Are you sure you want to delete this Requirement ?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onDeleteRequirement()"
-        >
-          <v-icon v-if="isDeleting" name="sync" spin class="mr-2" />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-  </div>
+      </b-overlay>
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete Requirement
+        </div>
+        Are you sure you want to delete this Requirement ?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onDeleteRequirement()"
+          >
+            <v-icon v-if="isDeleting" name="sync" spin class="mr-2" />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+    </template>
+  </PageContent>
 </template>
 
 <script>
-import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
-import { Semesters, SchoolCategories } from '../../../helpers/enum';
+import PageContent from '../../components/PageContainer/PageContent'
+import { SchoolCategories } from '../../../helpers/enum';
 import { RequirementApi, SchoolYearApi } from '../../../mixins/api';
 import { showNotification } from '../../../helpers/forms';
+import Access from '../../../mixins/utils/Access';
 
 export default {
   components: {
-    SchoolCategoryTabs,
+    PageContent
   },
-  mixins: [RequirementApi, SchoolYearApi],
+  mixins: [RequirementApi, SchoolYearApi, Access],
+  SchoolCategories,
   data() {
     return {
       isLoading: false,
       isProcessing: false,
-      SchoolCategories: SchoolCategories,
       showModalConfirmation: false,
       isDeleting: false,
       selectedRow: null,
@@ -155,6 +175,10 @@ export default {
         },
       },
     };
+  },
+  created() {
+    this.filters.requirement.schoolCategoryId = this.getDefaultSchoolCategory()?.id
+    this.loadRequirements()
   },
   methods: {
     onAddRequirement() {

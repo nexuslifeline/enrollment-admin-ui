@@ -1,5 +1,5 @@
 <template>
-  <PageContent title="Grade Sheet"
+  <PageContent title="Transcripts"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadTranscriptRecords"
     :filterVisible="isFilterVisible"
@@ -37,7 +37,7 @@
         placeholder="Level"
         class="mt-2"
       />
-       <v-select
+      <v-select
         v-if="isCourseVisible"
         :options="options.courses.items"
         :value="filters.transcriptRecord.courseItem"
@@ -1718,6 +1718,10 @@ export default {
     };
   },
   created() {
+    if (this.$route.query?.success) {
+      showNotification(this, "success", "Updated Successfully.")
+      this.$router.replace({'query': null});
+    }
     const { transcriptRecord } = this.filters
     if (!this.checkIfSuperUser()) {
       transcriptRecord.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
@@ -1780,7 +1784,7 @@ export default {
     loadLevels() {
       const params = { paginate: false };
       const { levels } = this.options;
-     const { schoolCategoryId } = this.filters.transcriptRecord;
+      const { schoolCategoryId } = this.filters.transcriptRecord;
       this.getLevelList(params).then(({ data }) => {
         levels.items = schoolCategoryId ? data.filter(e => e.schoolCategoryId === schoolCategoryId) : data;
       });
@@ -1802,16 +1806,19 @@ export default {
       return '';
     },
     loadDetails(row) {
-      if (!row.detailsShowing) {
-        const {
-          item,
-          item: { id, schoolCategoryId, levelId, courseId, studentId },
-        } = row;
-        this.$set(item, 'isLoading', true);
-        this.loadTranscriptRecord(id, row);
-        this.loadSubjects(schoolCategoryId);
-      }
-      row.toggleDetails();
+      this.$router.push({
+        path: `/registrar/academic-transcript/${row.item.id}`,
+      })
+      // if (!row.detailsShowing) {
+      //   const {
+      //     item,
+      //     item: { id, schoolCategoryId, levelId, courseId, studentId },
+      //   } = row;
+      //   this.$set(item, 'isLoading', true);
+      //   this.loadTranscriptRecord(id, row);
+      //   this.loadSubjects(schoolCategoryId);
+      // }
+      // row.toggleDetails();
     },
     loadSubjects(schoolCategoryId) {
       const { subjects } = this.tables;
