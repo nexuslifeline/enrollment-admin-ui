@@ -111,7 +111,7 @@
                 :unchecked-value=0
                 v-model="item.isCleared" /> -->
                 <Toggle
-                  :value="item.isCleared"
+                  :value="item.isCleared ? true : false"
                   @input="item.isCleared = $event" />
             </template>
             <template v-slot:cell(remarks)="{ item }">
