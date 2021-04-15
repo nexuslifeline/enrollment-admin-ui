@@ -6,7 +6,8 @@
         v-if="showCancel"
         variant="dark"
         size="sm"
-        @click="$emit('onCancel')">
+        @click="$emit('onCancel')"
+        :disabled="isConfirmBusy || isDeleteBusy">
         {{ cancelText }}
       </b-button>
       <b-button
@@ -14,7 +15,9 @@
         v-if="showDelete"
         variant="dark"
         size="sm"
-        @click="$emit('onDelete')">
+        @click="$emit('onDelete')"
+        :disabled="isConfirmBusy || isDeleteBusy">
+        <v-icon name="spinner" spin v-if="isDeleteBusy" />
         {{ deleteText }}
       </b-button>
     </div>
@@ -22,7 +25,9 @@
     <b-button
       variant="primary"
       size="sm"
-      @click="$emit('onConfirm')">
+      @click="$emit('onConfirm')"
+      :disabled="isConfirmBusy || isDeleteBusy">
+      <v-icon name="spinner" spin v-if="isConfirmBusy" />
       {{ confirmText }}
     </b-button>
   </div>
@@ -31,6 +36,10 @@
 export default {
   props: {
     isConfirmBusy: {
+      type: [Boolean],
+      default: false
+    },
+    isDeleteBusy: {
       type: [Boolean],
       default: false
     },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AccountSettings />
+    <AccountSettings :user="user"/>
     <UserEducation :personnelId="personnelId" />
     <UserEmployments :personnelId="personnelId" />
     <router-view></router-view>
@@ -26,6 +26,9 @@ export default {
   computed: {
     personnelId() {
       return this.$store.state?.user?.userable?.id;
+    },
+    user() {
+      return this.$store.state?.user
     }
   },
   created() {

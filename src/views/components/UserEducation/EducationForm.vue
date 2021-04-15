@@ -11,43 +11,51 @@
     <div class="modal-field-container">
       <b-form-group>
         <label class="required">School</label>
-        <b-form-input v-model="education.school" />
+        <b-form-input v-model="form.fields.school"
+          :state="form.states.school"/>
         <b-form-invalid-feedback>
-
+          {{ form.errors.school }}
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label class="required">Address</label>
-        <b-form-textarea v-model="education.address" />
+        <b-form-textarea
+          v-model="form.fields.address"
+          :state="form.states.address"/>
         <b-form-invalid-feedback>
-
+          {{ form.errors.address }}
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label>Degree</label>
-        <b-form-input v-model="education.degree" />
+        <b-form-input v-model="form.fields.degree" />
       </b-form-group>
       <b-form-group>
         <label>Field of Study</label>
-        <b-form-input v-model="education.field" />
+        <b-form-input v-model="form.fields.field" />
       </b-form-group>
       <InputGroup>
         <InputContainer>
           <b-form-group>
             <label>Start Year</label>
-            <b-form-select v-model="education.start" />
+            <b-form-input  v-model="form.fields.start" />
           </b-form-group>
         </InputContainer>
         <InputContainer>
           <b-form-group>
             <label>End Year(or Expected)</label>
-            <b-form-select v-model="education.end" />
+            <b-form-input v-model="form.fields.end" max="9999"/>
           </b-form-group>
         </InputContainer>
       </InputGroup>
       <b-form-group>
         <label class="required">Societies or Activities</label>
-        <b-form-textarea v-model="education.societies" />
+        <b-form-textarea
+          v-model="form.fields.societies"
+          :state="form.states.societies"/>
+        <b-form-invalid-feedback>
+          {{ form.errors.societies }}
+        </b-form-invalid-feedback>
       </b-form-group>
     </div>
     <template v-slot:modal-footer>
@@ -59,6 +67,7 @@
         :isConfirmBusy="isConfirmBusy"
         :showDelete="isEditing"
         :showCancel="!isEditing"
+        :isDeleteBusy="isDeleteBusy"
       />
     </template>
   </b-modal>
@@ -85,10 +94,20 @@ export default {
       type: [String],
       default: 'id'
     },
+    form: {
+      type: [Object]
+    },
+    isConfirmBusy: {
+      type: [Boolean],
+      default: false
+    },
+    isDeleteBusy: {
+      type: [Boolean],
+      default: false
+    },
   },
   data() {
     return {
-      isConfirmBusy: false,
       education: {}
     }
   },

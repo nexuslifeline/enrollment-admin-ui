@@ -6,8 +6,8 @@
     </div>
     <div class="item__action">
       <div class="item__details">
-        <vText size="s" weight="bold" type="p" align="right">chrisrueda14@yahoo.com</vText>
-        <vText size="s" color="light" type="p" align="right">System Administrator</vText>
+        <vText size="s" weight="bold" type="p" align="right">{{ username || '' }}</vText>
+        <vText size="s" color="light" type="p" align="right">{{ userGroup || '' }}</vText>
       </div>
       <b-button @click="$router.push({ name: 'ChangeUsername' })" type="button" variant="outline-primary">
         Change
@@ -23,10 +23,16 @@ export default {
 
   },
   props: {
-    data: {
-      type: [Object],
+    username: {
+      type: [String],
+    },
+    userGroup: {
+      type: [String]
     }
   },
+  computed: {
+
+  }
 };
 </script>
 <style lang="scss" scoped>

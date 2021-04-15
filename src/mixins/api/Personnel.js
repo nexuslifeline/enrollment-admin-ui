@@ -5,26 +5,50 @@ export default {
     getPersonnelList(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels`, { params: params });
     },
-    getPersonnel(id) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${id}`);
+    getPersonnel(personnelId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}`);
     },
     addPersonnel(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels`, data);
     },
-    updatePersonnel(data, id) {
-      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/personnels/` + id, data)
+    updatePersonnel(data, personnelId) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/personnels/${personnelId}`, data)
     },
-    deletePersonnel(id){
-      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/` + id)
+    deletePersonnel(personnelId){
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${personnelId}`)
     },
-    savePhoto(data, id){
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${id}/photos`, data)
+    savePhoto(data, personnelId){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/photos`, data)
     },
-    deletePhoto(id){
-      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${id}/photos`)
+    deletePhoto(personnelId){
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/photos`)
     },
-    getSectionsOfPersonnel(params, id) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${id}/sections`, { params: params });
+    getSectionsOfPersonnel(params, personnelId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/sections`, { params: params });
+    },
+    getPersonnelEducationList(params, personnelId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/education`, { params: params });
+    },
+    addPersonnelEducation(data, personnelId) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/education`, data);
+    },
+    updatePersonnelEducation(data, personnelId, educationId) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/education/${educationId}`, data)
+    },
+    deletePersonnelEducation(personnelId, educationId){
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/education/${educationId}`)
+    },
+    getPersonnelEmploymentList(params, personnelId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/employment`, { params: params });
+    },
+    addPersonnelEmployment(data, personnelId) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/employment`, data);
+    },
+    updatePersonnelEmployment(data, personnelId, educationId) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/employment/${educationId}`, data)
+    },
+    deletePersonnelEmployment(personnelId, educationId){
+      return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/employment/${educationId}`)
     },
   }
 }

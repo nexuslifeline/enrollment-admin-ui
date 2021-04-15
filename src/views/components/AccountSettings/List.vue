@@ -1,7 +1,7 @@
 <template>
-  <Card title="Account Settings">
+  <Card title="Account Settings" :key="key">
     <div class="items__list">
-      <EmailRow />
+      <EmailRow :username="user.username" :userGroup="user.userGroup.name"/>
       <PasswordRow />
     </div>
   </Card>
@@ -20,16 +20,22 @@ export default {
   props: {
     personnelId: {
       type: [String, Number],
+    },
+    user: {
+      type: [Object]
     }
   },
   data() {
     return {
-      
+      key: 1,
     }
+  },
+  computed: {
+
   },
   created() {
     // load user employments here
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>

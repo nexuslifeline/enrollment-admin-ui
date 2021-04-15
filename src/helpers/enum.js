@@ -692,3 +692,18 @@ export const EClearancePermissions = new Enum({
 export const EClearanceClearingPermissions = new Enum({
   CLEARING_E_CLEARANCE: { id: 381, name: 'Clearing E-Clearance' },
 });
+
+export const Months = new Enum({
+  JANUARY: { id: 1, name: 'January'},
+  FEBRUARY: { id: 2, name: 'February'},
+  MARCH: { id: 3, name: 'March'},
+  APRIL: { id: 4, name: 'April'},
+  MAY: { id: 5, name: 'May'},
+  JUNE: { id: 6, name: 'June'},
+  JULY: { id: 7, name: 'July'},
+  AUGUST: { id: 8, name: 'August'},
+  SEPTEMBER: { id: 9, name: 'September'},
+  OCTOBER: { id: 10, name: 'October'},
+  NOVEMBER: { id: 11, name: 'November'},
+  DECEMBER: { id: 12, name: 'December'}
+});

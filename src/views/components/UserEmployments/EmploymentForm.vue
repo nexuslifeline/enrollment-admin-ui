@@ -11,36 +11,49 @@
     <div class="modal-field-container">
       <b-form-group>
         <label class="required">Position</label>
-        <b-form-input v-model="employment.position" />
+        <b-form-input
+          v-model="form.fields.position"
+          :state="form.states.position"/>
         <b-form-invalid-feedback>
-
+          {{ form.errors.position }}
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label class="required">Company Name</label>
-        <b-form-input v-model="employment.company" />
+        <b-form-input
+          v-model="form.fields.company"
+          :state="form.states.company"/>
         <b-form-invalid-feedback>
-
+          {{ form.errors.company }}
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label class="required">Address</label>
-        <b-form-textarea v-model="employment.address" />
+        <b-form-textarea
+          v-model="form.fields.address"
+          :state="form.states.address"/>
         <b-form-invalid-feedback>
-
+          {{ form.errors.address }}
         </b-form-invalid-feedback>
       </b-form-group>
       <InputGroup>
         <InputContainer>
           <b-form-group>
             <label>Start Month</label>
-            <b-form-select v-model="employment.start" />
+            <b-form-select v-model="form.fields.startMonth" >
+              <b-form-select-option
+                v-for="month in $options.Months.values"
+                :key="month.id"
+                :value="month.id">
+                {{ month.name }}
+              </b-form-select-option>
+            </b-form-select>
           </b-form-group>
         </InputContainer>
         <InputContainer>
           <b-form-group>
             <label>Start Year</label>
-            <b-form-select v-model="employment.end" />
+            <b-form-input v-model="form.fields.startYear" />
           </b-form-group>
         </InputContainer>
       </InputGroup>
@@ -48,13 +61,21 @@
         <InputContainer>
           <b-form-group>
             <label>End Month</label>
-            <b-form-select v-model="employment.start" />
+            <b-form-select
+              v-model="form.fields.endMonth">
+              <b-form-select-option
+                v-for="month in $options.Months.values"
+                :key="month.id"
+                :value="month.id">
+                {{ month.name }}
+              </b-form-select-option>
+          </b-form-select>
           </b-form-group>
         </InputContainer>
         <InputContainer>
           <b-form-group>
             <label>End Year</label>
-            <b-form-select v-model="employment.end" />
+            <b-form-input v-model="form.fields.endYear" />
           </b-form-group>
         </InputContainer>
       </InputGroup>
@@ -66,6 +87,7 @@
         @onCancel="isShown = false"
         confirmText="Save"
         :isConfirmBusy="isConfirmBusy"
+        :isDeleteBusy="isDeleteBusy"
         :showDelete="isEditing"
         :showCancel="!isEditing"
       />
@@ -75,8 +97,10 @@
 <script>
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import { InputGroup, InputContainer } from '../../components/InputGroup';
+import { Months } from '../../../helpers/enum'
 
 export default {
+  Months,
   components: {
     FooterAction,
     InputGroup,
@@ -94,11 +118,21 @@ export default {
       type: [String],
       default: 'id'
     },
+    form: {
+      type: [Object]
+    },
+    isConfirmBusy: {
+      type: [Boolean],
+      default: false
+    },
+    isDeleteBusy: {
+      type: [Boolean],
+      default: false
+    },
   },
   data() {
     return {
-      isConfirmBusy: false,
-      employment: {}
+      employment: {},
     }
   },
   computed: {

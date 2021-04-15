@@ -3,7 +3,7 @@
     <Card
       title="Education"
       actionLabel="Add Education"
-      @onAddNew="selected = {}, isShown = true"
+      @onAddNew="onAddEduation"
       showAction>
       <div v-if="items.length > 0" class="education__list">
         <template v-for="(item, idx) in items">
@@ -20,19 +20,39 @@
       @onCreate="onCreateEducation"
       @onDelete="onDeleteEducation"
       :data="selected"
+      :form="forms.education"
+      :isConfirmBusy="isConfirmBusy"
+      :isDeleteBusy="isDeleteBusy"
     />
   </div>
 </template>
 <script>
+
+const educationFields = {
+  id: null,
+  school: null,
+  degree: null,
+  address: null,
+  field: null,
+  startYear:null,
+  endYear: null,
+  societies: null
+};
+
 import Card from '../Card';
 import Item from './Item';
 import EducationForm from './EducationForm';
+import { PersonnelApi } from '../../../mixins/api';
+import { copyValue } from '../../../helpers/extractor';
+import { reset, showNotification, validate, clearFields } from '../../../helpers/forms';
+
 export default {
   components: {
     Card,
     Item,
     EducationForm
   },
+  mixins: [ PersonnelApi ],
   props: {
     personnelId: {
       type: [String, Number],
@@ -42,44 +62,84 @@ export default {
     return {
       isShown: false,
       selected: {},
-      items: [
-        {
-          id: 1,
-          school: 'St. Nicolas College of Business and Administration',
-          field: 'Bachelor of Science in Information Technology',
-          address: 'San Fernando City, Pampanga, PH',
-          start: '2016',
-          end: '2018',
+      items: [],
+      isConfirmBusy: false,
+      isDeleteBusy: false,
+      forms: {
+        education: {
+          fields: { ...educationFields },
+          states: { ...educationFields },
+          errors: { ...educationFields },
         },
-        {
-          id: 2,
-          school: 'Cansinal High School (Secondary)',
-          field: 'Junior High School',
-          address: 'Cansinala, Apalit, Pampanga, PH',
-          start: '2016',
-          end: '2018',
-          societies: 'Boyscout of the Philippines',
-        }
-      ]
+      }
     }
   },
   created() {
-    // load user employments here
+    reset(this.forms.education)
+    const params = { paginate: false }
+    this.getPersonnelEducationList(params, this.personnelId).then(({ data }) => {
+      this.items = data
+    })
   },
   methods: {
     onSaveEducation(id, data) {
-      alert(id)
+      this.isConfirmBusy = true
+      const { education } = this.forms
+      reset(education)
+      this.updatePersonnelEducation(education.fields, this.personnelId, id).then(({ data }) => {
+        const index = this.items.findIndex(item => item.id === this.selected.id)
+        this.items.splice(index, 1);
+        this.items.splice(index, 0, data);
+        this.isShown = false
+        this.isConfirmBusy = false
+        showNotification(this, 'success', 'Education has been updated.')
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        validate(education, errors);
+        this.isConfirmBusy = false
+      });
     },
     onCreateEducation(data) {
-      alert('create education')
+      this.isConfirmBusy = true
+      const { education } = this.forms
+
+      reset(education)
+      this.addPersonnelEducation(education.fields, this.personnelId).then(({ data }) => {
+        this.items.push(data)
+        this.isShown = false
+        this.isConfirmBusy = false
+        showNotification(this, 'success', 'Education has been added.')
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        validate(education, errors);
+        this.isConfirmBusy = false
+      });
     },
     onDeleteEducation(id) {
-      this.items = this.items.filter(v => v?.id !== id);
-      this.isShown = false;
+      this.isDeleteBusy = true
+      this.deletePersonnelEducation(this.personnelId, id).then(({ data }) => {
+        this.items = this.items.filter(v => v?.id !== id);
+        this.isShown = false
+        this.isDeleteBusy = false
+        showNotification(this, 'success', 'Education has been deleted.')
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        showNotification(this, 'danger', 'Sorry, unable to delete this record.')
+        this.isDeleteBusy = false
+        this.isShown = false;
+      });
     },
     onEditEducation(item) {
+      const { education } = this.forms
       this.selected = { ...item };
       this.isShown = true;
+      copyValue(item, education.fields)
+    },
+    onAddEduation() {
+      const { education } = this.forms
+      this.selected = {}
+      this.isShown = true
+      clearFields(education.fields)
     }
   }
 };

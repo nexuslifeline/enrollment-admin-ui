@@ -31,8 +31,8 @@
           <vText size="s" marginBottom="5" v-if="!!userable.mobileNo || !!userable.phoneNo">
             {{ userable.mobileNo || userable.phoneNo }}
           </vText>
-          <vText size="s" marginBottom="5" v-if="true">https://www.facebook.com/chrisrueda14/</vText>
-          <vText size="s" marginBottom="5" v-if="true">https://www.nexuslifeline.com/</vText>
+          <vText size="s" marginBottom="5" v-if="!!userable.facebookUrl">{{ userable.facebookUrl }}/</vText>
+          <vText size="s" marginBottom="5" v-if="!!userable.webUrl">{{ userable.webUrl }}</vText>
         </div>
       </div>
     </div>
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { PersonnelApi } from '../mixins/api';
 import AvatarMaker from '../views/components/AvatarMaker';
 import WaveBackground from '../views/components/WaveMaker';
 import Navs from './navs';
@@ -55,6 +56,7 @@ export default {
   props: {
     user: Object,
   },
+  mixins: [ PersonnelApi ],
   data() {
     return {
       homeMenus: Navs.filter(v => v?.label === 'Home')?.[0]?.children,
@@ -86,12 +88,17 @@ export default {
   methods: {
     onPhotoChange(file) {
       const formData = new FormData();
+      const { id: personnelId } = this.userable
       formData.append('photo', file);
 
-      // http request here to send form data
-      console.log(file)
+      this.savePhoto(formData, personnelId).then(({ data }) => {
+        showNotification(this, 'sucess', 'Your profile photo has been updated.')
+      }).catch((error) => {
+        showNotification(this, 'danger', 'Unable to update your photo. Please contact your system administrator.')
+      });
+
     }
-  }
+  },
 }
 </script>
 
