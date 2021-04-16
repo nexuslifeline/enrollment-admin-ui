@@ -53,18 +53,7 @@
         </template>
       </ul>
       <YearDropdown />
-      <div class="header__secondary-account-details">
-        <AvatarMaker
-          :avatarId="user.id"
-          :size="31"
-          :text="`${user.userable.firstName.charAt(0)}${user.userable.lastName.charAt(0)}`"
-          :src="userPhoto"
-        />
-        <div class="header__secondary-account-name">
-          {{ user.userable.name }}
-        </div>
-        <OverviewDropdown :user="user" @onLogout="logout" :isLoggingOut="isLoading" />
-      </div>
+      <OverviewDropdown :user="user" @onLogout="logout" :isLoggingOut="isLoading" />
     </div>
     <div v-if="isVisibleSubNav" class="header__account-details">
       <!-- <HeaderProfileCard v-if="isHome" :user="user" /> -->
@@ -439,7 +428,7 @@ export default {
 .header {
   position: fixed;
   width: 100%;
-  z-index: 4;
+  z-index: 10;
 
   &.shrink {
     .header__menus {
@@ -802,25 +791,4 @@ export default {
 .header__school-year {
   margin-right: 15px;
 }
-
-.header__secondary-account-details {
-  display: flex;
-  align-items: center;
-  margin-right: -50px;
-}
-
-.header__secondary-account-photo {
-  border-radius: 50%;
-  object-fit: cover;
-  height: 28px;
-  width: 28px;
-}
-
-.header__secondary-account-name {
-  flex: 1;
-  margin: 0 10px;
-  color: $white;
-}
-
-
 </style>

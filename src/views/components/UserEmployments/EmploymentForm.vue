@@ -89,7 +89,6 @@
         :isConfirmBusy="isConfirmBusy"
         :isDeleteBusy="isDeleteBusy"
         :showDelete="isEditing"
-        :showCancel="!isEditing"
       />
     </template>
   </b-modal>

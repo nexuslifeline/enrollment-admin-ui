@@ -3,15 +3,6 @@
     <div class="action-left__area">
       <b-button
         class="mr-2"
-        v-if="showCancel"
-        variant="dark"
-        size="sm"
-        @click="$emit('onCancel')"
-        :disabled="isConfirmBusy || isDeleteBusy">
-        {{ cancelText }}
-      </b-button>
-      <b-button
-        class="mr-2"
         v-if="showDelete"
         variant="dark"
         size="sm"
@@ -21,6 +12,16 @@
         {{ deleteText }}
       </b-button>
     </div>
+
+    <b-button
+        class="mr-2"
+        v-if="showCancel"
+        variant="dark"
+        size="sm"
+        @click="$emit('onCancel')"
+        :disabled="isConfirmBusy || isDeleteBusy">
+        {{ cancelText }}
+    </b-button>
 
     <b-button
       variant="primary"

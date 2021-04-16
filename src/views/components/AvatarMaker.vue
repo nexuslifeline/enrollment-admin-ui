@@ -95,6 +95,7 @@
     position: relative;
     width: auto;
     height: auto;
+    z-index: 2;
 
     &.uploadable {
       cursor: pointer;

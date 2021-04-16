@@ -109,7 +109,7 @@ export default {
 @import '../assets/scss/shared.scss';
 
 .year-dropdown__menu-container {
-  padding: 10px 30px;
+  padding: 10px 20px;
   margin-left: auto;
   display: flex;
   align-items: center;
@@ -149,7 +149,8 @@ export default {
 
 .year-dropdown__items-container {
   position: absolute;
-  right: 30px;
+  z-index: 100;
+  right: 25px;
   top: 40px;
   background-color: #fff;
   border: 1px solid #dce6f8;
@@ -157,7 +158,6 @@ export default {
   -webkit-box-shadow: 0 3px 6px 0 #e2e2e2;
   box-shadow: 0 3px 6px 0 #e2e2e2;
   min-width: 210px;
-  z-index: 10;
   padding-bottom: 10px;
 }
 

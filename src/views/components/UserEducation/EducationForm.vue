@@ -66,7 +66,6 @@
         confirmText="Save"
         :isConfirmBusy="isConfirmBusy"
         :showDelete="isEditing"
-        :showCancel="!isEditing"
         :isDeleteBusy="isDeleteBusy"
       />
     </template>
