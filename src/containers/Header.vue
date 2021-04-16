@@ -295,10 +295,10 @@ export default {
       this.mainNavLimit = this.getMainNavLimit();
     },
     getSubNavLimit() {
-      return this.$options.createLimiter([6, 6, 5, 4, 3, 2, 2, 1]);
+      return this.$options.createLimiter([5, 5, 4, 4, 2, 2, 2, 1]);
     },
     getMainNavLimit(w) {
-      return this.$options.createLimiter([8, 8, 7, 6, 4, 4, 3, 1]);
+      return this.$options.createLimiter([6, 6, 6, 4, 4, 3, 2, 1]);
     },
     hideDropdownItems() {
       this.showDropdown = false;
