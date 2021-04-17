@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { SchoolCategories } from "../../../helpers/enum";
+import { SchoolCategories, UserGroups } from "../../../helpers/enum";
 import Access from "../../../mixins/utils/Access";
 export default {
   SchoolCategories,
