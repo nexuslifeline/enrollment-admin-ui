@@ -57,7 +57,6 @@ export default {
   },
   data() {
     return {
-      nani: true,
       userGroupId: null,
       isLoading: false,
       isProcessing: false,

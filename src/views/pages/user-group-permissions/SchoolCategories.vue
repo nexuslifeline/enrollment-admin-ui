@@ -5,13 +5,14 @@
         <b-form-group>
           <label class="school-category__label">Allow access to School Categories :</label>
           <v-select
+            :disabled="Number(userGroupId) === $options.UserGroups.SUPER_USER.id"
             v-model="selectedSchoolCategories"
             :reduce="item => item.id"
             multiple
             label="name"
             :options="schoolCategories.values" />
         </b-form-group>
-        <template v-slot:footer>
+        <template v-if="Number(userGroupId) !== $options.UserGroups.SUPER_USER.id" v-slot:footer>
           <b-button
             class="float-right btn-close ml-2"
             @click="$router.push('/maintenance/user-group')"
@@ -36,17 +37,19 @@
   </div>
 </template>
 <script>
-import { SchoolCategories } from '../../../helpers/enum'
+import { SchoolCategories, UserGroups } from '../../../helpers/enum'
 import { showNotification } from '../../../helpers/forms'
 import { UserGroupApi } from '../../../mixins/api'
 export default {
   mixins: [ UserGroupApi ],
+  UserGroups,
   data() {
     return {
       isProcessing: false,
       isLoading: false,
       schoolCategories: SchoolCategories,
-      selectedSchoolCategories: []
+      selectedSchoolCategories: [],
+      userGroupId: null
     }
   },
   created() {

@@ -150,26 +150,6 @@ export default [
     ],
     children: [
       {
-        label: 'Rate Sheet',
-        to: '/finance/rate-sheet',
-        permissionIds: RateSheetPermissions.getIds()
-      },
-      {
-        label: 'Fee Category',
-        to: '/finance/school-fee-category',
-        permissionIds: FeeCategoryPermissions.getIds()
-      },
-      {
-        label: 'School Fee',
-        to: '/finance/school-fee',
-        permissionIds: SchoolFeePermissions.getIds()
-      },
-      {
-        label: 'Payment',
-        to: '/finance/payment',
-        permissionIds: PaymentPermissions.getIds()
-      },
-      {
         label: 'SOA',
         to: '/finance/soa',
         permissionIds: StatementOfAccountPermissions.getIds()
@@ -178,7 +158,17 @@ export default [
         label: 'Other Billing',
         to: '/finance/other-billing',
         permissionIds: OtherBillingPermissions.getIds()
-      }
+      },
+      {
+        label: 'Post Payment',
+        to: '/finance/payment',
+        permissionIds: PaymentPermissions.getIds()
+      },
+      {
+        label: 'Rate Sheet',
+        to: '/finance/rate-sheet',
+        permissionIds: RateSheetPermissions.getIds()
+      },
     ]
   },
   {
@@ -264,6 +254,16 @@ export default [
         label: 'Group & Permissions',
         to: '/maintenance/user-group',
         permissionIds: UserGroupPermissions.getIds()
+      },
+      {
+        label: 'Fee Category',
+        to: '/maintenance/school-fee-category',
+        permissionIds: FeeCategoryPermissions.getIds()
+      },
+      {
+        label: 'School Fee',
+        to: '/maintenance/school-fee',
+        permissionIds: SchoolFeePermissions.getIds()
       },
       {
         label: 'Bank Account',
