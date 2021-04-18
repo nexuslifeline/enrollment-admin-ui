@@ -226,18 +226,6 @@ function configRoutes () {
               meta: { requiresAuth: true, userType: 2 }
             },
             {
-              path: 'school-fee-category',
-              name: 'School Fee Category',
-              component: SchoolFeeCategory,
-              meta: { requiresAuth: true, userType: 2 }
-            },
-            {
-              path: 'school-fee',
-              name: 'School Fee',
-              component: SchoolFee,
-              meta: { requiresAuth: true, userType: 2 }
-            },
-            {
               path: 'soa',
               name: 'Soa',
               component: Soa,
@@ -305,6 +293,18 @@ function configRoutes () {
               name: 'School Year',
               component: SchoolYear,
               meta: { requiresAuth: true, userType: 0 }
+            },
+            {
+              path: 'school-fee-category',
+              name: 'School Fee Category',
+              component: SchoolFeeCategory,
+              meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'school-fee',
+              name: 'School Fee',
+              component: SchoolFee,
+              meta: { requiresAuth: true, userType: 2 }
             },
             {
               path: 'bank-account',

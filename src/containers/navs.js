@@ -257,12 +257,12 @@ export default [
       },
       {
         label: 'Fee Category',
-        to: '/finance/school-fee-category',
+        to: '/maintenance/school-fee-category',
         permissionIds: FeeCategoryPermissions.getIds()
       },
       {
         label: 'School Fee',
-        to: '/finance/school-fee',
+        to: '/maintenance/school-fee',
         permissionIds: SchoolFeePermissions.getIds()
       },
       {
