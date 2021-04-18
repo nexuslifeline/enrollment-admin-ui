@@ -27,6 +27,9 @@
         <slot name="content"></slot>
       </div>
     </div>
+    <div class="action-bar__container" v-if="showBottomActions">
+      <slot name="bottom-actions"></slot>
+    </div>
   </div>
 </template>
 <script>
@@ -52,6 +55,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    showBottomActions: {
+      type: Boolean,
+      default: false
     }
   },
 };
@@ -82,6 +89,8 @@ export default {
 }
 
 .c-page-content {
+  position: relative;
+  height: calc(100vh - 85px);
 
   &.filter-visible {
     .content-list__container {
@@ -91,6 +100,11 @@ export default {
 
     .row {
       margin: 0 !important;
+    }
+
+    .action-bar__container {
+      width: calc(100% - 245px);
+      margin-left: 240px;
     }
   }
 }
@@ -116,6 +130,8 @@ export default {
   display: flex;
   flex-direction: row;
 }
+
+
 
 .action-bar__container {
   position: absolute;

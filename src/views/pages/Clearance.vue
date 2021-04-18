@@ -288,6 +288,7 @@
               :reduce="(item) => item.id"
               label="name"
               placeholder="Personnel"
+              @input="onPersonnelChange($event, data)"
             />
           </template>
           <template v-slot:cell(pivot.description)="data">
@@ -410,12 +411,12 @@
             />
           </template>
           <template v-slot:cell(pivot.description)="data">
-            <b-form-input 
+            <b-form-input
               debounce="500"
               v-model="data.item.pivot.description" />
           </template>
           <template v-slot:cell(action)="{ index }">
-            <b-button 
+            <b-button
               @click="removeSignatory(index, false)"
               size="sm"
               variant="outline-danger">
@@ -689,7 +690,7 @@ export default {
         clearance.to = data.meta.to;
         clearance.totalRows = data.meta.total;
         clearances.isBusy = false;
-      }); 
+      });
     },
     loadPersonnels() {
       const params = { paginate: false }
@@ -765,6 +766,11 @@ export default {
       }).catch(error => {
         console.log(error)
       })
+    },
+    onPersonnelChange($event, data) {
+      const personnel = this.options.personnels.items.find(p => p.id === $event)
+      if(personnel)
+      this.$set(data.item.pivot, 'description', personnel.jobTitle || personnel.user.userGroup.name)
     },
     // loadSchoolYears() {
     //   const params = { paginate: false }

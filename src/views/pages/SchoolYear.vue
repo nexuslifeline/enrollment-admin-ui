@@ -12,13 +12,6 @@
         type="text"
         placeholder="Search"
       />
-      <!-- <b-button
-        v-if="isAccessible($options.SchoolYearPermissions.ADD.id)"
-        variant="primary"
-        class="w-100 mt-2"
-        @click="setCreate()"
-      ><v-icon name="plus-circle" /> ADD NEW SCHOOL YEAR
-      </b-button> -->
     </template>
     <template v-slot:content>
       <div>
@@ -167,15 +160,24 @@
         </b-form-group>
         <b-form-group>
           <b-form-checkbox
-            class="pl-5"
             v-model="forms.schoolYear.fields.isActive"
             :value="1"
             :unchecked-value="0"
+            :disabled="entryMode === 'Edit' && forms.schoolYear.fields.id === activeSchoolYearId"
           >
-            <b>Active</b>
+            <b>Active
+              <v-icon
+                v-if="entryMode === 'Edit' && forms.schoolYear.fields.id === activeSchoolYearId"
+                name="info-circle"
+                class="icon-tooltip"
+                v-b-tooltip.hover="{
+                  variant: 'info',
+                  title:
+                    'Setting active/inactive is disabled for active schoolyear.',
+                }"
+              /></b>
           </b-form-checkbox>
         </b-form-group>
-        <!-- end modal body -->
       </b-overlay>
       <div slot="modal-footer" class="w-100">
         <!-- modal footer buttons -->
@@ -460,5 +462,11 @@ export default {
       }
     },
   },
+  computed: {
+    activeSchoolYearId() {
+      return this.$store.state?.schoolYear?.id || 0
+    }
+  }
 };
 </script>
+

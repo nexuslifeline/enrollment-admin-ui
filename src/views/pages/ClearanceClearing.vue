@@ -4,7 +4,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"
-    :createButtonVisible="false">
+    :createButtonVisible="false"
+    showBottomActions>
     <template v-slot:filters>
       <b-form-input
         v-model="filters.clearance.criteria"
@@ -71,14 +72,6 @@
         placeholder="Section"
         class="mt-2"
       />
-      <b-button 
-        :disabled="tables.clearances.items.length == 0"
-        block
-        class="mt-5" @click="onSaveClearance()" 
-        variant="primary">
-        <v-icon v-if="isProcessing" name="spinner" spin />
-        Save
-      </b-button>
     </template>
     <template v-slot:content>
       <b-row>
@@ -147,6 +140,15 @@
           </b-row>
         </b-col>
       </b-row>
+    </template>
+    <template v-slot:bottom-actions>
+       <b-button
+        :disabled="tables.clearances.items.length == 0"
+         @click="onSaveClearance()"
+        variant="primary">
+        <v-icon v-if="isProcessing" name="spinner" spin />
+        Save
+      </b-button>
     </template>
   </PageContent>
 </template>
