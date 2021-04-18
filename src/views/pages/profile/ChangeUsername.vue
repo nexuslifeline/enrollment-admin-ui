@@ -30,6 +30,7 @@
 </template>
 <script>
 const userFields = {
+  id: null,
   username: null,
 };
 
@@ -37,7 +38,7 @@ const userErrorFields = {
   userUsername: null,
 };
 
-import { PersonnelApi } from '../../../mixins/api';
+import { AuthApi, PersonnelApi } from '../../../mixins/api';
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import { copyValue } from '../../../helpers/extractor';
 import { reset, showNotification, validate } from '../../../helpers/forms';
@@ -46,7 +47,7 @@ export default {
   components: {
     FooterAction
   },
-  mixins: [ PersonnelApi ],
+  mixins: [ PersonnelApi, AuthApi ],
   data() {
     return {
       isConfirmBusy: false,
@@ -69,25 +70,12 @@ export default {
   methods: {
     onSave() {
       this.isConfirmBusy = true
-      const { user, user: { fields: { username } }} = this.forms
+      const { user, user: { fields: { id: userId } }} = this.forms
 
       reset(user)
 
-      const userData = { user: { username }, id: this.personnelId };
-      this.updatePersonnel(userData, this.personnelId).then(({ data }) => {
-        copyValue(data.user, user.fields)
-
-        const updatedUser = {
-          ...data.user,
-          userable: {
-            ...data,
-            name: data.name,
-            photo: {
-              ...data.photo
-            },
-          }
-        }
-        this.$store.commit('SET_USER', updatedUser);
+      this.updateUsername(userId, user.fields).then(({ data }) => {
+        this.$store.commit('SET_USER', data);
         this.isShown = false
         this.isConfirmBusy = false
         showNotification(this, 'success', 'Username has been updated.')

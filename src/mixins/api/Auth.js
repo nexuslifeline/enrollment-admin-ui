@@ -10,6 +10,12 @@ export default {
     },
     revokeAuthentication() {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/logout`);
-    }
+    },
+    updateUsername(userId, data) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/users/${userId}/update-email`, data);
+    },
+    updatePassword(userId, data) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/users/${userId}/update-password`, data);
+    },
   }
 }
