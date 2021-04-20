@@ -367,10 +367,20 @@
               <b-col md=3>
                 <b-form-group>
                   <label>Mobile No</label>
-                  <b-form-input
+                  <masked-input
+                    type="text"
+                    class="form-control"
                     v-model="forms.personnel.fields.mobileNo"
                     :state="forms.personnel.states.mobileNo"
-                  />
+                    :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+                    :guide="false"
+                    :showMask="false"
+                    placeholderChar="_">
+                  </masked-input>
+                  <!-- <b-form-input
+                    v-model="forms.personnel.fields.mobileNo"
+                    :state="forms.personnel.states.mobileNo"
+                  /> -->
                   <b-form-invalid-feedback>
                     {{ forms.personnel.errors.mobileNo }}
                   </b-form-invalid-feedback>
@@ -391,10 +401,20 @@
               <b-col md=3>
                 <b-form-group>
                   <label>Emergency Mobile No</label>
-                  <b-form-input
+                  <!-- <b-form-input
                     v-model="forms.personnel.fields.emergencyMobileNo"
                     :state="forms.personnel.states.emergencyMobileNo"
-                  />
+                  /> -->
+                  <masked-input
+                    type="text"
+                    class="form-control"
+                    v-model="forms.personnel.fields.emergencyMobileNo"
+                    :state="forms.personnel.states.emergencyMobileNo"
+                    :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+                    :guide="false"
+                    :showMask="false"
+                    placeholderChar="_">
+                  </masked-input>
                   <b-form-invalid-feedback>
                     {{ forms.personnel.errors.emergencyMobileNo }}
                   </b-form-invalid-feedback>
@@ -612,10 +632,20 @@
               <b-col md=3>
                 <b-form-group>
                   <label>Mobile No</label>
-                  <b-form-input
+                  <masked-input
+                    type="text"
+                    class="form-control"
                     v-model="forms.personnel.fields.mobileNo"
                     :state="forms.personnel.states.mobileNo"
-                  />
+                    :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+                    :guide="false"
+                    :showMask="false"
+                    placeholderChar="_">
+                  </masked-input>
+                  <!-- <b-form-input
+                    v-model="forms.personnel.fields.mobileNo"
+                    :state="forms.personnel.states.mobileNo"
+                  /> -->
                   <b-form-invalid-feedback>
                     {{ forms.personnel.errors.mobileNo }}
                   </b-form-invalid-feedback>
@@ -636,10 +666,20 @@
               <b-col md=3>
                 <b-form-group>
                   <label>Emergency Mobile No</label>
-                  <b-form-input
+                  <masked-input
+                    type="text"
+                    class="form-control"
                     v-model="forms.personnel.fields.emergencyMobileNo"
                     :state="forms.personnel.states.emergencyMobileNo"
-                  />
+                    :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+                    :guide="false"
+                    :showMask="false"
+                    placeholderChar="_">
+                  </masked-input>
+                  <!-- <b-form-input
+                    v-model="forms.personnel.fields.emergencyMobileNo"
+                    :state="forms.personnel.states.emergencyMobileNo"
+                  /> -->
                   <b-form-invalid-feedback>
                     {{ forms.personnel.errors.emergencyMobileNo }}
                   </b-form-invalid-feedback>

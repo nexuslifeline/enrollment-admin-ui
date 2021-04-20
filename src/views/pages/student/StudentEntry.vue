@@ -76,9 +76,18 @@
                 </b-form-group>
                 <b-form-group>
                   <label>Mobile No.</label>
-                  <b-form-input
+                  <masked-input
+                    type="text"
+                    class="form-control"
                     v-model="forms.student.fields.mobileNo"
-                    debounce="500"/>
+                    :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+                    :guide="false"
+                    :showMask="false"
+                    placeholderChar="_">
+                  </masked-input>
+                  <!-- <b-form-input
+                    v-model="forms.student.fields.mobileNo"
+                    debounce="500"/> -->
                 </b-form-group>
                 <b-form-group>
                   <label class="required">Civil Status</label>

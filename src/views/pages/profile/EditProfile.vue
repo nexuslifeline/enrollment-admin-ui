@@ -58,7 +58,16 @@
         <template>
           <b-form-group>
             <label>Mobile Number</label>
-            <b-form-input v-model="forms.personnel.fields.mobileNo" />
+            <masked-input
+              type="text"
+              class="form-control"
+              v-model="forms.personnel.fields.mobileNo"
+              :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+              :guide="false"
+              :showMask="false"
+              placeholderChar="_">
+            </masked-input>
+            <!-- <b-form-input v-model="forms.personnel.fields.mobileNo" /> -->
           </b-form-group>
           <b-form-group>
             <label>Phone Number</label>

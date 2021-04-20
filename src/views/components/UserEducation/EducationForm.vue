@@ -38,13 +38,33 @@
         <InputContainer>
           <b-form-group>
             <label>Start Year</label>
-            <b-form-input  v-model="form.fields.start" />
+            <!-- <b-form-input  v-model="form.fields.start" /> -->
+            <masked-input
+              type="text"
+              name="phone"
+              class="form-control"
+              v-model="form.fields.start"
+              :mask="[/\d/, /\d/, /\d/, /\d/]"
+              :guide="true"
+              :showMask="false"
+              placeholderChar="_">
+            </masked-input>
           </b-form-group>
         </InputContainer>
         <InputContainer>
           <b-form-group>
             <label>End Year(or Expected)</label>
-            <b-form-input v-model="form.fields.end" max="9999"/>
+            <masked-input
+              type="text"
+              name="phone"
+              class="form-control"
+              v-model="form.fields.end"
+              :mask="[/\d/, /\d/, /\d/, /\d/]"
+              :guide="true"
+              :showMask="false"
+              placeholderChar="_">
+            </masked-input>
+            <!-- <b-form-input v-model="form.fields.end" max="9999"/> -->
           </b-form-group>
         </InputContainer>
       </InputGroup>

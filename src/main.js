@@ -58,6 +58,7 @@ import { TabsPlugin } from 'bootstrap-vue'
 //import { TimePlugin } from 'bootstrap-vue'
 import { ToastPlugin } from 'bootstrap-vue'
 import { TooltipPlugin } from 'bootstrap-vue'
+import MaskedInput from 'vue-text-mask'
 import {
   BIconFolderSymlink,
   BIconFolder2Open,
@@ -176,6 +177,7 @@ Vue.component('vSelectCategory', vSelectCategory);
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
 //Vue.use(IconsPlugin)
+Vue.component('masked-input', MaskedInput);
 Vue.component('vue-autonumeric', require('vue-autonumeric'))
 //import axios from 'axios'
 Vue.prototype.$log = console.log.bind(console)

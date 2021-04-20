@@ -54,10 +54,20 @@
               <b-form-group
                 label="MOBILE NO."
                 class="contact-info">
-                <b-form-input
+                <!-- <b-form-input
                   v-model="forms.organizationSetting.fields.mobileNo"
                   :state="forms.organizationSetting.states.mobileNo"
-                  debounce="500"/>
+                  debounce="500"/> -->
+                  <masked-input
+                    type="text"
+                    class="form-control"
+                    v-model="forms.organizationSetting.fields.mobileNo"
+                    :state="forms.organizationSetting.states.mobileNo"
+                    :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
+                    :guide="false"
+                    :showMask="false"
+                    placeholderChar="_">
+                  </masked-input>
                 <b-form-invalid-feedback>
                   {{forms.organizationSetting.errors.mobileNo}}
                 </b-form-invalid-feedback>
