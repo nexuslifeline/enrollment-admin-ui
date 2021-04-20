@@ -432,13 +432,13 @@ export default {
 
   &.shrink {
     .header__menus {
-      .header__menu-item {
-        &.active {
-          &:after {
-            border-color: transparent transparent $white transparent;
-          }
-        }
-      }
+      // .header__menu-item {
+      //   &.active {
+      //     &:after {
+      //       border-color: transparent transparent $white transparent;
+      //     }
+      //   }
+      // }
     }
 
     .header__account-details {
@@ -477,13 +477,13 @@ export default {
       //background-color: $white;
     }
 
-    .header__menu-item {
-      &.active {
-        &:after {
-          border-color: transparent transparent $white transparent;
-        }
-      }
-    }
+    // .header__menu-item {
+    //   &.active {
+    //     &:after {
+    //       border-color: transparent transparent $white transparent;
+    //     }
+    //   }
+    // }
 
     .header__account-details {
       position: fixed;
@@ -635,7 +635,8 @@ export default {
       height: 0;
       border-style: solid;
       border-width: 0 11px 10px 11px;
-      border-color: transparent transparent #40acdb transparent;
+      // border-color: transparent transparent #40acdb transparent;
+      border-color: transparent transparent $white transparent;
       opacity: 0.95;
     }
   }

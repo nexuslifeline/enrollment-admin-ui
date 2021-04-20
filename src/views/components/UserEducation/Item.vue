@@ -2,7 +2,7 @@
   <div class="user-education__list-item">
     <div class="item__content">
       <vText size="m" weight="bold">{{ data.school }}</vText>
-      <vText size="s" color="light">{{ data.field }}</vText>
+      <vText size="s" color="light">{{ data.degree || data.field || data.societies }}</vText>
       <vText size="s" color="light">{{ data.address }}</vText>
       <vText size="s" color="light">{{ data.period }}</vText>
     </div>
