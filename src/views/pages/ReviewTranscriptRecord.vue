@@ -2,7 +2,8 @@
   <PageContent
     title="Review Transcript Record"
     :createButtonVisible="false"
-    :filterVisible="false">
+    :filterVisible="false"
+    showBottomActions>
     <template v-slot:content>
       <b-overlay :show="isProcessing">
         <div class="transcript">
@@ -436,23 +437,7 @@
               </b-row>
             </div>
           </div>
-          <div class="transcript__action-bar">
-            <b-button
-              :disabled="isSaving"
-              variant="outline-primary" 
-              @click="onUpdateTranscriptRecord()">
-              <v-icon v-if="isSaving" name="spinner" spin />
-              Update
-            </b-button>
-            <b-button
-              :disabled="isSaving"
-              variant="outline-primary" 
-              @click="onUpdateTranscriptRecord(true)">
-              <v-icon v-if="isSaving" name="spinner" spin />
-              Finalize
-            </b-button>
-            <b-button variant="outline-danger" :to="`/registrar/academic-transcript`">Cancel</b-button>
-          </div>
+          
         </div>
       </b-overlay>
       <b-modal
@@ -541,6 +526,25 @@
         </div>
         <!-- modal footer buttons -->
         </b-modal>
+    </template>
+    <template v-slot:bottom-actions>
+      <div class="transcript__action-bar">
+        <b-button
+          :disabled="isSaving"
+          variant="outline-primary" 
+          @click="onUpdateTranscriptRecord()">
+          <v-icon v-if="isSaving" name="spinner" spin />
+          Update
+        </b-button>
+        <b-button
+          :disabled="isSaving"
+          variant="outline-primary" 
+          @click="onUpdateTranscriptRecord(true)">
+          <v-icon v-if="isSaving" name="spinner" spin />
+          Finalize
+        </b-button>
+        <b-button variant="outline-danger" :to="`/registrar/academic-transcript`">Cancel</b-button>
+      </div>
     </template>
   </PageContent>
 </template>
@@ -945,15 +949,6 @@ export default {
   }
 
   .transcript__action-bar {
-    height: 60px;
-    position: sticky;
-    bottom: 0;
-    background-color: white;
-    width: 100%;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
     padding: 0 15px;
     
     button {
