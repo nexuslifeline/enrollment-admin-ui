@@ -207,8 +207,8 @@ export default [
         permissionIds: StudentPermissions.getIds()
       },
       {
-        label: 'User',
-        to: '/master-files/user',
+        label: 'Member',
+        to: '/master-files/member',
         permissionIds: PersonnelPermissions.getIds()
       },
     ]

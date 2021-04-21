@@ -394,25 +394,25 @@ function configRoutes () {
           component: { render(c) { return c('router-view') } },
           children: [
             {
-              path: 'user',
-              name: 'User',
+              path: 'member',
+              name: 'Member',
               component: { render(c) { return c('router-view') } },
               children: [
                 {
                   path: '/',
-                  name: 'User List',
+                  name: 'Member List',
                   component: User,
                   meta: { requiresAuth: true, userType: 0 }
                 },
                 {
                   path: 'add',
-                  name: 'User Add',
+                  name: 'Member Add',
                   component: UserEntry,
                   meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':personnelId',
-                  name: 'User Edit',
+                  name: 'Member Edit',
                   component: UserEntry,
                   meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },

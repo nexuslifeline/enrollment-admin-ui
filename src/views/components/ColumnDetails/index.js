@@ -3,3 +3,4 @@ export { default as EducationColumn } from './EducationColumn';
 export { default as ContactColumn } from './ContactColumn';
 export { default as AddressColumn } from './AddressColumn';
 export { default as CurriculumColumn } from './CurriculumColumn';
+export { default as MemberColumn } from './MemberColumn';

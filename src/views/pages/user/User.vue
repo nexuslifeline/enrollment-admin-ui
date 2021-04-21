@@ -1,10 +1,10 @@
 <template>
   <PageContent
-    title="User Management"
+    title="Member Management"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPersonnels"
     :filterVisible="isFilterVisible"
-    @create="$router.push(`/master-files/user/add`)"
+    @create="$router.push(`/master-files/member/add`)"
     :createButtonVisible="isAccessible($options.PersonnelPermissions.ADD.id)">
     <template v-slot:filters>
       <b-form-input
@@ -48,40 +48,17 @@
               :filter="filters.user.criteria"
               @filtered="onFiltered($event, paginations.user)"
             >
-              <template v-slot:cell(photo)="data">
-                <b-media>
-                  <template v-slot:aside>
-                    <AvatarMaker
-                      :avatarId="data.item.id"
-                      :size="33"
-                      :text="
-                        `${data.item.firstName.charAt(0)}${data.item.lastName.charAt(
-                          0
-                        )}`
-                      "
-                      :src="
-                        $options.getFilePath(
-                          (data.item.photo && data.item.photo.hashName) || ''
-                        )
-                      "
-                    />
-                  </template>
-                </b-media>
+              <template v-slot:cell(account)="data">
+                <MemberColumn
+                  :data="data.item"
+                  :callback="{ loadDetails: () => $router.push(`/master-files/member/${data.item.id}`) }"
+                />
               </template>
               <template v-slot:table-busy>
                 <div class="text-center my-2">
                   <v-icon name="spinner" spin class="mr-2" />
                   <strong>Loading...</strong>
                 </div>
-              </template>
-              <template v-slot:cell(user.username)="row">
-                <b-link
-                  :to="`/master-files/user/${row.item.id}`"
-                  :disabled="
-                    !isAccessible($options.PersonnelPermissions.EDIT.id)
-                  "
-                  >{{ row.item.user.username }}
-                </b-link>
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
@@ -104,7 +81,7 @@
                   </template>
                   <b-dropdown-item
                     v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
-                    :to="`/master-files/user/${row.item.id}`"
+                    :to="`/master-files/member/${row.item.id}`"
                     :disabled="showModalEntry"
                   >
                     Edit Profile
@@ -178,7 +155,7 @@
     >
       <div slot="modal-title">
         <!-- modal title -->
-        User - Add
+        Member - Add
       </div>
       <!-- modal title -->
       <!-- modal body -->
@@ -1001,6 +978,7 @@ import PageContent from "../../components/PageContainer/PageContent";
 import { copyValue } from '../../../helpers/extractor';
 import { getFilePath } from '../../../helpers/utils';
 import AvatarMaker from "../../components/AvatarMaker";
+import { MemberColumn, AddressColumn } from "../../components/ColumnDetails";
 
 export default {
   name: 'Personnel',
@@ -1012,7 +990,8 @@ export default {
     PhotoViewer,
     Card,
     PageContent,
-    AvatarMaker
+    AvatarMaker,
+    MemberColumn
   },
   PersonnelPermissions,
   data() {
@@ -1048,47 +1027,34 @@ export default {
           isBusy: false,
           fields: [
             {
-              key: 'photo',
-              label: '',
+              key: 'account',
+              label: 'Account',
               tdClass: 'align-middle',
-              thStyle: { width: '64px', maxWidth: '64px' },
+              thStyle: { width: 'auto' },
             },
             {
-              key: 'user.username',
-              label: 'Email',
+              key: 'completeAddress',
+              label: 'Address',
               tdClass: 'align-middle',
-              thStyle: { width: '20%' },
-            },
-            {
-              key: 'name',
-              label: 'Name',
-              tdClass: 'align-middle',
-              thStyle: { width: '30%' },
-              formatter: (value, key, item) => {
-                if (!item.middleName) {
-                  item.middleName = '';
-                }
-                return (item.name =
-                  item.firstName + ' ' + item.middleName + ' ' + item.lastName);
-              },
+              thStyle: { width: 'auto' },
             },
             {
               key: 'user.userGroup.name',
               label: 'User Group',
               tdClass: 'align-middle',
-              thStyle: { width: '25%' },
+              thStyle: { width: 'auto' },
             },
             {
               key: 'department.name',
-              label: 'User Group',
+              label: 'Department',
               tdClass: 'align-middle',
-              thStyle: { width: '25%' },
+              thStyle: { width: '18%' },
             },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle',
-              thStyle: { width: '40px', maxWidth: '40px' },
+              thStyle: { width: '20px' },
             },
           ],
           items: [],
