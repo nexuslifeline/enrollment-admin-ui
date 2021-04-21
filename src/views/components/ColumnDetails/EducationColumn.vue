@@ -1,13 +1,15 @@
 <template>
   <div>
-    <div>
-      {{ data && data.level ? $options.getPropValue(data.level) : ''}}
+    <div v-if="!!(data && data.level)">
+      {{ $options.getPropValue(data.level) }}
     </div>
     <div>
-      {{ data && data.course ? $options.getPropValue(data.course) : '' }} {{ data && data.semester ? $options.getPropValue(data.semester) : '' }}
+      <span v-if="!!(data && data.course)">{{ $options.getPropValue(data.course) }}</span>
+      &nbsp;
+      <span v-if="!!(data && data.semester)">{{ $options.getPropValue(data.semester) }}</span>
     </div>
-    <div v-if="showSchoolYear">
-      {{ data && data.schoolYear ? $options.getPropValue(data.schoolYear): '' }}
+    <div v-if="!!(showSchoolYear && data && data.schoolYear)">
+      {{  $options.getPropValue(data.schoolYear) }}
     </div>
   </div>
 </template>

@@ -183,48 +183,17 @@
             </div>
           </template>
           <template v-slot:cell(name)="data">
-            <b-media>
-              <template v-slot:aside>
-                <AvatarMaker
-                  :avatarId="data.item.student.id"
-                  :size="50"
-                  :text="
-                    `${data.item.student.firstName.charAt(
-                      0
-                    )}${data.item.student.lastName.charAt(0)}`
-                  "
-                  :src="avatar(data.item.student)"
-                />
-              </template>
-              <div>
-                <b-link @click="loadDetails(data)">{{
-                  data.item.student.name
-                }}</b-link>
-              </div>
-              <div class="text-muted">
-                {{ data.item.student.email }}
-              </div>
-              <div class="text-muted">
-                {{
-                  data.item.student.currentAddress ||
-                  data.item.student.address
-                    ? data.item.student.address.currentCompleteAddress
-                    : ''
-                }}
-              </div>
-            </b-media>
-          </template>
+            <StudentColumn
+              :showIsManual="true"
+              :data="data.item"
+              :callback="{ loadDetails: () => loadDetails(data) }"
+            />
+           </template>
           <template v-slot:cell(curriculum)="data">
-            <span>
-              {{ getName(data.item, 'curriculum') }}<br />
-              {{ getName(data.item, 'level') }}<br />
-              <small v-if="data.item.course"
-                >{{ data.item.course.description }}
-                {{
-                  data.item.course.major ? `(${data.item.course.major})` : ''
-                }}</small
-              >
-            </span>
+            <CurriculumColumn :data="data.item" />
+          </template>
+          <template v-slot:cell(education)="data">
+            <EducationColumn :data="data.item" />
           </template>
           <template v-slot:cell(status)="data">
             <b-badge
@@ -1433,6 +1402,7 @@ import AttachmentList from '../components/Attachment/AttachmentList';
 import Access from '../../mixins/utils/Access';
 import PageContent from  '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
+import { StudentColumn, CurriculumColumn, EducationColumn } from '../components/ColumnDetails';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1466,7 +1436,10 @@ export default {
     ActiveViewLinks,
     FileViewer,
     PageContent,
-    NoAccess
+    NoAccess,
+    StudentColumn,
+    CurriculumColumn,
+    EducationColumn
   },
   TranscriptRecordStatuses,
   SchoolCategories,
@@ -1505,22 +1478,16 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
-              // formatter: (value, key, item) => {
-              // 	if(!item.student.middleName){
-              // 		item.student.middleName = ""
-              // 	}
-              // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-              // }
             },
-            // {
-            // 	key: "education",
-            // 	label: "Education",
-            // 	tdClass: "align-middle",
-            //   thStyle: { width: "20%"}
-            // },
             {
               key: 'curriculum',
               label: 'Curriculum',
+              tdClass: 'align-middle',
+              thStyle: { width: '35%' },
+            },
+            {
+              key: 'education',
+              label: 'Education (Recent)',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
             },
@@ -1529,13 +1496,13 @@ export default {
               label: 'Status',
               tdClass: 'align-middle text-center',
               thClass: 'text-center',
-              thStyle: { width: '12%' },
+              thStyle: { width: '7%' },
             },
             {
               key: 'action',
               label: '',
-              tdClass: 'align-middle',
-              thStyle: { width: '40px' },
+              tdClass: 'align-middle text-center',
+              thStyle: { width: '20px' },
             },
           ],
           items: [],

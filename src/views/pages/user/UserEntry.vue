@@ -374,7 +374,7 @@
     </b-row>
     <div class="action-bar">
        <b-button class="float-right ml-2 mr-2"
-        :to="`/master-files/user`"
+        :to="`/master-files/member`"
         variant="outline-danger"
         :disabled="isProcessing" > Cancel </b-button>
       <b-button class="float-right"
@@ -505,7 +505,7 @@ export default {
 
     this.isLoading = true
     if (this.$route.params.personnelId && isNaN(this.$route.params.personnelId)) {
-      this.$router.push('/master-files/user')
+      this.$router.push('/master-files/member')
       return
     }
 
@@ -609,7 +609,7 @@ export default {
               });
             }
             this.isProcessing = false
-            this.$router.push('/master-files/user')
+            this.$router.push('/master-files/member')
             showNotification(this, 'success', 'User created successfully.')
           })
           .catch((error) => {
@@ -623,7 +623,7 @@ export default {
           .then(({ data }) => {
             this.isProcessing = false
             showNotification(this, 'success', 'User updated successfully.');
-            this.$router.push('/master-files/user')
+            this.$router.push('/master-files/member')
           })
           .catch((error) => {
             const errors = error.response.data.errors;
