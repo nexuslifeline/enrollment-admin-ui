@@ -47,13 +47,13 @@ export default [
         label: 'Activity',
         to: '/home/activity'
       },
-      {
-        label: 'Settings',
-        to: '/home/settings',
-        permissionIds: [
-          ...SettingPermissions.getIds(),
-        ],
-      },
+      // {
+      //   label: 'Settings',
+      //   to: '/home/settings',
+      //   permissionIds: [
+      //     ...SettingPermissions.getIds(),
+      //   ],
+      // },
     ]
   },
   {

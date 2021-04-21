@@ -23,7 +23,7 @@
         </b-dropdown-item>
       </b-dropdown>
     </div>
-    <div class="c-card__body">
+    <div class="c-card__body" :class="{ noPadding: noPaddingBody }">
       <slot></slot>
     </div>
   </div>
@@ -49,6 +49,10 @@ export default {
     titleSize: {
       type: [String],
       default: 'xl'
+    },
+    noPaddingBody: {
+      type: Boolean,
+      default: false,
     },
   },
 };
@@ -83,6 +87,10 @@ export default {
   padding: 20px;
   background-color: $white;
   padding-bottom: 50px;
+
+  &.noPadding {
+    padding: 0;
+  }
 }
 
 .c-card__refresh-button {

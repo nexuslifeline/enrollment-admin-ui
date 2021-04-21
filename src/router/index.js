@@ -502,7 +502,7 @@ function configRoutes () {
           name: 'Home',
           component: Home,
           redirect: { name: 'Profile' },
-          meta: { requiresAuth: true },
+          meta: { requiresAuth: true, hideSubNav: true },
           children: [
             {
               path: 'profile',
@@ -514,16 +514,19 @@ function configRoutes () {
                   path: 'edit',
                   name: 'EditProfile',
                   component: EditProfile,
+                  meta: { requiresAuth: true, hideSubNav: true }
                 },
                 {
                   path: 'change-username',
                   name: 'ChangeUsername',
                   component: ChangeUsername,
+                  meta: { requiresAuth: true, hideSubNav: true }
                 },
                 {
                   path: 'update-password',
                   name: 'UpdatePassword',
                   component: UpdatePassword,
+                  meta: { requiresAuth: true, hideSubNav: true }
                 }
               ]
             },
