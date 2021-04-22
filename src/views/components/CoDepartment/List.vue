@@ -2,12 +2,17 @@
   <Card :title="`Users in ${department}`" titleSize="m" noPaddingBody>
     <div v-if="!!personnels.length" class="co-department__list">
       <template v-for="personnel in personnels">
-        <template v-if="personnel.user.id !== $store.state.user.id">
+        <template v-if="personnel.user.id === $store.state.user.id">
           <Item
             :key="personnel.id"
-            :data="personnel"
+            :data="{ ...personnel, name: `${personnel.name} (You)` }"
           />
         </template>
+         <Item
+          v-else
+          :key="personnel.id"
+          :data="personnel"
+        />
       </template>
     </div>
     <div v-else class="empty-message">
@@ -85,7 +90,7 @@ export default {
 
 .co-department__list {
   width: 100%;
-  min-height: 250px;
+  min-height: 160px;
   background-color: $white;
   padding: 18px;
 }
