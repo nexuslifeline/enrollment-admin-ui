@@ -1,15 +1,16 @@
 <template>
   <Card title="Users in Department" titleSize="m" noPaddingBody>
     <div class="co-department__list">
-      <template v-for="item in [1, 2, 3, 4, 5]">
-        <Item :data="{ id: item, name: 'Paul Christian Rueda', group: 'System Administrator' }" />
+      <template v-for="personnel in personnels">
+        <Item :data="{ id: personnel.id, name: personnel.name, group: personnel.user.userGroup.name }" />
       </template>
     </div>
     <ItemLoader v-if="isLoadingMore" />
-    <ShowMore v-if="!!page.to && !isLoadingMore" @onShowMore="onShowMore" />
+    <ShowMore v-if="!!page.to && !isLoadingMore && page.current !== page.lastPage" @onShowMore="onShowMore" />
   </Card>
 </template>
 <script>
+import { PersonnelApi } from '../../../mixins/api';
 import Card from '../Card';
 import Item from './Item';
 import ShowMore from './ShowMore';
@@ -26,22 +27,38 @@ export default {
       type: [String, Number],
     }
   },
+  mixins: [ PersonnelApi ],
   data() {
     return {
       page: {
         current: 1,
-        to: 2 // this is the next page. you can get this in the response data.meta.to
+        to: 2, // this is the next page. you can get this in the response data.meta.to,
+        lastPage: 1
       },
-      isLoadingMore: false
+      isLoadingMore: false,
+      personnels: []
     }
   },
   created() {
-    console.log('load first page here')
+    const params = { departmentId: this.departmentId, paginate: true, perPage: 5, page: this.page.current }
+    this.getPersonnelList(params).then(({ data }) => {
+      this.personnels = data.data
+      this.page.current = data.meta.currentPage
+      this.page.to = data.meta.to
+      this.page.lastPage = data.meta.lastPage
+    })
   },
   methods: {
     onShowMore() {
       this.isLoadingMore = true;
-      alert('load next page here(limit to 5 per_page) and update page.current and page.to.')
+      const params = { departmentId: this.departmentId, paginate: true, perPage: 5, page: this.page.current + 1 }
+      this.getPersonnelList(params).then(({ data }) => {
+        this.personnels.push(...data.data)
+        this.page.current = data.meta.currentPage
+        this.page.to = data.meta.to
+        this.page.lastPage = data.meta.lastPage
+        this.isLoadingMore = false;
+      })
     }
   }
 };

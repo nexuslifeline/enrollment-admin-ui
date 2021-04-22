@@ -3,7 +3,7 @@
     <AvatarMaker
       :size="43"
       :avatarId="data.id"
-      text="PR"
+      :text="data.name.charAt(0)"
     />
     <div class="co-department__list-item-detail">
       <vText size="s" weight="bold">{{ data.name }}</vText>
