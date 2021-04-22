@@ -3,7 +3,8 @@
     <AvatarMaker
       :size="43"
       :avatarId="data.id"
-      :text="data.name.charAt(0)"
+      :text="avatarText"
+      :src="$options.getFilePath(photoHashName)"
     />
     <div class="co-department__list-item-detail">
       <vText size="s" weight="bold">{{ data.name }}</vText>
@@ -16,7 +17,9 @@
 <script>
 import Card from '../Card';
 import AvatarMaker from '../AvatarMaker';
+import { getFilePath } from '../../../helpers/utils';
 export default {
+  getFilePath,
   components: {
     Card,
     AvatarMaker
@@ -26,6 +29,16 @@ export default {
       type: [Object],
     }
   },
+  computed: {
+    avatarText() {
+      const { firstName, lastName } = this.data;
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+    },
+    photoHashName() {
+      const { photo } = this.data;
+      return photo?.hashName || '';
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
