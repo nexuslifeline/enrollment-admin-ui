@@ -11,6 +11,7 @@
         debounce="500"
         type="text"
         placeholder="Search"
+        @update="loadTranscriptRecords"
       />
       <!--<v-select
         :options="$options.SchoolCategories.values"

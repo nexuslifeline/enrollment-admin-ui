@@ -133,12 +133,14 @@ export default {
       const { employment } = this.forms
       this.selected = { ...item };
       this.isShown = true;
+      reset(employment)
       copyValue(item, employment.fields)
     },
     onAddEmployment() {
       const { employment } = this.forms
       this.selected = {}
       this.isShown = true
+      reset(employment)
       clearFields(employment.fields)
     }
   }

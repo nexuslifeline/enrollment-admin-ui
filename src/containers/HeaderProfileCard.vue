@@ -47,16 +47,17 @@
 </template>
 
 <script>
-import { PersonnelApi } from '../mixins/api';
+import { AuthApi, PersonnelApi } from '../mixins/api';
 import AvatarMaker from '../views/components/AvatarMaker';
 import WaveBackground from '../views/components/WaveMaker';
 import Navs from './navs';
+import { showNotification } from '../helpers/forms'
 
 export default {
   props: {
     user: Object,
   },
-  mixins: [ PersonnelApi ],
+  mixins: [ PersonnelApi, AuthApi ],
   data() {
     return {
       homeMenus: Navs.filter(v => v?.label === 'Home')?.[0]?.children,
@@ -92,7 +93,12 @@ export default {
       formData.append('photo', file);
 
       this.savePhoto(formData, personnelId).then(({ data }) => {
-        showNotification(this, 'sucess', 'Your profile photo has been updated.')
+        this.getAuthenticatedUser()
+        .then(({ data }) => {
+          this.isLoading = false;
+          this.$store.commit('SET_USER', data);
+          showNotification(this, 'success', 'Your profile photo has been updated.')
+        })
       }).catch((error) => {
         showNotification(this, 'danger', 'Unable to update your photo. Please contact your system administrator.')
       });
