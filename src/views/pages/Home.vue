@@ -9,7 +9,7 @@
           <router-view></router-view>
         </div>
         <div class="main-container__side-panel">
-          <CoDepartmentList />
+          <CoDepartmentList :departmentId="personnel.departmentId"/>
         </div>
       </div>
     </div>
@@ -35,7 +35,12 @@ export default {
   methods: {
 
   },
-};
+  computed: {
+    personnel() {
+      return this.$store.state.user?.userable || {}
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
