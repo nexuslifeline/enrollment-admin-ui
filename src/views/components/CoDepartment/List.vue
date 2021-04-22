@@ -1,9 +1,17 @@
 <template>
-  <Card title="Users in Department" titleSize="m" noPaddingBody>
-    <div class="co-department__list">
+  <Card :title="`Users in ${department}`" titleSize="m" noPaddingBody>
+    <div v-if="!!personnels.length" class="co-department__list">
       <template v-for="personnel in personnels">
-        <Item :data="{ id: personnel.id, name: personnel.name, group: personnel.user.userGroup.name }" />
+        <template v-if="personnel.user.id !== $store.state.user.id">
+          <Item
+            :key="personnel.id"
+            :data="personnel"
+          />
+        </template>
       </template>
+    </div>
+    <div v-else class="empty-message">
+      No users in current department.
     </div>
     <ItemLoader v-if="isLoadingMore" />
     <ShowMore v-if="!!page.to && !isLoadingMore && page.current !== page.lastPage" @onShowMore="onShowMore" />
@@ -39,14 +47,23 @@ export default {
       personnels: []
     }
   },
+  computed: {
+    department() {
+      return this.personnels?.[0]?.department?.name || 'Department';
+    }
+  },
   created() {
+    this.isLoadingMore = true;
     const params = { departmentId: this.departmentId, paginate: true, perPage: 5, page: this.page.current }
     this.getPersonnelList(params).then(({ data }) => {
       this.personnels = data.data
       this.page.current = data.meta.currentPage
       this.page.to = data.meta.to
       this.page.lastPage = data.meta.lastPage
-    })
+      this.isLoadingMore = false;
+    }).catch((error) => {
+      this.isLoadingMore = false;
+    });
   },
   methods: {
     onShowMore() {
@@ -71,6 +88,13 @@ export default {
   min-height: 250px;
   background-color: $white;
   padding: 18px;
+}
+
+.empty-message {
+  padding: 20px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
 }
 
 </style>

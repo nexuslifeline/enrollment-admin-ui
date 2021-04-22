@@ -7,7 +7,9 @@
     />
     <div class="co-department__list-item-detail">
       <vText size="s" weight="bold">{{ data.name }}</vText>
-      <vText size="s" color="light">{{ data.group }}</vText>
+      <vText v-if="!!(data && data.user && data.user.userGroup)" size="s" color="light">
+        {{ data.user.userGroup.name }}
+      </vText>
     </div>
   </div>
 </template>
@@ -32,10 +34,10 @@ export default {
 .co-department__list-item {
   display: flex;
   padding: 0;
-  margin-bottom: 18px;
+  margin-bottom: 15px;
 
   &:last-child {
-    margin-bottom: 0;
+    margin-bottom: 8px;
   }
 }
 
