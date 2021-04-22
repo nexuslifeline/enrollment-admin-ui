@@ -76,6 +76,7 @@ const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentL
 const StudentGrade = () => import('@/views/pages/StudentGrade')
 const Clearance = () => import('@/views/pages/Clearance')
 const ClearanceClearing = () => import('@/views/pages/ClearanceClearing')
+const SchoolYearSetup = () => import('@/views/pages/school-year-setup/SchoolYearSetup')
 
 
 
@@ -618,6 +619,11 @@ function configRoutes () {
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/school-year-setup',
+      name: 'SchoolYearSetup',
+      component: SchoolYearSetup
     },
     {
       path: '/demo',

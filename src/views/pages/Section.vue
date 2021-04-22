@@ -13,17 +13,6 @@
         type="text"
         placeholder="Search"
       />
-      <!--<v-select
-        :options="options.schoolCategories.values"
-        :value="filters.section.schoolCategoryItem"
-        @input="onCategoryFilterChange"
-        label="name"
-        placeholder="School Category"
-        class="mt-2"
-        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
-        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
-        :clearable="checkIfAllowedAll()"
-      />-->
       <vSelectCategory
         :value="filters.section.schoolCategoryItem"
         @input="onCategoryFilterChange"
