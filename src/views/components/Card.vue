@@ -26,6 +26,9 @@
     <div class="c-card__body" :class="{ noPadding: noPaddingBody }">
       <slot></slot>
     </div>
+    <div v-if="hasFooter" class="c-card__footer">
+      <slot name="footer"></slot>
+    </div>
   </div>
 </template>
 <script>
@@ -51,6 +54,10 @@ export default {
       default: 'xl'
     },
     noPaddingBody: {
+      type: Boolean,
+      default: false,
+    },
+    hasFooter: {
       type: Boolean,
       default: false,
     },
@@ -100,5 +107,13 @@ export default {
     width: 100%;
     margin-top: 10px;
   }
+}
+
+.c-card__footer {
+  background-color: $light-gray-50;
+  border-top: 1px solid $light-gray-10;
+  min-height: 60px;
+  width: 100%;
+  padding: 15px;
 }
 </style>

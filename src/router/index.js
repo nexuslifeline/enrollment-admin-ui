@@ -77,7 +77,7 @@ const StudentGrade = () => import('@/views/pages/StudentGrade')
 const Clearance = () => import('@/views/pages/Clearance')
 const ClearanceClearing = () => import('@/views/pages/ClearanceClearing')
 
-
+const SetupSchoolYear = () => import('@/views/pages/sy-setup/Setup')
 
 
 Vue.use(Router)
@@ -119,7 +119,7 @@ next()
 
 function configRoutes () {
   return [
-  {
+    {
       path: '/',
       redirect: { name: 'Home' },
       name: 'Dashboard',
@@ -290,9 +290,21 @@ function configRoutes () {
             },
             {
               path: 'school-year',
-              name: 'School Year',
-              component: SchoolYear,
-              meta: { requiresAuth: true, userType: 0 }
+              component: { render(c) { return c('router-view') } },
+              redirect: { name: 'School Year' },
+              children: [
+                {
+                  path: '/',
+                  name: 'School Year',
+                  component: SchoolYear,
+                  meta: { requiresAuth: true }
+                },
+                {
+                  path: ':id/setup',
+                  component: SetupSchoolYear,
+                  meta: { requiresAuth: true, hideHeader: true, hideMainArea: true },
+                }
+              ]
             },
             {
               path: 'school-fee-category',
@@ -540,7 +552,6 @@ function configRoutes () {
         },
         {
           path: 'setting',
-          name: 'Settings',
           component: { render(c) { return c('router-view') } },
           children: [
             {
@@ -621,13 +632,13 @@ function configRoutes () {
     },
     {
       path: '/demo',
-      name: 'Login',
+      name: 'Demo',
       component: DemoPage
     },
     {
       path: '*',
       name: 'Page404',
       component: Page404
-    },
+    }
   ]
 }

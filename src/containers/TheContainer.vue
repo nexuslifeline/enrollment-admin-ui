@@ -3,8 +3,11 @@
     <!-- <TheSidebar/> -->
     <b-overlay :show="isLoading" class="full-overlay-container">
       <div v-if="!isLoading" class="c-wrapper">
-        <TheHeader />
-        <div class="main-content" :class="{ shrink: !isHome && !isReport, report: isReport, home: isHome }">
+        <TheHeader v-if="!$route.meta.hideHeader" />
+        <div
+          v-if="!$route.meta.hideMainArea"
+          class="main-content"
+          :class="{ shrink: !isHome && !isReport, report: isReport, home: isHome }">
           <!-- <LeftPane /> -->
           <div class="c-body">
             <main class="c-main">
@@ -15,6 +18,9 @@
             <!-- <TheFooter/> -->
           </div>
         </div>
+        <template v-else>
+          <router-view></router-view>
+        </template>
       </div>
     </b-overlay>
   </div>
