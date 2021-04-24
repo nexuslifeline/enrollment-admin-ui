@@ -21,7 +21,6 @@
           <template v-if="[
             $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id,
             $options.SchoolCategories.COLLEGE.id,
-            $options.SchoolCategories.VOCATIONAL.id,
           ].includes(category.id)">
             <tr :key="category.id">
               <td>{{ category.name }}</td>
@@ -48,7 +47,6 @@
           <template v-if="![
             $options.SchoolCategories.SENIOR_HIGH_SCHOOL.id,
             $options.SchoolCategories.COLLEGE.id,
-            $options.SchoolCategories.VOCATIONAL.id,
           ].includes(category.id)">
             <tr :key="category.id">
               <td>{{ category.name }}</td>
