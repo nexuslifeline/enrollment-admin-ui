@@ -15,6 +15,7 @@ export default {
 .input-group__container {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   width: 100%;
   margin-bottom: 5px;
 }

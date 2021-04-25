@@ -1,7 +1,13 @@
 <template>
   <component
     :is="type"
-    :style="`margin-bottom: ${marginBottom}px; flex: ${flex}; text-align: ${align}; text-transform: ${transform}`"
+    :style="`
+    margin-bottom: ${marginBottom}px;
+    margin-left: ${marginLeft}px;
+    margin-top: ${marginTop}px;
+    flex: ${flex};
+    text-align: ${align};
+    text-transform: ${transform}`"
     :class="`${size}-text ${color}-color ${weight}-weight`">
     <slot></slot>
   </component>
@@ -30,6 +36,14 @@ export default {
       default: 'left' // normal, light, lighter
     },
     marginBottom: {
+      type: [Number, String],
+      default: 0
+    },
+    marginTop: {
+      type: [Number, String],
+      default: 0
+    },
+    marginLeft: {
       type: [Number, String],
       default: 0
     },
