@@ -216,13 +216,14 @@ export default {
 .action-edit {
   margin: 10px 10px 10px 0;
   padding: 6px 14px;
-  background-color: $light-gray;
+  background-color: $white;
   border: 0;
-  border-radius: 4px;
+  border-radius: 3px;
   outline: none;
 
   &:hover {
-    background-color: $light-gray-200;
+    background-color: $black;
+    color: $white;
   }
 }
 

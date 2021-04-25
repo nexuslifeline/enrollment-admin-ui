@@ -9,6 +9,7 @@ import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
 import vSelectCategory from './views/components/SelectCategory.vue';
 import vText from './views/components/Text';
+import BareContainer from './views/components/BareContainer';
 import vSelect from 'vue-select'
 import { AlertPlugin, BIconPlus } from 'bootstrap-vue';
 import { AvatarPlugin } from 'bootstrap-vue';
@@ -172,7 +173,7 @@ Vue.component('v-select', vSelect)
 
 Vue.component('vText', vText);
 Vue.component('vSelectCategory', vSelectCategory);
-
+Vue.component('BareContainer', BareContainer);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)

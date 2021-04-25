@@ -40,7 +40,7 @@ const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
 const StudentList = () => import('@/views/pages/student/StudentList')
-const StudentEntry = () => import('@/views/pages/student/StudentEntry')
+const StudentForm = () => import('@/views/pages/student/StudentForm')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
 const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
@@ -431,13 +431,13 @@ function configRoutes () {
                 {
                   path: 'add',
                   name: 'Student Add',
-                  component: StudentEntry,
+                  component: StudentForm,
                   meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':studentId',
                   name: 'Student Edit',
-                  component: StudentEntry,
+                  component: StudentForm,
                   meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {

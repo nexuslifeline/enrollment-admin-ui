@@ -85,9 +85,6 @@
                     :showMask="false"
                     placeholderChar="_">
                   </masked-input>
-                  <!-- <b-form-input
-                    v-model="forms.student.fields.mobileNo"
-                    debounce="500"/> -->
                 </b-form-group>
                 <b-form-group>
                   <label class="required">Civil Status</label>
