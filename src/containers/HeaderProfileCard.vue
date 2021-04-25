@@ -57,7 +57,7 @@ export default {
   props: {
     user: Object,
   },
-  mixins: [ PersonnelApi, AuthApi ],
+  mixins: [PersonnelApi],
   data() {
     return {
       homeMenus: Navs.filter(v => v?.label === 'Home')?.[0]?.children,
@@ -83,9 +83,6 @@ export default {
       return this.$store.state?.user?.userable || {};
     },
   },
-  created() {
-    console.log(this.$store.state.user)
-  },
   methods: {
     onPhotoChange(file) {
       const formData = new FormData();
@@ -93,12 +90,11 @@ export default {
       formData.append('photo', file);
 
       this.savePhoto(formData, personnelId).then(({ data }) => {
-        this.getAuthenticatedUser()
-        .then(({ data }) => {
-          this.isLoading = false;
-          this.$store.commit('SET_USER', data);
-          showNotification(this, 'success', 'Your profile photo has been updated.')
-        })
+        const { user } = this.$store.state;
+        const newUser = { ...user, userable: { ...this.userable, photo: { ...data } } };
+        this.$store.commit('SET_USER', newUser);
+        this.isLoading = false;
+        showNotification(this, 'success', 'Your profile photo has been updated.')
       }).catch((error) => {
         showNotification(this, 'danger', 'Unable to update your photo. Please contact your system administrator.')
       });
