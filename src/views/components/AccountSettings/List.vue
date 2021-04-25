@@ -1,7 +1,8 @@
 <template>
-  <Card title="Account Settings" :key="key">
+  <Card title="Account Settings" titleSize="m" :key="key">
     <div class="items__list">
       <EmailRow :username="user.username" :userGroup="user.userGroup.name"/>
+      <hr />
       <PasswordRow />
     </div>
   </Card>

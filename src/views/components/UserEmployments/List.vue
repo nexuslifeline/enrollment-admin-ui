@@ -4,6 +4,7 @@
       title="Employment"
       actionLabel="Add Employment"
       @onAddNew="onAddEmployment"
+      titleSize="m"
       showAction>
       <div v-if="items.length > 0" class="employment__list">
         <template v-for="(item, idx) in items">

@@ -9,7 +9,12 @@ import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
 import vSelectCategory from './views/components/SelectCategory.vue';
 import vText from './views/components/Text';
-import BareContainer from './views/components/BareContainer';
+import Card from './views/components/Card';
+import CardFooterRow from './views/components/CardFooterRow';
+import { InputGroup, InputContainer, InputInline } from './views/components/InputGroup';
+import LinkVisibilityToggler from './views/components/VisibilityToggler/Link';
+import CenterContainer from './views/components/CenterContainer';
+import Toggle from './views/components/Form/Toggle';
 import vSelect from 'vue-select'
 import { AlertPlugin, BIconPlus } from 'bootstrap-vue';
 import { AvatarPlugin } from 'bootstrap-vue';
@@ -173,7 +178,14 @@ Vue.component('v-select', vSelect)
 
 Vue.component('vText', vText);
 Vue.component('vSelectCategory', vSelectCategory);
-Vue.component('BareContainer', BareContainer);
+Vue.component('CenterContainer', CenterContainer);
+Vue.component('Card', Card);
+Vue.component('CardFooterRow', CardFooterRow);
+Vue.component('InputGroup', InputGroup);
+Vue.component('InputContainer', InputContainer);
+Vue.component('InputInline', InputInline);
+Vue.component('Toggle', Toggle);
+Vue.component('LinkVisibilityToggler', LinkVisibilityToggler);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)

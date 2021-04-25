@@ -93,7 +93,7 @@ export default {
 .c-card__body {
   padding: 20px;
   background-color: $white;
-  padding-bottom: 50px;
+  padding-bottom: 35px;
 
   &.noPadding {
     padding: 0;

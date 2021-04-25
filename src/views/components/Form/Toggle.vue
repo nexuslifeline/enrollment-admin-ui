@@ -25,6 +25,7 @@ export default {
     display: inline-block;
     width: 50px;
     height: 28px;
+    margin: 0;
 
     input {
       opacity: 0;

@@ -41,6 +41,9 @@ const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
 const StudentList = () => import('@/views/pages/student/StudentList')
 const StudentForm = () => import('@/views/pages/student/StudentForm')
+const CreateStudentAccount = () => import('@/views/components/Student/CreateAccount')
+const ChangeStudentPassword = () => import('@/views/components/Student/ChangePassword')
+const ChangeStudentUsername = () => import('@/views/components/Student/ChangeUsername')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
 const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
@@ -450,7 +453,27 @@ function configRoutes () {
                   path: ':studentId',
                   name: 'Student Edit',
                   component: StudentForm,
-                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                  meta: { requiresAuth: true, userType: 0, hideSubNav: true },
+                  children: [
+                    {
+                      path: 'account/create',
+                      name: 'Create Student Account',
+                      component: CreateStudentAccount,
+                      meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                    },
+                    {
+                      path: 'account/change-username',
+                      name: 'Change Student Username',
+                      component: ChangeStudentUsername,
+                      meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                    },
+                    {
+                      path: 'account/change-password',
+                      name: 'Change Student Password',
+                      component: ChangeStudentPassword,
+                      meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                    },
+                  ]
                 },
                 {
                   path: ':studentId/school-records',

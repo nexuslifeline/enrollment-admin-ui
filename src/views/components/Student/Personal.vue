@@ -96,18 +96,17 @@
         </b-form-group>
       </InputContainer>
     </InputGroup>
+    <template v-slot:footer>
+      <CardFooterRow>
+        <b-button variant="primary" @click="onSave">
+          Save Profile
+        </b-button>
+      </CardFooterRow>
+    </template>
   </Card>
 </template>
 <script>
-import Card from '../Card';
-import { InputGroup, InputContainer } from '../InputGroup';
-
 export default {
-  components: {
-    Card,
-    InputGroup,
-    InputContainer
-  },
   props: {},
   data() {
     return {
@@ -120,6 +119,11 @@ export default {
           states: {}
         }
       }
+    }
+  },
+  methods: {
+    onSave() {
+
     }
   }
 };

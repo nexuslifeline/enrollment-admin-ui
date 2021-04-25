@@ -4,6 +4,7 @@
       title="Education"
       actionLabel="Add Education"
       @onAddNew="onAddEduation"
+      titleSize="m"
       showAction>
       <div v-if="items.length > 0" class="education__list">
         <template v-for="(item, idx) in items">

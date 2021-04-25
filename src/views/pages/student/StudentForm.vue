@@ -1,14 +1,24 @@
 <template>
-  <BareContainer>
+  <CenterContainer>
     <Personal />
-  </BareContainer>
+    <Account />
+    <Address />
+    <Education />
+  </CenterContainer>
 </template>
 
 <script>
 import Personal from '../../components/Student/Personal';
+import Account from '../../components/Student/Account';
+import Address from '../../components/Student/Address';
+import Education from '../../components/Student/Education';
+
 export default {
   components: {
-    Personal
+    Personal,
+    Account,
+    Address,
+    Education
   }
 }
 </script>
