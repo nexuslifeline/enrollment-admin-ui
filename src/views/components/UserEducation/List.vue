@@ -3,7 +3,7 @@
     <Card
       title="Education"
       actionLabel="Add Education"
-      @onAddNew="onAddEduation"
+      @onAddNew="onAddEducation"
       titleSize="m"
       showAction>
       <div v-if="items.length > 0" class="education__list">
@@ -137,7 +137,7 @@ export default {
       reset(education)
       copyValue(item, education.fields)
     },
-    onAddEduation() {
+    onAddEducation() {
       const { education } = this.forms
       this.selected = {}
       this.isShown = true

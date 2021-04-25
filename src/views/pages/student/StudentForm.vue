@@ -1,6 +1,6 @@
 <template>
   <CenterContainer>
-    <Personal />
+    <Personal :data="{ id: 1, userable: {} }" />
     <Account />
     <Address />
     <Education />

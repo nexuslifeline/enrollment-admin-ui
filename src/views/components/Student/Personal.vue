@@ -96,6 +96,24 @@
         </b-form-group>
       </InputContainer>
     </InputGroup>
+    <LinkVisibilityToggler
+      linkText="Upload Student Photo"
+      hideLinkText="Hide Student Photo"
+      :hideOnContentShow="false">
+      <template>
+        <div>
+          <AvatarMaker
+            @onPhotoChange="onPhotoChange"
+            :avatarId="data.id"
+            :size="130"
+            :text="avatarText"
+            :src="userPhoto"
+            :borderSize="3"
+            enableUpload
+          />
+        </div>
+      </template>
+    </LinkVisibilityToggler>
     <template v-slot:footer>
       <CardFooterRow>
         <b-button variant="primary" @click="onSave">
@@ -106,8 +124,27 @@
   </Card>
 </template>
 <script>
+import AvatarMaker from '../AvatarMaker';
 export default {
-  props: {},
+  props: {
+    data: {
+      type: [Object]
+    }
+  },
+  components: {
+    AvatarMaker
+  },
+  computed: {
+    avatarText() {
+      const { userable } = this.data;
+      return `${userable?.firstName?.charAt(0) || '?'}${userable?.lastName?.charAt(0) || ''}`
+    },
+    userPhoto() {
+      const { userable } = this.data;
+      const path = userable?.photo?.hashName || '';
+      return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
+    },
+  },
   data() {
     return {
       forms: {
@@ -123,6 +160,9 @@ export default {
   },
   methods: {
     onSave() {
+
+    },
+    onPhotoChange(file) {
 
     }
   }

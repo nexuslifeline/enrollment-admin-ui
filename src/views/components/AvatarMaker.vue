@@ -1,6 +1,7 @@
 <template>
   <div class="avatar-maker__container"
     :class="{ uploadable: enableUpload }"
+    :style="{ height: `${size}px`, width: `${size}px` }"
     @click.stop="onBrowseClick">
     <b-avatar
       blank

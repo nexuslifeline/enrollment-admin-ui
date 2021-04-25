@@ -14,7 +14,7 @@
           @onPhotoChange="onPhotoChange"
           :avatarId="user.id"
           :size="110"
-          :text="`${user.userable.firstName.charAt(0)}${userable.lastName.charAt(0)}`"
+          :text="`${userable.firstName.charAt(0)}${userable.lastName.charAt(0)}`"
           :src="userPhoto"
           :borderSize="3"
           enableUpload
