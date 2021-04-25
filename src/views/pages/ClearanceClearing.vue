@@ -15,9 +15,8 @@
         placeholder="Search"
       />
       <vSelectCategory
-        @input="loadClearances(), loadCourses(), loadLevels()"
-        v-model="filters.clearance.schoolCategoryId"
-        :reduce="(item) => item.id"
+        @input="onCategoryFilterChange"
+        v-model="filters.clearance.schoolCategoryItem"
         label="name"
         placeholder="School Category"
       />
@@ -32,10 +31,9 @@
       /> -->
       <v-select
         v-if="isCourseVisible"
-        @input="loadLevelsOfCourse(), loadSections(), loadClearances()"
+        @input="onCourseFilterChange"
         :options="options.courses.items"
-        v-model="filters.clearance.courseId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.courseItem"
         placeholder="Course"
         class="mt-2"
         label="name"
@@ -46,28 +44,25 @@
       </v-select>
       <v-select
         v-if="isCourseVisible"
-        @input="loadSections(), loadClearances()"
+        @input="onSemesterFilterChange"
         :options="$options.Semesters.values"
-        v-model="filters.clearance.semesterId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.semesterItem"
         label="name"
         placeholder="Semester"
         class="mt-2"
       />
       <v-select
-        @input="loadSections(), loadClearances()"
+        @input="onLevelFilterChange"
         :options="options.levels.items"
-        v-model="filters.clearance.levelId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.levelItem"
         label="name"
         placeholder="Level"
         class="mt-2"
       />
       <v-select
-        @input="loadClearances()"
+        @input="onSectionFilterChange"
         :options="options.sections.items"
-        v-model="filters.clearance.sectionId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.sectionItem"
         label="name"
         placeholder="Section"
         class="mt-2"
@@ -134,7 +129,7 @@
                 :per-page="paginations.clearance.perPage"
                 size="sm"
                 align="end"
-                @input="loadClearances()"
+                @input="onSaveClearance()"
               />
             </b-col>
           </b-row>
@@ -227,11 +222,16 @@ export default {
       filters: {
         clearance: {
           criteria: null,
+          schoolCategoryItem: null,
           schoolCategoryId: null,
           schoolYearId: null,
+          courseItem: null,
           courseId: null,
+          levelItem: null,
           levelId: null,
+          semesterItem: null,
           semesterId: null,
+          sectionItem: null,
           sectionId: null,
         }
       },
@@ -386,6 +386,42 @@ export default {
       }).catch(error => {
         console.log(error)
       })
+    },
+    onCategoryFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.schoolCategoryId = item?.id || 0;
+      clearance.schoolCategoryItem = item;
+      this.loadClearances()
+      this.loadCourses()
+      this.loadLevels()
+    },
+    onSemesterFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.semesterId = item?.id || 0;
+      clearance.semesterItem = item;
+      this.loadSections()
+      this.loadClearances()
+    },
+    onCourseFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.courseId = item?.id || 0;
+      clearance.courseItem = item;
+      this.loadLevelsOfCourse()
+      this.loadSections()
+      this.loadClearances()
+    },
+    onLevelFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.levelId = item?.id || 0;
+      clearance.levelItem = item;
+      this.loadSections()
+      this.loadClearances()
+    },
+    onSectionFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.sectionId = item?.id || 0;
+      clearance.sectionItem = item;
+      this.loadClearances()
     },
   },
   computed: {

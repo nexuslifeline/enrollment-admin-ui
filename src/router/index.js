@@ -12,6 +12,7 @@ const Setting = () => import('@/views/pages/settings/Setting')
 const OrganizationSetting = () => import('@/views/pages/settings/OrganizationSetting')
 const GeneralSetting = () => import('@/views/pages/settings/GeneralSetting')
 const TermsSetting = () => import('@/views/pages/settings/TermsSetting')
+const GradingPeriodSetting = () => import('@/views/pages/settings/GradingPeriodSetting')
 const RequirementsSetting = () => import('@/views/pages/settings/RequirementsSetting')
 
 
@@ -598,36 +599,29 @@ function configRoutes () {
               meta: { requiresAuth: true }
             },
             {
-              path: 'settings',
-              name: 'Settings',
-              component: Setting,
-              children: [
-                {
-                  path: 'general-setting',
-                  name: 'GeneralSetting',
-                  component: GeneralSetting,
-                  meta: { requiresAuth: true, hideSubNav: true }
-                },
-                {
-                  path: 'organization-setting',
-                  name: 'OrganizationSetting',
-                  component: OrganizationSetting,
-                  meta: { requiresAuth: true, hideSubNav: true }
-                },
-                {
-                  path: 'terms-setting',
-                  name: 'TermsSetting',
-                  component: TermsSetting,
-                  meta: { requiresAuth: true, hideSubNav: true }
-                },
-                {
-                  path: 'requirements-setting',
-                  name: 'Requirements Setting',
-                  component: RequirementsSetting,
-                  meta: { requiresAuth: true, hideSubNav: true }
-                },
-              ]
-            }
+              path: 'organization-setting',
+              name: 'OrganizationSetting',
+              component: OrganizationSetting,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'terms-setting',
+              name: 'TermsSetting',
+              component: TermsSetting,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'grading-period-setting',
+              name: 'Grading Period Setting',
+              component: GradingPeriodSetting,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'requirements-setting',
+              name: 'Requirements Setting',
+              component: RequirementsSetting,
+              meta: { requiresAuth: true }
+            },
           ]
         },
         {

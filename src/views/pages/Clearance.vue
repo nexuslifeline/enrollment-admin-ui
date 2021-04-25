@@ -27,18 +27,16 @@
         :clearable="checkIfAllowedAll()"
       />-->
       <vSelectCategory
-        @input="loadSchoolCategoryInfo(), loadSections(), loadClearances()"
-        v-model="filters.clearance.schoolCategoryId"
-        :reduce="item => item.id"
+        @input="onCategoryFilterChange"
+        v-model="filters.clearance.schoolCategoryItem"
         label="name"
         placeholder="School Category"
       />
       <v-select
         v-if="isCourseVisible"
-        @input="loadLevelsOfCourse($event), loadSections(), loadClearances()"
+        @input="onCourseFilterChange"
         :options="options.courses.items"
-        v-model="filters.clearance.courseId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.courseItem"
         placeholder="Course"
         class="mt-2"
         label="name"
@@ -49,32 +47,29 @@
       </v-select>
       <v-select
         v-if="isCourseVisible"
-        @input="loadSections(), loadClearances()"
+        @input="onSemesterFilterChange"
         :options="$options.Semesters.values"
-        v-model="filters.clearance.semesterId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.semesterItem"
         label="name"
         placeholder="Semester"
         class="mt-2"
       />
       <v-select
-        @input="loadSections(), loadClearances()"
+        @input="onLevelFilterChange"
         :options="options.levels.items"
-        v-model="filters.clearance.levelId"
-        :reduce="(item) => item.id"
+        v-model="filters.clearance.levelItem"
         label="name"
         placeholder="Level"
         class="mt-2"
       />
       <v-select
-          @input="loadClearances()"
-          :options="options.sections.items"
-          v-model="filters.clearance.sectionId"
-          :reduce="(item) => item.id"
-          label="name"
-          placeholder="Section"
-          class="mt-2"
-        />
+        @input="onSectionFilterChange"
+        :options="options.sections.items"
+        v-model="filters.clearance.sectionItem"
+        label="name"
+        placeholder="Section"
+        class="mt-2"
+      />
     </template>
     <template v-slot:extra-buttons>
       <div class="ml-1 drop-down__container" >
@@ -635,11 +630,16 @@ export default {
       filters: {
         clearance: {
           criteria: null,
+          schoolCategoryItem: null,
           schoolCategoryId: null,
           // schoolYearId: null,
+          courseItem: null,
           courseId: null,
+          semesterItem: null,
           semesterId: null,
+          levelItem: null,
           levelId: null,
+          sectionItem: null,
           sectionId: null
         }
       }
@@ -823,7 +823,7 @@ export default {
         fields.signatories.push({
           personnelId: null,
           pivot: {
-            description: null
+            description: null,
           }
         })
         return
@@ -833,7 +833,8 @@ export default {
       fields.signatories.push({
         pivot: {
           personnelId: null,
-          description: null
+          description: null,
+          subjectId: null
         }
       })
     },
@@ -924,7 +925,43 @@ export default {
         showNotification(this, 'success', 'Clearance deleted successfully.');
         this.showModalConfirmation = false;
       });
-    }
+    },
+    onCategoryFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.schoolCategoryId = item?.id || 0;
+      clearance.schoolCategoryItem = item;
+      this.loadSchoolCategoryInfo()
+      this.loadSections()
+      this.loadClearances()
+    },
+    onSemesterFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.semesterId = item?.id || 0;
+      clearance.semesterItem = item;
+      this.loadSections()
+      this.loadClearances()
+    },
+    onCourseFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.courseId = item?.id || 0;
+      clearance.courseItem = item;
+      this.loadLevelsOfCourse(clearance.courseId)
+      this.loadSections()
+      this.loadClearances()
+    },
+    onLevelFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.levelId = item?.id || 0;
+      clearance.levelItem = item;
+      this.loadSections()
+      this.loadClearances()
+    },
+    onSectionFilterChange(item) {
+      const { clearance } = this.filters;
+      clearance.sectionId = item?.id || 0;
+      clearance.sectionItem = item;
+      this.loadClearances()
+    },
   },
   computed: {
     isCourseVisible() {
