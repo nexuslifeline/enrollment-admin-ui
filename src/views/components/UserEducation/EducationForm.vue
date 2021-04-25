@@ -27,8 +27,13 @@
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
-        <label>Degree</label>
-        <b-form-input v-model="form.fields.degree" />
+        <label class="required">Degree</label>
+        <b-form-input
+          v-model="form.fields.degree"
+          :state="form.states.degree"/>
+        <b-form-invalid-feedback>
+          {{ form.errors.degree }}
+        </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group>
         <label>Field of Study</label>
@@ -43,7 +48,7 @@
               type="text"
               name="phone"
               class="form-control"
-              v-model="form.fields.start"
+              v-model="form.fields.startYear"
               :mask="[/\d/, /\d/, /\d/, /\d/]"
               :guide="true"
               :showMask="false"
@@ -58,7 +63,7 @@
               type="text"
               name="phone"
               class="form-control"
-              v-model="form.fields.end"
+              v-model="form.fields.endYear"
               :mask="[/\d/, /\d/, /\d/, /\d/]"
               :guide="true"
               :showMask="false"
@@ -69,7 +74,7 @@
         </InputContainer>
       </InputGroup>
       <b-form-group>
-        <label class="required">Societies or Activities</label>
+        <label >Societies or Activities</label>
         <b-form-textarea
           v-model="form.fields.societies"
           :state="form.states.societies"/>

@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Section and Schedule Management"
+    :title="`Section and Schedule Management (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadSections"
     :filterVisible="isFilterVisible"
@@ -906,12 +906,6 @@ export default {
             //   tdClass: "align-middle",
             //   thStyle: { width: "auto" },
             // },
-            {
-              key: 'schoolYear.name',
-              label: 'School Year',
-              tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
-            },
             {
               key: 'schoolCategory.name',
               label: 'Category',

@@ -140,9 +140,9 @@
               <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
               <b-dropdown-item @click.prevent="loadDetails(row)">
                 {{
-                  row.item.evaluationStatusId ===
-                  evaluationStatuses.APPROVED.id
-                    ? 'View Details'
+                  row.item.evaluationStatusId !=
+                  evaluationStatuses.SUBMITTED.id
+                    ? 'View Record'
                     : 'Review Record'
                 }}
               </b-dropdown-item>
