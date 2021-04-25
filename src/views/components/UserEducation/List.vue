@@ -133,12 +133,14 @@ export default {
       const { education } = this.forms
       this.selected = { ...item };
       this.isShown = true;
+      reset(education)
       copyValue(item, education.fields)
     },
     onAddEduation() {
       const { education } = this.forms
       this.selected = {}
       this.isShown = true
+      reset(education)
       clearFields(education.fields)
     }
   }
