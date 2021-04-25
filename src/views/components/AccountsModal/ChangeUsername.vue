@@ -7,7 +7,7 @@
     :noCloseOnBackdrop="true"
     bodyClass="modal-body__container"
     :centered="true"
-    @hidden="$router.push({ name: 'Student Edit', params: { studentId: $route.params.studentId } })">
+    @hidden="$router.push(previousRoute)">
     <div class="modal-field-container">
       <b-form-group>
         <label class="required">Username</label>
@@ -30,6 +30,14 @@
 import FooterAction from '../ModalFooter/ActionBar';
 
 export default {
+  props: {
+    previousRoute: {
+      type: Object
+    },
+    user: {
+      type: Object
+    }
+  },
   components: {
     FooterAction
   },
@@ -41,7 +49,7 @@ export default {
   },
   methods: {
     onSave() {
-
+      alert('PUT users/:id/change-username')
     }
   }
 };

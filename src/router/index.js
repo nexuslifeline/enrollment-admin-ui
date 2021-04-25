@@ -42,8 +42,8 @@ const Section = () => import('@/views/pages/Section')
 const StudentList = () => import('@/views/pages/student/StudentList')
 const StudentForm = () => import('@/views/pages/student/StudentForm')
 const CreateStudentAccount = () => import('@/views/components/Student/CreateAccount')
-const ChangeStudentPassword = () => import('@/views/components/Student/ChangePassword')
-const ChangeStudentUsername = () => import('@/views/components/Student/ChangeUsername')
+const ChangeStudentPassword = () => import('@/views/components/AccountsModal/ChangePassword')
+const ChangeStudentUsername = () => import('@/views/components/AccountsModal/ChangeUsername')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
 const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
@@ -441,7 +441,21 @@ function configRoutes () {
                   path: '/',
                   name: 'Student List',
                   component: StudentList,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0 },
+                  children: [
+                    {
+                      path: 'account/:studentId/change-username',
+                      name: 'List Change Student Username',
+                      component: ChangeStudentUsername,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'account/:studentId/change-password',
+                      name: 'List Change Student Password',
+                      component: ChangeStudentPassword,
+                      meta: { requiresAuth: true }
+                    },
+                  ]
                 },
                 {
                   path: 'add',
@@ -459,19 +473,19 @@ function configRoutes () {
                       path: 'account/create',
                       name: 'Create Student Account',
                       component: CreateStudentAccount,
-                      meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'account/change-username',
                       name: 'Change Student Username',
                       component: ChangeStudentUsername,
-                      meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'account/change-password',
                       name: 'Change Student Password',
                       component: ChangeStudentPassword,
-                      meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                      meta: { requiresAuth: true, hideSubNav: true }
                     },
                   ]
                 },

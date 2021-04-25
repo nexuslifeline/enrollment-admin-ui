@@ -28,7 +28,7 @@ export default {
     onUpdatePassword() {
       this.$router.push({
         name: 'Change Student Password',
-        params: { studentId: this.$route.params.studentId }
+        params: { ...this.$route.params }
       });
     }
   }

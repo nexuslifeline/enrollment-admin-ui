@@ -34,7 +34,7 @@ export default {
     onChangeUsername() {
       this.$router.push({
         name: 'Change Student Username',
-        params: { studentId:  this.$route.params.studentId }
+        params: { ...this.$route.params }
       });
     }
   }

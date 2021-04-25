@@ -155,27 +155,21 @@
                     :to="`/master-files/student/${row.item.id}`"
                     :disabled="showStudentEntry"
                   >
-                    Edit Student Info
+                    Edit Student Profile
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible(
+                    v-if="isAccessible(
                         $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
-                      ) & showRowActionButton
-                    "
-                    @click="setUpdateUser(row), entryMode = 'Edit User', showModalUpdateUser = true"
-                    :disabled="showModalUpdateUser"
+                      ) & showRowActionButton"
+                    :to="`/master-files/student/account/${row.item.id}/change-username`"
                   >
-                    Edit Username
+                    Change Username
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
-                      ) & showRowActionButton
-                    "
-                    @click="setUpdateUser(row), entryMode = 'Change Password', showModalChangePassword = true"
-                    :disabled="showModalChangePassword"
+                    v-if="isAccessible(
+                      $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
+                    ) & showRowActionButton"
+                    :to="`/master-files/student/account/${row.item.id}/change-password`"
                   >
                     Change Password
                   </b-dropdown-item>
@@ -224,18 +218,17 @@
         </b-row>
         <!-- end table -->
       </div>
-      <b-modal
+      
+      <!-- <b-modal
         @shown="$refs.username.focus()"
         v-model="showModalUpdateUser"
         :noCloseOnEsc="true"
         :noCloseOnBackdrop="true"
       >
         <div slot="modal-title">
-          <!-- modal title -->
           User Account - Edit Username
         </div>
-        <!-- modal title -->
-        <!-- modal body -->
+
         <b-row>
           <b-col md="12">
             <b-form-group>
@@ -252,9 +245,7 @@
             </b-form-group>
           </b-col>
         </b-row>
-        <!-- modal body -->
         <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
           <b-button
             variant="outline-danger"
             class="float-left btn-close"
@@ -272,7 +263,6 @@
             Save
           </b-button>
         </div>
-        <!-- modal footer buttons -->
       </b-modal>
 
       <b-modal
@@ -282,11 +272,8 @@
         :noCloseOnBackdrop="true"
       >
         <div slot="modal-title">
-          <!-- modal title -->
           User Account - Change Password
         </div>
-        <!-- modal title -->
-        <!-- modal body -->
         <b-row>
           <b-col md="12">
             <b-form-group>
@@ -312,9 +299,7 @@
             </b-form-group>
           </b-col>
         </b-row>
-        <!-- modal body -->
         <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
           <b-button
             variant="outline-danger"
             class="float-left btn-close"
@@ -332,8 +317,7 @@
             Save
           </b-button>
         </div>
-        <!-- modal footer buttons -->
-      </b-modal>
+      </b-modal> -->
 
       <b-modal
         v-model="showModalConfirmation"
@@ -428,6 +412,9 @@
         :isBusy="file.isLoading"
         @close="showModalFileViewer = false"
       />
+      <router-view :previousRoute="{ name: 'Student List' }">
+
+      </router-view>
     </template>
   </PageContent>
 </template>
@@ -628,8 +615,8 @@ export default {
       showModalPreview: false,
       showModalFileViewer: false,
       showStudentEntry: false,
-      showModalUpdateUser: false,
-      showModalChangePassword: false,
+      //showModalUpdateUser: false,
+      //showModalChangePassword: false,
       showModalConfirmation: false,
       isProfilePhotoBusy: false,
       isProcessing: false,
@@ -878,55 +865,56 @@ export default {
             this.isProcessing = false;
             this.showBulletedNotification(errors);
           });
-      } else if (this.entryMode == 'Edit User') {
-        this.isUserSaving = true;
-        student.fields.email = user.fields.username;
-        const data = {
-          id: student.fields.id,
-          // email: student.fields.email,
-          user: { username: user.fields.username },
-        };
-        this.updateStudent(data, studentId)
-          .then(({ data }) => {
-            this.updateRow(students, data);
-            showNotification(
-              this,
-              'success',
-              "Student's Account is updated successfully."
-            );
-            this.showModalUpdateUser = false;
-            this.isUserSaving = false;
-          })
-          .catch((error) => {
-            const errors = error.response.data.errors;
-            validate(user, errors);
-            this.isUserSaving = false;
-          });
-      } else if (this.entryMode == 'Change Password') {
-        this.isUserSaving = true;
-        student.fields.email = user.fields.username;
-        const data = {
-          id: student.fields.id,
-          user: { password: user.fields.password, passwordConfirmation: user.fields.passwordConfirmation },
-        };
+      } 
+      // else if (this.entryMode == 'Edit User') {
+      //   this.isUserSaving = true;
+      //   student.fields.email = user.fields.username;
+      //   const data = {
+      //     id: student.fields.id,
+      //     // email: student.fields.email,
+      //     user: { username: user.fields.username },
+      //   };
+      //   this.updateStudent(data, studentId)
+      //     .then(({ data }) => {
+      //       this.updateRow(students, data);
+      //       showNotification(
+      //         this,
+      //         'success',
+      //         "Student's Account is updated successfully."
+      //       );
+      //       this.showModalUpdateUser = false;
+      //       this.isUserSaving = false;
+      //     })
+      //     .catch((error) => {
+      //       const errors = error.response.data.errors;
+      //       validate(user, errors);
+      //       this.isUserSaving = false;
+      //     });
+      // } else if (this.entryMode == 'Change Password') {
+      //   this.isUserSaving = true;
+      //   student.fields.email = user.fields.username;
+      //   const data = {
+      //     id: student.fields.id,
+      //     user: { password: user.fields.password, passwordConfirmation: user.fields.passwordConfirmation },
+      //   };
 
-        this.updateStudent(data, studentId)
-          .then(({ data }) => {
-            this.updateRow(students, data);
-            showNotification(
-              this,
-              'success',
-              "Student's Account is updated successfully."
-            );
-            this.showModalChangePassword = false;
-            this.isUserSaving = false;
-          })
-          .catch((error) => {
-            const errors = error.response.data.errors;
-            validate(user, errors);
-            this.isUserSaving = false;
-          });
-      }
+      //   this.updateStudent(data, studentId)
+      //     .then(({ data }) => {
+      //       this.updateRow(students, data);
+      //       showNotification(
+      //         this,
+      //         'success',
+      //         "Student's Account is updated successfully."
+      //       );
+      //       this.showModalChangePassword = false;
+      //       this.isUserSaving = false;
+      //     })
+      //     .catch((error) => {
+      //       const errors = error.response.data.errors;
+      //       validate(user, errors);
+      //       this.isUserSaving = false;
+      //     });
+      // }
     },
     setUpdateUser(row) {
       const { student, user } = this.forms;

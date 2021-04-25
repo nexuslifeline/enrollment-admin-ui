@@ -10,7 +10,9 @@
       <hr />
       <PasswordItem />
     </template>
-    <router-view></router-view>
+    <router-view
+      :previousRoute="{ name: 'Student Edit', params: { ...$route.params } }">
+    </router-view>
   </Card>
 </template>
 <script>
