@@ -334,9 +334,13 @@ export default [
         to: '/setting/terms-setting'
       },
       {
+        label: 'Grading Period Setting',
+        to: '/setting/grading-period-setting'
+      },
+      {
         label: 'Requirements Setting',
         to: '/setting/requirements-setting',
-        permissionIds: CoursePermissions.getIds()
+        // permissionIds: CoursePermissions.getIds()
       }
     ]
   },

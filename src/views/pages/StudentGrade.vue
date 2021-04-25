@@ -4,7 +4,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadStudents()"
     :filterVisible="isFilterVisible"
-    :createButtonVisible="false">
+    :createButtonVisible="false"
+    showBottomActions>
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
@@ -23,48 +24,36 @@
         class="mt-2"
       />-->
       <vSelectCategory
-        @input="loadSectionsOfPersonnel()"
-        v-model="filters.student.schoolCategoryId"
-        :reduce="(item) => item.id"
+        @input="onCategoryFilterChange"
+        v-model="filters.student.schoolCategoryItem"
         label="name"
         placeholder="School Category"
       />
       <v-select
         v-if="isCourseVisible"
-        @input="loadSectionsOfPersonnel()"
+        @input="onSemesterFilterChange"
         :options="$options.Semesters.values"
-        v-model="filters.student.semesterId"
-        :reduce="(item) => item.id"
+        v-model="filters.student.semesterItem"
         label="name"
         placeholder="Semester"
         class="mt-2"
       />
       <v-select
-        @input="loadSubjectsOfSection()"
+        @input="onSectionFilterChange"
         :options="options.sections.items"
-        v-model="filters.student.sectionId"
-        :reduce="(item) => item.id"
+        v-model="filters.student.sectionItem"
         label="name"
         placeholder="Section"
         class="mt-2"
       />
       <v-select
-        @input="loadStudents()"
+        @input="onSubjectFilterChange"
         :options="options.subjects.items"
-        v-model="filters.student.subjectId"
-        :reduce="(item) => item.id"
+        v-model="filters.student.subjectItem"
         label="name"
         placeholder="Subject"
         class="mt-2"
       />
-      <b-button
-        :disabled="tables.students.items.length == 0"
-        block
-        class="mt-5" @click="onSaveStudentGrade()"
-        variant="primary">
-        <v-icon v-if="isProcessing" name="spinner" spin />
-        Save
-      </b-button>
     </template>
     <template v-slot:content>
       <b-row>
@@ -88,20 +77,20 @@
                 }"
               />
             </template>
-            <template v-slot:head(terms)>
+            <template v-slot:head(gradingPeriods)>
               <div class="cell-term__header">
-                <div v-for="term in terms" :key="term.id">
-                  {{ term.name }}
+                <div v-for="gradingPeriod in gradingPeriods" :key="gradingPeriod.id">
+                  {{ gradingPeriod.name }}
                 </div>
               </div>
             </template>
-            <template v-slot:cell(terms)="{ item }">
-              <div class="cell-term" v-if="item.grades">
+            <template v-slot:cell(gradingPeriods)="{ item }">
+              <div class="cell-gradingPeriod" v-if="item.grades">
                 <vue-autonumeric
-                  v-for="term in terms"
-                  v-model="item.grades.find(d => d.id === term.id).pivot.grade"
-                  :key="term.id"
-                  class="form-control text-right cell-term-input"
+                  v-for="gradingPeriod in gradingPeriods"
+                  v-model="item.grades.find(d => d.id === gradingPeriod.id).pivot.grade"
+                  :key="gradingPeriod.id"
+                  class="form-control text-right cell-gradingPeriod-input"
                   :options="[
                     {
                       minimumValue: 0,
@@ -119,7 +108,7 @@
                 <strong>Loading...</strong>
               </div>
             </template>
-            <template v-slot:cell(action)="{item}">
+            <!-- <template v-slot:cell(action)="{item}">
               <b-btn
                 @click="onFinalizeGrade(item)"
                 :disabled="item.grades.some(d => d.pivot.grade === 0 || d.grade === null)"
@@ -128,9 +117,9 @@
                 <v-icon v-if="!item.isFinalizing" name="check" />
                 <v-icon v-else name="spinner" spin />
               </b-btn>
-            </template>
+            </template> -->
           </b-table>
-          <b-row>
+          <!-- <b-row>
             <b-col md="6">
               Showing {{ paginations.student.from }} to
               {{ paginations.student.to }} of
@@ -147,16 +136,34 @@
                 @input="loadStudents()"
               />
             </b-col>
-          </b-row>
+          </b-row> -->
         </b-col>
       </b-row>
+    </template>
+    <template v-slot:bottom-actions>
+      <b-button
+        class="btn-save"
+        :disabled="tables.students.items.length == 0"
+        @click="onSaveStudentGrade()"
+        variant="primary">
+        <v-icon v-if="isProcessing" name="spinner" spin />
+        Save
+      </b-button>
+      <b-button
+        class="btn-save"
+        :disabled="tables.students.items.length == 0"
+        @click="onFinalizeGrade()"
+        variant="primary">
+        <v-icon v-if="isFinalizing" name="spinner" spin />
+        Finalize
+      </b-button>
     </template>
   </PageContent>
 </template>
 <script>
 import PageContent from "../components/PageContainer/PageContent";
 import { SchoolCategories, Semesters } from "../../helpers/enum"
-import { SchoolYearApi, PersonnelApi, SubjectApi, StudentApi, TermApi, AcademicRecordApi } from '../../mixins/api';
+import { SchoolYearApi, PersonnelApi, SubjectApi, StudentApi, GradingPeriodApi, AcademicRecordApi } from '../../mixins/api';
 import { StudentColumn } from '../components/ColumnDetails';
 import { showNotification } from '../../helpers/forms';
 export default {
@@ -165,13 +172,14 @@ export default {
     PageContent,
     StudentColumn
   },
-  mixins: [ SchoolYearApi, SubjectApi, PersonnelApi, StudentApi, TermApi, AcademicRecordApi ],
+  mixins: [ SchoolYearApi, SubjectApi, PersonnelApi, StudentApi, GradingPeriodApi, AcademicRecordApi ],
   SchoolCategories, Semesters,
   data() {
     return {
       isFilterVisible: true,
       isProcessing: false,
-      terms: [],
+      isFinalizing: false,
+      gradingPeriods: [],
       tables: {
         students: {
           isBusy: false,
@@ -183,16 +191,16 @@ export default {
               thStyle: { width: '40%' },
             },
             {
-              key: 'terms',
+              key: 'gradingPeriods',
               label: '',
               tdClass: 'align-middle',
             },
-            {
-              key: 'action',
-              label: '',
-              tdClass: 'align-middle',
-              thStyle: { width: '40px' },
-            },
+            // {
+            //   key: 'action',
+            //   label: '',
+            //   tdClass: 'align-middle',
+            //   thStyle: { width: '40px' },
+            // },
           ],
           items: []
         },
@@ -209,9 +217,13 @@ export default {
       filters: {
         student: {
           criteria: null,
+          schoolCategoryItem: null,
           schoolCategoryId: null,
+          semesterItem: null,
           semesterId: null,
+          sectionItem: null,
           sectionId: null,
+          subjectItem: null,
           subjectId: null
         }
       },
@@ -236,15 +248,15 @@ export default {
       let { subjectId, sectionId, criteria } = this.filters.student
       const { student, student: { perPage, page } } = this.paginations
       const { students } = this.tables
-      const params = { paginate: true, perPage, page, criteria }
+      const params = { paginate: false, criteria }
       students.isBusy = true;
       subjectId = subjectId ?? 0
       sectionId = sectionId ?? 0
       this.getGradesOfAcademicRecords(subjectId, sectionId, params).then(({ data }) => {
-        students.items = data.data;
-        student.from = data.meta.from;
-        student.to = data.meta.to;
-        student.totalRows = data.meta.total;
+        students.items = data;
+        // student.from = data.meta.from;
+        // student.to = data.meta.to;
+        // student.totalRows = data.meta.total;
         students.isBusy = false;
       })
     },
@@ -262,6 +274,7 @@ export default {
     // },
     loadSectionsOfPersonnel() {
       const { student, student: { schoolCategoryId } } = this.filters
+
       const { id: schoolYearId } = this.$store.state.schoolYear
       if(!this.isCourseVisible) {
         student.semesterId = null
@@ -276,7 +289,7 @@ export default {
         }).catch(error => {
           console.log(error)
         })
-        this.loadTerms();
+        this.loadGradingPeriods();
       }
     },
     loadSubjectsOfSection() {
@@ -291,7 +304,7 @@ export default {
       const section = sections.items.find(s => s.id === sectionId)
       subjects.items = section.subjects ?? []
     },
-    loadTerms() {
+    loadGradingPeriods() {
       const { schoolCategoryId, semesterId } = this.filters.student
       const { id: schoolYearId } = this.$store.state.schoolYear
       const params = {
@@ -301,8 +314,8 @@ export default {
         schoolYearId,
       };
 
-      this.getTermList(params).then(({ data }) => {
-        this.terms = data
+      this.getGradingPeriodList(params).then(({ data }) => {
+        this.gradingPeriods = data
       });
     },
     onSaveStudentGrade() {
@@ -331,23 +344,51 @@ export default {
       })
     },
     onFinalizeGrade(item) {
-      const { id, grades } = item
-      this.$set(item, 'isFinalizing', true);
-      const data = {
-        id,
-        subjectId: this.filters.student.subjectId,
-        grades: grades.map(grade => {
-          return {
-            termId: grade.id,
-            grade: grade.pivot?.grade
-          }
-        })
-      }
+      this.isFinalizing = true
+      const { students } = this.tables
+      const data = students.items.map(student => {
+        return {
+          id: student.id,
+          sectionId: student.sectionId,
+          subjectId: this.filters.student.subjectId,
+          grades: student.grades.map(grade => {
+            return {
+              termId: grade.id,
+              grade: grade.pivot.grade
+            }
+          })
+        }
+      })
       this.finalizeGrade(data)
       .then(({ data }) => {
+        this.loadStudents()
         showNotification(this, 'success', 'Finalized successfully.');
-        item.isFinalizing = false
+        this.isFinalizing = false
       })
+    },
+    onCategoryFilterChange(item) {
+      const { student } = this.filters;
+      student.schoolCategoryId = item?.id || 0;
+      student.schoolCategoryItem = item;
+      this.loadSectionsOfPersonnel()
+    },
+    onSemesterFilterChange(item) {
+      const { student } = this.filters;
+      student.semesterId = item?.id || 0;
+      student.semesterItem = item;
+      this.loadSectionsOfPersonnel()
+    },
+    onSectionFilterChange(item) {
+      const { student } = this.filters;
+      student.sectionId = item?.id || 0;
+      student.sectionItem = item;
+      this.loadSubjectsOfSection()
+    },
+    onSubjectFilterChange(item) {
+      const { student } = this.filters;
+      student.subjectId = item?.id || 0;
+      student.subjectItem = item;
+      this.loadStudents()
     }
   },
   computed: {
@@ -369,10 +410,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.cell-term {
+.cell-gradingPeriod {
   display: flex;
   width: 100%;
-  .cell-term-input {
+  .cell-gradingPeriod-input {
     margin: 0 5px;
   }
 }
@@ -380,5 +421,9 @@ export default {
   display: flex;
   justify-content: space-around;
   width: 100%;
+}
+.btn-save {
+  width: 150px;
+  margin-right: 5px;
 }
 </style>
