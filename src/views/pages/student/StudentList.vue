@@ -4,7 +4,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadStudents"
     :filterVisible="isFilterVisible"
-    @create="$router.push(`/master-files/student/add`)"
+    @create="onAddNewStudent"
+    :isBusyCreating="isBusyCreating"
     :createButtonVisible="isAccessible($options.StudentPermissions.ADD.id) && showAddButton">
     <template v-slot:filters>
       <b-form-input
@@ -610,6 +611,7 @@ export default {
   StudentPermissions,
   data() {
     return {
+      isBusyCreating: false,
       isFilterVisible: true,
       selectedStudentId: null,
       showModalPreview: false,
@@ -1025,6 +1027,16 @@ export default {
       student.semesterItem = item;
       this.loadStudents();
     },
+    onAddNewStudent() {
+      this.isBusyCreating = true;
+      this.addStudent({}).then(({ data }) => {
+        this.isBusyCreating = false;
+        this.$router.push({ name: 'Student Edit', params: { studentId: data?.id } });
+      }).catch((error) => {
+        console.log(error);
+        this.isBusyCreating = false;
+      });
+    }
   },
   computed: {
     getActiveSchoolYearId() {

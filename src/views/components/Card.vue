@@ -84,10 +84,6 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-
-  @include for-size(phone-only) {
-    flex-direction: column;
-  }
 }
 
 .c-card__body {

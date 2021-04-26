@@ -1,11 +1,16 @@
 <template>
-  <button class="create-button" @click="$emit('create')">
-    <BIconPlus />
+  <button class="create-button" @click="$emit('create')" :disabled="isBusy">
+    <BSpinner v-if="isBusy" small type="grow" />
+    <BIconPlus v-else />
   </button>
 </template>
 <script>
 export default {
   props: {
+    isBusy: {
+      type: Boolean,
+      default: false
+    }
   },
 };
 </script>
