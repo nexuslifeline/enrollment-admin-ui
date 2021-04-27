@@ -26,7 +26,7 @@
               <td>{{ category.name }}</td>
               <template v-for="sem in $options.Semesters.values">
                 <td :key="sem.id">
-                  <Toggle @input="(v) => onToggleChange(v, category.id, sem.id)" />
+                  <Toggle @input="(v) => onToggleChange(v, category.id, sem.id)" :value="checkData(category.id, sem.id)"/>
                 </td>
               </template>
             </tr>
@@ -50,7 +50,7 @@
           ].includes(category.id)">
             <tr :key="category.id">
               <td>{{ category.name }}</td>
-              <td><Toggle @input="(v) => onToggleChange(v, category.id)" /></td>
+              <td><Toggle @input="(v) => onToggleChange(v, category.id)" :value="checkData(category.id, null)"/></td>
             </tr>
           </template>
         </template>
@@ -63,6 +63,7 @@
 import Card from '../../components/Card';
 import { SchoolCategories, Semesters } from '../../../helpers/enum';
 import Toggle from '../../components/Form/Toggle';
+import { SchoolCategoryApi } from '../../../mixins/api';
 
 export default {
   SchoolCategories,
@@ -71,14 +72,38 @@ export default {
     Toggle,
     Card,
   },
+  props: {
+    schoolYearId: {
+      type: Number
+    },
+    schoolCategoryModes: {
+      type: Array,
+      default: []
+    }
+  },
+  mixins: [ SchoolCategoryApi ],
   data() {
     return {
-
     };
   },
   methods: {
     onToggleChange(status, schoolCategoryid, semesterId) {
-      alert('update(PUT) here ===> ' + schoolCategoryid + ' MODE is ==> ' + status + ' SEM ===> ' + semesterId)
+      const { schoolYearId } = this
+      // alert('update(PUT) here ===> ' + schoolCategoryid + ' MODE is ==> ' + status + ' SEM ===> ' + semesterId)
+      const data = { schoolYearId, semesterId, isOpen: status }
+      this.updateSchoolCategoryMode(data, schoolCategoryid).then(({ data }) => {
+        const indx = this.schoolCategoryModes.findIndex(s => s.schoolCategoryid = schoolCategoryid)
+        if(indx){
+          this.schoolCategoryModes.splice(indx, 1, data)
+        }
+        else {
+          this.schoolCategoryModes.splice(indx, 0, data)
+        }
+      })
+    },
+    checkData(schoolCategoryId, semesterId) {
+      const schoolCat = this.schoolCategoryModes.find(s => s.schoolCategoryId === schoolCategoryId && s.semesterId === semesterId)
+      return schoolCat?.isOpen ? true : false
     }
   }
 }

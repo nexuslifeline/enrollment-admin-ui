@@ -3,6 +3,7 @@
     <div class="item__content">
       <vText size="m" weight="bold">{{ data.name }}</vText>
       <vText size="s" color="light">{{ data.description }}</vText>
+      <vText size="s" color="light">{{ data.schoolCategory.name }} <span v-if="data.semester">/ {{  data.semester.name }}</span></vText>
     </div>
     <div>
       <b-button @click="$emit('onEdit', data)" type="button" variant="outline-primary">

@@ -3,7 +3,8 @@
     <b-button v-if="showBack" variant="dark" @click="$emit('onBack')">
       Back
     </b-button>
-    <b-button variant="primary" class="ml-auto" @click="$emit('onContinue')">
+    <b-button variant="primary" class="ml-auto" @click="$emit('onContinue')" :disabled="isDisabled || isBusy">
+      <v-icon name="spinner" spin v-if="isBusy"></v-icon>
       {{ nextLabel }}
     </b-button>
   </div>
@@ -23,6 +24,14 @@ export default {
     showBack: {
       type: Boolean,
       default: true
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false
+    },
+    isBusy: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

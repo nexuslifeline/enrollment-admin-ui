@@ -6,8 +6,8 @@
       actionLabel="Add Term"
       @onAddNew="onAddTerm"
       showAction>
-      <div v-if="items.length > 0" class="terms__list">
-        <template v-for="(item, idx) in items">
+      <div v-if="options.billingTerms.items.length > 0" class="terms__list">
+        <template v-for="(item, idx) in options.billingTerms.items">
           <Item :data="item" :key="idx" @onEdit="onEditTerm" />
         </template>
       </div>
@@ -28,16 +28,21 @@
   </div>
 </template>
 <script>
-
-const termFields = {
-  name: null,
-  description: null,
-  schooolYearId: null
-};
-
+import { TermApi } from '../../../mixins/api';
+import { reset, clearFields, validate } from '../../../helpers/forms'
+import { copyValue } from '../../../helpers/extractor';
 import Card from '../Card';
 import Item from './Item';
 import TermForm from './TermForm';
+
+const termFields = {
+  id: null,
+  name: null,
+  description: null,
+  schoolYearId: null,
+  schoolCategoryId: null,
+  semesterId: null
+};
 
 export default {
   components: {
@@ -46,58 +51,104 @@ export default {
     TermForm
   },
   props: {
-    selected: {},
-    schooolYearId: {
+    schoolYearId: {
       type: Number
     }
   },
+  mixins: [ TermApi ],
   data() {
     return {
       isShown: false,
       forms: {
         term: {
-
+          fields: { ...termFields },
+          states: { ...termFields },
+          errors: { ...termFields },
         }
       },
-      items: [
-        {
-          id: 1,
-          name: 'Monthly',
-          description: 'Pays due monthly.'
-        },
-        {
-          id: 2,
-          name: 'Quarterly',
-          description: 'Pays due quarterly.'
-        },
-        {
-          id: 3,
-          name: 'Semi-Annual',
-          description: 'Pays due semi-annually.'
+      isDeleteBusy: false,
+      isConfirmBusy: false,
+      selected: {},
+      options: {
+        billingTerms: {
+          items: []
         }
-      ]
+      },
     }
   },
   created() {
-    alert('load list here base on School year id provided')
+    // alert('load list here base on School year id provided')
+    const { billingTerms } = this.options
+    const params = { paginate: false, schoolYearId: this.schoolYearId}
+    this.getTermList(params).then(({ data }) => {
+      billingTerms.items = data
+    })
   },
   methods: {
     onAddTerm() {
-      this.selected = {};
-      this.isShown = true;
+      const { term } = this.forms
+      this.selected = {}
+      this.isShown = true
+      reset(term)
+      clearFields(term.fields)
     },
     onEditTerm(item) {
+      const { term } = this.forms
       this.selected = { ...item };
       this.isShown = true;
+      reset(term)
+      copyValue(item, term.fields)
     },
     onCreateTerm() {
-
+      this.isConfirmBusy = true
+      const { term } = this.forms
+      const { items } = this.options.billingTerms
+      reset(term)
+      term.fields.schoolYearId = this.schoolYearId
+      this.addTerm(term.fields).then(({ data }) => {
+        items.push(data)
+        this.isShown = false
+        this.isConfirmBusy = false
+        showNotification(this, 'success', 'Term has been added.')
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        validate(term, errors);
+        this.isConfirmBusy = false
+      });
     },
     onSaveTerm() {
-
+      this.isConfirmBusy = true
+      const { term, term: {fields: { id: termId }} } = this.forms
+      const { items } = this.options.billingTerms
+      reset(term)
+      this.updateTerm(term.fields, termId).then(({ data }) => {
+        const index = items.findIndex(item => item.id === this.selected.id)
+        items.splice(index, 1);
+        items.splice(index, 0, data);
+        this.isShown = false
+        this.isConfirmBusy = false
+        showNotification(this, 'success', 'Term has been updated.')
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        validate(term, errors);
+        this.isConfirmBusy = false
+      });
     },
     onDeleteTerm() {
-
+      this.isDeleteBusy = true
+      const { term: {fields: { id: termId }} } = this.forms
+      const { billingTerms } = this.options
+      this.deleteTerm(termId).then(({ data }) => {
+        billingTerms.items = billingTerms.items.filter(v => v?.id !== termId);
+        this.isShown = false
+        this.isDeleteBusy = false
+        showNotification(this, 'success', 'Term has been deleted.')
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        showNotification(this, 'danger', 'Sorry, unable to delete this record.')
+        this.isDeleteBusy = false
+        this.isShown = false;
+      });
     }
   }
 };
