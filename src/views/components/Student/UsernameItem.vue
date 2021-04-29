@@ -28,13 +28,16 @@ export default {
     },
     userGroup: {
       type: [String]
+    },
+    user: {
+      type: [Object]
     }
   },
   methods: {
     onChangeUsername() {
       this.$router.push({
         name: 'Change Student Username',
-        params: { ...this.$route.params }
+        params: { ...this.$route.params, user: { ...this.user } }
       });
     }
   }

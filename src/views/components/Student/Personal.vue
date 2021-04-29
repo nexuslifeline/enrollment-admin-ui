@@ -86,7 +86,7 @@
             <template v-slot:first>
               <b-form-select-option :value='null' disabled>--Select Civil Status --</b-form-select-option>
             </template>
-            <b-form-select-option v-for='civilStatus in []' :key='civilStatus.id' :value='civilStatus.id'>
+            <b-form-select-option v-for='civilStatus in $options.CivilStatuses.values' :key='civilStatus.id' :value='civilStatus.id'>
               {{ civilStatus.name }}
             </b-form-select-option>
           </b-form-select>
@@ -116,16 +116,35 @@
     </LinkVisibilityToggler>
     <template v-slot:footer>
       <CardFooterRow>
-        <b-button variant="primary" @click="onSave">
-          Save Profile
+        <b-button variant="primary" @click="onSave" :disabled="isProcessing">
+          <v-icon name="spinner" spin v-if="isProcessing"/> Save Profile
         </b-button>
       </CardFooterRow>
     </template>
   </Card>
 </template>
 <script>
+import { copyValue } from '../../../helpers/extractor';
+import { validate, reset, showNotification } from '../../../helpers/forms';
+import { StudentApi } from '../../../mixins/api';
 import AvatarMaker from '../AvatarMaker';
+import { CivilStatuses } from '../../../helpers/enum'
+
+const profileFields = {
+  id: null,
+  studentNo: null,
+  firstName: null,
+  middleName: null,
+  lastName: null,
+  mobileNo: null,
+  birthDate: null,
+  civilStatusId: null,
+  email: null,
+  isManual: 1,
+}
+
 export default {
+  CivilStatuses,
   props: {
     data: {
       type: [Object]
@@ -134,6 +153,7 @@ export default {
   components: {
     AvatarMaker
   },
+  mixins: [ StudentApi ],
   computed: {
     avatarText() {
       const { userable } = this.data;
@@ -144,26 +164,69 @@ export default {
       const path = userable?.photo?.hashName || '';
       return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
     },
+    studentId() {
+       const { userable } = this.data;
+       return userable?.id
+    }
   },
   data() {
     return {
       forms: {
         profile: {
-          fields: {
-
-          },
-          errors: {},
-          states: {}
+          fields: { ...profileFields },
+          errors: { ...profileFields },
+          states: { ...profileFields }
         }
-      }
+      },
+      isProcessing: false,
     }
+  },
+  mounted() {
+    const { profile } = this.forms
+    copyValue(this.data.userable, profile.fields)
   },
   methods: {
     onSave() {
+      this.isProcessing = true
+      const { profile, profile: { fields: { studentNo }} } = this.forms
+      // reset(profile)
 
+      profile.fields.studentNo = profile.fields.studentNo === "" ? null : profile.fields.studentNo
+
+      const payLoad = {
+        ...profile.fields,
+
+      }
+
+      console.log(payLoad)
+
+      reset(profile)
+
+      this.updateStudent(payLoad, this.studentId).then(({ data }) => {
+        this.data.userable = data
+        this.isProcessing = false
+        showNotification(this, 'success', 'Profile has been saved.')
+      }).catch(error => {
+        const errors = error.response.data.errors
+        validate(profile, errors)
+        this.isProcessing = false
+      })
     },
     onPhotoChange(file) {
-
+      const formData = new FormData();
+      formData.append('photo', file);
+      this.savePhoto(formData, this.studentId).then(({ data }) =>{
+        this.data.userable.photo = data
+      }).catch(error => {
+        const errors = error.response.data.errors
+        console.log(errors)
+      })
+    }
+  },
+  watch: {
+    'data.userable' : function(val) {
+      const { profile } = this.forms
+      copyValue(this.data.userable, profile.fields)
     }
   }
 };

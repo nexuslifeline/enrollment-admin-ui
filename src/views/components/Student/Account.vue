@@ -6,7 +6,7 @@
     titleSize="m"
     :showAction="!hasAccount">
     <template v-if="hasAccount">
-      <UsernameItem />
+      <UsernameItem :username="userable.user ? userable.user.username : ''" :user="data.userable.user"/>
       <hr />
       <PasswordItem />
     </template>
@@ -25,13 +25,13 @@ export default {
     PasswordItem
   },
   props: {
-    userable: {
+    data: {
       type: [Object]
     }
   },
   data() {
     return {
-      hasAccount: true,
+      hasAccount: false,
       forms: {
         profile: {
           fields: {
@@ -49,9 +49,24 @@ export default {
     },
     onAddNew() {
       this.$router.push({
-        name: 'Create Account',
+        name: 'Create Student Account',
         params: { studentId: this.$route.params.studentId }
       });
+    }
+  },
+  computed: {
+    // hasAccount() {
+    //   console.log(this.userable)
+    //   return !!this.userable?.user
+    // },
+    userable() {
+      const { userable } = this.data;
+      return userable
+    },
+  },
+  watch: {
+    'data.userable' : function(val) {
+      this.hasAccount = !!this.data.userable?.user
     }
   }
 };

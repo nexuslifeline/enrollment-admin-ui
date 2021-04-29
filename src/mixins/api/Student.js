@@ -47,5 +47,8 @@ export default {
     manualRegisterStudent(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/manual-registration`, data);
     },
+    addStudentUser(data, studentId){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${studentId}/user`, data);
+    }
   }
 }

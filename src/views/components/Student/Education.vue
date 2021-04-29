@@ -137,32 +137,99 @@
 
     <template v-slot:footer>
       <CardFooterRow>
-        <b-button variant="primary" @click="onSave">
-          Save Changes
+        <b-button variant="primary" @click="onSave" :disabled="isProcessing">
+          <v-icon name="spinner" spin v-if="isProcessing"/>  Save Education
         </b-button>
       </CardFooterRow>
     </template>
   </Card>
 </template>
 <script>
+
+const educationFields = {
+  lastSchoolAttended: null,
+  lastSchoolAddress: null,
+  lastSchoolYearFrom: null,
+  lastSchoolYearTo: null,
+  lastLevel: null,
+  elementaryCourse: null,
+  elementaryCourseYearFrom: null,
+  elementaryCourseYearTo: null,
+  elementaryCourseHonors: null,
+  highSchoolCourse: null,
+  highSchoolCourseYearFrom: null,
+  highSchoolCourseYearTo: null,
+  highSchoolCourseHonors: null,
+  seniorSchoolCourse: null,
+  seniorSchoolCourseYearFrom: null,
+  seniorSchoolCourseYearTo: null,
+  seniorSchoolCourseHonors: null,
+  collegeDegree: null,
+  collegeDegreeYearFrom: null,
+  collegeDegreeYearTo: null,
+  collegeDegreeHonors: null,
+}
+
+import { StudentApi } from '../../../mixins/api';
+import { copyValue } from '../../../helpers/extractor';
+import { validate, reset, showNotification } from '../../../helpers/forms';
+
 export default {
-  props: {},
+  props: {
+    data: {
+      type: [Object]
+    }
+  },
+  mixins: [ StudentApi ],
   data() {
     return {
       forms: {
         education: {
-          fields: {
-
-          },
-          errors: {},
-          states: {}
-        }
-      }
+          fields: { ...educationFields },
+          errors: { ...educationFields },
+          states: { ...educationFields }
+        },
+      },
+      isProcessing: false,
     }
   },
   methods: {
     onSave() {
+      this.isProcessing = true
+      const { education } = this.forms
+      reset(education)
 
+      const data = {
+        id: this.studentId,
+        education: {
+          ...education.fields
+        }
+      }
+
+      this.updateStudent(data, this.studentId).then(({ data }) => {
+        this.data.userable = data
+        this.isProcessing = false
+        showNotification(this, 'success', 'Education has been saved.')
+      }).catch(error => {
+        const errors = error.response.data.errors
+        validate(education, errors)
+        console.log(errors)
+        this.isProcessing = false
+      })
+    }
+  },
+  computed: {
+    studentId() {
+      const { userable } = this.data
+      return userable?.id
+    }
+  },
+  watch: {
+    'data.userable' : function(val) {
+      const { education } = this.forms
+      const { userable } = this.data
+      if(userable.education)
+      copyValue(userable.education, education.fields)
     }
   }
 };
