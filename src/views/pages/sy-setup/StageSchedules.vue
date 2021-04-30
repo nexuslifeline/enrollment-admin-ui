@@ -19,7 +19,6 @@ export default {
   },
   data() {
     return {
-      
     };
   },
   methods: {
@@ -27,6 +26,12 @@ export default {
       if (idx < this.selectedIndex) {
         this.selectedIndex = idx;
       }
+    },
+    onContinue() {
+
+    },
+    onBack() {
+      this.$emit('onBack')
     }
   }
 }

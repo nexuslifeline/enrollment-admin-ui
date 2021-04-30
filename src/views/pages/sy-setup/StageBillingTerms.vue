@@ -1,11 +1,12 @@
 <template>
   <div>
-    <BillingTermList :schoolYearId="1" />
+    <BillingTermList :schoolYearId="form.fields.id" />
     <ActionRow
       :showBack="true"
       nextLabel="Continue"
       @onContinue="onContinue"
       @onBack="onBack"
+      :isBusy="isProcessing"
     />
   </div>
 </template>
@@ -14,12 +15,16 @@
 import Card from '../../components/Card';
 import { InputGroup, InputContainer } from '../../components/InputGroup';
 import ActionRow from './ActionRow';
-import { SchoolCategories } from '../../../helpers/enum';
+import { SchoolCategories, SchoolYearStatuses } from '../../../helpers/enum';
 import Toggle from '../../components/Form/Toggle';
 import BillingTermList from '../../components/BillingTerms/List';
+import { SchoolYearApi } from '../../../mixins/api';
+import { copyValue } from '../../../helpers/extractor';
+import { showNotification } from '../../../helpers/forms';
 
 export default {
   SchoolCategories,
+  SchoolYearStatuses,
   components: {
     Card,
     InputGroup,
@@ -28,21 +33,41 @@ export default {
     Toggle,
     BillingTermList
   },
+  mixins: [ SchoolYearApi ],
+  props: {
+    form: {
+      type: Object
+    }
+  },
   data() {
     return {
-
+      isProcessing: false,
     };
   },
   methods: {
     onContinue() {
       // save here
-      alert('save here!')
+      // alert('save here!')
       // after saving
-      const nextStage = 2;
-      this.$emit('onContinue', nextStage);
+      // const nextStage = 2;
+      // this.$emit('onContinue', nextStage);
+      this.isProcessing = true
+      const { id: schoolYearId } = this.form.fields
+      const data = { schoolYearStatusId: this.$options.SchoolYearStatuses.SETUP_GRADING_PERIOD.id}
+
+      this.patchSchoolYear(data, schoolYearId).then(({ data }) => {
+        copyValue(data, this.form )
+        const nextStage = 2
+        this.$emit('onContinue', nextStage);
+        this.isProcessing = false
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        showNotification(this, 'danger', 'Error!')
+        this.isProcessing = false
+      });
     },
     onBack() {
-
+      this.$emit('onBack')
     }
   }
 }

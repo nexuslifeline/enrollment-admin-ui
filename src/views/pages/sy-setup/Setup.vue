@@ -18,21 +18,28 @@
         <template v-if="selectedIndex === 0">
           <StageSchoolYear
             @onContinue="(idx) => selectedIndex = idx"
+            :form="forms.schoolYear"
+            :schoolCategoryModes="schoolCategoryModes"
           />
         </template>
         <template v-if="selectedIndex === 1">
           <StageBillingTerms
             @onContinue="(idx) => selectedIndex = idx"
+            :form="forms.schoolYear"
+            @onBack ="selectedIndex -= 1"
           />
         </template>
         <template v-if="selectedIndex === 2">
           <StageGradingPeriod
             @onContinue="(idx) => selectedIndex = idx"
+            :form="forms.schoolYear"
+            @onBack ="selectedIndex -= 1"
           />
         </template>
         <template v-if="selectedIndex === 3">
           <StageSchedules
             @onContinue="(idx) => selectedIndex = idx"
+            @onBack ="selectedIndex -= 1"
           />
         </template>
       </div>
@@ -47,6 +54,18 @@ import StageBillingTerms from './StageBillingTerms';
 import StageGradingPeriod from './StageGradingPeriod';
 import StageSchedules from './StageSchedules';
 import { InputGroup, InputContainer } from '../../components/InputGroup';
+import { copyValue } from '../../../helpers/extractor';
+import { SchoolYearApi } from '../../../mixins/api';
+import { SchoolYearStatuses } from '../../../helpers/enum'
+
+
+const schoolYearFields = {
+  id: null,
+  name: null,
+  description: null,
+  startDate: null,
+  schoolYearStatusId: null
+}
 
 export default {
   components: {
@@ -58,8 +77,18 @@ export default {
     StageGradingPeriod,
     StageSchedules
   },
+  SchoolYearStatuses,
+  mixins: [ SchoolYearApi ],
   data() {
     return {
+      forms: {
+        schoolYear: {
+          fields: { ...schoolYearFields },
+          states: { ...schoolYearFields },
+          errors: { ...schoolYearFields }
+        }
+      },
+      schoolCategoryModes: [],
       selectedIndex: 0,
       stages: [
         {
@@ -81,13 +110,29 @@ export default {
       ]
     };
   },
+  created() {
+    const schoolYearId = this.$route.params?.id
+    if (schoolYearId && isNaN(schoolYearId)) {
+      this.$router.push('/master-files/school-year')
+      return
+    }
+
+    //load sy info
+    const { schoolYear } = this.forms
+    this.getSchoolYear(schoolYearId).then(({ data }) => {
+      copyValue(data, schoolYear.fields)
+      this.schoolCategoryModes = data.schoolCategoryModes
+      this.selectedIndex = data.schoolYearStatusId - 1
+    })
+
+  },
   methods: {
     onSelectStage(idx) {
       if (idx < this.selectedIndex) {
         this.selectedIndex = idx;
       }
     }
-  }
+  },
 }
 </script>
 <style lang="scss">

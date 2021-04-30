@@ -16,6 +16,9 @@ export default {
     },
     deleteSchoolYear(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/school-years/${id}`);
-    }
+    },
+    patchSchoolYear(data, id) {
+      return this.$authHttp.patch(`${apiPrefix}/${apiVersion}/school-years/${id}`, data);
+    },
   }
 }

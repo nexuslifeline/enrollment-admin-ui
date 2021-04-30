@@ -92,9 +92,12 @@ export default {
     },
     onSchoolYearOpen() {
       // create new school year with empty object data
-      alert('create(POST) school year here with empty object {} data. get the id in the response and redirect to the page');
-      const yearId = 1;
-      this.$router.push({ path: `/maintenance/school-year/${yearId}/setup` });
+      //alert('create(POST) school year here with empty object {} data. get the id in the response and redirect to the page');
+      //const yearId = 1;
+      const data = {}
+      this.addSchoolYear(data).then(({ data }) => {
+        this.$router.push({ path: `/maintenance/school-year/${data.id}/setup` });
+      })
     }
   },
   created() {

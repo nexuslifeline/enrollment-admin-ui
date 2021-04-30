@@ -707,3 +707,10 @@ export const Months = new Enum({
   NOVEMBER: { id: 11, name: 'November'},
   DECEMBER: { id: 12, name: 'December'}
 });
+
+export const SchoolYearStatuses = new Enum({
+  SETUP_SCHOOL_YEAR: { id: 1, name: 'Setup School Year' },
+  SETUP_BILLING_TERMS: { id: 2, name: 'Setup Billing Terms' },
+  SETUP_GRADING_PERIOD: { id: 3, name: 'Setup Grading Period' },
+  SETUP_SECTION_SCHEDULE: { id: 4, name: 'Setup Section and Schedule' },
+});

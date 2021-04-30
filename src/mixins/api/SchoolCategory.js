@@ -20,5 +20,8 @@ export default {
     getCoursesOfSchoolCategoryList(schoolCategoryId, params){
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/school-categories/${schoolCategoryId}/courses`, { params: params });
     },
+    updateSchoolCategoryMode(data, schoolCategoryId) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/school-categories/${schoolCategoryId}/modes`, data);
+    }
   }
 }
