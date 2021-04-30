@@ -154,7 +154,6 @@
                         showRowActionButton
                     "
                     :to="`/master-files/student/${row.item.id}`"
-                    :disabled="showStudentEntry"
                   >
                     Edit Student Profile
                   </b-dropdown-item>
@@ -162,7 +161,7 @@
                     v-if="isAccessible(
                         $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
                       ) & showRowActionButton"
-                    :to="`/master-files/student/account/${row.item.id}/change-username`"
+                    @click="onChangeUsername(row)"
                   >
                     Change Username
                   </b-dropdown-item>
@@ -413,8 +412,9 @@
         :isBusy="file.isLoading"
         @close="showModalFileViewer = false"
       />
-      <router-view :previousRoute="{ name: 'Student List' }">
-
+      <router-view
+        :user="selectedUser"
+        :previousRoute="{ name: 'Student List' }">
       </router-view>
     </template>
   </PageContent>
@@ -611,23 +611,24 @@ export default {
   StudentPermissions,
   data() {
     return {
+      selectedUser: {},
       isBusyCreating: false,
       isFilterVisible: true,
       selectedStudentId: null,
       showModalPreview: false,
       showModalFileViewer: false,
-      showStudentEntry: false,
+      // showStudentEntry: false,
       //showModalUpdateUser: false,
       //showModalChangePassword: false,
       showModalConfirmation: false,
-      isProfilePhotoBusy: false,
+      // isProfilePhotoBusy: false,
       isProcessing: false,
       isUserSaving: false,
       studentPhotoUrl: null,
       Countries: Countries,
       CivilStatuses: CivilStatuses,
       selectedPhoto: null,
-      entryMode: '',
+      // entryMode: '',
       activeTabIndex: 0,
       isLoading: false,
       file: {
@@ -637,33 +638,33 @@ export default {
         notes: null,
         isLoading: false,
       },
-      forms: {
-        student: {
-          fields: { ...studentFields },
-          states: { ...studentFields },
-          errors: { ...studentFields },
-        },
-        address: {
-          fields: { ...addressFields },
-          states: { ...addressErrorFields },
-          errors: { ...addressErrorFields },
-        },
-        family: {
-          fields: { ...familyFields },
-          states: { ...familyErrorFields },
-          errors: { ...familyErrorFields },
-        },
-        education: {
-          fields: { ...educationFields },
-          states: { ...educationFields },
-          errors: { ...educationFields },
-        },
-        user: {
-          fields: { ...userFields },
-          states: { ...userErrorFields },
-          errors: { ...userErrorFields },
-        },
-      },
+      // forms: {
+      //   student: {
+      //     fields: { ...studentFields },
+      //     states: { ...studentFields },
+      //     errors: { ...studentFields },
+      //   },
+      //   address: {
+      //     fields: { ...addressFields },
+      //     states: { ...addressErrorFields },
+      //     errors: { ...addressErrorFields },
+      //   },
+      //   family: {
+      //     fields: { ...familyFields },
+      //     states: { ...familyErrorFields },
+      //     errors: { ...familyErrorFields },
+      //   },
+      //   education: {
+      //     fields: { ...educationFields },
+      //     states: { ...educationFields },
+      //     errors: { ...educationFields },
+      //   },
+      //   user: {
+      //     fields: { ...userFields },
+      //     states: { ...userErrorFields },
+      //     errors: { ...userErrorFields },
+      //   },
+      // },
       tables: {
         students: {
           isBusy: false,
@@ -822,114 +823,114 @@ export default {
         courses.items = data
       })
     },
-    onStudentEntry() {
-      const {
-        student: {
-          fields: { id: studentId },
-        },
-        student,
-        address,
-        family,
-        education,
-        user,
-      } = this.forms;
+    // onStudentEntry() {
+    //   const {
+    //     student: {
+    //       fields: { id: studentId },
+    //     },
+    //     student,
+    //     address,
+    //     family,
+    //     education,
+    //     user,
+    //   } = this.forms;
 
-      const { students } = this.tables;
+    //   const { students } = this.tables;
 
-      reset(student);
-      reset(address);
-      reset(family);
-      reset(education);
-      reset(user);
+    //   reset(student);
+    //   reset(address);
+    //   reset(family);
+    //   reset(education);
+    //   reset(user);
 
-      const data = {
-        ...student.fields,
-        address: { ...address.fields },
-        family: { ...family.fields },
-        education: { ...education.fields },
-      };
+    //   const data = {
+    //     ...student.fields,
+    //     address: { ...address.fields },
+    //     family: { ...family.fields },
+    //     education: { ...education.fields },
+    //   };
 
-      if (this.entryMode == 'Edit Student') {
-        this.isProcessing = true;
-        this.updateStudent(data, studentId)
-          .then(({ data }) => {
-            this.updateRow(students, data);
-            showNotification(this, 'success', 'Student has been updated.');
-            this.showStudentEntry = false;
-            this.isProcessing = false;
-          })
-          .catch((error) => {
-            const errors = error.response.data.errors;
-            validate(student, errors);
-            validate(address, errors);
-            validate(family, errors);
-            validate(education, errors);
-            this.isProcessing = false;
-            this.showBulletedNotification(errors);
-          });
-      } 
-      // else if (this.entryMode == 'Edit User') {
-      //   this.isUserSaving = true;
-      //   student.fields.email = user.fields.username;
-      //   const data = {
-      //     id: student.fields.id,
-      //     // email: student.fields.email,
-      //     user: { username: user.fields.username },
-      //   };
-      //   this.updateStudent(data, studentId)
-      //     .then(({ data }) => {
-      //       this.updateRow(students, data);
-      //       showNotification(
-      //         this,
-      //         'success',
-      //         "Student's Account is updated successfully."
-      //       );
-      //       this.showModalUpdateUser = false;
-      //       this.isUserSaving = false;
-      //     })
-      //     .catch((error) => {
-      //       const errors = error.response.data.errors;
-      //       validate(user, errors);
-      //       this.isUserSaving = false;
-      //     });
-      // } else if (this.entryMode == 'Change Password') {
-      //   this.isUserSaving = true;
-      //   student.fields.email = user.fields.username;
-      //   const data = {
-      //     id: student.fields.id,
-      //     user: { password: user.fields.password, passwordConfirmation: user.fields.passwordConfirmation },
-      //   };
+    //   if (this.entryMode == 'Edit Student') {
+    //     this.isProcessing = true;
+    //     this.updateStudent(data, studentId)
+    //       .then(({ data }) => {
+    //         this.updateRow(students, data);
+    //         showNotification(this, 'success', 'Student has been updated.');
+    //         this.showStudentEntry = false;
+    //         this.isProcessing = false;
+    //       })
+    //       .catch((error) => {
+    //         const errors = error.response.data.errors;
+    //         validate(student, errors);
+    //         validate(address, errors);
+    //         validate(family, errors);
+    //         validate(education, errors);
+    //         this.isProcessing = false;
+    //         this.showBulletedNotification(errors);
+    //       });
+    //   } 
+    //   // else if (this.entryMode == 'Edit User') {
+    //   //   this.isUserSaving = true;
+    //   //   student.fields.email = user.fields.username;
+    //   //   const data = {
+    //   //     id: student.fields.id,
+    //   //     // email: student.fields.email,
+    //   //     user: { username: user.fields.username },
+    //   //   };
+    //   //   this.updateStudent(data, studentId)
+    //   //     .then(({ data }) => {
+    //   //       this.updateRow(students, data);
+    //   //       showNotification(
+    //   //         this,
+    //   //         'success',
+    //   //         "Student's Account is updated successfully."
+    //   //       );
+    //   //       this.showModalUpdateUser = false;
+    //   //       this.isUserSaving = false;
+    //   //     })
+    //   //     .catch((error) => {
+    //   //       const errors = error.response.data.errors;
+    //   //       validate(user, errors);
+    //   //       this.isUserSaving = false;
+    //   //     });
+    //   // } else if (this.entryMode == 'Change Password') {
+    //   //   this.isUserSaving = true;
+    //   //   student.fields.email = user.fields.username;
+    //   //   const data = {
+    //   //     id: student.fields.id,
+    //   //     user: { password: user.fields.password, passwordConfirmation: user.fields.passwordConfirmation },
+    //   //   };
 
-      //   this.updateStudent(data, studentId)
-      //     .then(({ data }) => {
-      //       this.updateRow(students, data);
-      //       showNotification(
-      //         this,
-      //         'success',
-      //         "Student's Account is updated successfully."
-      //       );
-      //       this.showModalChangePassword = false;
-      //       this.isUserSaving = false;
-      //     })
-      //     .catch((error) => {
-      //       const errors = error.response.data.errors;
-      //       validate(user, errors);
-      //       this.isUserSaving = false;
-      //     });
-      // }
-    },
-    setUpdateUser(row) {
-      const { student, user } = this.forms;
-      const { item } = row;
-      this.isLoading = true;
-      clearFields(user.fields);
-      reset(user);
+    //   //   this.updateStudent(data, studentId)
+    //   //     .then(({ data }) => {
+    //   //       this.updateRow(students, data);
+    //   //       showNotification(
+    //   //         this,
+    //   //         'success',
+    //   //         "Student's Account is updated successfully."
+    //   //       );
+    //   //       this.showModalChangePassword = false;
+    //   //       this.isUserSaving = false;
+    //   //     })
+    //   //     .catch((error) => {
+    //   //       const errors = error.response.data.errors;
+    //   //       validate(user, errors);
+    //   //       this.isUserSaving = false;
+    //   //     });
+    //   // }
+    // },
+    // setUpdateUser(row) {
+    //   const { student, user } = this.forms;
+    //   const { item } = row;
+    //   this.isLoading = true;
+    //   clearFields(user.fields);
+    //   reset(user);
 
-      copyValue(item, student.fields);
+    //   copyValue(item, student.fields);
 
-      if (row.item.user) user.fields.username = row.item.user.username;
-      this.isLoading = false;
-    },
+    //   if (row.item.user) user.fields.username = row.item.user.username;
+    //   this.isLoading = false;
+    // },
     onStudentDelete() {
       const {
         student,
@@ -953,15 +954,15 @@ export default {
       }
       return src;
     },
-    createBase64Image(fileObject) {
-      const reader = new FileReader();
+    // createBase64Image(fileObject) {
+    //   const reader = new FileReader();
 
-      reader.onload = (e) => {
-        this.studentPhotoUrl = e.target.result;
-      };
-      reader.readAsDataURL(fileObject);
-      setTimeout(() => (this.isProfilePhotoBusy = false), 1000);
-    },
+    //   reader.onload = (e) => {
+    //     this.studentPhotoUrl = e.target.result;
+    //   };
+    //   reader.readAsDataURL(fileObject);
+    //   setTimeout(() => (this.isProfilePhotoBusy = false), 1000);
+    // },
     showBulletedNotification(errors) {
       const h = this.$createElement;
       const errorList = [];
@@ -1036,6 +1037,10 @@ export default {
         console.log(error);
         this.isBusyCreating = false;
       });
+    },
+    onChangeUsername(row) {
+      this.selectedUser = row.item?.user || {};
+      this.$router.push({ name: 'List Change Student Username', params: { studentId: row.item.id } })
     }
   },
   computed: {

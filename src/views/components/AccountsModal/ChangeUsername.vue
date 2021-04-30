@@ -13,7 +13,9 @@
         <label class="required">Username</label>
         <b-form-input
           v-model="forms.user.fields.username"
-          :state="forms.user.states.username"/>
+          :state="forms.user.states.username"
+          :disabled="!forms.user.fields.username"
+        />
         <b-form-invalid-feedback>
           {{ forms.user.errors.username }}
         </b-form-invalid-feedback>
@@ -46,6 +48,9 @@ export default {
     previousRoute: {
       type: Object
     },
+    user: {
+      type: Object
+    }
   },
   components: {
     FooterAction
@@ -70,10 +75,19 @@ export default {
       this.$router.push('/master-files/student')
       return
     }
-    const { user } = this.forms
-    this.getStudent(studentId).then(({ data }) => {
-      copyValue(data.user, user.fields)
-    })
+
+    const { user } = this.forms;
+
+    // if no user provide in props, fetch user from server
+    if (!Object.keys(this.user).length) {
+      this.getStudent(studentId).then(({ data }) => {
+        copyValue(data.user, user.fields)
+      });
+      return;
+    }
+
+    // most of the time user is provided(except when reloaded) from selected user or with currently editing form
+    copyValue(this.user, user.fields)
   },
   methods: {
     onSave() {
@@ -92,9 +106,6 @@ export default {
         this.isConfirmBusy = false
       });
     }
-  },
-  watch: {
-
   }
 };
 </script>
