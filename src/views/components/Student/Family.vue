@@ -175,6 +175,9 @@ export default {
       isProcessing: false,
     }
   },
+  created() {
+    copyValue(this.data, this.forms.family.fields)
+  },
   methods: {
     onSave() {
       this.isProcessing = true
@@ -189,7 +192,6 @@ export default {
       }
 
       this.updateStudent(data, this.studentId).then(({ data }) => {
-        this.data.userable = data
         this.isProcessing = false
         showNotification(this, 'success', 'Family has been saved.')
       }).catch(error => {
@@ -202,16 +204,8 @@ export default {
   },
   computed: {
     studentId() {
-      const { userable } = this.data
-      return userable?.id
-    }
-  },
-  watch: {
-    'data.userable' : function(val) {
-      const { family } = this.forms
-      const { userable } = this.data
-      if(userable.family)
-      copyValue(userable.family, family.fields)
+      const { data } = this
+      return data?.id
     }
   }
 };

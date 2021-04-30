@@ -6,11 +6,12 @@
     titleSize="m"
     :showAction="!hasAccount">
     <template v-if="hasAccount">
-      <UsernameItem :username="userable.user ? userable.user.username : ''" :user="data.userable.user"/>
+      <UsernameItem :username="data ? data.username : ''" :user="data" />
       <hr />
       <PasswordItem />
     </template>
     <router-view
+      :user="data"
       :previousRoute="{ name: 'Student Edit', params: { ...$route.params } }">
     </router-view>
   </Card>
@@ -31,7 +32,7 @@ export default {
   },
   data() {
     return {
-      hasAccount: false,
+      hasAccount: !!this.data?.username,
       forms: {
         profile: {
           fields: {
@@ -54,21 +55,6 @@ export default {
       });
     }
   },
-  computed: {
-    // hasAccount() {
-    //   console.log(this.userable)
-    //   return !!this.userable?.user
-    // },
-    userable() {
-      const { userable } = this.data;
-      return userable
-    },
-  },
-  watch: {
-    'data.userable' : function(val) {
-      this.hasAccount = !!this.data.userable?.user
-    }
-  }
 };
 </script>
 <style lang="scss" scoped>

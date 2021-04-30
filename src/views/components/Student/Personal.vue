@@ -141,6 +141,7 @@ const profileFields = {
   civilStatusId: null,
   email: null,
   isManual: 1,
+  photo: {}
 }
 
 export default {
@@ -156,17 +157,17 @@ export default {
   mixins: [ StudentApi ],
   computed: {
     avatarText() {
-      const { userable } = this.data;
-      return `${userable?.firstName?.charAt(0) || '?'}${userable?.lastName?.charAt(0) || ''}`
+      const { fields } = this.forms.profile;
+      return `${fields?.firstName?.charAt(0) || '?'}${fields?.lastName?.charAt(0) || ''}`
     },
     userPhoto() {
-      const { userable } = this.data;
-      const path = userable?.photo?.hashName || '';
+      const { fields } = this.forms.profile;
+      const path = fields?.photo?.hashName || '';
       return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
     },
     studentId() {
-       const { userable } = this.data;
-       return userable?.id
+       const { data } = this;
+       return data?.id
     }
   },
   data() {
@@ -183,7 +184,7 @@ export default {
   },
   mounted() {
     const { profile } = this.forms
-    copyValue(this.data.userable, profile.fields)
+    copyValue(this.data, profile.fields)
   },
   methods: {
     onSave() {
@@ -191,19 +192,17 @@ export default {
       const { profile, profile: { fields: { studentNo }} } = this.forms
       // reset(profile)
 
-      profile.fields.studentNo = profile.fields.studentNo === "" ? null : profile.fields.studentNo
+      profile.fields.studentNo = profile.fields.studentNo === ""
+        ? null
+        : profile.fields.studentNo
 
       const payLoad = {
         ...profile.fields,
-
       }
-
-      console.log(payLoad)
 
       reset(profile)
 
       this.updateStudent(payLoad, this.studentId).then(({ data }) => {
-        this.data.userable = data
         this.isProcessing = false
         showNotification(this, 'success', 'Profile has been saved.')
       }).catch(error => {
@@ -216,17 +215,11 @@ export default {
       const formData = new FormData();
       formData.append('photo', file);
       this.savePhoto(formData, this.studentId).then(({ data }) =>{
-        this.data.userable.photo = data
+        this.forms.profile.fields.photo = data
       }).catch(error => {
         const errors = error.response.data.errors
         console.log(errors)
       })
-    }
-  },
-  watch: {
-    'data.userable' : function(val) {
-      const { profile } = this.forms
-      copyValue(this.data.userable, profile.fields)
     }
   }
 };

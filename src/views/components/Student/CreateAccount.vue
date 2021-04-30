@@ -93,7 +93,6 @@ export default {
       this.isConfirmBusy = true
       const { user } = this.forms
       this.addStudentUser(user.fields, this.studentId).then(({ data }) => {
-        // this.userable.user = data
         this.isConfirmBusy = false
         showNotification(this, 'success', 'User Account has been saved.')
         this.onClose()

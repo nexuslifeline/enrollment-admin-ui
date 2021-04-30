@@ -320,6 +320,7 @@ export default {
     }
   },
   created() {
+    copyValue(this.data, this.forms.address.fields)
   },
   methods: {
     onSave() {
@@ -349,7 +350,6 @@ export default {
       }
 
       this.updateStudent(data, this.studentId).then(({ data }) => {
-        this.data.userable = data
         this.isProcessing = false
         showNotification(this, 'success', 'Address has been saved.')
       }).catch(error => {
@@ -361,16 +361,8 @@ export default {
   },
   computed: {
     studentId() {
-      const { userable } = this.data
-      return userable?.id
-    }
-  },
-  watch: {
-    'data.userable' : function(val) {
-      const { address } = this.forms
-      const { userable } = this.data
-      if(userable.address)
-      copyValue(userable.address, address.fields)
+      const { data } = this
+      return data?.id
     }
   }
 };

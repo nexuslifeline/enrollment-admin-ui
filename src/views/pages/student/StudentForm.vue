@@ -1,10 +1,12 @@
 <template>
   <CenterContainer :key="compKey">
-    <Personal :data="data" />
-    <Account :data="data" />
-    <Family :data="data" />
-    <Address :data="data"/>
-    <Education :data="data"/>
+    <template v-if="!!Object.keys(data).length">
+      <Personal :data="data" />
+      <Account :data="data.user" />
+      <Family :data="data.family" />
+      <Address :data="data.address" />
+      <Education :data="data.education"/>
+    </template>
   </CenterContainer>
 </template>
 
@@ -27,10 +29,7 @@ export default {
   mixins: [ StudentApi ],
   data() {
     return {
-      data: {
-        id: 1,
-        userable: {}
-      },
+      data: {},
       compKey: 1,
       compKey2: 1,
     }
@@ -43,7 +42,7 @@ export default {
     }
 
     this.getStudent(studentId).then(({ data }) => {
-      this.data.userable = { ...data }
+      this.data = { ...data }
     })
   }
 }
