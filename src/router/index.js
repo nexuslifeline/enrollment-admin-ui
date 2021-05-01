@@ -35,8 +35,8 @@ const Subject = () => import('@/views/pages/Subject')
 const Course = () => import('@/views/pages/Course')
 const SchoolFee = () => import('@/views/pages/SchoolFee')
 const UserGroup = () => import('@/views/pages/UserGroup')
-const User = () => import('@/views/pages/user/User')
-const UserEntry = () => import('@/views/pages/user/UserEntry')
+const Member = () => import('@/views/pages/member/Member')
+const MemberForm = () => import('@/views/pages/member/MemberForm')
 const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
@@ -417,19 +417,13 @@ function configRoutes () {
                 {
                   path: '/',
                   name: 'Member List',
-                  component: User,
+                  component: Member,
                   meta: { requiresAuth: true, userType: 0 }
-                },
-                {
-                  path: 'add',
-                  name: 'Member Add',
-                  component: UserEntry,
-                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':personnelId',
                   name: 'Member Edit',
-                  component: UserEntry,
+                  component: MemberForm,
                   meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
               ]
@@ -457,12 +451,6 @@ function configRoutes () {
                       meta: { requiresAuth: true }
                     },
                   ]
-                },
-                {
-                  path: 'add',
-                  name: 'Student Add',
-                  component: StudentForm,
-                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
                 {
                   path: ':studentId',

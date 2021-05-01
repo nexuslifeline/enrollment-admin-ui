@@ -855,14 +855,14 @@ const educationFields = {
   collegeDegreeHonors: null,
 }
 
-import { StudentApi, UserGroupApi } from "../../../mixins/api"
-import { validate, reset, showNotification, clearFields } from '../../../helpers/forms'
-import { Countries, CivilStatuses, StudentPermissions } from "../../../helpers/enum"
-import Tables from "../../../helpers/tables"
+import { StudentApi, UserGroupApi } from "../src/mixins/api"
+import { validate, reset, showNotification, clearFields } from '../src/helpers/forms'
+import { Countries, CivilStatuses, StudentPermissions } from "../src/helpers/enum"
+import Tables from "../src/helpers/tables"
 import PhotoViewer from '../../components/PhotoViewer'
-import { copyValue } from '../../../helpers/extractor'
-import Access from '../../../mixins/utils/Access'
-import tabHeaders from "./data/tabHeaders";
+import { copyValue } from '../src/helpers/extractor'
+import Access from '../src/mixins/utils/Access'
+import tabHeaders from "../src/views/pages/student/data/tabHeaders";
 
 export default {
   name: "StudentEntry",

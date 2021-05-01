@@ -1,7 +1,7 @@
 <template>
   <CenterContainer>
-    <BackLink />
     <template v-if="!!Object.keys(data).length">
+      <BackLink />
       <Personal :data="data" />
       <Account :data="data.user || {}" />
       <Family :data="data.family || {}" />
