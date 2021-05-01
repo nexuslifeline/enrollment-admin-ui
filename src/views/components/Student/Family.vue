@@ -185,7 +185,6 @@ export default {
       reset(family)
 
       const data = {
-        id: this.studentId,
         family: {
           ...family.fields
         }
