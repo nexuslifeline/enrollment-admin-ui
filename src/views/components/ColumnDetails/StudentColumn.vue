@@ -10,7 +10,7 @@
     </template>
     <div class="student-name">
       <b-link @click="callback.loadDetails">
-        {{ data.student && data.student.name }}
+        {{ (data.student && data.student.name) || 'No Name' }}
       </b-link>
       <div class="label__badges-container">
         <span
@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="text-muted">
-      {{ data.student.email }}
+      {{ (data.student.user && data.student.user.username) || 'No Account' }}
     </div>
   </b-media>
 </template>

@@ -1,5 +1,6 @@
 <template>
   <CenterContainer :key="compKey">
+    <BackLink />
     <template v-if="!!Object.keys(data).length">
       <Personal :data="data" />
       <Account :data="data.user" />

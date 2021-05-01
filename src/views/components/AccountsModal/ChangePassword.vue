@@ -56,9 +56,6 @@ export default {
     previousRoute: {
       type: Object
     },
-    // user: {
-    //   type: Object
-    // }
   },
   mixins: [ StudentApi, AuthApi ],
   components: {

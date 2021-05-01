@@ -11,6 +11,7 @@ import vSelectCategory from './views/components/SelectCategory.vue';
 import vText from './views/components/Text';
 import Card from './views/components/Card';
 import CardFooterRow from './views/components/CardFooterRow';
+import BackLink from './views/components/BackLink/Link';
 import { InputGroup, InputContainer, InputInline } from './views/components/InputGroup';
 import LinkVisibilityToggler from './views/components/VisibilityToggler/Link';
 import CenterContainer from './views/components/CenterContainer';
@@ -177,6 +178,7 @@ Vue.component('v-icon', Icon)
 Vue.component('v-select', vSelect)
 
 Vue.component('vText', vText);
+Vue.component('BackLink', BackLink);
 Vue.component('vSelectCategory', vSelectCategory);
 Vue.component('CenterContainer', CenterContainer);
 Vue.component('Card', Card);

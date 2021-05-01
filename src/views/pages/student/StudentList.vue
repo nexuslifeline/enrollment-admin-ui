@@ -111,8 +111,7 @@
                   <b-link
                     :to="
                       `/master-files/student/${item.id}/school-records/requirements`
-                    "
-                  >
+                    ">
                     {{ value }}%
                     <BProgress :value="value" variant="info" animated striped />
                   </b-link>
@@ -162,6 +161,7 @@
                         $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
                       ) & showRowActionButton"
                     @click="onChangeUsername(row)"
+                    :disabled="!row.item.user"
                   >
                     Change Username
                   </b-dropdown-item>
@@ -170,6 +170,7 @@
                       $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
                     ) & showRowActionButton"
                     :to="`/master-files/student/account/${row.item.id}/change-password`"
+                    :disabled="!row.item.user"
                   >
                     Change Password
                   </b-dropdown-item>
@@ -457,126 +458,6 @@ import {
 import { getFilePath } from '../../../helpers/utils';
 import PageContent from "../../components/PageContainer/PageContent";
 
-const studentFields = {
-  id: null,
-  //studentNo: null,
-  // studentNo: null,
-  firstName: null,
-  middleName: null,
-  lastName: null,
-  mobileNo: null,
-  birthDate: null,
-  civilStatusId: null,
-  email: null,
-};
-
-const addressFields = {
-  currentHouseNoStreet: null,
-  currentBarangay: null,
-  currentCityTown: null,
-  currentProvince: null,
-  currentRegion: null,
-  currentDistrict: null,
-  currentPostalCode: null,
-  currentCountryId: Countries.PHILIPPINES.id,
-  currentCompleteAddress: null,
-  currentHomeLandlineMobileNo: null,
-  permanentHouseNoStreet: null,
-  permanentBarangay: null,
-  permanentCityTown: null,
-  permanentProvince: null,
-  permanentRegion: null,
-  permanentDistrict: null,
-  permanentPostalCode: null,
-  permanentCountryId: Countries.PHILIPPINES.id,
-  permanentCompleteAddress: null,
-  permanentHomeLandlineMobileNo: null,
-};
-
-const addressErrorFields = {
-  addressCurrentHouseNoStreet: null,
-  addressCurrentBarangay: null,
-  addressCurrentCityTown: null,
-  addressCurrentProvince: null,
-  addressCurrentRegion: null,
-  addressCurrentDistrict: null,
-  addressCurrentPostalCode: null,
-  addressCurrentCountryId: null,
-  addressCurrentCompleteAddress: null,
-  addressCurrentHomeLandlineMobileNo: null,
-  addressPermanentHouseNoStreet: null,
-  addressPermanentBarangay: null,
-  addressPermanentCityTown: null,
-  addressPermanentProvince: null,
-  addressPermanentRegion: null,
-  addressPermanentDistrict: null,
-  addressPermanentPostalCode: null,
-  addressPermanentCountryId: null,
-  addressPermanentCompleteAddress: null,
-  addressPermanentHomeLandlineMobileNo: null,
-};
-
-const familyFields = {
-  fatherName: null,
-  fatherOccupation: null,
-  fatherMobileNo: null,
-  fatherEmail: null,
-  motherName: null,
-  motherOccupation: null,
-  motherMobileNo: null,
-  motherEmail: null,
-  parentGuardianName: null,
-  parentGuardianContactNo: null,
-};
-
-const familyErrorFields = {
-  familyFatherName: null,
-  familyFatherOccupation: null,
-  familyFatherMobileNo: null,
-  familyFatherEmail: null,
-  familyMotherName: null,
-  familyMotherOccupation: null,
-  familyMotherMobileNo: null,
-  familyMotherEmail: null,
-  familyParentGuardianName: null,
-  familyParentGuardianContactNo: null,
-};
-
-const educationFields = {
-  lastSchoolAttended: null,
-  lastSchoolAddress: null,
-  lastSchoolYearFrom: null,
-  lastSchoolYearTo: null,
-  lastLevel: null,
-  elementaryCourse: null,
-  elementaryCourseYearFrom: null,
-  elementaryCourseYearTo: null,
-  elementaryCourseHonors: null,
-  highSchoolCourse: null,
-  highSchoolCourseYearFrom: null,
-  highSchoolCourseYearTo: null,
-  highSchoolCourseHonors: null,
-  seniorSchoolCourse: null,
-  seniorSchoolCourseYearFrom: null,
-  seniorSchoolCourseYearTo: null,
-  seniorSchoolCourseHonors: null,
-  collegeDegree: null,
-  collegeDegreeYearFrom: null,
-  collegeDegreeYearTo: null,
-  collegeDegreeHonors: null,
-};
-
-const userFields = {
-  username: null,
-  password: null,
-  passwordConfirmation: null,
-};
-
-const userErrorFields = {
-  userUsername: null,
-  userPassword: null,
-};
-
 export default {
   name: 'StudentList',
   getFilePath,
@@ -823,114 +704,6 @@ export default {
         courses.items = data
       })
     },
-    // onStudentEntry() {
-    //   const {
-    //     student: {
-    //       fields: { id: studentId },
-    //     },
-    //     student,
-    //     address,
-    //     family,
-    //     education,
-    //     user,
-    //   } = this.forms;
-
-    //   const { students } = this.tables;
-
-    //   reset(student);
-    //   reset(address);
-    //   reset(family);
-    //   reset(education);
-    //   reset(user);
-
-    //   const data = {
-    //     ...student.fields,
-    //     address: { ...address.fields },
-    //     family: { ...family.fields },
-    //     education: { ...education.fields },
-    //   };
-
-    //   if (this.entryMode == 'Edit Student') {
-    //     this.isProcessing = true;
-    //     this.updateStudent(data, studentId)
-    //       .then(({ data }) => {
-    //         this.updateRow(students, data);
-    //         showNotification(this, 'success', 'Student has been updated.');
-    //         this.showStudentEntry = false;
-    //         this.isProcessing = false;
-    //       })
-    //       .catch((error) => {
-    //         const errors = error.response.data.errors;
-    //         validate(student, errors);
-    //         validate(address, errors);
-    //         validate(family, errors);
-    //         validate(education, errors);
-    //         this.isProcessing = false;
-    //         this.showBulletedNotification(errors);
-    //       });
-    //   } 
-    //   // else if (this.entryMode == 'Edit User') {
-    //   //   this.isUserSaving = true;
-    //   //   student.fields.email = user.fields.username;
-    //   //   const data = {
-    //   //     id: student.fields.id,
-    //   //     // email: student.fields.email,
-    //   //     user: { username: user.fields.username },
-    //   //   };
-    //   //   this.updateStudent(data, studentId)
-    //   //     .then(({ data }) => {
-    //   //       this.updateRow(students, data);
-    //   //       showNotification(
-    //   //         this,
-    //   //         'success',
-    //   //         "Student's Account is updated successfully."
-    //   //       );
-    //   //       this.showModalUpdateUser = false;
-    //   //       this.isUserSaving = false;
-    //   //     })
-    //   //     .catch((error) => {
-    //   //       const errors = error.response.data.errors;
-    //   //       validate(user, errors);
-    //   //       this.isUserSaving = false;
-    //   //     });
-    //   // } else if (this.entryMode == 'Change Password') {
-    //   //   this.isUserSaving = true;
-    //   //   student.fields.email = user.fields.username;
-    //   //   const data = {
-    //   //     id: student.fields.id,
-    //   //     user: { password: user.fields.password, passwordConfirmation: user.fields.passwordConfirmation },
-    //   //   };
-
-    //   //   this.updateStudent(data, studentId)
-    //   //     .then(({ data }) => {
-    //   //       this.updateRow(students, data);
-    //   //       showNotification(
-    //   //         this,
-    //   //         'success',
-    //   //         "Student's Account is updated successfully."
-    //   //       );
-    //   //       this.showModalChangePassword = false;
-    //   //       this.isUserSaving = false;
-    //   //     })
-    //   //     .catch((error) => {
-    //   //       const errors = error.response.data.errors;
-    //   //       validate(user, errors);
-    //   //       this.isUserSaving = false;
-    //   //     });
-    //   // }
-    // },
-    // setUpdateUser(row) {
-    //   const { student, user } = this.forms;
-    //   const { item } = row;
-    //   this.isLoading = true;
-    //   clearFields(user.fields);
-    //   reset(user);
-
-    //   copyValue(item, student.fields);
-
-    //   if (row.item.user) user.fields.username = row.item.user.username;
-    //   this.isLoading = false;
-    // },
     onStudentDelete() {
       const {
         student,
@@ -954,15 +727,6 @@ export default {
       }
       return src;
     },
-    // createBase64Image(fileObject) {
-    //   const reader = new FileReader();
-
-    //   reader.onload = (e) => {
-    //     this.studentPhotoUrl = e.target.result;
-    //   };
-    //   reader.readAsDataURL(fileObject);
-    //   setTimeout(() => (this.isProfilePhotoBusy = false), 1000);
-    // },
     showBulletedNotification(errors) {
       const h = this.$createElement;
       const errorList = [];
