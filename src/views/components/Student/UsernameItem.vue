@@ -6,8 +6,8 @@
     </div>
     <div class="item__action">
       <div class="item__details">
-        <vText size="s" weight="bold" type="p" align="right">{{ username || '' }}</vText>
-        <vText size="s" color="light" type="p" align="right">{{ userGroup || '' }}</vText>
+        <vText size="s" weight="bold" type="p" align="right">{{ user.username || '' }}</vText>
+        <vText size="s" color="light" type="p" align="right">{{ userGroup }}</vText>
       </div>
       <b-button @click="onChangeUsername" type="button" variant="outline-primary">
         Change
@@ -19,25 +19,24 @@
 
 
 export default {
-  components: {
-
-  },
   props: {
-    username: {
-      type: [String],
-    },
-    userGroup: {
-      type: [String]
-    },
     user: {
       type: [Object]
     }
+  },
+  computed: {
+    userGroup() {
+      return this.user?.userGroup?.name || 'No User Group';
+    }
+  },
+  created() {
+    console.log(this.user)
   },
   methods: {
     onChangeUsername() {
       this.$router.push({
         name: 'Change Student Username',
-        params: { ...this.$route.params, user: { ...this.user } }
+        params: { ...this.$route.params }
       });
     }
   }

@@ -94,6 +94,7 @@ export default {
       const { user } = this.forms
       this.addStudentUser(user.fields, this.studentId).then(({ data }) => {
         this.isConfirmBusy = false
+        this.$emit('onAccountCreated', data)
         showNotification(this, 'success', 'User Account has been saved.')
         this.onClose()
       }).catch(error => {

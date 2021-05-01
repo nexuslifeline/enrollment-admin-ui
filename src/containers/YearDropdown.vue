@@ -35,6 +35,7 @@
       </div>
       <div class="year-dropdown__action-container">
         <button class="year-dropdown__action-open" @click.stop="onSchoolYearOpen">
+          <BSpinner v-if="isCreating" small class="mr-2" />
           Open New School Year
         </button>
       </div>
@@ -47,6 +48,7 @@ export default {
   mixins: [SchoolYearApi],
   data() {
     return {
+      isCreating: false,
       search: '',
       options: {
         schoolYears: {
@@ -94,10 +96,12 @@ export default {
       // create new school year with empty object data
       //alert('create(POST) school year here with empty object {} data. get the id in the response and redirect to the page');
       //const yearId = 1;
-      const data = {}
+      this.isCreating = true;
+      const data = {};
       this.addSchoolYear(data).then(({ data }) => {
         this.$router.push({ path: `/maintenance/school-year/${data.id}/setup` });
-      })
+        this.isCreating = false
+      });
     }
   },
   created() {

@@ -1,12 +1,12 @@
 <template>
-  <CenterContainer :key="compKey">
+  <CenterContainer>
     <BackLink />
     <template v-if="!!Object.keys(data).length">
       <Personal :data="data" />
-      <Account :data="data.user" />
-      <Family :data="data.family" />
-      <Address :data="data.address" />
-      <Education :data="data.education"/>
+      <Account :data="data.user || {}" />
+      <Family :data="data.family || {}" />
+      <Address :data="data.address || {}" />
+      <Education :data="data.education || {}"/>
     </template>
   </CenterContainer>
 </template>
@@ -30,9 +30,15 @@ export default {
   mixins: [ StudentApi ],
   data() {
     return {
-      data: {},
-      compKey: 1,
-      compKey2: 1,
+      data: {}
+    }
+  },
+  methods: {
+    loadData() {
+      const studentId = this.$route.params?.studentId
+      this.getStudent(studentId).then(({ data }) => {
+        this.data = { ...data }
+      })
     }
   },
   created() {
@@ -41,10 +47,7 @@ export default {
       this.$router.push('/master-files/student')
       return
     }
-
-    this.getStudent(studentId).then(({ data }) => {
-      this.data = { ...data }
-    })
+    this.loadData();
   }
 }
 </script>

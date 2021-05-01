@@ -6,13 +6,20 @@
     titleSize="m"
     :showAction="!hasAccount">
     <template v-if="hasAccount">
-      <UsernameItem :username="data ? data.username : ''" :user="data" />
+      <UsernameItem :user="user" />
       <hr />
       <PasswordItem />
     </template>
+    <div v-else>
+      No account found.
+    </div>
     <router-view
-      :user="data"
-      :previousRoute="{ name: 'Student Edit', params: { ...$route.params } }">
+      @onAccountCreated="onAccountCreated"
+      :user="user"
+      :previousRoute="{
+        name: 'Student Edit',
+        params: { ...$route.params }
+      }">
     </router-view>
   </Card>
 </template>
@@ -32,27 +39,23 @@ export default {
   },
   data() {
     return {
-      hasAccount: !!this.data?.username,
-      forms: {
-        profile: {
-          fields: {
-
-          },
-          errors: {},
-          states: {}
-        }
-      }
+      user: { ...this.data }
+    }
+  },
+  computed: {
+    hasAccount() {
+      return !!this.user?.username;
     }
   },
   methods: {
-    onSave() {
-
-    },
     onAddNew() {
       this.$router.push({
         name: 'Create Student Account',
         params: { studentId: this.$route.params.studentId }
       });
+    },
+    onAccountCreated(user) {
+      this.user = user;
     }
   },
 };
