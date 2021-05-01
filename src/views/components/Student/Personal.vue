@@ -196,7 +196,7 @@ export default {
         ? null
         : profile.fields.studentNo
 
-      const { photo, restProps } = profile.fields; // excempt photo property
+      const { photo, ...restProps } = profile.fields; // excempt photo property
       const payLoad = {
         ...restProps
       }

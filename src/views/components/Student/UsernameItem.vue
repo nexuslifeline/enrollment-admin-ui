@@ -2,12 +2,14 @@
   <div class="item__row">
     <div class="item__content">
       <vText size="m" weight="bold">Change Username</vText>
-      <vText color="light" size="s">It is important to use existing email address as username to properly linked account.</vText>
+      <vText color="light" size="s">
+        It is important to use existing email address as username to properly linked account.
+      </vText>
     </div>
     <div class="item__action">
       <div class="item__details">
         <vText size="s" weight="bold" type="p" align="right">{{ user.username || '' }}</vText>
-        <vText size="s" color="light" type="p" align="right">{{ userGroup }}</vText>
+        <vText size="s" color="light" type="p" align="right">Student</vText>
       </div>
       <b-button @click="onChangeUsername" type="button" variant="outline-primary">
         Change
@@ -22,11 +24,6 @@ export default {
   props: {
     user: {
       type: [Object]
-    }
-  },
-  computed: {
-    userGroup() {
-      return this.user?.userGroup?.name || 'No User Group';
     }
   },
   created() {
