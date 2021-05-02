@@ -8,7 +8,7 @@
     bodyClass="modal-body__container"
     :centered="true"
     @hidden="$router.push(previousRoute)">
-    <div class="modal-field-container">
+    <div class="modal-field-container overflow-visible">
       <b-form-group>
         <label class="required">Username</label>
         <b-form-input
@@ -20,6 +20,17 @@
           {{ forms.user.errors.username }}
         </b-form-invalid-feedback>
       </b-form-group>
+      <template v-if="user.userableType === 'App\\Personnel'">
+        <b-form-group>
+          <label class="required">User Group</label>
+          <v-select
+            label="name"
+            placeholder="User Group"
+            :options="options.userGroups.items"
+            v-model="forms.user.fields.userGroup"
+          />
+        </b-form-group>
+      </template>
     </div>
     <template v-slot:modal-footer>
       <FooterAction
@@ -32,12 +43,13 @@
 </template>
 <script>
 import { copyValue } from '../../../helpers/extractor';
-import { AuthApi, StudentApi } from '../../../mixins/api';
+import { AuthApi, StudentApi, UserGroupApi, PersonnelApi } from '../../../mixins/api';
 import { reset, validate, showNotification } from '../../../helpers/forms'
 
 const userFields = {
   id: null,
   username: null,
+  userGroup: null
 };
 
 
@@ -55,7 +67,7 @@ export default {
   components: {
     FooterAction
   },
-  mixins: [ StudentApi, AuthApi ],
+  mixins: [StudentApi, AuthApi, UserGroupApi, PersonnelApi],
   data() {
     return {
       isConfirmBusy: false,
@@ -66,37 +78,50 @@ export default {
           states: { ...userFields },
           errors: { ...userFields },
         },
+      },
+      options: {
+        userGroups: {
+          items: []
+        }
       }
     }
   },
   created() {
-    const studentId = this.$route.params?.studentId
-    if (studentId && isNaN(studentId)) {
-      this.$router.push('/master-files/student')
-      return
+    const { studentId, personnelId } = this.$route.params;
+    const id = studentId || personnelId;
+
+    const isMember = this.user?.userableType === 'App\\Personnel';
+
+    if (isMember) {
+      this.loadUserGroupList();
     }
 
     const { user } = this.forms;
-
     // if no user provide in props, fetch user from server
     if (!Object.keys(this.user).length) {
-      this.getStudent(studentId).then(({ data }) => {
+      this[isMember ? 'getPersonnel' : 'getStudent'](id).then(({ data }) => {
         copyValue(data.user, user.fields)
       });
       return;
     }
 
     // most of the time user is provided(except when reloaded) from selected user or with currently editing form
-    copyValue(this.user, user.fields)
+    copyValue(this.user, user.fields);
   },
   methods: {
+    loadUserGroupList() {
+      this.getUserGroupList({ paginate: false }).then(({ data }) => {
+        this.options.userGroups.items = data;
+      });
+    },
     onSave() {
       this.isConfirmBusy = true
-      const { user, user: { fields: { id: userId } }} = this.forms
+      const { user, user: { fields: { id: userId, username, userGroup } }} = this.forms
 
       reset(user)
 
-      this.updateUsername(userId, user.fields).then(({ data }) => {
+      const payload = { username, userGroupId: userGroup?.id }
+      this.updateUsername(userId, payload).then(({ data }) => {
         this.isShown = false
         this.isConfirmBusy = false
         showNotification(this, 'success', 'Username has been updated.')

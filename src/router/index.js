@@ -23,8 +23,8 @@ const Login = () => import('@/views/pages/Login')
 const Home = () => import('@/views/pages/Home')
 const Profile = () => import('@/views/pages/profile/Profile')
 const EditProfile = () => import('@/views/pages/profile/EditProfile')
-const ChangeUsername = () => import('@/views/pages/profile/ChangeUsername')
-const UpdatePassword = () => import('@/views/pages/profile/UpdatePassword')
+const ChangeProfileUsername = () => import('@/views/pages/profile/ChangeUsername')
+const UpdateProfilePassword = () => import('@/views/pages/profile/UpdatePassword')
 const MyActivity = () => import('@/views/pages/MyActivity')
 const Evaluation = () => import('@/views/pages/Evaluation')
 const StudentAdmission = () => import('@/views/pages/StudentAdmission')
@@ -43,8 +43,8 @@ const Section = () => import('@/views/pages/Section')
 const StudentList = () => import('@/views/pages/student/StudentList')
 const StudentForm = () => import('@/views/pages/student/StudentForm')
 const CreateStudentAccount = () => import('@/views/components/Student/CreateAccount')
-const ChangeStudentPassword = () => import('@/views/components/AccountsModal/ChangePassword')
-const ChangeStudentUsername = () => import('@/views/components/AccountsModal/ChangeUsername')
+const ChangePassword = () => import('@/views/components/AccountsModal/ChangePassword')
+const ChangeUsername = () => import('@/views/components/AccountsModal/ChangeUsername')
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
 const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
@@ -418,13 +418,41 @@ function configRoutes () {
                   path: '/',
                   name: 'Member List',
                   component: Member,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0 },
+                  children: [
+                    {
+                      path: 'account/:personnelId/change-username',
+                      name: 'List Change Member Username',
+                      component: ChangeUsername,
+                      meta: { requiresAuth: true }
+                    },
+                    {
+                      path: 'account/:personnelId/change-password',
+                      name: 'List Change Member Password',
+                      component: ChangePassword,
+                      meta: { requiresAuth: true }
+                    },
+                  ]
                 },
                 {
                   path: ':personnelId',
                   name: 'Member Edit',
                   component: MemberForm,
-                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
+                  meta: { requiresAuth: true, hideSubNav: true },
+                  children: [
+                    {
+                      path: 'account/change-username',
+                      name: 'Change Member Username',
+                      component: ChangeUsername,
+                      meta: { requiresAuth: true, hideSubNav: true }
+                    },
+                    {
+                      path: 'account/change-password',
+                      name: 'Change Member Password',
+                      component: ChangePassword,
+                      meta: { requiresAuth: true, hideSubNav: true }
+                    },
+                  ]
                 },
               ]
             },
@@ -441,13 +469,13 @@ function configRoutes () {
                     {
                       path: 'account/:studentId/change-username',
                       name: 'List Change Student Username',
-                      component: ChangeStudentUsername,
+                      component: ChangeUsername,
                       meta: { requiresAuth: true }
                     },
                     {
                       path: 'account/:studentId/change-password',
                       name: 'List Change Student Password',
-                      component: ChangeStudentPassword,
+                      component: ChangePassword,
                       meta: { requiresAuth: true }
                     },
                   ]
@@ -467,13 +495,13 @@ function configRoutes () {
                     {
                       path: 'account/change-username',
                       name: 'Change Student Username',
-                      component: ChangeStudentUsername,
+                      component: ChangeUsername,
                       meta: { requiresAuth: true, hideSubNav: true }
                     },
                     {
                       path: 'account/change-password',
                       name: 'Change Student Password',
-                      component: ChangeStudentPassword,
+                      component: ChangePassword,
                       meta: { requiresAuth: true, hideSubNav: true }
                     },
                   ]
@@ -557,13 +585,13 @@ function configRoutes () {
                 {
                   path: 'change-username',
                   name: 'ChangeUsername',
-                  component: ChangeUsername,
+                  component: ChangeProfileUsername,
                   meta: { requiresAuth: true, hideSubNav: true }
                 },
                 {
                   path: 'update-password',
                   name: 'UpdatePassword',
-                  component: UpdatePassword,
+                  component: UpdateProfilePassword,
                   meta: { requiresAuth: true, hideSubNav: true }
                 }
               ]

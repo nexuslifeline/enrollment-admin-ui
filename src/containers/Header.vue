@@ -262,7 +262,6 @@ export default {
     this.calculateNavLimit();
     window.addEventListener('resize', this.calculateNavLimit);
     window.addEventListener('click', this.hideDropdownItems);
-    console.log(this.user)
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.calculateNavLimit);

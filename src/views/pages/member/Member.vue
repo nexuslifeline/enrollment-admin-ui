@@ -88,21 +88,16 @@
                     Edit Profile
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT
-                          .id
-                      )
-                    "
-                    @click="setUpdateUser(row)"
+                    v-if="isAccessible($options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNTid)"
+                    @click="onEditAccount(row)"
                     :disabled="showModalConfirmation"
                   >
                     Edit Account
                   </b-dropdown-item>
                   <b-dropdown-item
-                    @click="setChangePasword(row)"
                     :disabled="showModalChangePassword"
                     v-if="isAccessible($options.PersonnelPermissions.CHANGE_PASSWORD.id)"
+                    @click="$router.push({ name: 'List Change Member Password', params: { personnelId: row.item.id } })"
                   >
                     Change Password
                   </b-dropdown-item>
@@ -147,41 +142,45 @@
         <!-- end table -->
       </div>
 
-    <!-- Modal Confirmation -->
-    <b-modal
-      v-model="showModalConfirmation"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Delete User Group
-      </div>
-      Are you sure you want to delete this user group?
-      <div slot="modal-footer">
-        <b-button
-          :disabled="forms.user.isProcessing"
-          variant="outline-primary"
-          class="mr-2 btn-save"
-          @click="onUserGroupDelete()"
-        >
-          <v-icon
-            v-if="forms.user.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Yes
-        </b-button>
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalConfirmation = false"
-        >
-          No
-        </b-button>
-      </div>
-    </b-modal>
-    <!-- End Modal Confirmation -->
+      <!-- Modal Confirmation -->
+      <b-modal
+        v-model="showModalConfirmation"
+        :noCloseOnEsc="true"
+        :noCloseOnBackdrop="true"
+      >
+        <div slot="modal-title">
+          Delete User Group
+        </div>
+        Are you sure you want to delete this user group?
+        <div slot="modal-footer">
+          <b-button
+            :disabled="forms.user.isProcessing"
+            variant="outline-primary"
+            class="mr-2 btn-save"
+            @click="onUserGroupDelete()"
+          >
+            <v-icon
+              v-if="forms.user.isProcessing"
+              name="sync"
+              spin
+              class="mr-2"
+            />
+            Yes
+          </b-button>
+          <b-button
+            variant="outline-danger"
+            class="btn-close"
+            @click="showModalConfirmation = false"
+          >
+            No
+          </b-button>
+        </div>
+      </b-modal>
+      <!-- End Modal Confirmation -->
+      <router-view
+        :user="selectedMember"
+        :previousRoute="{ name: 'Member List' }">
+      </router-view>
     </template>
   </PageContent>
 </template>
@@ -251,6 +250,7 @@ export default {
   PersonnelPermissions,
   data() {
     return {
+      selectedMember: {},
       isBusyCreating: false,
       isFilterVisible: true,
       showModalEntry: false,
@@ -478,125 +478,6 @@ export default {
         this.showModalConfirmation = false;
       });
     },
-    setUpdateUser(row) {
-      const {
-        personnel,
-        user,
-        user: { fields },
-      } = this.forms;
-      user.isLoading = true;
-      const { item } = row;
-      clearFields(fields);
-      reset(user);
-
-      personnel.fields.id = item.id;
-      fields.username = item.user.username;
-      fields.userGroupId = item.user.userGroupId;
-
-      this.entryMode = 'Edit User';
-      this.showModalUpdateUser = true;
-      user.isLoading = false;
-    },
-    setChangePasword(row) {
-      const {
-        personnel,
-        user,
-        user: { fields },
-      } = this.forms;
-      user.isLoading = true;
-      const { item } = row;
-      clearFields(fields);
-      reset(user);
-
-      personnel.fields.id = item.id;
-      fields.username = item.user.username;
-      fields.userGroupId = item.user.userGroupId;
-
-      this.entryMode = 'Change Password';
-      this.showModalChangePassword = true;
-      user.isLoading = false;
-    },
-    setUpdatePersonnel(row) {
-      this.personnelPhotoUrl = null;
-      const {
-        personnel,
-        personnel: { fields },
-      } = this.forms;
-      const { item } = row;
-      this.showModalUpdatePersonnel = true;
-      personnel.isLoading = true;
-      clearFields(fields);
-      reset(personnel);
-      copyValue(item, fields)
-
-      if (item.photo)
-        this.personnelPhotoUrl =
-          process.env.VUE_APP_PUBLIC_PHOTO_URL + item.photo.hashName;
-
-      this.entryMode = 'Edit Personnel';
-      personnel.isLoading = false;
-    },
-    setCreate() {
-      this.personnelPhotoUrl = null;
-      const { user, personnel } = this.forms;
-      this.showModalEntry = true;
-      personnel.isLoading = true;
-      reset(user);
-      reset(personnel);
-      clearFields(user.fields);
-      clearFields(personnel.fields);
-      personnel.fields.personnelStatusId = this.$options.PersonnelStatuses.ACTIVE.id
-      user.fields.userGroupId = null;
-      this.entryMode = 'Add';
-      personnel.isLoading = false;
-    },
-    onPhotoChange(file) {
-      this.personnelPhotoUrl = null;
-      this.isProfilePhotoBusy = true;
-
-      if (this.entryMode == 'Add') {
-        this.createBase64Image(file);
-        this.selectedPhoto = file;
-      } else if (this.entryMode == 'Edit Personnel') {
-        const formData = new FormData();
-        const { id: personnelId } = this.forms.personnel.fields;
-        formData.append('photo', file);
-
-        this.savePhoto(formData, personnelId).then(({ data }) => {
-          this.personnelPhotoUrl =
-            process.env.VUE_APP_PUBLIC_PHOTO_URL + data.hashName;
-          setTimeout(() => (this.isProfilePhotoBusy = false), 2000);
-        });
-      }
-    },
-    onPhotoRemove() {
-      if (this.entryMode == 'Add') {
-        this.personnelPhotoUrl = '';
-      } else if (this.entryMode == 'Edit Personnel') {
-        const { id: studentId } = this.forms.student.fields;
-
-        this.deletePhoto(studentId).then(({ data }) => {
-          this.personnelPhotoUrl = '';
-        });
-      }
-      this.selectedPhoto = null;
-    },
-    createBase64Image(fileObject) {
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        this.personnelPhotoUrl = e.target.result;
-      };
-      reader.readAsDataURL(fileObject);
-      setTimeout(() => (this.isProfilePhotoBusy = false), 1000);
-    },
-    avatar(personnel) {
-      let src = '';
-      if (personnel.photo) {
-        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + personnel.photo.hashName;
-      }
-      return src;
-    },
     onUserGroupFilterChange(item) {
       const { user } = this.filters;
       user.userGroupId = item?.id || 0;
@@ -618,6 +499,13 @@ export default {
         console.log(error);
         this.isBusyCreating = false;
       });
+    },
+    onEditAccount(row) {
+      this.selectedMember = row.item?.user || {};
+      this.$router.push({
+        name: 'List Change Member Username',
+        params: { personnelId: row.item.id }
+      })
     }
   },
 };

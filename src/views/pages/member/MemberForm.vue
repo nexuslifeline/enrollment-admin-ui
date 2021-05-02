@@ -1,7 +1,7 @@
 <template>
   <CenterContainer>
     <template v-if="!!Object.keys(data).length">
-      <BackLink />
+      <BackLink :previousRoute="{ name: 'Member List' }" />
       <Personal :data="data" />
     </template>
   </CenterContainer>
