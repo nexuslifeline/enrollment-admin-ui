@@ -2,10 +2,10 @@
   <PageContent
     :title="`Student Grade (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadStudents()"
-    :filterVisible="isFilterVisible"
+    @refresh="loadSectionsOfPersonnel()"
+    :filterVisible="isFilterVisible && !showGradeSheet"
     :createButtonVisible="false"
-    showBottomActions>
+    :showBottomActions="showGradeSheet">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
@@ -38,7 +38,7 @@
         placeholder="Semester"
         class="mt-2"
       />
-      <v-select
+      <!-- <v-select
         @input="onSectionFilterChange"
         :options="options.sections.items"
         v-model="filters.student.sectionItem"
@@ -53,10 +53,10 @@
         label="name"
         placeholder="Subject"
         class="mt-2"
-      />
+      /> -->
     </template>
     <template v-slot:content>
-      <b-row>
+      <b-row v-if="!showGradeSheet">
         <b-col md="12">
           <b-table
             class="c-table"
@@ -64,42 +64,31 @@
             hover
             outlined
             show-empty
-            :fields="tables.students.fields"
-            :busy="tables.students.isBusy"
-            :items="tables.students.items"
+            :fields="tables.sections.fields"
+            :busy="tables.sections.isBusy"
+            :items="tables.sections.items"
             responsive
           >
-            <template v-slot:cell(name)="data">
-              <StudentColumn
-                :data="{ student: data.item.student }"
+            <template v-slot:cell(name)="row">
+              <b-link @click="row.toggleDetails()">{{ row.item.name }}</b-link>
+            </template>
+            <template v-slot:cell(details)="data">
+              <EducationColumn
+                :data="data.item"
                 :callback="{
                   loadDetails: () => null,
                 }"
               />
             </template>
-            <template v-slot:head(gradingPeriods)>
-              <div class="cell-term__header">
-                <div v-for="gradingPeriod in gradingPeriods" :key="gradingPeriod.id">
-                  {{ gradingPeriod.name }}
+            <template v-slot:row-details="data">
+              <div class="section__subjects">
+                <h6>Subjects</h6>
+                <div 
+                  class="subjects" 
+                  v-for="subject in data.item.subjects" :key="subject.id" 
+                  @click="setGradeSheet(data.item, subject)">
+                  <li>{{ `${subject.code} - ${subject.name} ${subject.description}` }}</li>
                 </div>
-              </div>
-            </template>
-            <template v-slot:cell(gradingPeriods)="{ item }">
-              <div class="cell-gradingPeriod" v-if="item.grades">
-                <vue-autonumeric
-                  v-for="gradingPeriod in gradingPeriods"
-                  v-model="item.grades.find(d => d.id === gradingPeriod.id).pivot.grade"
-                  :key="gradingPeriod.id"
-                  class="form-control text-right cell-gradingPeriod-input"
-                  :options="[
-                    {
-                      minimumValue: 0,
-                      maximumValue: 100,
-                      modifyValueOnWheel: false,
-                      emptyInputBehavior: 0,
-                    },
-                  ]"
-                />
               </div>
             </template>
             <template v-slot:table-busy>
@@ -108,37 +97,38 @@
                 <strong>Loading...</strong>
               </div>
             </template>
-            <!-- <template v-slot:cell(action)="{item}">
-              <b-btn
-                @click="onFinalizeGrade(item)"
-                :disabled="item.grades.some(d => d.pivot.grade === 0 || d.grade === null)"
-                size="sm"
-                variant="outline-primary">
-                <v-icon v-if="!item.isFinalizing" name="check" />
-                <v-icon v-else name="spinner" spin />
-              </b-btn>
-            </template> -->
           </b-table>
-          <!-- <b-row>
-            <b-col md="6">
-              Showing {{ paginations.student.from }} to
-              {{ paginations.student.to }} of
-              {{ paginations.student.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.student.page"
-                :total-rows="paginations.student.totalRows"
-                :per-page="paginations.student.perPage"
-                size="sm"
-                align="end"
-                @input="loadStudents()"
-              />
-            </b-col>
-          </b-row> -->
         </b-col>
       </b-row>
+      <GradeSheet 
+        v-else
+        :section="section"
+        :subject="subject"
+        :students="tables.students"
+        :gradingPeriods="gradingPeriods"
+      />
+    </template>
+    <template v-slot:bottom-actions>
+      <b-button
+        class="btn-save"
+        @click="onSaveStudentGrade()"
+        variant="primary">
+        <v-icon v-if="isProcessing" name="spinner" spin />
+        Save
+      </b-button>
+      <b-button
+        class="btn-save"
+        @click="onSaveStudentGrade(true)"
+        variant="primary">
+        <v-icon v-if="isFinalizing" name="spinner" spin />
+        Finalize
+      </b-button>
+      <b-button
+        class="btn-save"
+        @click="showGradeSheet = false"
+        variant="outline-danger">
+        Cancel
+      </b-button>
     </template>
     <template v-slot:bottom-actions>
       <b-button
@@ -162,37 +152,42 @@
 </template>
 <script>
 import PageContent from "../components/PageContainer/PageContent";
-import { SchoolCategories, Semesters } from "../../helpers/enum"
-import { SchoolYearApi, PersonnelApi, SubjectApi, StudentApi, GradingPeriodApi, AcademicRecordApi } from '../../mixins/api';
-import { StudentColumn } from '../components/ColumnDetails';
+import { SchoolCategories, Semesters, StudentGradeStatuses } from "../../helpers/enum"
+import { StudentApi, GradingPeriodApi, StudentGradeApi, PersonnelApi } from '../../mixins/api';
+import { EducationColumn } from '../components/ColumnDetails';
 import { showNotification } from '../../helpers/forms';
+import GradeSheet from "../pages/GradeSheet"
 export default {
   name: 'StudentGrade',
   components: {
     PageContent,
-    StudentColumn
+    EducationColumn,
+    GradeSheet
   },
-  mixins: [ SchoolYearApi, SubjectApi, PersonnelApi, StudentApi, GradingPeriodApi, AcademicRecordApi ],
-  SchoolCategories, Semesters,
+  mixins: [ PersonnelApi, StudentApi, GradingPeriodApi, StudentGradeApi ],
+  SchoolCategories, Semesters, StudentGradeStatuses,
   data() {
     return {
       isFilterVisible: true,
       isProcessing: false,
       isFinalizing: false,
+      showGradeSheet: false,
+      section: [],
+      subject: [],
       gradingPeriods: [],
       tables: {
-        students: {
+        sections: {
           isBusy: false,
           fields: [
             {
               key: 'name',
-              label: 'Name',
+              label: 'Section',
               tdClass: 'align-middle',
               thStyle: { width: '40%' },
             },
             {
-              key: 'gradingPeriods',
-              label: '',
+              key: 'details',
+              label: 'DETAILS',
               tdClass: 'align-middle',
             },
             // {
@@ -202,6 +197,10 @@ export default {
             //   thStyle: { width: '40px' },
             // },
           ],
+          items: []
+        },
+        students: {
+          isBusy: false,
           items: []
         },
       },
@@ -241,98 +240,46 @@ export default {
     }
   },
   created() {
-    // this.loadSchoolYears()
+    this.loadSectionsOfPersonnel()
   },
   methods: {
-    loadStudents() {
-      let { subjectId, sectionId, criteria } = this.filters.student
-      const { student, student: { perPage, page } } = this.paginations
-      const { students } = this.tables
-      const params = { paginate: false, criteria }
-      students.isBusy = true;
-      subjectId = subjectId ?? 0
-      sectionId = sectionId ?? 0
-      this.getGradesOfAcademicRecords(subjectId, sectionId, params).then(({ data }) => {
-        students.items = data;
-        // student.from = data.meta.from;
-        // student.to = data.meta.to;
-        // student.totalRows = data.meta.total;
-        students.isBusy = false;
-      })
-    },
-    // loadSchoolYears() {
-    //   const params = { paginate: false }
-    //   const { schoolYears } = this.options
-    //   const { student } = this.filters
-    //   this.getSchoolYearList(params).then(({ data }) => {
-    //     const activeSchoolYear = data.find(x => x.isActive)
-    //     student.schoolYearId = activeSchoolYear.id ?? null
-    //     schoolYears.items = data
-    //   }).catch(error => {
-    //     console.log(error)
-    //   })
-    // },
     loadSectionsOfPersonnel() {
       const { student, student: { schoolCategoryId } } = this.filters
-
+      const { sections } = this.tables
       const { id: schoolYearId } = this.$store.state.schoolYear
-      if(!this.isCourseVisible) {
-        student.semesterId = null
-      }
       student.sectionId = null
-      if (schoolCategoryId && schoolYearId && (this.isCourseVisible ? student.semesterId : true)) {
-        const params = { schoolCategoryId, schoolYearId, semesterId: student.semesterId }
-        const { id } = this.$store.state.user.userable
-        const { sections } = this.options
-        this.getSectionsOfPersonnel(params, id).then(({ data }) => {
-          sections.items = data
-        }).catch(error => {
-          console.log(error)
-        })
-        this.loadGradingPeriods();
-      }
+      const params = { schoolCategoryId, schoolYearId, semesterId: student.semesterId }
+      this.getSectionsOfPersonnel(params).then(({ data }) => {
+        sections.items = data
+      }).catch(error => {
+        console.log(error)
+      })
+      
     },
-    loadSubjectsOfSection() {
-      const { sections, subjects } = this.options
-      const { student, student: { sectionId } } = this.filters
-      student.subjectId = null
-
-      if(!sectionId) {
-        subjects.items = []
-        return
-      }
-      const section = sections.items.find(s => s.id === sectionId)
-      subjects.items = section.subjects ?? []
-    },
-    loadGradingPeriods() {
-      const { schoolCategoryId, semesterId } = this.filters.student
-      const { id: schoolYearId } = this.$store.state.schoolYear
-      const params = {
-        paginate: false,
-        schoolCategoryId,
-        semesterId,
-        schoolYearId,
-      };
-
-      this.getGradingPeriodList(params).then(({ data }) => {
-        this.gradingPeriods = data
-      });
-    },
-    onSaveStudentGrade() {
+    onSaveStudentGrade(isFinalized = false) {
       this.isProcessing = true
       const { students } = this.tables
-
+      const { id: sectionId, schoolYearId, courseId, levelId, semesterId } = this.section
+      const { id: subjectId } = this.subject 
+      const { StudentGradeStatuses } = this.$options
       const data = students.items.map(student => {
         return {
-          id: student.id,
-          sectionId: student.sectionId,
-          subjectId: this.filters.student.subjectId,
+          studentGradeId: student.studentGradeId,
+          studentId: student.id,
+          sectionId,
+          schoolYearId,
+          courseId,
+          levelId,
+          semesterId,
+          subjectId,
+          notes: null,
           grades: student.grades.map(grade => {
             return {
-              termId: grade.id,
+              gradingPeriodId: grade.id,
               grade: grade.pivot.grade
             }
-          })
+          }),
+          studentGradeStatusId: isFinalized ? StudentGradeStatuses.SUBMITTED.id : StudentGradeStatuses.PENDING.id
         }
       })
       this.batchUpdateStudentGrade(data).then(({ data }) => {
@@ -378,18 +325,62 @@ export default {
       student.semesterItem = item;
       this.loadSectionsOfPersonnel()
     },
-    onSectionFilterChange(item) {
-      const { student } = this.filters;
-      student.sectionId = item?.id || 0;
-      student.sectionItem = item;
-      this.loadSubjectsOfSection()
-    },
-    onSubjectFilterChange(item) {
-      const { student } = this.filters;
-      student.subjectId = item?.id || 0;
-      student.subjectItem = item;
+    setGradeSheet(section, subject) {
+      const { subjects, ...data } = section
+      this.subject = subject
+      this.section = data
       this.loadStudents()
-    }
+      this.loadGradingPeriods()
+      this.showGradeSheet = true
+    },
+    loadStudents() {
+      const { students } = this.tables
+      const { id: sectionId, schoolYearId, courseId, levelId, semesterId } = this.section
+      const { id: subjectId } = this.subject
+      const params = { subjectId, sectionId, paginate: false }
+      const studentGradeParams = { subjectId, sectionId, schoolYearId, courseId, levelId, semesterId, filterByUser: true, paginate: false }
+      students.isBusy = true;
+      this.getStudentList(params).then(({ data }) => {
+        const studentData = data;
+        this.getStudentGradeList(studentGradeParams).then(({ data }) => {
+          students.items = studentData.map(student => {
+            const studentGrade = data.find(s => s.studentId === student.id)
+            const grades = this.gradingPeriods.map(g => {
+              const studentGradePeriod = studentGrade ? studentGrade.grades.find(sg => sg.id === g.id) : null
+              const grade = studentGradePeriod ? studentGradePeriod.pivot.grade : 0
+              return {
+                id: g.id,
+                pivot: {
+                  grade
+                }
+              }
+            })
+            const studentGradeId = studentGrade ? studentGrade.id : null
+            const studentGradeStatusId = studentGrade ? studentGrade.studentGradeStatusId : null
+            this.$set(student, 'studentGradeId', studentGradeId)
+            this.$set(student, 'grades', grades)
+            this.$set(student, 'studentGradeStatusId', studentGradeStatusId)
+            return student
+          })
+          this.$set(studentData, 'grades', )
+          students.isBusy = false;
+        })
+      })
+    },
+    loadGradingPeriods() {
+      const { schoolCategoryId, semesterId } = this.section
+      const { id: schoolYearId } = this.$store.state.schoolYear
+      const params = {
+        paginate: false,
+        schoolCategoryId,
+        semesterId,
+        schoolYearId,
+      };
+
+      this.getGradingPeriodList(params).then(({ data }) => {
+        this.gradingPeriods = data
+      });
+    },
   },
   computed: {
     isCourseVisible() {
@@ -425,5 +416,19 @@ export default {
 .btn-save {
   width: 150px;
   margin-right: 5px;
+}
+.btn-submit {
+  width: 200px;
+  margin-right: 5px;
+}
+.section__subjects {
+  width: 100%;
+  text-align: center;
+}
+.subjects {
+  &:hover {
+    cursor: pointer;
+    color: blue;
+  }
 }
 </style>

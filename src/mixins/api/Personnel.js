@@ -23,8 +23,8 @@ export default {
     deletePhoto(personnelId){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/photos`)
     },
-    getSectionsOfPersonnel(params, personnelId) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/sections`, { params: params });
+    getSectionsOfPersonnel(params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/me/sections`, { params: params });
     },
     getPersonnelEducationList(params, personnelId) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/education`, { params: params });

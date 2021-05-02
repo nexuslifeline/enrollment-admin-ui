@@ -64,9 +64,6 @@ export default {
       return photo?.hashName || '';
     }
   },
-  created() {
-    console.log(this.data.student)
-  }
 };
 </script>
 <style lang="scss" scoped>

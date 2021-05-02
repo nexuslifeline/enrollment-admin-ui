@@ -117,6 +117,12 @@ export const EvaluationStatuses = new Enum({
   COMPLETED: { id: 5, name: 'Completed'}
 })
 
+export const StudentGradeStatuses = new Enum({
+  PENDING: { id: 1, name: 'Pending' },
+  SUBMITTED: { id: 2, name: 'Submitted' },
+  FINALIZED: { id: 3, name: 'Finalized' },
+})
+
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Semester', description: 'First Semester' },
   SECOND_SEM: { id: 2, name: '2nd Semester', description: 'Second Semester' },
