@@ -710,3 +710,9 @@ legend.required:before {
     overflow: visible;
   }
 }
+
+.v-select.is-invalid {
+  .vs__dropdown-toggle {
+    border-color: red!important;
+  }
+}

@@ -37,6 +37,7 @@ const SchoolFee = () => import('@/views/pages/SchoolFee')
 const UserGroup = () => import('@/views/pages/UserGroup')
 const Member = () => import('@/views/pages/member/Member')
 const MemberForm = () => import('@/views/pages/member/MemberForm')
+const CreateMemberAccount = () => import('@/views/components/Member/CreateAccount')
 const Department = () => import('@/views/pages/Department')
 const Payment = () => import('@/views/pages/Payment')
 const Section = () => import('@/views/pages/Section')
@@ -440,6 +441,12 @@ function configRoutes () {
                   component: MemberForm,
                   meta: { requiresAuth: true, hideSubNav: true },
                   children: [
+                    {
+                      path: 'account/create',
+                      name: 'Create Member Account',
+                      component: CreateMemberAccount,
+                      meta: { requiresAuth: true, hideSubNav: true }
+                    },
                     {
                       path: 'account/change-username',
                       name: 'Change Member Username',
