@@ -8,7 +8,7 @@
 <script>
 export default {
   props: {
-    value: [Boolean]
+    value: [Boolean, Number]
   },
   methods: {
     onInput(e) {

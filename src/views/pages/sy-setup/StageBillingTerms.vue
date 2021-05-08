@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BillingTermList :schoolYearId="form.fields.id" />
+    <BillingTermList :schoolYearId="schoolYearId" />
     <ActionRow
       :showBack="true"
       nextLabel="Continue"
@@ -35,8 +35,8 @@ export default {
   },
   mixins: [ SchoolYearApi ],
   props: {
-    form: {
-      type: Object
+    schoolYearId: {
+      type: [Number, String]
     }
   },
   data() {
@@ -46,19 +46,14 @@ export default {
   },
   methods: {
     onContinue() {
-      // save here
-      // alert('save here!')
-      // after saving
-      // const nextStage = 2;
-      // this.$emit('onContinue', nextStage);
       this.isProcessing = true
-      const { id: schoolYearId } = this.form.fields
-      const data = { schoolYearStatusId: this.$options.SchoolYearStatuses.SETUP_GRADING_PERIOD.id}
+      const { schoolYearId } = this;
+
+      const nextStageId = this.$options.SchoolYearStatuses.SETUP_GRADING_PERIOD.id;
+      const data = { schoolYearStatusId: nextStageId }
 
       this.patchSchoolYear(data, schoolYearId).then(({ data }) => {
-        copyValue(data, this.form )
-        const nextStage = 2
-        this.$emit('onContinue', nextStage);
+        this.$emit('onContinue', nextStageId - 1);
         this.isProcessing = false
       }).catch((error) => {
         const errors = error.response.data.errors;

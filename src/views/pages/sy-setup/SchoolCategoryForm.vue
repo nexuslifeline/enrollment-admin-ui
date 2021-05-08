@@ -74,14 +74,14 @@ export default {
   },
   props: {
     schoolYearId: {
-      type: Number
+      type: [Number, String]
     },
     schoolCategoryModes: {
       type: Array,
       default: []
     }
   },
-  mixins: [ SchoolCategoryApi ],
+  mixins: [SchoolCategoryApi],
   data() {
     return {
     };
@@ -89,16 +89,10 @@ export default {
   methods: {
     onToggleChange(status, schoolCategoryid, semesterId) {
       const { schoolYearId } = this
-      // alert('update(PUT) here ===> ' + schoolCategoryid + ' MODE is ==> ' + status + ' SEM ===> ' + semesterId)
       const data = { schoolYearId, semesterId, isOpen: status }
       this.updateSchoolCategoryMode(data, schoolCategoryid).then(({ data }) => {
-        const indx = this.schoolCategoryModes.findIndex(s => s.schoolCategoryid = schoolCategoryid)
-        if(indx){
-          this.schoolCategoryModes.splice(indx, 1, data)
-        }
-        else {
-          this.schoolCategoryModes.splice(indx, 0, data)
-        }
+        const idx = this.schoolCategoryModes.findIndex(s => s.schoolCategoryid = schoolCategoryid)
+        this.schoolCategoryModes.splice(idx, (idx ? 1 : 0), data);
       })
     },
     checkData(schoolCategoryId, semesterId) {

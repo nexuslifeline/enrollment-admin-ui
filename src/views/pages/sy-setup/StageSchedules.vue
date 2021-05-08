@@ -1,24 +1,33 @@
 <template>
   <div>
-    Skip this for the meantime, need to review first the Section & Schedule management.
+    Feature not available.
 
     <ActionRow
       :showBack="true"
-      nextLabel="Finish"
+      nextLabel="Finish and Set as Active"
       @onContinue="onContinue"
       @onBack="onBack"
+      :isBusy="isProcessing"
     />
   </div>
 </template>
 
 <script>
 import ActionRow from './ActionRow';
+import { SchoolYearApi } from '../../../mixins/api';
 export default {
   components: {
     ActionRow
   },
+  mixins: [SchoolYearApi],
+  props: {
+    schoolYearId: {
+      type: [Number, String]
+    }
+  },
   data() {
     return {
+      isProcessing: false
     };
   },
   methods: {
@@ -28,7 +37,16 @@ export default {
       }
     },
     onContinue() {
-
+      this.isProcessing = true
+      const { schoolYearId } = this
+      this.patchSchoolYear({ isActive: true }, schoolYearId).then(({ data }) => {
+        this.isProcessing = false
+        this.$router.push({ name: 'School Year' });
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        showNotification(this, 'danger', 'Error!')
+        this.isProcessing = false
+      });
     },
     onBack() {
       this.$emit('onBack')

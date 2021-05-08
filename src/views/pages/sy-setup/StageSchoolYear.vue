@@ -6,12 +6,11 @@
           <b-form-group>
             <label class="required">Name</label>
             <b-form-input type="text"
-              v-model="form.fields.name"
-              :state="form.states.name"
-              debounce="1000"
-              @update="onSaveChanges"/>
+              v-model="forms.schoolYear.fields.name"
+              :state="forms.schoolYear.states.name"
+            />
             <b-form-invalid-feedback>
-              {{ form.errors.name }}
+              {{ forms.schoolYear.errors.name }}
             </b-form-invalid-feedback>
           </b-form-group>
         </InputContainer>
@@ -19,12 +18,11 @@
           <b-form-group>
             <label class="required">Start Date(or Expected)</label>
             <b-form-input type="date"
-              v-model="form.fields.startDate"
-              :state="form.states.startDate"
-              debounce="1000"
-              @update="onSaveChanges"/>
+              v-model="forms.schoolYear.fields.startDate"
+              :state="forms.schoolYear.states.startDate"
+            />
             <b-form-invalid-feedback>
-              {{ form.errors.startDate }}
+              {{ forms.schoolYear.errors.startDate }}
             </b-form-invalid-feedback>
           </b-form-group>
         </InputContainer>
@@ -32,24 +30,32 @@
       <b-form-group>
         <label class="required">Description</label>
         <b-form-textarea
-          v-model="form.fields.description"
-          :state="form.states.description"
-          debounce="1000"
-          @update="onSaveChanges" />
+          v-model="forms.schoolYear.fields.description"
+          :state="forms.schoolYear.states.description"
+        />
         <b-form-invalid-feedback>
-          {{ form.errors.description }}
+          {{ forms.schoolYear.errors.description }}
         </b-form-invalid-feedback>
       </b-form-group>
+      <InputGroup>
+        <InputInline>
+          <Toggle v-model="forms.schoolYear.fields.isActive" />
+          <span class="ml-2">Active</span>
+        </InputInline>
+      </InputGroup>
       <template v-slot:footer>
         <div class="card-footer__action">
-          <b-button variant="primary" @click="onSaveChanges" :disabled="isSavingSchoolYear">
-            <v-icon name="spinner" spin v-if="isSavingSchoolYear"/> Save Changes
+          <b-button variant="primary" @click="onSaveChanges" :disabled="isSaving">
+            <v-icon name="spinner" spin v-if="isSaving"/> Save Changes
           </b-button>
         </div>
       </template>
     </Card>
 
-    <SchoolCategoryForm :schoolYearId="this.form.fields.id" :schoolCategoryModes="schoolCategoryModes"/>
+    <SchoolCategoryForm
+      :schoolYearId="schoolYearId"
+      :schoolCategoryModes="schoolCategoryModes"
+    />
 
     <ActionRow
       :showBack="false"
@@ -72,6 +78,14 @@ import ActionRow from './ActionRow';
 import SchoolCategoryForm from './SchoolCategoryForm';
 import { SchoolYearStatuses } from '../../../helpers/enum';
 
+const schoolYearFields = {
+  id: null,
+  name: null,
+  description: null,
+  startDate: null,
+  schoolYearStatusId: null,
+  isActive: null
+}
 
 export default {
   components: {
@@ -82,37 +96,50 @@ export default {
     SchoolCategoryForm
   },
   SchoolYearStatuses,
-  mixins: [ SchoolYearApi ],
+  mixins: [SchoolYearApi],
   props: {
-    form: {
+    data: {
       type: Object,
     },
     schoolCategoryModes: {
       type: Array,
       default: []
-    }
+    },
+    schoolYearId: {
+      type: [Number, String]
+    },
    },
   data() {
     return {
       isProcessing: false,
-      isSavingSchoolYear: false,
+      isSaving: false,
+      forms: {
+        schoolYear: {
+          fields: { ...schoolYearFields },
+          states: { ...schoolYearFields },
+          errors: { ...schoolYearFields }
+        }
+      },
     };
+  },
+  created() {
+    copyValue(this.data, this.forms.schoolYear.fields)
   },
   methods: {
     onContinue() {
-      // alert('this button will enable only if all school year requireds fields are provided')
-      // patch school year stage here
-      // alert('patch school year stage here!')
+      this.onSaveChanges();
+
       this.isProcessing = true
-      const { id: schoolYearId } = this.form.fields
-      const data = { schoolYearStatusId: this.$options.SchoolYearStatuses.SETUP_BILLING_TERMS.id}
-      this.patchSchoolYear(data, schoolYearId).then(({ data }) => {
-        copyValue(data, this.form )
-        const nextStage = 1
-        this.$emit('onContinue', nextStage);
+      const { schoolYearId, forms: { schoolYear } } = this
+      const nextStageId = this.$options.SchoolYearStatuses.SETUP_BILLING_TERMS.id;
+      reset(schoolYear);
+      this.patchSchoolYear({ schoolYearStatusId: nextStageId }, schoolYearId).then(({ data }) => {
+        this.$emit('update:data', data);
+        this.$emit('onContinue', nextStageId - 1);
         this.isProcessing = true
       }).catch((error) => {
         const errors = error.response.data.errors;
+        validate(schoolYear, errors)
         showNotification(this, 'danger', 'Error!')
         this.isProcessing = false
       });
@@ -121,26 +148,21 @@ export default {
 
     },
     onSaveChanges() {
-      ///alert('update(PUT) school year here. Note: changes in School Year fields should be auto-save. throttle it for atleast 1 second.')
-      reset(this.form)
-      this.isSavingSchoolYear = true
-      const { fields, fields: { id: schoolYearId } } = this.form
-      const data = { ...fields }
-      this.updateSchoolYear(data, schoolYearId).then(({ data }) => {
-        copyValue(fields, data)
-        this.isSavingSchoolYear = false
+      this.isSaving = true
+      const { schoolYearId, forms: { schoolYear } } = this
+      reset(schoolYear)
+      this.updateSchoolYear(schoolYear.fields, schoolYearId).then(({ data }) => {
+        this.isSaving = false
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(this.form, errors);
-        this.isSavingSchoolYear = false
+        validate(schoolYear, errors);
+        this.isSaving = false
       });
     }
   },
   computed: {
     isEnableContinue() {
-      //false => button is enabled
-      //true => button is disabled
-      const { name, description, startDate } = this.form.fields
+      const { name, description, startDate } = this.forms.schoolYear.fields
       return !(name && description && startDate)
     }
   }

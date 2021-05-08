@@ -28,15 +28,23 @@
           :key="item.id"
           @click="onSchoolYearSelect(item)"
           class="year-dropdown__item"
-          :class="{ active: item.id === $store.state.schoolYear.id}">
-          {{item.name}}
+          :class="{
+            active: item.id === $store.state.schoolYear.id && item.isActive,
+            inactive: item.id === $store.state.schoolYear.id && !item.isActive
+          }">
+          {{ item.name || 'No SY Name' }}
           <span v-if="item.isActive" class="text-active">(Open)</span>
+          <button
+            @click.stop="$router.push({ name: 'School Year Setup', params: { id: item.id } })"
+            class="year-dropdown__item-edit">
+            <b-icon-pencil />
+          </button>
         </div>
       </div>
       <div class="year-dropdown__action-container">
         <button class="year-dropdown__action-open" @click.stop="onSchoolYearOpen">
           <BSpinner v-if="isCreating" small class="mr-2" />
-          Open New School Year
+          Create New School Year
         </button>
       </div>
     </div>
@@ -93,13 +101,9 @@ export default {
       this.isShown = false;
     },
     onSchoolYearOpen() {
-      // create new school year with empty object data
-      //alert('create(POST) school year here with empty object {} data. get the id in the response and redirect to the page');
-      //const yearId = 1;
       this.isCreating = true;
-      const data = {};
-      this.addSchoolYear(data).then(({ data }) => {
-        this.$router.push({ path: `/maintenance/school-year/${data.id}/setup` });
+      this.addSchoolYear({ isActive: false }).then(({ data }) => {
+        this.$router.push({ name: 'School Year Setup', params: { id: data.id } });
         this.isCreating = false
       });
     }
@@ -216,6 +220,10 @@ export default {
 
   &:hover {
     background-color: $light-gray-100;
+
+    .year-dropdown__item-edit {
+      display: inline;
+    }
   }
 
   &.active {
@@ -267,6 +275,15 @@ export default {
   border: 0;
   border-radius: 3px;
   outline: none;
+}
+
+.year-dropdown__item-edit {
+  display: none;
+  margin-left: auto;
+  border: 0;
+  outline: none;
+  background: none;
+  margin-right: -10px;
 }
 
 </style>

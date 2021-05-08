@@ -3,7 +3,8 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadSchoolYear"
     :filterVisible="isFilterVisible"
-    @create="setCreate()"
+    @create="onCreate"
+    :isBusyCreating="isCreating"
     :createButtonVisible="isAccessible($options.SchoolYearPermissions.ADD.id)">
      <template v-slot:filters>
       <b-form-input
@@ -37,13 +38,13 @@
                   <strong>Loading...</strong>
                 </div>
               </template>
-              <template v-slot:cell(name)="{ item, value }">
+              <template v-slot:cell(name)="row">
                 <b-link
-                  @click="setUpdate(item)"
+                  @click="visitPage(row)"
                   :disabled="
                     !isAccessible($options.SchoolYearPermissions.EDIT.id)
                   "
-                  >{{ value }}
+                  >{{ row.value || 'No SY Name' }}
                 </b-link>
               </template>
               <template v-slot:cell(isActive)="row">
@@ -53,8 +54,7 @@
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
-                  v-if="
-                    isAccessible([
+                  v-if="isAccessible([
                       $options.SchoolYearPermissions.EDIT.id,
                       $options.SchoolYearPermissions.DELETE.id,
                     ])
@@ -69,21 +69,17 @@
                   </template>
                   <b-dropdown-item
                     v-if="isAccessible($options.SchoolYearPermissions.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
+                    @click="visitPage(row)"
+                    :disabled="showModalEntry">
+                    Edit & Setup
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible($options.SchoolYearPermissions.DELETE.id)
-                    "
+                    v-if="!row.item.isActive && isAccessible($options.SchoolYearPermissions.DELETE.id)"
                     @click="
                       (forms.schoolYear.fields.id = row.item.id),
                         (showModalConfirmation = true)
                     "
-                    :disabled="showModalConfirmation"
-                  >
+                    :disabled="showModalConfirmation">
                     Delete
                   </b-dropdown-item>
                 </b-dropdown>
@@ -112,100 +108,6 @@
         <!-- end table -->
       </div>
 
-      <!-- Modal Entry -->
-    <b-modal
-      v-model="showModalEntry"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        <!-- modal title -->
-        School Year - {{ entryMode }}
-      </div>
-      <!-- modal title -->
-      <b-overlay :show="forms.schoolYear.isLoading" rounded="sm">
-        <!-- modal body -->
-        <b-form-group>
-          <label class="required">Name</label>
-          <b-form-input
-            ref="name"
-            v-model="forms.schoolYear.fields.name"
-            :state="forms.schoolYear.states.name"
-          />
-          <b-form-invalid-feedback>
-            {{ forms.schoolYear.errors.name }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-        <b-form-group>
-          <label class="required">Description</label>
-          <b-form-textarea
-            ref="description"
-            v-model="forms.schoolYear.fields.description"
-            :state="forms.schoolYear.states.description"
-          />
-          <b-form-invalid-feedback>
-            {{ forms.schoolYear.errors.description }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-        <b-form-group>
-          <label class="required">Start Date</label>
-          <b-form-input
-            type="date"
-            v-model="forms.schoolYear.fields.startDate"
-            :state="forms.schoolYear.states.startDate"
-          />
-          <b-form-invalid-feedback>
-            {{ forms.schoolYear.errors.startDate }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-        <b-form-group>
-          <b-form-checkbox
-            v-model="forms.schoolYear.fields.isActive"
-            :value="1"
-            :unchecked-value="0"
-            :disabled="entryMode === 'Edit' && forms.schoolYear.fields.id === activeSchoolYearId"
-          >
-            <b>Active
-              <v-icon
-                v-if="entryMode === 'Edit' && forms.schoolYear.fields.id === activeSchoolYearId"
-                name="info-circle"
-                class="icon-tooltip"
-                v-b-tooltip.hover="{
-                  variant: 'info',
-                  title:
-                    'Setting active/inactive is disabled for active schoolyear.',
-                }"
-              /></b>
-          </b-form-checkbox>
-        </b-form-group>
-      </b-overlay>
-      <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
-        <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
-          @click="showModalEntry = false"
-        >
-          Close
-        </b-button>
-        <b-button
-          :disabled="forms.schoolYear.isProcessing"
-          variant="outline-primary"
-          class="float-right btn-save"
-          @click="onSchoolYearEntry()"
-        >
-          <v-icon
-            v-if="forms.schoolYear.isProcessing"
-            name="sync"
-            spin
-            class="mr-2"
-          />
-          Save
-        </b-button>
-      </div>
-      <!-- modal footer buttons -->
-    </b-modal>
-    <!-- End Modal Entry -->
 
     <!-- Modal Confirmation -->
     <b-modal
@@ -220,7 +122,7 @@
       <div slot="modal-footer">
         <b-button
           :disabled="forms.schoolYear.isProcessing"
-          variant="outline-primary"
+          variant="dark"
           class="mr-2 btn-save"
           @click="onSchoolYearDelete()"
         >
@@ -233,7 +135,7 @@
           Yes
         </b-button>
         <b-button
-          variant="outline-danger"
+          variant="outline-primary"
           class="btn-close"
           @click="showModalConfirmation = false"
         >
@@ -247,19 +149,19 @@
 </template>
 
 <script>
-import { SchoolYearApi } from '../../mixins/api';
-import Tables from '../../helpers/tables';
+import { SchoolYearApi } from '../../../mixins/api';
+import Tables from '../../../helpers/tables';
 import {
   clearFields,
   reset,
   validate,
   showNotification,
-} from '../../helpers/forms';
-import { copyValue } from '../../helpers/extractor';
-import { SchoolYearPermissions } from '../../helpers/enum';
-import Access from '../../mixins/utils/Access';
-import Card from '../components/Card';
-import PageContent from "../components/PageContainer/PageContent";
+} from '../../../helpers/forms';
+import { copyValue } from '../../../helpers/extractor';
+import { SchoolYearPermissions } from '../../../helpers/enum';
+import Access from '../../../mixins/utils/Access';
+import Card from '../../components/Card';
+import PageContent from "../../components/PageContainer/PageContent";
 
 const schoolYearFields = {
   id: null,
@@ -279,6 +181,7 @@ export default {
   SchoolYearPermissions,
   data() {
     return {
+      isCreating: false,
       isFilterVisible: true,
       entryMode: 'Add',
       showModalEntry: false,
@@ -367,52 +270,12 @@ export default {
           schoolYears.isBusy = false;
         });
     },
-    onSchoolYearEntry() {
-      const {
-        schoolYear,
-        schoolYear: { fields },
-      } = this.forms;
-      const { schoolYears } = this.tables;
-      schoolYear.isProcessing = true;
-      reset(schoolYear);
-      if (this.entryMode == 'Add') {
-        this.addSchoolYear(fields)
-          .then(({ data }) => {
-            this.addRow(schoolYears, this.paginations.schoolYear, data);
-            schoolYear.isProcessing = false;
-            showNotification(
-              this,
-              'success',
-              'School Year created successfully.'
-            );
-            this.showModalEntry = false;
-            this.updateOldSchoolYear(data);
-          })
-          .catch((error) => {
-            const errors = error.response.data.errors;
-            schoolYear.isProcessing = false;
-            validate(schoolYear, errors);
-          });
-      } else {
-        const { fields } = this.forms.schoolYear;
-        this.updateSchoolYear(fields, fields.id)
-          .then(({ data }) => {
-            this.updateRow(schoolYears, data);
-            schoolYear.isProcessing = false;
-            showNotification(
-              this,
-              'success',
-              'School Year updated successfully.'
-            );
-            this.showModalEntry = false;
-            this.updateOldSchoolYear(data);
-          })
-          .catch((error) => {
-            const errors = error.response.data.errors;
-            schoolYear.isProcessing = false;
-            validate(schoolYear, errors);
-          });
-      }
+    onCreate() {
+      this.isCreating = true
+      this.addSchoolYear({ isActive: false }).then(({ data }) => {
+        this.$router.push({ name: 'School Year Setup', params: { id: data.id } });
+        this.isCreating = false
+      });
     },
     onSchoolYearDelete() {
       const {
@@ -430,37 +293,9 @@ export default {
         this.showModalConfirmation = false;
       });
     },
-    setCreate() {
-      const { schoolYear } = this.forms;
-      this.showModalEntry = true;
-      schoolYear.isLoading = true;
-
-      clearFields(schoolYear.fields);
-      reset(schoolYear);
-      schoolYear.fields.isActive = 1;
-      this.entryMode = 'Add';
-      schoolYear.isLoading = false;
-    },
-    setUpdate(item) {
-      const {
-        schoolYear,
-        schoolYear: { fields },
-      } = this.forms;
-      copyValue(item, fields);
-      reset(schoolYear);
-      this.entryMode = 'Edit';
-      this.showModalEntry = true;
-    },
-    updateOldSchoolYear(data) {
-      if (data.isActive) {
-        let schoolYear = this.tables.schoolYears.items.find(
-          (sy) => sy.id !== data.id && sy.isActive === data.isActive
-        );
-        if (schoolYear) {
-          schoolYear.isActive = 0;
-        }
-      }
-    },
+    visitPage(row) {
+      this.$router.push({ name: 'School Year Setup', params: { id: row.item.id } });
+    }
   },
   computed: {
     activeSchoolYearId() {

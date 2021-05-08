@@ -1,12 +1,12 @@
 <template>
   <div class="setup__main-container">
-    <div class="setup__header">
-      <button class="setup__action-back" @click="() => $router.push({ name: 'School Year' })">
-        <BIconArrowLeft scale="1.5" />
-        <vText size="s" color="primary" :marginLeft="15">Return to List</vText>
-      </button>
-    </div>
     <div class="setup__body">
+      <div class="setup__header">
+        <button class="setup__action-back" @click="() => $router.push({ name: 'School Year' })">
+          <BIconArrowLeft scale="1.5" />
+          <vText size="s" color="primary" :marginLeft="15">Return to List</vText>
+        </button>
+      </div>
       <div class="setup__side-panel">
         <StageIndicator
           :stages="stages"
@@ -14,31 +14,33 @@
           @selectedItem="onSelectStage"
         />
       </div>
-      <div class="setup__content-area">
+      <div v-if="!!Object.keys(data).length" class="setup__content-area">
         <template v-if="selectedIndex === 0">
           <StageSchoolYear
             @onContinue="(idx) => selectedIndex = idx"
-            :form="forms.schoolYear"
+            :schoolYearId="$route.params.id"
+            :data.sync="data"
             :schoolCategoryModes="schoolCategoryModes"
           />
         </template>
         <template v-if="selectedIndex === 1">
           <StageBillingTerms
             @onContinue="(idx) => selectedIndex = idx"
-            :form="forms.schoolYear"
+            :schoolYearId="$route.params.id"
             @onBack ="selectedIndex -= 1"
           />
         </template>
         <template v-if="selectedIndex === 2">
           <StageGradingPeriod
             @onContinue="(idx) => selectedIndex = idx"
-            :form="forms.schoolYear"
+            :schoolYearId="$route.params.id"
             @onBack ="selectedIndex -= 1"
           />
         </template>
         <template v-if="selectedIndex === 3">
           <StageSchedules
             @onContinue="(idx) => selectedIndex = idx"
+            :schoolYearId="$route.params.id"
             @onBack ="selectedIndex -= 1"
           />
         </template>
@@ -54,18 +56,8 @@ import StageBillingTerms from './StageBillingTerms';
 import StageGradingPeriod from './StageGradingPeriod';
 import StageSchedules from './StageSchedules';
 import { InputGroup, InputContainer } from '../../components/InputGroup';
-import { copyValue } from '../../../helpers/extractor';
 import { SchoolYearApi } from '../../../mixins/api';
 import { SchoolYearStatuses } from '../../../helpers/enum'
-
-
-const schoolYearFields = {
-  id: null,
-  name: null,
-  description: null,
-  startDate: null,
-  schoolYearStatusId: null
-}
 
 export default {
   components: {
@@ -81,13 +73,7 @@ export default {
   mixins: [ SchoolYearApi ],
   data() {
     return {
-      forms: {
-        schoolYear: {
-          fields: { ...schoolYearFields },
-          states: { ...schoolYearFields },
-          errors: { ...schoolYearFields }
-        }
-      },
+      data: {},
       schoolCategoryModes: [],
       selectedIndex: 0,
       stages: [
@@ -117,12 +103,10 @@ export default {
       return
     }
 
-    //load sy info
-    const { schoolYear } = this.forms
     this.getSchoolYear(schoolYearId).then(({ data }) => {
-      copyValue(data, schoolYear.fields)
+      this.data = data;
       this.schoolCategoryModes = data.schoolCategoryModes
-      this.selectedIndex = data.schoolYearStatusId - 1
+      this.selectedIndex = data.schoolYearStatusId ?  data.schoolYearStatusId - 1 : 0
     })
 
   },

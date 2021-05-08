@@ -49,7 +49,7 @@ const ChangeUsername = () => import('@/views/components/AccountsModal/ChangeUser
 const SchoolFeeCategory = () => import('@/views/pages/SchoolFeeCategory')
 const Schedule = () => import('@/views/pages/Schedule')
 const Semester = () => import('@/views/pages/Semester')
-const SchoolYear = () => import('@/views/pages/SchoolYear')
+const SchoolYear = () => import('@/views/pages/school-year/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
 const DemoPage = () => import('@/views/pages/DemoPage')
 const SchoolRecords = () => import('@/views/pages/school-records/SchoolRecords')
@@ -306,6 +306,7 @@ function configRoutes () {
                 },
                 {
                   path: ':id/setup',
+                  name: 'School Year Setup',
                   component: SetupSchoolYear,
                   meta: { requiresAuth: true, hideHeader: true, hideMainArea: true },
                 }

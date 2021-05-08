@@ -55,7 +55,7 @@ export default {
   },
   props: {
     schoolYearId: {
-      type: Number
+      type: [Number, String]
     }
   },
   mixins: [ GradingPeriodApi ],
