@@ -50,5 +50,8 @@ export default {
     deletePersonnelEmployment(personnelId, educationId){
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/employment/${educationId}`)
     },
+    addPersonnelUser(data, personnelId){
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/user`, data);
+    }
   }
 }

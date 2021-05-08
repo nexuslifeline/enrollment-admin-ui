@@ -41,7 +41,7 @@
 <script>
 import FooterAction from '../ModalFooter/ActionBar';
 import { copyValue } from '../../../helpers/extractor';
-import { AuthApi, StudentApi } from '../../../mixins/api';
+import { AuthApi, PersonnelApi, StudentApi } from '../../../mixins/api';
 import { reset, validate, showNotification } from '../../../helpers/forms'
 
 const userFields = {
@@ -56,8 +56,11 @@ export default {
     previousRoute: {
       type: Object
     },
+    user: {
+      type: Object
+    }
   },
-  mixins: [ StudentApi, AuthApi ],
+  mixins: [ StudentApi, AuthApi, PersonnelApi ],
   components: {
     FooterAction
   },
@@ -76,15 +79,32 @@ export default {
     }
   },
   created() {
-    const studentId = this.$route.params?.studentId
-    if (studentId && isNaN(studentId)) {
-      this.$router.push('/master-files/student')
-      return
+    const { studentId, personnelId } = this.$route.params;
+    const id = studentId || personnelId;
+
+    const isMember = this.user?.userableType === 'App\\Personnel';
+
+    // const studentId = this.$route.params?.studentId
+    // if (studentId && isNaN(studentId)) {
+    //   this.$router.push('/master-files/student')
+    //   return
+    // }
+    // const { user } = this.forms
+    // this.getStudent(studentId).then(({ data }) => {
+    //   user.fields.id = data.user.id
+    // })
+
+    const { user } = this.forms;
+    // if no user provide in props, fetch user from server
+    if (!Object.keys(this.user).length) {
+      this[isMember ? 'getPersonnel' : 'getStudent'](id).then(({ data }) => {
+        copyValue(data.user, user.fields)
+      });
+      return;
     }
-    const { user } = this.forms
-    this.getStudent(studentId).then(({ data }) => {
-      user.fields.id = data.user.id
-    })
+
+    // most of the time user is provided(except when reloaded) from selected user or with currently editing form
+    copyValue(this.user, user.fields);
   },
   methods: {
     onSave() {

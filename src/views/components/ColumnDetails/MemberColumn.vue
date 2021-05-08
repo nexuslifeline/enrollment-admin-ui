@@ -44,9 +44,6 @@ export default {
       const { photo } = this.data;
       return photo?.hashName || '';
     }
-  },
-  created() {
-    console.log('created', this.data)
   }
 };
 </script>
