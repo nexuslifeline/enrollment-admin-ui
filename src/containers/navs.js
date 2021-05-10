@@ -161,7 +161,7 @@ export default [
       },
       {
         label: 'Post Payment',
-        to: '/finance/payment',
+        to: '/finance/post-payment',
         permissionIds: PaymentPermissions.getIds()
       },
       {

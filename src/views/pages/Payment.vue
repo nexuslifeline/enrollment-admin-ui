@@ -49,6 +49,21 @@
         :min="filters.payment.dateFrom"
       />
     </template>
+    <template v-slot:extra-buttons>
+      <div class="ml-1 drop-down__container" v-if="isAccessible($options.PaymentPermissions.ADD.id)">
+         <b-dropdown
+          v-if="isAccessible($options.PaymentPermissions.ADD.id)"
+          text="Post Payment"
+          variant="outline-primary"
+          split-variant="outline-primary"
+          class="soa__drop-down"
+          split>
+          <b-dropdown-item @click="$router.push('/finance/post-payment')">
+            Add Payment Manually
+          </b-dropdown-item>
+        </b-dropdown>
+      </div>
+    </template>
     <template v-slot:content>
       <div>
         <!-- <b-row class="mb-2">
@@ -748,6 +763,7 @@ import {
   PaymentStatuses,
   StudentPaymentPermissions,
   BillingTypes,
+  PaymentPermissions
 } from '../../helpers/enum';
 import {
   showNotification,
@@ -804,6 +820,7 @@ export default {
   },
   format,
   StudentPaymentPermissions,
+  PaymentPermissions,
   data() {
     return {
       isFilterVisible: true,
@@ -1382,15 +1399,29 @@ export default {
   },
 };
 </script>
-<style scoped lang="scss">
-.file-uploader-container {
-  width: 100%;
-  height: 150px;
-  margin: 20px 0 20px 0;
-}
+<style lang="scss">
+  .file-uploader-container {
+    width: 100%;
+    height: 150px;
+    margin: 20px 0 20px 0;
+  }
 
-.file-item-container {
-  width: 100%;
-  height: auto;
-}
+  .file-item-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .drop-down__container {
+    display: flex;
+    align-items: center;
+  }
+
+  .soa__drop-down {
+    height: 24px;
+
+    .btn-outline-primary {
+      display: flex;
+      align-items: center;
+    }
+  }
 </style>

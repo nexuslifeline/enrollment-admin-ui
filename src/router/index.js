@@ -243,7 +243,7 @@ function configRoutes () {
               meta: { requiresAuth: true, userType: 2 }
             },
             {
-              path: 'payment',
+              path: 'post-payment',
               component: { render(c) { return c('router-view') } },
               meta: { requiresAuth: true, userType: 2 },
               children: [

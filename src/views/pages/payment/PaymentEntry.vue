@@ -303,7 +303,7 @@
       <div class="action-container mt-2">
         <b-button
           class="float-right ml-2"
-          :to="`/finance/payment`"
+          :to="`/finance/post-payment`"
           variant="outline-danger"
           :disabled="isProcessing"
         >
@@ -800,7 +800,7 @@ export default {
         .then(({ data }) => {
           // console.log(data);
           this.isProcessing = false;
-          this.$router.push('/finance/payment');
+          this.$router.push('/finance/post-payment');
         })
         .catch((error) => {
           const errors = error.response.data.errors;
