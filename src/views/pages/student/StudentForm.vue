@@ -7,6 +7,7 @@
       <Family :data="data.family || {}" />
       <Address :data="data.address || {}" />
       <Education :data="data.education || {}"/>
+      <Subjects :studentId="$route.params.studentId" />
     </template>
   </CenterContainer>
 </template>
@@ -17,6 +18,7 @@ import Account from '../../components/Student/Account';
 import Address from '../../components/Student/Address';
 import Education from '../../components/Student/Education';
 import Family from '../../components/Student/Family';
+import Subjects from '../../components/StudentSubjects/List'; // added here for the meantime while testing the component
 import { StudentApi } from '../../../mixins/api';
 
 export default {
@@ -25,7 +27,8 @@ export default {
     Account,
     Address,
     Education,
-    Family
+    Family,
+    Subjects
   },
   mixins: [ StudentApi ],
   data() {

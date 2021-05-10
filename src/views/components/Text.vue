@@ -7,6 +7,7 @@
     margin-top: ${marginTop}px;
     flex: ${flex};
     text-align: ${align};
+    ${fontSize ? `font-size: ${fontSize}px` : ``}
     text-transform: ${transform}`"
     :class="`${size}-text ${color}-color ${weight}-weight`">
     <slot></slot>
@@ -38,6 +39,9 @@ export default {
     marginBottom: {
       type: [Number, String],
       default: 0
+    },
+    fontSize: {
+      type: [Number, String],
     },
     marginTop: {
       type: [Number, String],

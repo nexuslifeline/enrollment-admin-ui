@@ -1,24 +1,25 @@
 <template>
   <v-select
-    :options="options || schoolCategories"
+    :options="options"
     :reduce="reduce"
     :value="value"
     @input="onInput"
     :label="label"
     :placeholder="placeholder"
-    class="mt-2"
     :searchable="searchable"
     :selectable="selectable"
-    :clearable="clearable"
-  />
+    :clearable="clearable">
+    <template slot="option" slot-scope="data">
+      <div>
+        {{ 'SY 2015-2016 - First Year - 1st Semester' }}
+      </div>
+    </template>
+  </v-select>
 </template>
 <script>
-import { SchoolCategories } from '../../helpers/enum';
+
 export default {
   props: {
-    options: {
-      type: [Array]
-    },
     value: {
       type: [Object]
     },
@@ -51,10 +52,13 @@ export default {
   },
   data() {
     return {
-      schoolCategories: SchoolCategories?.values?.filter(
-        v => this.$store.state?.user?.userGroup?.schoolCategories?.map(c => c.id).includes(v.id)
-      ) || []
+      options: [
+        {} // for testing only
+      ]
     }
+  },
+  created() {
+    console.log('load academic records here')
   },
   methods: {
     onInput(item) {
@@ -64,6 +68,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '../../assets/scss/shared.scss';
-
+@import '../../../assets/scss/shared.scss';
 </style>

@@ -18,7 +18,7 @@
           :searchable="false"
           :selectable="option => checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         />-->
-        <vSelectCategory
+        <SelectCategory
           :value="filters.rateSheet.schoolCategoryItem"
           @input="onCategoryFilterChange"
           label="name"

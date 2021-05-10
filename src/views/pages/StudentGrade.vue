@@ -23,7 +23,7 @@
         placeholder="School Category"
         class="mt-2"
       />-->
-      <vSelectCategory
+      <SelectCategory
         @input="onCategoryFilterChange"
         v-model="filters.student.schoolCategoryItem"
         label="name"

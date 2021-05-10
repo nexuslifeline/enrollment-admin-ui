@@ -7,7 +7,8 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
-import vSelectCategory from './views/components/SelectCategory';
+import SelectCategory from './views/components/Dropdowns/SelectCategory';
+import SelectAcademicRecord from './views/components/Dropdowns/SelectAcademicRecord';
 import AvatarMaker from './views/components/AvatarMaker';
 import vText from './views/components/Text';
 import Card from './views/components/Card';
@@ -180,7 +181,8 @@ Vue.component('v-select', vSelect)
 
 Vue.component('vText', vText);
 Vue.component('BackLink', BackLink);
-Vue.component('vSelectCategory', vSelectCategory);
+Vue.component('SelectCategory', SelectCategory);
+Vue.component('SelectAcademicRecord', SelectAcademicRecord);
 Vue.component('CenterContainer', CenterContainer);
 Vue.component('AvatarMaker', AvatarMaker);
 Vue.component('Card', Card);

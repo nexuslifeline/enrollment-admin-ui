@@ -24,7 +24,7 @@
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
       />-->
-      <vSelectCategory
+      <SelectCategory
         :value="filters.transcriptRecord.schoolCategoryItem"
         @input="onCategoryFilterChange"
         label="name"
