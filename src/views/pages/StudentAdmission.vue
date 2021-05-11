@@ -52,7 +52,7 @@
     <template v-slot:content>
       <div v-if="checkIfHasSchoolCategoryAccess()">
         <b-alert v-model="showTermsAlert" variant="danger" class="mb-3">
-          No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/home/settings/terms-setting">here</router-link></span>.
+          No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
         </b-alert>
 
         <b-table
@@ -177,7 +177,7 @@
               <template v-slot:content>
                 <div>
                   <b-alert :show="!hasTermsSchoolCategory(data.item)" variant="danger" class="mb-3">
-                    No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/home/settings/terms-setting">here</router-link></span>.
+                    No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
                   </b-alert>
 
                   <ActiveViewItems>
