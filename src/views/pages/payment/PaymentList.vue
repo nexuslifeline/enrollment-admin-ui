@@ -1,11 +1,11 @@
 <template>
   <PageContent
-    title="Payment Transactions"
+    title="Post Payment"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPayments"
     :filterVisible="isFilterVisible"
     :createButtonVisible="showAddButton && isAccessible($options.PaymentPermissions.ADD.id)"
-    @create="$router.push(`/finance/payment/add`)">
+    @create="$router.push(`/finance/post-payment/add`)">
     <template v-slot:filters>
       <b-form-input
         type="text"

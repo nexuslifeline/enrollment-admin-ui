@@ -97,7 +97,7 @@
                   <b-dropdown-item
                     :disabled="showModalChangePassword"
                     v-if="isAccessible($options.PersonnelPermissions.CHANGE_PASSWORD.id)"
-                    @click="$router.push({ name: 'List Change Member Password', params: { personnelId: row.item.id } })"
+                    @click="onChangePassword(row)"
                   >
                     Change Password
                   </b-dropdown-item>
@@ -506,7 +506,14 @@ export default {
         name: 'List Change Member Username',
         params: { personnelId: row.item.id }
       })
-    }
+    },
+    onChangePassword(row) {
+      this.selectedMember = row.item?.user || {};
+      this.$router.push({
+        name: 'List Change Member Password',
+        params: { personnelId: row.item.id }
+      })
+    },
   },
 };
 </script>

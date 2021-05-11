@@ -1582,44 +1582,44 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 @import '../../assets/scss/_shared.scss';
-.drop-down__container {
-  display: flex;
-  align-items: center;
-}
 
-.search-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  .select-paginated {
+  .search-container {
+    display: flex;
+    align-items: center;
     width: 100%;
 
-    @include for-size(phone-only) {
+    .select-paginated {
       width: 100%;
-    }
-    .select-option {
-      display: flex;
-      justify-content: center;
-      align-items: center;
 
-      .select-option__avatar {
-        width: auto;
+      @include for-size(phone-only) {
+        width: 100%;
       }
-
-      .select-option__info {
-        flex: 1;
-        margin-left: 10px;
+      .select-option {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .select-option__avatar {
+          width: auto;
+        }
+
+        .select-option__info {
+          flex: 1;
+          margin-left: 10px;
+          display: flex;
+          flex-direction: column;
+        }
       }
     }
   }
-}
-</style>
-<style lang="scss">
+
+  .drop-down__container {
+    display: flex;
+    align-items: center;
+  }
+
   .soa__drop-down {
     height: 24px;
 

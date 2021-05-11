@@ -5,6 +5,13 @@
     :filterVisible="isFilterVisible"
     @create="setCreate()"
     :createButtonVisible="false">
+    <template v-slot:extra-buttons>
+      <button 
+        @click="$router.push({path: `/registrar/student-grade`})"
+        class="for-approval-button">
+        For Approval {{studentGradeCount > 0 ? `(${studentGradeCount})` : ''}}
+      </button>
+    </template>
     <template v-slot:filters>
       <b-form-input
         v-model="filters.transcriptRecord.criteria"
@@ -1372,6 +1379,7 @@ import {
   LevelApi,
   ReportApi,
   SchoolCategoryApi,
+  StudentGradeApi,
   SubjectApi,
   TranscriptRecordApi,
 } from '../../mixins/api';
@@ -1381,6 +1389,7 @@ import {
   StudentCategories,
   Semesters,
   TranscriptRecordPermissions,
+  StudentGradeStatuses
 } from '../../helpers/enum';
 import {
   showNotification,
@@ -1424,6 +1433,7 @@ export default {
     SubjectApi,
     ReportApi,
     Access,
+    StudentGradeApi
   ],
   components: {
     SchoolCategoryTabs,
@@ -1447,9 +1457,11 @@ export default {
   StudentCategories,
   Semesters,
   TranscriptRecordPermissions,
+  StudentGradeStatuses,
   data() {
     return {
       isFilterVisible: true,
+      studentGradeCount: 0,
       fileViewer: {
         isActiveNavEnabled: false,
         activeNavCount: 0,
@@ -1704,8 +1716,16 @@ export default {
     this.loadLevels()
     this.loadCourses()
     this.loadTranscriptRecords();
+    this.loadStudentGrades();
   },
   methods: {
+    loadStudentGrades() {
+      const { StudentGradeStatuses } = this.$options
+      const params = { studentGradeStatusId: StudentGradeStatuses.SUBMITTED.id, paginate: false }
+      this.getStudentGradeList(params).then(({ data }) => {
+        this.studentGradeCount = data.length
+      })
+    },
     loadTranscriptRecords() {
       const {
         transcriptRecordStatusId,
@@ -2029,8 +2049,25 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '../../assets/scss/shared.scss';
+
 .collapsed .when-open,
 .not-collapsed .when-closed {
   display: none;
+}
+.for-approval-button {
+  background: none;
+  outline: 0;
+  border: 1px solid $light-gray-10;
+  border-radius: 4px;
+  padding: 4px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+
+  &:hover {
+    background-color: $light-gray-50;
+  }
 }
 </style>
