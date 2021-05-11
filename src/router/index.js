@@ -79,6 +79,7 @@ const ReviewTranscriptRecord = () => import('@/views/pages/ReviewTranscriptRecor
 const EnrolledStudentList = () => import('@/views/pages/reports/EnrolledStudentList')
 
 const StudentGrade = () => import('@/views/pages/StudentGrade')
+const StudentGradeApproval = () => import('@/views/pages/StudentGradeApproval')
 const Clearance = () => import('@/views/pages/Clearance')
 const ClearanceClearing = () => import('@/views/pages/ClearanceClearing')
 
@@ -214,6 +215,12 @@ function configRoutes () {
               path: 'academic-transcript/:transcriptRecordId',
               name: 'Review Academic Transript',
               component: ReviewTranscriptRecord,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'student-grade',
+              name: 'Student Grades',
+              component: StudentGradeApproval,
               meta: { requiresAuth: true }
             },
           ]

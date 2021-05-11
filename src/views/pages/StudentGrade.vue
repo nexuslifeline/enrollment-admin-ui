@@ -130,24 +130,6 @@
         Cancel
       </b-button>
     </template>
-    <template v-slot:bottom-actions>
-      <b-button
-        class="btn-save"
-        :disabled="tables.students.items.length == 0"
-        @click="onSaveStudentGrade()"
-        variant="primary">
-        <v-icon v-if="isProcessing" name="spinner" spin />
-        Save
-      </b-button>
-      <b-button
-        class="btn-save"
-        :disabled="tables.students.items.length == 0"
-        @click="onFinalizeGrade()"
-        variant="primary">
-        <v-icon v-if="isFinalizing" name="spinner" spin />
-        Finalize
-      </b-button>
-    </template>
   </PageContent>
 </template>
 <script>

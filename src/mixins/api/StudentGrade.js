@@ -5,6 +5,9 @@ export default {
     getStudentGradeList(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/student-grades`, { params: params });
     },
+    getStudentGradePersonnelList(params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/student-grades/personnels/list`, { params: params });
+    },
     getStudentGrade(id) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/student-grades/${id}`);
     },
@@ -19,6 +22,9 @@ export default {
     },
     deleteStudentGrade(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/student-grades/${id}`);
+    },
+    acceptStudentGrade(personnelId, sectionId, subjectId) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${personnelId}/${sectionId}/${subjectId}`);
     }
   }
 }
