@@ -315,7 +315,8 @@ export default {
       const { personnelId, sectionId, subjectId } = row.item
       this.acceptStudentGrade(personnelId, sectionId, subjectId)
       .then(({ data }) => {
-        console.log(data)
+        showNotification(this, 'success', 'Grade accepted successfully.')
+        this.loadStudentGrades()
       })
     }
   },
