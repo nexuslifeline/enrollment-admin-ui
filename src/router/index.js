@@ -52,6 +52,7 @@ const Semester = () => import('@/views/pages/Semester')
 const SchoolYear = () => import('@/views/pages/school-year/SchoolYear')
 const SchoolCategory = () => import('@/views/pages/SchoolCategory')
 const DemoPage = () => import('@/views/pages/DemoPage')
+const DemoPage2 = () => import('@/views/pages/DemoPage2')
 const SchoolRecords = () => import('@/views/pages/school-records/SchoolRecords')
 const SchoolRecordEvaluation = () => import('@/views/pages/school-records/Evaluation')
 const SchoolRecordEvaluationEntry = () => import('@/views/pages/school-records/EvaluationEntry')
@@ -696,6 +697,11 @@ function configRoutes () {
       path: '/demo',
       name: 'Demo',
       component: DemoPage
+    },
+    {
+      path: '/demo-2',
+      name: 'Demo2',
+      component: DemoPage2
     },
     {
       path: '*',
