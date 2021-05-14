@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options"
+    :options="options.academicRecords.items"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -9,14 +9,18 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable">
+    <template v-slot:selected-option="data">
+      {{ `${data.schoolYear.name} - ${data.level.name}` }} {{ data.semester ?  ` - ${data.semester.name}` : '' }}
+    </template>
     <template slot="option" slot-scope="data">
       <div>
-        {{ 'SY 2015-2016 - First Year - 1st Semester' }}
+        {{ `${data.schoolYear.name} - ${data.level.name}` }} {{ data.semester ?  ` - ${data.semester.name}` : '' }}
       </div>
     </template>
   </v-select>
 </template>
 <script>
+import { AcademicRecordApi } from '../../../mixins/api';
 
 export default {
   props: {
@@ -49,22 +53,34 @@ export default {
       type: [Boolean],
       default: false
     },
+    studentId: {
+      type: [String, Number],
+      default: false
+    },
   },
+  mixins: [ AcademicRecordApi ],
   data() {
     return {
-      options: [
-        {} // for testing only
-      ]
+      options: {
+        academicRecords: {
+          items: []
+        }
+      }
     }
   },
   created() {
-    console.log('load academic records here')
+    const { academicRecords } = this.options
+    const params = { paginate: false, studentId: this.studentId }
+    this.getAcademicRecordList(params).then(({ data }) => {
+      // console.log(data)
+      academicRecords.items = data
+    })
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     }
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>

@@ -23,5 +23,11 @@ export default {
     getGradesOfAcademicRecords(subjectId, sectionId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/subjects/${subjectId}/sections/${sectionId}`, { params: params });
     },
+    getAcademicRecordSubjects(id, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/${id}/subjects`, { params: params });
+    },
+    updateAcademicRecordSubject(id, subjectId, data) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${id}/subjects/${subjectId}`, data);
+    },
   }
 }
