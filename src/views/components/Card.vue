@@ -22,6 +22,7 @@
           Refresh
         </b-dropdown-item>
       </b-dropdown>
+      <slot name="header-action"></slot>
     </div>
     <div class="c-card__body" :class="{ noPadding: noPaddingBody }">
       <slot></slot>

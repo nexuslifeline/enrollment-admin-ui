@@ -215,7 +215,7 @@
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="false"
       />-->
-       <vSelectCategory
+       <SelectCategory
         :value="filters.academicRecord.schoolCategoryItem"
         @input="onCategoryFilterChange"
         label="name"

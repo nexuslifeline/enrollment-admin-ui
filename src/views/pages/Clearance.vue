@@ -26,7 +26,7 @@
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="checkIfAllowedAll()"
       />-->
-      <vSelectCategory
+      <SelectCategory
         @input="onCategoryFilterChange"
         v-model="filters.clearance.schoolCategoryItem"
         label="name"
@@ -181,7 +181,7 @@
               placeholder="School Category"
               class="mt-2"
             />-->
-            <vSelectCategory
+            <SelectCategory
               @input="loadFormSchoolCategoryInfo(), loadFormSections()"
               append-to-body
               v-model="forms.batchClearance.fields.schoolCategoryId"

@@ -13,7 +13,7 @@
   />
 </template>
 <script>
-import { SchoolCategories } from '../../helpers/enum';
+import { SchoolCategories } from '../../../helpers/enum';
 export default {
   props: {
     options: {
@@ -64,6 +64,5 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '../../assets/scss/shared.scss';
-
+@import '../../../assets/scss/shared.scss';
 </style>

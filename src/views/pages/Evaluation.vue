@@ -14,7 +14,7 @@
         placeholder="Search"
       >
       </b-form-input>
-      <vSelectCategory
+      <SelectCategory
         :value="filters.student.schoolCategoryItem"
         @input="onCategoryFilterChange"
         label="name"

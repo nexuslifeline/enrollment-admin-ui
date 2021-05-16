@@ -14,7 +14,7 @@
         type="text"
         placeholder="Search"
       />
-      <vSelectCategory
+      <SelectCategory
         @input="onCategoryFilterChange"
         v-model="filters.clearance.schoolCategoryItem"
         label="name"
