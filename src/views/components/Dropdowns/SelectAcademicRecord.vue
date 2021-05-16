@@ -10,11 +10,11 @@
     :selectable="selectable"
     :clearable="clearable">
     <template v-slot:selected-option="data">
-      {{ `${data.schoolYear.name} - ${data.level.name}` }} {{ data.semester ?  ` - ${data.semester.name}` : '' }}
+      {{ formatOption(data) }}
     </template>
     <template slot="option" slot-scope="data">
       <div>
-        {{ `${data.schoolYear.name} - ${data.level.name}` }} {{ data.semester ?  ` - ${data.semester.name}` : '' }}
+        {{ formatOption(data) }}
       </div>
     </template>
   </v-select>
@@ -58,7 +58,7 @@ export default {
       default: false
     },
   },
-  mixins: [ AcademicRecordApi ],
+  mixins: [AcademicRecordApi],
   data() {
     return {
       options: {
@@ -72,13 +72,15 @@ export default {
     const { academicRecords } = this.options
     const params = { paginate: false, studentId: this.studentId }
     this.getAcademicRecordList(params).then(({ data }) => {
-      // console.log(data)
       academicRecords.items = data
     })
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
+    },
+    formatOption(data) {
+      return `${data?.schoolYear?.name || 'No School Year'} - ${data?.level?.name} ${data?.semester?.name}`;
     }
   },
 };
