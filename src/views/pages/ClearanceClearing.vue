@@ -236,9 +236,6 @@ export default {
         }
       },
       options: {
-        schoolYears: {
-          items: []
-        },
         sections: {
           items: []
         },
@@ -252,7 +249,6 @@ export default {
     }
   },
   created() {
-    this.loadSchoolYears()
     this.loadClearances()
   },
   methods: {
@@ -269,18 +265,6 @@ export default {
         clearance.to = data.meta.to;
         clearance.totalRows = data.meta.total;
         clearances.isBusy = false;
-      })
-    },
-    loadSchoolYears() {
-      const params = { paginate: false }
-      const { schoolYears } = this.options
-      const { clearance } = this.filters
-      this.getSchoolYearList(params).then(({ data }) => {
-        const activeSchoolYear = data.find(x => x.isActive)
-        clearance.schoolYearId = activeSchoolYear.id ?? null
-        schoolYears.items = data
-      }).catch(error => {
-        console.log(error)
       })
     },
     loadCourses() {

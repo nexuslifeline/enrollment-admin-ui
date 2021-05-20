@@ -599,9 +599,6 @@ export default {
         }
       },
       options: {
-        schoolYears: {
-          items: [],
-        },
         levels: {
           items: [],
           formItems: []
@@ -646,7 +643,6 @@ export default {
     }
   },
   created() {
-    // this.loadSchoolYears()
     this.loadClearances()
     this.loadPersonnels()
   },
@@ -772,18 +768,6 @@ export default {
       if(personnel)
       this.$set(data.item.pivot, 'description', personnel.jobTitle || personnel.user.userGroup.name)
     },
-    // loadSchoolYears() {
-    //   const params = { paginate: false }
-    //   const { schoolYears } = this.options
-    //   const { clearance } = this.filters
-    //   this.getSchoolYearList(params).then(({ data }) => {
-    //     const activeSchoolYear = data.find(x => x.isActive)
-    //     clearance.schoolYearId = activeSchoolYear.id ?? null
-    //     schoolYears.items = data
-    //   }).catch(error => {
-    //     console.log(error)
-    //   })
-    // },
     loadFormSections() {
       const { schoolCategoryId, schoolYearId, courseId, semesterId, levelId } = this.forms.batchClearance.fields
       const params = { paginate: false, schoolCategoryId, schoolYearId, courseId, semesterId, levelId }
