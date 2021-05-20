@@ -2,8 +2,17 @@
   <div class="student-subject__list-item">
     <div class="item__content">
       <vText :fontSize="16" weight="bold">{{ `${data.code || 'N/A' } - ${data.description}` }}</vText>
-      <!-- <vText size="s" color="light">{{ 'Section 1 * Juan Dela Cruz * 1:00 pm - 3:00pm | 2:00 pm - 4:00pm' }}</vText> -->
-      <vText size="s" color="light" v-if="data.section">{{ `${data.section ? data.section.name : ''} * ${instructor} * ${subjectSchedule}` }}</vText>
+      <vText size="s" color="light" v-if="data.section" class="item__sub-text">
+        <span>
+          {{ `${data.section ? data.section.name : ''}` }}
+        </span>
+        <span>
+          {{ instructor }}
+        </span>
+        <span>
+          {{ subjectSchedule }}
+        </span>
+      </vText>
     </div>
     <div>
       <InputGroup>
@@ -76,5 +85,19 @@ export default {
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+.item__sub-text {
+  span {
+    &::after {
+      content: '\25CF';
+      margin: 0 7px;
+    }
+
+    &:last-child::after {
+      content: '';
+      margin: 0;
+    }
+  }
 }
 </style>

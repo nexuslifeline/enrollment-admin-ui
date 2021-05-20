@@ -6,7 +6,7 @@
       <template v-slot:header-action>
         <div class="header__action-dropdown">
           <SelectAcademicRecord
-            placeholder="Academic Record"
+            placeholder="Academic Year"
             :value="selectedAcademicRecord"
             :studentId="studentId"
             label="id"

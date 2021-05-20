@@ -319,7 +319,7 @@ export default {
       const { students } = this.tables
       const { id: sectionId, schoolYearId, courseId, levelId, semesterId } = this.section
       const { id: subjectId } = this.subject
-      const params = { subjectId, sectionId, paginate: false }
+      const params = { subjectId, sectionId, withTheSubject: true, paginate: false }
       const studentGradeParams = { subjectId, sectionId, schoolYearId, courseId, levelId, semesterId, filterByUser: true, paginate: false }
       students.isBusy = true;
       this.getStudentList(params).then(({ data }) => {
@@ -339,9 +339,13 @@ export default {
             })
             const studentGradeId = studentGrade ? studentGrade.id : null
             const studentGradeStatusId = studentGrade ? studentGrade.studentGradeStatusId : null
+            const academicRecord = student.academicRecords[0] ?? null
+            const isDropped = academicRecord?.subjects[0]?.pivot?.isDropped ?? null
             this.$set(student, 'studentGradeId', studentGradeId)
             this.$set(student, 'grades', grades)
             this.$set(student, 'studentGradeStatusId', studentGradeStatusId)
+            this.$set(student, 'academicRecordId', academicRecord.id)
+            this.$set(student, 'isDropped', isDropped)
             return student
           })
           this.$set(studentData, 'grades', )

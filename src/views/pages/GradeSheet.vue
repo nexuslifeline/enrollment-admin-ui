@@ -23,6 +23,9 @@
             }"
           />
         </template>
+        <template v-slot:cell(isDropped)="{ item, value }">
+          <Toggle :value="value" @input="checked => onUpdateAcademicRecordSubject(item, checked)" />
+        </template>
         <template v-slot:head(gradingPeriods)>
           <div class="cell-term__header">
             <div v-for="gradingPeriod in gradingPeriods" :key="gradingPeriod.id">
@@ -63,11 +66,13 @@
 <script>
 import { StudentColumn } from '../components/ColumnDetails';
 import { StudentGradeStatuses } from '../../helpers/enum';
+import { AcademicRecordApi } from '../../mixins/api';
 export default {
   name: 'GradeSheet',
   components: {
     StudentColumn
   },
+  mixins: [AcademicRecordApi],
   props: {
     section: {
       default: null,
@@ -102,6 +107,11 @@ export default {
               thStyle: { width: '40%' },
             },
             {
+              key: 'isDropped',
+              label: 'Is Dropped?',
+              tdClass: 'align-middle',
+            },
+            {
               key: 'gradingPeriods',
               label: '',
               tdClass: 'align-middle',
@@ -112,6 +122,16 @@ export default {
       },
     }
   },
+  methods: {
+    onUpdateAcademicRecordSubject(item, checked) {
+      const { academicRecordId } = item
+      const { id: subjectId } = this.subject
+      const data = { isDropped: checked }
+      this.updateAcademicRecordSubject(academicRecordId, subjectId, data).then(({ data }) => {
+        console.log(data)
+      })
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
