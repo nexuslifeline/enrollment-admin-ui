@@ -1603,9 +1603,6 @@ export default {
           isLoading: false,
           items: [],
         },
-        schoolYears: {
-          items: []
-        }
       },
       isProcessing: false,
       schoolCategoryId: null,
@@ -1622,16 +1619,8 @@ export default {
     }
     this.loadEvaluation();
     this.loadCourseList();
-    this.loadSchoolYears();
   },
   methods: {
-    loadSchoolYears() {
-      const params = { paginate: false}
-      const { schoolYears } = this.options
-      this.getSchoolYearList(params).then(({data}) => {
-        schoolYears.items = data
-      })
-    },
     setApproval(row) {
       this.forms.evaluation.approvalNotes = null;
       if (row.item.curriculumMsg) {
@@ -2172,12 +2161,7 @@ export default {
         schoolCategories.COLLEGE.id,
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
-    },
-    selectedSchoolYear() {
-      const { schoolYearId } = this.$store.state
-      const { schoolYears } = this.options
-      return schoolYears.items.find(sy => sy.id ===  schoolYearId)
-    },
+    }
   },
 };
 </script>

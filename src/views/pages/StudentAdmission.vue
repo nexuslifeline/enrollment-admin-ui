@@ -1326,9 +1326,6 @@ export default {
         sections: {
           items: [],
         },
-        schoolYears: {
-          items: []
-        },
         terms: {
           items: []
         }
@@ -1349,7 +1346,6 @@ export default {
       student.schoolCategoryItem =  this.getDefaultSchoolCategory()
     }
 
-    this.loaSchoolYears();
     this.loadCourseList();
     // this.loadDepartmentList()
     this.loadSections();
@@ -1365,13 +1361,6 @@ export default {
       this.getTermList(params).then(({ data }) => {
         terms.items = data
         this.showTermsAlert = terms.items.length > 0 ? false : true
-      })
-    },
-    loaSchoolYears() {
-      const params = { paginate: false}
-      const { schoolYears } = this.options
-      this.getSchoolYearList(params).then(({data}) => {
-        schoolYears.items = data
       })
     },
     setApproval(row) {
@@ -1817,12 +1806,7 @@ export default {
         schoolCategories.COLLEGE.id,
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
-    },
-    // selectedSchoolYear() {
-    //   const { schoolYearId } = this.$store.state
-    //   const { schoolYears } = this.options
-    //   return schoolYears.items.find(sy => sy.id ===  schoolYearId)
-    // }
+    }
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {

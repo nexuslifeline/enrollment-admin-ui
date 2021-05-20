@@ -998,9 +998,6 @@ export default {
           items: [],
         },
         schoolCategories: SchoolCategories,
-        schoolYears: {
-          items: []
-        },
         terms: {
           items: []
         }
@@ -1017,7 +1014,6 @@ export default {
       student.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
       student.schoolCategoryItem =  this.getDefaultSchoolCategory()
     }
-    this.loaSchoolYears()
     this.loadCourseList();
     this.loadFees();
     this.loadAcademicRecord()
@@ -1029,13 +1025,6 @@ export default {
       this.getTermList(params).then(({ data }) => {
         terms.items = data
         this.showTermsAlert = terms.items.length > 0 ? false : true
-      })
-    },
-    loaSchoolYears() {
-      const params = { paginate: false}
-      const { schoolYears } = this.options
-      this.getSchoolYearList(params).then(({data}) => {
-        schoolYears.items = data
       })
     },
     setApproveFees(row) {
@@ -1384,11 +1373,6 @@ export default {
     },
   },
   computed: {
-    // selectedSchoolYear() {
-    //   const { schoolYearId } = this.$store.state
-    //   const { schoolYears } = this.options
-    //   return schoolYears.items.find(sy => sy.id ===  schoolYearId)
-    // },
     subjectsTotalAmount() {
       return (subjects) => {
         let amount = 0;

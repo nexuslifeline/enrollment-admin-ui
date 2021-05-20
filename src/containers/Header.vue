@@ -185,12 +185,7 @@ export default {
       subNavLimit: SUB_NAV_LIMIT,
       mainNavLimit: MAIN_NAV_LIMIT,
       subNavOpen: [],
-      mainNavOpen: [],
-      options: {
-        schoolYears: {
-          items: [],
-        },
-      },
+      mainNavOpen: []
     };
   },
   computed: {
@@ -268,16 +263,6 @@ export default {
     window.removeEventListener('click', this.hideDropdownItems);
   },
   methods: {
-    loadSchoolYearList() {
-      const { schoolYears } = this.options;
-      this.getSchoolYearList({ paginate: false }).then(({ data }) => {
-        const activeSchoolYear = data.find((d) => d.isActive === 1);
-        this.$store.state.schoolYearId = activeSchoolYear
-          ? activeSchoolYear.id
-          : null;
-        schoolYears.items = data;
-      });
-    },
     calculateNavLimit() {
       this.subNavLimit = this.getSubNavLimit();
       this.mainNavLimit = this.getMainNavLimit();
@@ -332,7 +317,7 @@ export default {
     },
   },
   created() {
-    this.loadSchoolYearList();
+
   },
 };
 </script>
