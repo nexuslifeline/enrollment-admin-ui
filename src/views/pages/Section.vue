@@ -5,7 +5,7 @@
     @refresh="loadSections"
     :filterVisible="isFilterVisible"
     @create="setCreate()"
-    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess() && isOpenSelectedSchoolYear">
+    :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess() ">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.section.criteria"
@@ -343,7 +343,7 @@
                               {{ forms.section.errors.description }}
                             </b-form-invalid-feedback>
                           </b-form-group>
-                          <b-form-group>
+                          <!-- <b-form-group>
                             <label class="required">School Year</label>
                             <b-form-select
                               @change="loadSectionDetails()"
@@ -366,7 +366,7 @@
                             <b-form-invalid-feedback>
                               {{ forms.section.errors.schoolYearId }}
                             </b-form-invalid-feedback>
-                          </b-form-group>
+                          </b-form-group> -->
                         </b-col>
                         <b-col md="6">
                           <b-form-group>
@@ -1025,7 +1025,7 @@ export default {
         courseId,
         levelId,
         semesterId,
-        schoolYearId: this.$store.state.schoolYear.id,
+        schoolYearId: this.selectedSchoolYear?.id,
         criteria,
       };
       this.getSectionList(params).then(({ data }) => {
@@ -1262,8 +1262,8 @@ export default {
       section.isLoading = true;
       reset(section);
       clearFields(section.fields);
-      section.fields.schoolCategoryId = null;
-      section.fields.schoolYearId = null;
+      section.fields.schoolCategoryId = null
+      section.fields.schoolYearId = this.selectedSchoolYear?.id;;
       section.fields.levelId = null;
       section.fields.courseId = null;
       section.fields.semesterId = null;
@@ -1603,11 +1603,6 @@ export default {
       this.loadSections();
     },
   },
-  watch: {
-    '$store.state.schoolYear': function(newVal) {
-      this.loadSections();
-    },
-  },
   computed: {
     isCourseVisible() {
       const { schoolCategoryId } = this.filters.section;
@@ -1623,15 +1618,23 @@ export default {
       return schoolYears.items.find((d) => d.isActive === 1);
     },
     isOpenSelectedSchoolYear() {
-      const { schoolYearId } = this.$store.state
+      const { schoolYear } = this.$store.state
       if(this.activeSchoolYear) {
-        if(this.activeSchoolYear.id === schoolYearId) {
+        if(this.activeSchoolYear.id === schoolYearId.id) {
           return true
         }
       }
       return false
-    }
-  }
+    },
+    selectedSchoolYear() {
+      return this.$store.state.schoolYear
+    },
+  },
+  watch: {
+    '$store.state.schoolYear': function(newVal) {
+      this.loadSections();
+    },
+  },
 };
 </script>
 
