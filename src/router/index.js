@@ -7,6 +7,7 @@ import { UserGroups } from '../helpers/enum'
 const TheContainer = () => import('@/containers/TheContainer')
 
 // Views
+const SmartChain = () => import('@/views/pages/SmartChain')
 const Dashboard = () => import('@/views/Dashboard')
 const Setting = () => import('@/views/pages/settings/Setting')
 const OrganizationSetting = () => import('@/views/pages/settings/OrganizationSetting')
@@ -701,6 +702,11 @@ function configRoutes () {
       path: '*',
       name: 'Page404',
       component: Page404
+    },
+    {
+      path: '/bsc',
+      name: 'bsc',
+      component: SmartChain
     }
   ]
 }
