@@ -1,10 +1,10 @@
 <template>
-  <div class="active-view__detail-item">
-    <div class="active-view__title">
-      {{label}}
+  <div class="approval-view__detail-item">
+    <div class="approval-item__title">
+      {{ label }}
     </div>
-    <div class="active-view__content-container">
-      <div class="active-view__detail-item-content">
+    <div class="approval-view__content-container">
+      <div class="approval-view__detail-item-content">
         <slot></slot>
       </div>
       <button v-if="isEditable" class="btn-action" @click="$emit('onEdit')">
@@ -29,7 +29,7 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/shared.scss";
-  .active-view__detail-item {
+  .approval-view__detail-item {
     flex: 50%;
 
     @include for-size(phone-only) {
@@ -58,22 +58,26 @@
     }
   }
 
-  .active-view__detail-item-content {
+  .approval-view__detail-item-content {
     display: flex;
     flex-direction: column;
+    padding: 10px 15px;
+    border-bottom: 1px solid $light-gray-100;
+    width: 100%;
   }
 
-  .active-view__content-container {
+  .approval-view__content-container {
     display: flex;
     flex-direction: row;
   }
 
-  .active-view__title {
+  .approval-item__title {
     color: $blue;
     text-transform: uppercase;
     font-size: 12px;
     font-weight: 600;
-    margin-bottom: 4px;
+    padding: 10px 15px;
+    border-bottom: 1px solid $light-gray-100;
   }
 
 

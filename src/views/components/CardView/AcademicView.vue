@@ -1,5 +1,5 @@
 <template>
-  <Card title="Student Academic Application" titleSize="m" noPaddingBody>
+  <div>
      <ActiveViewItems>
       <ActiveViewItem label="Curriculum" @onEdit="onEditCurriculum" isEditable>
         <p>
@@ -26,9 +26,15 @@
         </p>
       </ActiveViewItem>
     </ActiveViewItems>
-  </Card>
+    <ChangeCurriculum
+      :isShown="isShown"
+      @onCancel="isShown = false"
+      @onSave="onSaveCurriculum"
+    />
+  </div>
 </template>
 <script>
+import ChangeCurriculum from './ChangeCurriculum';
 
 export default {
   props: {
@@ -36,11 +42,22 @@ export default {
       type: [Object]
     }
   },
+  data() {
+    return {
+      isShown: false
+    }
+  },
+  components: {
+    ChangeCurriculum
+  },
   methods: {
     onEditCurriculum() {
-
+      this.isShown = true;
     },
     onEditCourse() {
+
+    },
+    onSaveCurriculum() {
 
     }
   }

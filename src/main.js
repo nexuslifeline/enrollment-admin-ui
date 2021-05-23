@@ -7,6 +7,8 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import ApprovalItem from './views/components/ApprovalContainer/Item';
+import ApprovalView from './views/components/ApprovalContainer/PageLayout';
 import AcademicView from './views/components/CardView/AcademicView';
 import SchoolView from './views/components/CardView/SchoolView';
 import StudentView from './views/components/CardView/StudentView';
@@ -210,6 +212,8 @@ Vue.component('ActiveViewItem', ActiveViewItem);
 Vue.component('StudentView', StudentView);
 Vue.component('SchoolView', SchoolView);
 Vue.component('AcademicView', AcademicView);
+Vue.component('ApprovalView', ApprovalView);
+Vue.component('ApprovalItem', ApprovalItem);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)

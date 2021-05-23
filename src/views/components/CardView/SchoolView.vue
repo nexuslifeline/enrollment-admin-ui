@@ -1,5 +1,5 @@
 <template>
-  <Card title="Last School Attended" titleSize="m" noPaddingBody>
+  <div>
     <ActiveViewItems>
       <ActiveViewItem label="Last School Attended">
         <p>
@@ -17,7 +17,7 @@
         </p>
       </ActiveViewItem>
     </ActiveViewItems>
-  </Card>
+  </div>
 </template>
 <script>
 
