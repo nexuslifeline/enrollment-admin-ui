@@ -27,6 +27,7 @@ const ChangeProfileUsername = () => import('@/views/pages/profile/ChangeUsername
 const UpdateProfilePassword = () => import('@/views/pages/profile/UpdatePassword')
 const MyActivity = () => import('@/views/pages/MyActivity')
 const Evaluation = () => import('@/views/pages/Evaluation')
+const EvaluationDetail = () => import('@/views/pages/evaluation/Detail')
 const StudentAdmission = () => import('@/views/pages/StudentAdmission')
 const StudentAssessmentFee = () => import('@/views/pages/StudentAssessmentFee')
 const RateSheet = () => import('@/views/pages/RateSheet')
@@ -142,7 +143,14 @@ function configRoutes () {
               path: 'evaluation',
               name: 'Evaluation',
               component: Evaluation,
-              meta: { requiresAuth: true }
+              meta: { requiresAuth: true },
+              children: [
+                {
+                  path: ':evaluationId/detail',
+                  name: 'Evaluation Detail',
+                  component: EvaluationDetail
+                }
+              ]
             },
             {
               path: 'student-subject-enlisment',

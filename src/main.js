@@ -7,6 +7,15 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import AcademicView from './views/components/CardView/AcademicView';
+import SchoolView from './views/components/CardView/SchoolView';
+import StudentView from './views/components/CardView/StudentView';
+import ActiveRowViewer from './views/components/ActiveRowViewer/ActiveRowViewer';
+import ActiveViewLinks from './views/components/ActiveRowViewer/ActiveViewLinks';
+import ActiveViewHeader from './views/components/ActiveRowViewer/ActiveViewHeader';
+import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems';
+import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
+import PageContent from './views/components/PageContainer/PageContent';
 import SelectCategory from './views/components/Dropdowns/SelectCategory';
 import SelectAcademicRecord from './views/components/Dropdowns/SelectAcademicRecord';
 import AvatarMaker from './views/components/AvatarMaker';
@@ -192,6 +201,15 @@ Vue.component('InputContainer', InputContainer);
 Vue.component('InputInline', InputInline);
 Vue.component('Toggle', Toggle);
 Vue.component('LinkVisibilityToggler', LinkVisibilityToggler);
+Vue.component('PageContent', PageContent);
+Vue.component('ActiveRowViewer', ActiveRowViewer);
+Vue.component('ActiveViewLinks', ActiveViewLinks);
+Vue.component('ActiveViewHeader', ActiveViewHeader);
+Vue.component('ActiveViewItems', ActiveViewItems);
+Vue.component('ActiveViewItem', ActiveViewItem);
+Vue.component('StudentView', StudentView);
+Vue.component('SchoolView', SchoolView);
+Vue.component('AcademicView', AcademicView);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
