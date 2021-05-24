@@ -10,7 +10,9 @@ import { httpRequest, httpAuthRequest } from './helpers/http'
 import ApprovalItem from './views/components/ApprovalContainer/Item';
 import ApprovalView from './views/components/ApprovalContainer/PageLayout';
 import AcademicView from './views/components/CardView/AcademicView';
+import AttachmentsView from './views/components/CardView/AttachmentsView';
 import SchoolView from './views/components/CardView/SchoolView';
+import EducationView from './views/components/CardView/EducationView';
 import StudentView from './views/components/CardView/StudentView';
 import ActiveRowViewer from './views/components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewLinks from './views/components/ActiveRowViewer/ActiveViewLinks';
@@ -211,6 +213,8 @@ Vue.component('ActiveViewItems', ActiveViewItems);
 Vue.component('ActiveViewItem', ActiveViewItem);
 Vue.component('StudentView', StudentView);
 Vue.component('SchoolView', SchoolView);
+Vue.component('AttachmentsView', AttachmentsView);
+Vue.component('EducationView', EducationView);
 Vue.component('AcademicView', AcademicView);
 Vue.component('ApprovalView', ApprovalView);
 Vue.component('ApprovalItem', ApprovalItem);

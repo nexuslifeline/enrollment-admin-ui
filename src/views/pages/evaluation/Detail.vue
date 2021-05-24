@@ -32,7 +32,7 @@
         <b-tabs content-class="mt-3">
           <b-tab title="Request">
             <div class="tab__content">
-              <button class="action__accept-credit" type="button">
+              <button @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
                 <BIconPlus scale="1.2" class="mr-1" />
                 Accept Transfer Credit
               </button>
@@ -44,6 +44,7 @@
                 v-if="!!Object.keys(data).length"
                 :data="data"
               />
+              <AttachmentsView :data="{}" />
             </div>
           </b-tab>
           <b-tab title="Account History">
@@ -111,6 +112,9 @@
     methods: {
       onApproveRequest() {
         this.isApprovalShown = true;
+      },
+      onAcceptTransferCredit() {
+        console.log('show modal for transfer credit')
       }
     }
   }
