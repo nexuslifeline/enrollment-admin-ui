@@ -166,8 +166,7 @@ export default {
       return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
     },
     studentId() {
-       const { data } = this;
-       return data?.id
+      return this.$route.params.studentId;
     }
   },
   data() {

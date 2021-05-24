@@ -222,8 +222,7 @@ export default {
   },
   computed: {
     studentId() {
-      const { data } = this
-      return data?.id
+      return this.$route.params.studentId;
     }
   }
 };
