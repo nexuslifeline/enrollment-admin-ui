@@ -10,7 +10,7 @@
         </div>
         <slot name="header"></slot>
         <div v-if="showOptions" class="approval-view__header-right-actions">
-          <button variant="dark" class="btn-action">
+          <button @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
             Approve Request
           </button>
         </div>

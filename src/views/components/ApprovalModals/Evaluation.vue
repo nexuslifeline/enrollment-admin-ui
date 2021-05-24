@@ -2,18 +2,22 @@
   <b-modal
     :visible="isShown"
     size="md"
-    title="Change Curriculum"
+    title="Approve Evaluation"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
-    @hidden="$emit('update:isShown', false)"
     bodyClass="modal-body__container"
+    @hidden="$emit('update:isShown', false)"
     :centered="true">
     <div class="modal-field-container overflow-visible">
-
+      <label>Notes</label>
+      <b-textarea
+        rows="7"
+      />
     </div>
     <template v-slot:modal-footer>
       <FooterAction
-        @onConfirm="onChangeCurriculum"
+        confirmText="Confirm Approval"
+        @onConfirm="onApproveEvaluation"
         @onCancel="$emit('onCancel')"
         :isConfirmBusy="isConfirmBusy"
       />
@@ -30,11 +34,8 @@ export default {
     isConfirmBusy: {
       type: [Boolean]
     },
-    academicRecordId: {
+    evaluationId: {
       type: [Number, String]
-    },
-    curriculum: {
-      type: [Object]
     }
   },
   components: {
@@ -49,8 +50,8 @@ export default {
 
   },
   methods: {
-    onChangeCurriculum() {
-      console.log('patch curriculum in academic record here')
+    onApproveEvaluation() {
+      console.log('put or patch evaluation here')
     }
   }
 };

@@ -1,5 +1,8 @@
 <template>
-  <ApprovalView @onBack="$router.push(previousRoute)" backTitle="Evaluation">
+  <ApprovalView
+    @onBack="$router.push(previousRoute)"
+    @onApproveRequest="onApproveRequest"
+    backTitle="Evaluation">
      <template v-slot:detail>
        <div class="mt-2">
          <b-tabs content-class="mt-3">
@@ -55,12 +58,15 @@
           </b-tab>
         </b-tabs>
        </div>
-
+      <ApproveEvaluation
+        :isShown.sync="isApprovalShown"
+      />
      </template>
   </ApprovalView>
 </template>
 
 <script>
+  import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
   import { EvaluationApi } from '../../../mixins/api';
   export default {
     mixins: [EvaluationApi],
@@ -69,9 +75,13 @@
         type: [Object]
       }
     },
+    components: {
+      ApproveEvaluation
+    },
     data() {
       return {
-        data: {}
+        data: {},
+        isApprovalShown: false
       }
     },
     computed: {
@@ -97,6 +107,11 @@
         this.data = data;
         console.log(data)
       });
+    },
+    methods: {
+      onApproveRequest() {
+        this.isApprovalShown = true;
+      }
     }
   }
 </script>
