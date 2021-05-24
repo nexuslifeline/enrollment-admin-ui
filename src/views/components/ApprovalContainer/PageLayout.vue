@@ -156,7 +156,7 @@
     z-index: 10;
     background-color: $white;
     border-right: 1px solid $brand-border-color;
-    padding: 10px;
+    //padding: 10px;
 
     @include for-size(tablet-landscape-down) {
       display: none;
@@ -165,7 +165,7 @@
 
   .approval-view__content {
     flex: 1;
-    padding: 40px;
+    padding: 10px 0;
     //border-left: 1px solid $brand-border-color;
     background-color: $light-gray;
     position: relative;

@@ -12,7 +12,7 @@
     </div>
     <template v-slot:modal-footer>
       <FooterAction
-        @onConfirm="$emit('onSave')"
+        @onConfirm="onChangeCurriculum"
         @onCancel="$emit('onCancel')"
         :isConfirmBusy="isConfirmBusy"
       />
@@ -25,6 +25,12 @@ export default {
   props: {
     isShown: {
       type: [Boolean]
+    },
+    academicRecordId: {
+      type: [Number, String]
+    },
+    curriculum: {
+      type: [Object]
     }
   },
   components: {
@@ -39,7 +45,9 @@ export default {
 
   },
   methods: {
+    onChangeCurriculum() {
 
+    }
   }
 };
 </script>

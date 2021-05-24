@@ -28,8 +28,8 @@
     </ActiveViewItems>
     <ChangeCurriculum
       :isShown="isShown"
+      :academicRecordId="data.id"
       @onCancel="isShown = false"
-      @onSave="onSaveCurriculum"
     />
   </div>
 </template>
