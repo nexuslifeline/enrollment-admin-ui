@@ -60,8 +60,10 @@ export default {
       default: false
     },
     courseId: {
-      type: [String, Number],
-      default: false
+      type: [String, Number]
+    },
+    levelId: {
+      type: [String, Number]
     },
   },
   mixins: [ CurriculumApi ],

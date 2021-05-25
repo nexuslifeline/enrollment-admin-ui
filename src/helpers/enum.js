@@ -720,3 +720,9 @@ export const SchoolYearStatuses = new Enum({
   SETUP_GRADING_PERIOD: { id: 3, name: 'Setup Grading Period' },
   SETUP_SECTION_SCHEDULE: { id: 4, name: 'Setup Section and Schedule' },
 });
+
+export const TranscriptRecordStatus = new Enum({
+  DRAFT: { id: 1, name: 'DRAFT' }, // active
+  FINALIZED: { id: 2, name: 'Finalized' }, // completed
+  PENDING: { id: 3, name: 'Pending' } // shifted
+});

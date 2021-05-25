@@ -28,12 +28,9 @@
     </ActiveViewItems>
     <ChangeCurriculum
       @onCancel="isShowChangeCurriculum = false"
-      :data="data"
+      :data.sync="data.academicRecord"
       :isConfirmBusy="isChangingCurriculum"
       :isShown.sync="isShowChangeCurriculum"
-      :academicRecordId="data.id"
-      :curriculum="data.curriculum"
-      :courseId="data.courseId"
     />
   </div>
 </template>

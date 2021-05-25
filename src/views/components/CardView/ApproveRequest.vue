@@ -2,7 +2,7 @@
   <b-modal
     :visible="isShown"
     size="md"
-    title="Change Curriculum"
+    title="Approve Request"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     bodyClass="modal-body__container"
