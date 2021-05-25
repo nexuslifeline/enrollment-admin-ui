@@ -6,7 +6,7 @@
           {{ data.curriculum && data.curriculum.name || 'No Curriculum' }}
         </p>
       </ActiveViewItem>
-      <ActiveViewItem 
+      <ActiveViewItem
         v-if="data.course"
         label="Course"
         @onEdit="onEditCourse"
@@ -27,12 +27,18 @@
       </ActiveViewItem>
     </ActiveViewItems>
     <ChangeCurriculum
-      :isShown.sync="isShown"
+      @onCancel="isShowChangeCurriculum = false"
+      :data="data"
+      :isConfirmBusy="isChangingCurriculum"
+      :isShown.sync="isShowChangeCurriculum"
       :academicRecordId="data.id"
+      :curriculum="data.curriculum"
+      :courseId="data.courseId"
     />
   </div>
 </template>
 <script>
+import { AcademicRecordApi, CurriculumApi } from '../../../mixins/api';
 import ChangeCurriculum from './ChangeCurriculum';
 
 export default {
@@ -41,9 +47,20 @@ export default {
       type: [Object]
     }
   },
+  mixins: [ CurriculumApi, AcademicRecordApi ],
   data() {
     return {
-      isShown: false
+      isCreatingTranscript: false,
+      isShowChangeCurriculum: false,
+      isChangingCurriculum: false, //processing saving of curriculum
+      options: {
+        curriculums: {
+          items: []
+        },
+        studentCurriculums: {
+          items: []
+        }
+      }
     }
   },
   components: {
@@ -51,13 +68,30 @@ export default {
   },
   methods: {
     onEditCurriculum() {
-      this.isShown = true;
+      this.isShowChangeCurriculum = true;
     },
     onEditCourse() {
 
     },
-    onSaveCurriculum() {
-
+    onAcceptTransferCredit() {
+      const { curriculumId } = this.data
+      if(!curriculumId) {
+        showNotification(this,'danger', 'Curriculum is required before accepting credit.')
+        return
+      }
+      //call active firstcreate transcript
+      this.isCreatingTranscript = true
+      this.activeFirstOrCreateTranscriptRecord(this.data).then(({ data }) => {
+        console.log(data)
+        this.data.transcriptRecord = data
+        this.data.transcriptRecordId = data.id
+        this.isCreatingTranscript = false
+        console.log(this.data)
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        console.log(errors)
+        this.isCreatingTranscript = false
+      });
     }
   }
 };

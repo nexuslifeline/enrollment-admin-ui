@@ -33,7 +33,8 @@
           <b-tab title="Request">
             <div class="tab__content">
               <button @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
-                <BIconPlus scale="1.2" class="mr-1" />
+                <BIconPlus scale="1.2" class="mr-1" v-if="!isCreatingTranscript"/>
+                <v-icon name="spinner" spin v-if="isCreatingTranscript"></v-icon>
                 Accept Transfer Credit
               </button>
               <AcademicView
@@ -68,9 +69,9 @@
 
 <script>
   import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
-  import { EvaluationApi } from '../../../mixins/api';
+  import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
   export default {
-    mixins: [EvaluationApi],
+    mixins: [ EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
     props: {
       previousRoute: {
         type: [Object]
@@ -82,7 +83,8 @@
     data() {
       return {
         data: {},
-        isApprovalShown: false
+        isApprovalShown: false,
+        isCreatingTranscript: false,
       }
     },
     computed: {
@@ -106,7 +108,6 @@
     created() {
       this.getEvaluation(this.evaluationId).then(({ data }) => {
         this.data = data;
-        console.log(data)
       });
     },
     methods: {
@@ -115,6 +116,31 @@
       },
       onAcceptTransferCredit() {
         console.log('show modal for transfer credit')
+        console.log(this.data)
+        const { academicRecord, academicRecord: { curriculumId } } = this.data
+
+        if(!curriculumId) {
+          showNotification(this,'danger', 'Curriculum is required before accepting credit.')
+          return
+        }
+        //call active firstcreate transcript
+        this.isCreatingTranscript = true
+        const data = {
+          ...academicRecord
+        }
+
+        this.activeFirstOrCreateTranscriptRecord(data).then(({ data }) => {
+          //patch academic records transcript record id
+          this.patchAcademicRecord({ transcriptRecordId: data.id }, academicRecord.id).then(({ data }) => {
+            this.data.academicRecord = data//udpated acadmic record
+            this.isCreatingTranscript = false
+            //show component here
+          })
+        }).catch((error) => {
+          const errors = error.response.data.errors;
+          console.log(errors)
+          this.isCreatingTranscript = false
+        });
       }
     }
   }
