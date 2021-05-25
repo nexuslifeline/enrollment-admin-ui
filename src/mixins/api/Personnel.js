@@ -52,6 +52,9 @@ export default {
     },
     addPersonnelUser(data, personnelId){
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/user`, data);
-    }
+    },
+    getStudentsOfPersonnel(params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/me/students`, { params: params });
+    },
   }
 }

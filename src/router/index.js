@@ -83,6 +83,7 @@ const StudentGrade = () => import('@/views/pages/StudentGrade')
 const StudentGradeApproval = () => import('@/views/pages/StudentGradeApproval')
 const Clearance = () => import('@/views/pages/Clearance')
 const ClearanceClearing = () => import('@/views/pages/ClearanceClearing')
+const DroppedStudent = () => import('@/views/pages/DroppedStudent')
 
 const SetupSchoolYear = () => import('@/views/pages/sy-setup/Setup')
 
@@ -409,6 +410,12 @@ function configRoutes () {
               path: 'clearance',
               name: 'Clearance',
               component: ClearanceClearing,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'dropped-student',
+              name: 'Drop Student',
+              component: DroppedStudent,
               meta: { requiresAuth: true }
             },
           ]

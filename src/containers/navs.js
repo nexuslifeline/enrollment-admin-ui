@@ -189,6 +189,11 @@ export default [
         to: '/instructor/grade-sheet',
         permissionIds: StudentGradePermissions.getIds()
       },
+      {
+        label: 'Dropped Students',
+        to: '/instructor/dropped-student',
+        // permissionIds: StudentGradePermissions.getIds()
+      },
 
     ]
   },
