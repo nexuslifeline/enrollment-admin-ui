@@ -28,7 +28,7 @@
     </ActiveViewItems>
     <ChangeCurriculum
       @onCancel="isShowChangeCurriculum = false"
-      :data.sync="data.academicRecord"
+      :data="transcriptRecord"
       :isConfirmBusy="isChangingCurriculum"
       :isShown.sync="isShowChangeCurriculum"
     />
@@ -62,6 +62,11 @@ export default {
   },
   components: {
     ChangeCurriculum
+  },
+  computed: {
+    transcriptRecord() {
+      return this.data?.academicRecord?.transcriptRecord || {};
+    }
   },
   methods: {
     onEditCurriculum() {
