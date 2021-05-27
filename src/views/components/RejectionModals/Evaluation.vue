@@ -10,18 +10,18 @@
     :centered="true">
     <div class="modal-field-container overflow-visible">
       <b-form-group
-        :state="forms.evaluation.states.approvalNotes"
-        :invalid-feedback="forms.evaluation.errors.approvalNotes">
+        :state="forms.evaluation.states.disapprovalNotes"
+        :invalid-feedback="forms.evaluation.errors.disapprovalNotes">
           <label> Notes</label>
           <b-textarea
-            v-model="forms.evaluation.fields.approvalNotes"
+            v-model="forms.evaluation.fields.disapprovalNotes"
             rows="7" />
       </b-form-group>
     </div>
     <template v-slot:modal-footer>
       <FooterAction
         confirmText="Confirm Rejection"
-        @onConfirm="onApproveEvaluation"
+        @onConfirm="onRejectEvaluation"
         @onCancel="$emit('onCancel')"
         :isConfirmBusy="forms.evaluation.isProcessing"
       />
@@ -71,8 +71,7 @@ export default {
 
   },
   methods: {
-    onApproveEvaluation() {
-      console.log('put or patch evaluation here')
+    onRejectEvaluation() {
       const { evaluation, evaluation: { fields } } = this.forms
       evaluation.isProcessing = true
 
@@ -83,7 +82,6 @@ export default {
       this.updateEvaluation(fields, this.evaluationId).then(({ data }) => {
         evaluation.isProcessing = false
         showNotification(this, 'warning', 'Evaluation has been reject.')
-        this.$emit('update: isShown', false)
         this.$emit('onRejected')
       }).catch((error) => {
         const errors = error.response.data.errors;
