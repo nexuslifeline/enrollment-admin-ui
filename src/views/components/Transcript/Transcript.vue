@@ -17,6 +17,7 @@
                 :subjects.sync="subjects"
                 :levelId="level.id"
                 @onSave="onSave"
+                :isProcessing="isProcessing"
               />
             </template>
             <template v-else>
@@ -28,6 +29,7 @@
                       :semesterId="sem.id"
                       :levelId="level.id"
                       @onSave="onSave"
+                      :isProcessing="isProcessing"
                     />
                   </b-tab>
                 </template>
@@ -43,13 +45,14 @@
 import SubjectsTable from './SubjectsTable';
 import { TranscriptRecordApi } from '../../../mixins/api';
 import { Semesters } from '../../../helpers/enum'
+import { showNotification } from '../../../helpers/forms';
 
 export default {
   Semesters,
   components: {
     SubjectsTable
   },
-  mixins: [TranscriptRecordApi],
+  mixins: [ TranscriptRecordApi ],
   props: {
     transcriptId: {
       type: [Number, String]
@@ -60,7 +63,8 @@ export default {
       levels: [],
       semesters: Semesters.values.slice(0, 2),
       subjects: [],
-      courseId: 0
+      courseId: 0,
+      isProcessing: false
     }
   },
   created() {
@@ -85,14 +89,21 @@ export default {
         totalUnits,
         ...pivot
       }));
-      console.log(this.subjects)
+      // console.log(this.subjects)
     }).catch((error) => {
       console.log(error)
     });
   },
   methods: {
     onSave(data) {
-      console.log('onSave', data)
+      this.isProcessing = true
+      this.saveTranscriptRecordSubjects(this.transcriptId, data).then(({ data }) => {
+        showNotification(this, 'success', 'Subjects has been updated.')
+        this.isProcessing = false
+      }).catch(error => {
+        console.log(error)
+        this.isProcessing = false
+      })
     }
   }
 };

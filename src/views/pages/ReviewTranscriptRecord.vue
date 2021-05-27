@@ -87,7 +87,7 @@
               <h5>Transcript of Records</h5>
               <div class="font-weight-bold">{{transcriptRecord.curriculum ? transcriptRecord.curriculum.name : ''}}</div>
             </div>
-            <div v-if="transcriptRecord.subjects">
+            <!-- <div v-if="transcriptRecord.subjects">
               <b-row v-if="transcriptRecord.courseId === null">
                 <b-col md="12">
                   <b-row>
@@ -435,9 +435,9 @@
                   </b-list-group>
                 </b-col>
               </b-row>
-            </div>
+            </div> -->
+            <TranscriptView :transcriptId ="transcriptRecordId" />
           </div>
-          
         </div>
       </b-overlay>
       <b-modal
@@ -525,7 +525,7 @@
           </b-button>
         </div>
         <!-- modal footer buttons -->
-        </b-modal>
+      </b-modal>
     </template>
     <template v-slot:bottom-actions>
       <div class="transcript__action-bar">
@@ -574,9 +574,12 @@ import PageContent from  '../components/PageContainer/PageContent'
 import { Semesters, SchoolCategories, TranscriptRecordStatuses } from '../../helpers/enum'
 import tables from '../../helpers/tables'
 import { showNotification } from '../../helpers/forms'
+import TranscriptView  from '../components/Transcript/Transcript'
+
 export default {
   components: {
-    PageContent
+    PageContent,
+    TranscriptView
   },
   mixins: [TranscriptRecordApi,CourseApi,SubjectApi,tables],
   Semesters,
@@ -746,7 +749,6 @@ export default {
   },
   methods: {
     loadTranscript(transcriptRecordId) {
-      
       this.isProcessing = true
       this.getTranscriptRecord(transcriptRecordId).then(({ data }) => {
         copyValue(data, this.transcriptRecord)
@@ -911,7 +913,10 @@ export default {
         return units;
       };
     },
-  }
+    transcriptRecordId() {
+      return this.$route.params.transcriptRecordId
+    }
+  },
 }
 </script>
 <style lang="scss" scoped>

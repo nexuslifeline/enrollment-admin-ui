@@ -20,8 +20,8 @@ export default {
     getTranscriptRecordLevels(id, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/transcript-records/${id}/levels`, { params });
     },
-    activeFirstOrCreateTranscriptRecord(data) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/transcript-records/create-active`, data);
+    saveTranscriptRecordSubjects(id, data) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/transcript-records/${id}/subjects`, data);
     },
   }
 }

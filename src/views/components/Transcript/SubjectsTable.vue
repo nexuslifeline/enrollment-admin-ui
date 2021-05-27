@@ -38,8 +38,8 @@
       </tbody>
     </table>
     <div class="action-row">
-      <b-button variant="primary" @click="$emit('onSave', subjects)">
-        Save Changes
+      <b-button variant="primary" @click="$emit('onSave', subjects)" :disabled="isProcessing">
+        <v-icon name="spinner" spin v-if="isProcessing" />  Save Changes
       </b-button>
     </div>
   </div>
@@ -58,6 +58,10 @@ export default {
     levelId: {
       type: [Number, String],
       default: null
+    },
+    isProcessing: {
+      type: [Boolean, String],
+      default: false
     }
   }
 };
