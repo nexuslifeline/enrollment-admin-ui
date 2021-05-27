@@ -2,6 +2,7 @@
   <ApprovalView
     @onBack="$router.push(previousRoute)"
     @onApproveRequest="onApproveRequest"
+    @onRejectionRequest="onRejectionRequest"
     backTitle="Evaluation">
      <template v-slot:detail>
        <div class="mt-2">
@@ -62,6 +63,15 @@
        </div>
       <ApproveEvaluation
         :isShown.sync="isApprovalShown"
+        :evaluationId="evaluationId"
+        @onApproved="onEvaluationUpdated"
+        @onCancel="isApprovalShown = false"
+      />
+      <RejectEvaluation
+        :isShown.sync="isRejectionShown"
+        :evaluationId="evaluationId"
+        @onRejected="onEvaluationUpdated"
+        @onCancel="isRejectionShown = false"
       />
      </template>
   </ApprovalView>
@@ -69,6 +79,7 @@
 
 <script>
   import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
+  import RejectEvaluation from '../../components/RejectionModals/Evaluation';
   import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
   export default {
     mixins: [ EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
@@ -78,12 +89,14 @@
       }
     },
     components: {
-      ApproveEvaluation
+      ApproveEvaluation,
+      RejectEvaluation
     },
     data() {
       return {
         data: {},
         isApprovalShown: false,
+        isRejectionShown: false,
         isCreatingTranscript: false,
       }
     },
@@ -114,6 +127,9 @@
       onApproveRequest() {
         this.isApprovalShown = true;
       },
+      onRejectionRequest() {
+        this.isRejectionShown = true;
+      },
       onAcceptTransferCredit() {
         console.log('show modal for transfer credit')
         console.log(this.data)
@@ -141,6 +157,10 @@
           console.log(errors)
           this.isCreatingTranscript = false
         });
+      },
+      onEvaluationUpdated() {
+        this.$router.push(this.previousRoute)
+        this.$emit('onEvaluationUpdated')
       }
     }
   }

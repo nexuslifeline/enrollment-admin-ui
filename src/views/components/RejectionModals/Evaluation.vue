@@ -2,7 +2,7 @@
   <b-modal
     :visible="isShown"
     size="md"
-    title="Approve Evaluation"
+    title="Reject Evaluation"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     bodyClass="modal-body__container"
@@ -20,7 +20,7 @@
     </div>
     <template v-slot:modal-footer>
       <FooterAction
-        confirmText="Confirm Approval"
+        confirmText="Confirm Rejection"
         @onConfirm="onApproveEvaluation"
         @onCancel="$emit('onCancel')"
         :isConfirmBusy="forms.evaluation.isProcessing"
@@ -35,7 +35,7 @@ import { EvaluationStatuses } from '../../../helpers/enum'
 import { EvaluationApi } from '../../../mixins/api';
 
 const evaluationFields = {
-  approvalNotes: null,
+  disapprovalNotes: null,
   evaluationStatusId: null
 }
 export default {
@@ -78,13 +78,13 @@ export default {
 
       reset(evaluation)
 
-      fields.evaluationStatusId  = this.$options.EvaluationStatuses.APPROVED.id
+      fields.evaluationStatusId  = this.$options.EvaluationStatuses.REJECTED.id
 
       this.updateEvaluation(fields, this.evaluationId).then(({ data }) => {
         evaluation.isProcessing = false
-        showNotification(this, 'success', 'Evaluation has been approved.')
+        showNotification(this, 'warning', 'Evaluation has been reject.')
         this.$emit('update: isShown', false)
-        this.$emit('onApproved')
+        this.$emit('onRejected')
       }).catch((error) => {
         const errors = error.response.data.errors;
         validate(evaluation, errors)

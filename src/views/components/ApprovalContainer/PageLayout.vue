@@ -13,6 +13,10 @@
           <button @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
             Approve Request
           </button>
+
+          <button @click="$emit('onRejectionRequest')" variant="dark" class="btn-action ml-2">
+            Reject Request
+          </button>
         </div>
       </div>
       <div v-if="!!$slots.detail" class="approval-view__side-content">

@@ -269,7 +269,9 @@
         </div>
         <!-- modal footer buttons -->
       </b-modal>
-      <router-view :previousRoute="{ name: 'Evaluation' }"></router-view>
+      <router-view
+        :previousRoute="{ name: 'Evaluation' }"
+        @onEvaluationUpdated="loadEvaluation"></router-view>
     </template>
   </PageContent>
   <!-- main container -->
