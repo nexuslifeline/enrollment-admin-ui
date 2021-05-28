@@ -46,7 +46,12 @@
                 v-if="!!Object.keys(data).length"
                 :data="data"
               />
-              <AttachmentsView :data="{}" />
+              <div class="p-3">
+                <StudentAttachments
+                  v-if="!!Object.keys(data).length"
+                  :studentId="data.student.id"
+                />
+              </div>
             </div>
           </b-tab>
           <b-tab title="Account History">

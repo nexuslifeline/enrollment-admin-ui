@@ -10,7 +10,7 @@ import { httpRequest, httpAuthRequest } from './helpers/http'
 import ApprovalItem from './views/components/ApprovalContainer/Item';
 import ApprovalView from './views/components/ApprovalContainer/PageLayout';
 import AcademicView from './views/components/CardView/AcademicView';
-import AttachmentsView from './views/components/CardView/AttachmentsView';
+import StudentAttachments from './views/components/StudentFiles/List';
 import SchoolView from './views/components/CardView/SchoolView';
 import EducationView from './views/components/CardView/EducationView';
 import StudentView from './views/components/CardView/StudentView';
@@ -110,8 +110,10 @@ import {
   BIconCamera,
   BIconCameraFill,
   BIconPencil,
-  BIconArrowLeft
+  BIconArrowLeft,
+  BIconImage
 } from 'bootstrap-vue';
+Vue.component('BIconImage', BIconImage);
 Vue.component('BIconArrowLeft', BIconArrowLeft);
 Vue.component('BIconPencil', BIconPencil);
 Vue.component('BIconCameraFill', BIconCameraFill);
@@ -213,7 +215,7 @@ Vue.component('ActiveViewItems', ActiveViewItems);
 Vue.component('ActiveViewItem', ActiveViewItem);
 Vue.component('StudentView', StudentView);
 Vue.component('SchoolView', SchoolView);
-Vue.component('AttachmentsView', AttachmentsView);
+Vue.component('StudentAttachments', StudentAttachments);
 Vue.component('EducationView', EducationView);
 Vue.component('AcademicView', AcademicView);
 Vue.component('ApprovalView', ApprovalView);

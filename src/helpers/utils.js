@@ -56,3 +56,21 @@ export const convertToMonth = (idx) => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return months[parseInt(idx) - 1];
 }
+
+export const download = (blobData, contentType, name = 'File') => {
+  const fileUrl = window.URL.createObjectURL(
+    new Blob([blobData], {
+      type: contentType,
+    })
+  );
+  const reader = new FileReader();
+  reader.onload = (e) => (this.file.src = e.target.result);
+  const fileLink = document.createElement('a');
+
+  fileLink.href = fileUrl;
+  fileLink.setAttribute('download', name);
+  document.body.appendChild(fileLink);
+
+  fileLink.click();
+  fileLink.remove();
+}

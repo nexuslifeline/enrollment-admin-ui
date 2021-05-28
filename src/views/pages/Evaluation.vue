@@ -306,11 +306,11 @@ import Access from '../../mixins/utils/Access';
 import { camelToSnakeCase } from '../../helpers/utils';
 import { format } from 'date-fns';
 import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
-import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
-import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
-import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
-import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
-import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
+// import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
+// import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
+// import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
+// import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
+// import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
 import Card from '../components/Card';
@@ -348,12 +348,12 @@ export default {
   components: {
     SchoolCategoryTabs,
     FileViewer,
-    ActiveRowViewer,
-    ActiveViewHeader,
-    AttachmentList,
-    ActiveViewItems,
-    ActiveViewItem,
-    ActiveViewLinks,
+    // ActiveRowViewer,
+    // ActiveViewHeader,
+    // AttachmentList,
+    // ActiveViewItems,
+    // ActiveViewItem,
+    // ActiveViewLinks,
     AvatarMaker,
     Card,
     StudentColumn,
@@ -410,12 +410,6 @@ export default {
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
               sortable: false // allow first in backend
-              // formatter: (value, key, item) => {
-              // 	if(!item.student.middleName){
-              // 		item.student.middleName = ""
-              // 	}
-              // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-              // }
             },
              {
               key: 'address',
@@ -455,13 +449,6 @@ export default {
               thClass: 'text-center',
               thStyle: { width: '50px' },
             },
-            // {
-            // 	key: "attachments",
-            // 	label: "",
-            // 	tdClass: "align-middle text-center",
-            // 	thClass: "text-center",
-            // 	thStyle: { width: "8%"}
-            // },
             {
               key: 'action',
               label: '',
