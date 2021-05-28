@@ -2,7 +2,7 @@
   <b-modal
     :visible="isShown"
     size="md"
-    title="Change Curriculum"
+    title="Change Student Curriculum"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     @hidden="$emit('update:isShown', false)"
@@ -11,18 +11,18 @@
     @shown="onShown()">
     <div class="modal-field-container overflow-visible">
       <b-form-group
-        :state="forms.transcriptRecord.states.curriculumId"
-        :invalid-feedback="forms.transcriptRecord.errors.curriculumId">
+        :state="forms.transcriptRecord.states.studentCurriculumId"
+        :invalid-feedback="forms.transcriptRecord.errors.studentCurriculumId">
         <label class="required"> Curriculum</label>
           <SelectCurriculum
-            v-model="forms.transcriptRecord.fields.curriculumId"
+            v-model="forms.transcriptRecord.fields.studentCurriculumId"
             :reduce="option => option.id"
             label="name"
             placeholder="Curriculum"
             class="mt-2"
             :clearable="true"
             :courseId="courseId"
-            :class=" { 'is-invalid' : !!forms.transcriptRecord.errors.curriculumId  }"
+            :class=" { 'is-invalid' : !!forms.transcriptRecord.errors.studentCurriculumId  }"
           />
       </b-form-group>
     </div>
@@ -44,7 +44,7 @@ import { TranscriptRecordStatus } from '../../../helpers/enum';
 import { TranscriptRecordApi } from '../../../mixins/api';
 
 const transcriptRecordFields = {
-  curriculumId: null
+  studentCurriculumId: null
 }
 
 export default {
@@ -55,15 +55,6 @@ export default {
     data: {
       type: [Object]
     },
-    // transcriptRecordId: {
-    //   type: [Number, String]
-    // },
-    // curriculum: {
-    //   type: [Object]
-    // },
-    // courseId: {
-    //   type: [Number, String]
-    // }
   },
   mixins: [ TranscriptRecordApi ],
   components: {
@@ -109,7 +100,7 @@ export default {
     },
     onShown() {
       const { fields } = this.forms.transcriptRecord
-      fields.curriculumId = this.data?.curriculumId
+      fields.studentCurriculumId = this.data?.studentCurriculumId
     }
   },
 };
