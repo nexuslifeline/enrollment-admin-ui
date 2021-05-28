@@ -78,92 +78,102 @@
 </template>
 
 <script>
-  import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
-  import RejectEvaluation from '../../components/RejectionModals/Evaluation';
-  import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
-  export default {
-    mixins: [ EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
-    props: {
-      previousRoute: {
-        type: [Object]
+import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
+import RejectEvaluation from '../../components/RejectionModals/Evaluation';
+import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
+import { showNotification } from '../../../helpers/forms';
+export default {
+  mixins: [ EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
+  props: {
+    previousRoute: {
+      type: [Object]
+    }
+  },
+  components: {
+    ApproveEvaluation,
+    RejectEvaluation
+  },
+  data() {
+    return {
+      data: {},
+      isApprovalShown: false,
+      isRejectionShown: false,
+      isCreatingTranscript: false,
+    }
+  },
+  computed: {
+    evaluationId() {
+      return this.$route.params.evaluationId;
+    },
+    studentPhoto() {
+      const { student } = this.data;
+      const path = student?.photo?.hashName || '';
+      return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
+    },
+    studentAvatarText() {
+      const { student } = this.data;
+      return `${student?.firstName?.charAt(0)}${student?.lastName?.charAt(0)}`;
+    },
+    userId() {
+      const { student } = this.data;
+      return student?.user?.id;
+    },
+    transcriptRecord() {
+      return this.data?.academicRecord?.transcriptRecord
+    }
+  },
+  created() {
+    this.getEvaluation(this.evaluationId).then(({ data }) => {
+      this.data = data;
+    });
+  },
+  methods: {
+    onApproveRequest() {
+      const { curriculumId } = this.transcriptRecord
+      if(!curriculumId) {
+        showNotification(this,'danger', 'Curriculum is required before approving evaluation request.')
+        return
       }
+
+      this.isApprovalShown = true;
     },
-    components: {
-      ApproveEvaluation,
-      RejectEvaluation
+    onRejectionRequest() {
+      this.isRejectionShown = true;
     },
-    data() {
-      return {
-        data: {},
-        isApprovalShown: false,
-        isRejectionShown: false,
-        isCreatingTranscript: false,
+    onAcceptTransferCredit() {
+      console.log('show modal for transfer credit')
+      console.log(this.data)
+      const { academicRecord, academicRecord: { curriculumId } } = this.data
+
+      if(!curriculumId) {
+        showNotification(this,'danger', 'Curriculum is required before accepting credit.')
+        return
       }
-    },
-    computed: {
-      evaluationId() {
-        return this.$route.params.evaluationId;
-      },
-      studentPhoto() {
-        const { student } = this.data;
-        const path = student?.photo?.hashName || '';
-        return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
-      },
-      studentAvatarText() {
-        const { student } = this.data;
-        return `${student?.firstName?.charAt(0)}${student?.lastName?.charAt(0)}`;
-      },
-      userId() {
-        const { student } = this.data;
-        return student?.user?.id;
+      //call active firstcreate transcript
+      this.isCreatingTranscript = true
+      const data = {
+        ...academicRecord
       }
-    },
-    created() {
-      this.getEvaluation(this.evaluationId).then(({ data }) => {
-        this.data = data;
+
+      this.activeFirstOrCreateTranscriptRecord(data).then(({ data }) => {
+        //patch academic records transcript record id
+        this.patchAcademicRecord({ transcriptRecordId: data.id }, academicRecord.id).then(({ data }) => {
+          this.data.academicRecord = data//udpated acadmic record
+          this.isCreatingTranscript = false
+          //show component here
+        })
+      }).catch((error) => {
+        const errors = error.response.data.errors;
+        console.log(errors)
+        this.isCreatingTranscript = false
       });
     },
-    methods: {
-      onApproveRequest() {
-        this.isApprovalShown = true;
-      },
-      onRejectionRequest() {
-        this.isRejectionShown = true;
-      },
-      onAcceptTransferCredit() {
-        console.log('show modal for transfer credit')
-        console.log(this.data)
-        const { academicRecord, academicRecord: { curriculumId } } = this.data
-
-        if(!curriculumId) {
-          showNotification(this,'danger', 'Curriculum is required before accepting credit.')
-          return
-        }
-        //call active firstcreate transcript
-        this.isCreatingTranscript = true
-        const data = {
-          ...academicRecord
-        }
-
-        this.activeFirstOrCreateTranscriptRecord(data).then(({ data }) => {
-          //patch academic records transcript record id
-          this.patchAcademicRecord({ transcriptRecordId: data.id }, academicRecord.id).then(({ data }) => {
-            this.data.academicRecord = data//udpated acadmic record
-            this.isCreatingTranscript = false
-            //show component here
-          })
-        }).catch((error) => {
-          const errors = error.response.data.errors;
-          console.log(errors)
-          this.isCreatingTranscript = false
-        });
-      },
-      onEvaluationUpdated() {
-        this.$router.push(this.previousRoute)
-        this.$emit('onEvaluationUpdated')
-      }
+    onEvaluationUpdated() {
+      this.$router.push(this.previousRoute)
+      this.$emit('onEvaluationUpdated')
     }
   }
+}
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/shared.scss";
