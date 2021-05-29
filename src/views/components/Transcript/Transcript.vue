@@ -73,7 +73,7 @@ export default {
       this.getTranscriptRecord(this.transcriptId)
     ]).then(([{ data }, { data: transcript }]) => {
       this.levels = data;
-      this.courseId = transcript.courseId;
+      this.courseId = transcript?.curriculum?.courseId;
       this.subjects = transcript.subjects.map(({
         code,
         name,
