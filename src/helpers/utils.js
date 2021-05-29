@@ -63,8 +63,8 @@ export const download = (blobData, contentType, name = 'File') => {
       type: contentType,
     })
   );
-  const reader = new FileReader();
-  reader.onload = (e) => (this.file.src = e.target.result);
+  //const reader = new FileReader();
+  //reader.onload = (e) => (this.file.src = e.target.result);
   const fileLink = document.createElement('a');
 
   fileLink.href = fileUrl;
@@ -73,4 +73,16 @@ export const download = (blobData, contentType, name = 'File') => {
 
   fileLink.click();
   fileLink.remove();
+}
+
+export const preview = (blobData, contentType, completion) => {
+  const fileUrl = window.URL.createObjectURL(
+    new Blob([blobData], {
+      type: contentType,
+    })
+  );
+  completion?.(fileUrl);
+  // const reader = new FileReader();
+  // reader.onload = (e) => completion?.(e.target.result);
+  // reader.readAsDataURL(file);
 }

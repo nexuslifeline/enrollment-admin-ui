@@ -173,7 +173,7 @@
         </b-row>
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
-      <FileViewer
+      <!-- <FileViewer
         :show="fileViewer.show"
         :file="file"
         :owner="file.owner"
@@ -184,7 +184,7 @@
         :navCount="fileViewer.activeNavCount"
         :navActiveIndex="fileViewer.activeNavIndex"
         :enableArrowNav="fileViewer.isActiveNavEnabled"
-      />
+      /> -->
       <b-modal
         v-model="showModalApproval"
         centered
@@ -301,7 +301,7 @@ import {
 import Tables from '../../helpers/tables';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import { copyValue } from '../../helpers/extractor';
-import FileViewer from '../components/FileViewer';
+//import FileViewer from '../components/FileViewer';
 import Access from '../../mixins/utils/Access';
 import { camelToSnakeCase } from '../../helpers/utils';
 import { format } from 'date-fns';
@@ -347,7 +347,7 @@ export default {
   ],
   components: {
     SchoolCategoryTabs,
-    FileViewer,
+    //FileViewer,
     // ActiveRowViewer,
     // ActiveViewHeader,
     // AttachmentList,
@@ -622,137 +622,137 @@ export default {
     this.loadCourseList();
   },
   methods: {
-    setApproval(row) {
-      this.forms.evaluation.approvalNotes = null;
-      if (row.item.curriculumMsg) {
-        showNotification(
-          this,
-          'danger',
-          'Please set a curriculum before approving.'
-        );
-        return;
-      }
-      this.row = row;
-      this.showModalApproval = true;
-    },
-    onApproval() {
-      this.isProcessing = true;
-      const {
-        item,
-        item: {
-          id: evaluationId,
-          academicRecord: {
-            curriculumId,
-            studentCurriculumId,
-            courseId,
-            schoolCategoryId,
-            levelId,
-          }
-        },
-      } = this.row;
+    // setApproval(row) {
+    //   this.forms.evaluation.approvalNotes = null;
+    //   if (row.item.curriculumMsg) {
+    //     showNotification(
+    //       this,
+    //       'danger',
+    //       'Please set a curriculum before approving.'
+    //     );
+    //     return;
+    //   }
+    //   this.row = row;
+    //   this.showModalApproval = true;
+    // },
+    // onApproval() {
+    //   this.isProcessing = true;
+    //   const {
+    //     item,
+    //     item: {
+    //       id: evaluationId,
+    //       academicRecord: {
+    //         curriculumId,
+    //         studentCurriculumId,
+    //         courseId,
+    //         schoolCategoryId,
+    //         levelId,
+    //       }
+    //     },
+    //   } = this.row;
 
-      const {
-        evaluation: { fields: evaluation },
-      } = this.forms;
+    //   const {
+    //     evaluation: { fields: evaluation },
+    //   } = this.forms;
 
-      let subjects = [];
+    //   let subjects = [];
 
-      item.subjects.forEach((subject) => {
-        subjects.push({
-          subjectId: subject.id,
-          levelId: subject.pivot.levelId,
-          semesterId: subject.pivot.semesterId,
-          grade: subject.pivot.grade,
-          notes: subject.pivot.notes,
-          isTaken: subject.pivot.isTaken,
-        });
-      });
+    //   item.subjects.forEach((subject) => {
+    //     subjects.push({
+    //       subjectId: subject.id,
+    //       levelId: subject.pivot.levelId,
+    //       semesterId: subject.pivot.semesterId,
+    //       grade: subject.pivot.grade,
+    //       notes: subject.pivot.notes,
+    //       isTaken: subject.pivot.isTaken,
+    //     });
+    //   });
 
-      evaluation.evaluationStatusId = EvaluationStatuses.APPROVED.id;
-      // const curriculumId = item.curriculumId
-      // const studentCurriculumId = item.studentCurriculumId
+    //   evaluation.evaluationStatusId = EvaluationStatuses.APPROVED.id;
+    //   // const curriculumId = item.curriculumId
+    //   // const studentCurriculumId = item.studentCurriculumId
 
-      //set transcript fields value
-      const fullLevelSchoolCategory = [
-        SchoolCategories.SENIOR_HIGH_SCHOOL.id,
-        SchoolCategories.COLLEGE.id,
-        SchoolCategories.GRADUATE_SCHOOL.id,
-        SchoolCategories.VOCATIONAL.id,
-      ];
+    //   //set transcript fields value
+    //   const fullLevelSchoolCategory = [
+    //     SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+    //     SchoolCategories.COLLEGE.id,
+    //     SchoolCategories.GRADUATE_SCHOOL.id,
+    //     SchoolCategories.VOCATIONAL.id,
+    //   ];
 
-      if (item.transcriptRecord) {
-        item.transcriptRecord.curriculumId = curriculumId;
-        item.transcriptRecord.studentCurriculumId = studentCurriculumId;
-        item.transcriptRecord.courseId = courseId;
-        item.transcriptRecord.schoolCategoryId = schoolCategoryId;
-        item.transcriptRecord.levelId = fullLevelSchoolCategory.includes(
-          schoolCategoryId
-        )
-          ? null
-          : levelId;
-      }
+    //   if (item.transcriptRecord) {
+    //     item.transcriptRecord.curriculumId = curriculumId;
+    //     item.transcriptRecord.studentCurriculumId = studentCurriculumId;
+    //     item.transcriptRecord.courseId = courseId;
+    //     item.transcriptRecord.schoolCategoryId = schoolCategoryId;
+    //     item.transcriptRecord.levelId = fullLevelSchoolCategory.includes(
+    //       schoolCategoryId
+    //     )
+    //       ? null
+    //       : levelId;
+    //   }
 
-      const data = {
-        ...evaluation,
-        curriculumId,
-        studentCurriculumId,
-        courseId,
-        subjects,
-        transcriptRecord: {
-          ...item.transcriptRecord,
-        },
-      };
+    //   const data = {
+    //     ...evaluation,
+    //     curriculumId,
+    //     studentCurriculumId,
+    //     courseId,
+    //     subjects,
+    //     transcriptRecord: {
+    //       ...item.transcriptRecord,
+    //     },
+    //   };
 
-      this.updateEvaluation(data, evaluationId)
-        .then(({ data }) => {
-          clearFields(evaluation);
-          this.loadEvaluation();
-          this.isProcessing = false;
-          this.showModalApproval = false;
-          showNotification(this, 'success', 'Approved Successfully.');
-          this.$store.state.approvalCount.evaluation--;
-        })
-        .catch((error) => {
-          this.isProcessing = false;
-          const errors = error.response.data.errors;
-          this.showBulletedNotification(errors);
-        });
-    },
-    setDisapproval(row) {
-      this.forms.evaluation.disapprovalNotes = null;
-      this.row = row;
-      this.showModalRejection = true;
-    },
-    onDisapproval() {
-      this.isProcessing = true;
-      const {
-        item,
-        item: { id: evaluationId },
-      } = this.row;
+    //   this.updateEvaluation(data, evaluationId)
+    //     .then(({ data }) => {
+    //       clearFields(evaluation);
+    //       this.loadEvaluation();
+    //       this.isProcessing = false;
+    //       this.showModalApproval = false;
+    //       showNotification(this, 'success', 'Approved Successfully.');
+    //       this.$store.state.approvalCount.evaluation--;
+    //     })
+    //     .catch((error) => {
+    //       this.isProcessing = false;
+    //       const errors = error.response.data.errors;
+    //       this.showBulletedNotification(errors);
+    //     });
+    // },
+    // setDisapproval(row) {
+    //   this.forms.evaluation.disapprovalNotes = null;
+    //   this.row = row;
+    //   this.showModalRejection = true;
+    // },
+    // onDisapproval() {
+    //   this.isProcessing = true;
+    //   const {
+    //     item,
+    //     item: { id: evaluationId },
+    //   } = this.row;
 
-      const {
-        evaluation: { fields: evaluation },
-      } = this.forms;
+    //   const {
+    //     evaluation: { fields: evaluation },
+    //   } = this.forms;
 
-      evaluation.evaluationStatusId = EvaluationStatuses.REJECTED.id;
+    //   evaluation.evaluationStatusId = EvaluationStatuses.REJECTED.id;
 
-      const data = {
-        ...evaluation,
-      };
+    //   const data = {
+    //     ...evaluation,
+    //   };
 
-      this.updateEvaluation(data, evaluationId)
-        .then(({ data }) => {
-          clearFields(evaluation);
-          this.loadEvaluation();
-          this.isProcessing = false;
-          this.showModalRejection = false;
-          showNotification(this, 'success', 'Rejected Successfully.');
-        })
-        .catch((error) => {
-          console.log(error);
-          this.isProcessing = false;
-        });
-    },
+    //   this.updateEvaluation(data, evaluationId)
+    //     .then(({ data }) => {
+    //       clearFields(evaluation);
+    //       this.loadEvaluation();
+    //       this.isProcessing = false;
+    //       this.showModalRejection = false;
+    //       showNotification(this, 'success', 'Rejected Successfully.');
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //       this.isProcessing = false;
+    //     });
+    // },
     loadEvaluation() {
       const { students } = this.tables;
       const {
@@ -913,56 +913,56 @@ export default {
       }
       return '';
     },
-    setupActiveFileViewer(row, data) {
-      this.lastActiveEvaluation = data;
-      this.lastActiveFile = row;
-      this.fileViewer.isActiveNavEnabled = !!data?.item?.files?.length;
-      this.fileViewer.activeNavCount = data?.item?.files?.length;
-      this.fileViewer.activeNavIndex = row.index;
-    },
-    previewFile(row, data) {
-      this.setupActiveFileViewer(row, data);
+    // setupActiveFileViewer(row, data) {
+    //   this.lastActiveEvaluation = data;
+    //   this.lastActiveFile = row;
+    //   this.fileViewer.isActiveNavEnabled = !!data?.item?.files?.length;
+    //   this.fileViewer.activeNavCount = data?.item?.files?.length;
+    //   this.fileViewer.activeNavIndex = row.index;
+    // },
+    // previewFile(row, data) {
+    //   this.setupActiveFileViewer(row, data);
 
-      const { studentId, id, name, notes } = row.item;
-      this.file.type = null;
-      this.file.src = null;
-      this.file.name = name;
-      this.file.notes = notes;
-      this.fileViewer.show = true;
-      this.file.isLoading = true;
-      this.file.owner = data.item.student;
+    //   const { studentId, id, name, notes } = row.item;
+    //   this.file.type = null;
+    //   this.file.src = null;
+    //   this.file.name = name;
+    //   this.file.notes = notes;
+    //   this.fileViewer.show = true;
+    //   this.file.isLoading = true;
+    //   this.file.owner = data.item.student;
 
-      this.getStudentFilePreview(studentId, id).then((response) => {
-        this.file.type = response.headers.contentType;
-        this.file.isLoading = false;
-        const file = new Blob([response.data], {
-          type: response.headers.contentType,
-        });
-        const reader = new FileReader();
-        reader.onload = (e) => (this.file.src = e.target.result);
-        reader.readAsDataURL(file);
-      });
-    },
-    downloadFile(row, data) {
-      const { studentId, id, name } = row.item;
+    //   this.getStudentFilePreview(studentId, id).then((response) => {
+    //     this.file.type = response.headers.contentType;
+    //     this.file.isLoading = false;
+    //     const file = new Blob([response.data], {
+    //       type: response.headers.contentType,
+    //     });
+    //     const reader = new FileReader();
+    //     reader.onload = (e) => (this.file.src = e.target.result);
+    //     reader.readAsDataURL(file);
+    //   });
+    // },
+    // downloadFile(row, data) {
+    //   const { studentId, id, name } = row.item;
 
-      this.getStudentFilePreview(studentId, id).then((response) => {
-        const fileUrl = window.URL.createObjectURL(
-          new Blob([response.data], {
-            type: response.headers.contentType,
-          })
-        );
-        const reader = new FileReader();
-        reader.onload = (e) => (this.file.src = e.target.result);
-        const fileLink = document.createElement('a');
+    //   this.getStudentFilePreview(studentId, id).then((response) => {
+    //     const fileUrl = window.URL.createObjectURL(
+    //       new Blob([response.data], {
+    //         type: response.headers.contentType,
+    //       })
+    //     );
+    //     const reader = new FileReader();
+    //     reader.onload = (e) => (this.file.src = e.target.result);
+    //     const fileLink = document.createElement('a');
 
-        fileLink.href = fileUrl;
-        fileLink.setAttribute('download', name);
-        document.body.appendChild(fileLink);
+    //     fileLink.href = fileUrl;
+    //     fileLink.setAttribute('download', name);
+    //     document.body.appendChild(fileLink);
 
-        fileLink.click();
-      });
-    },
+    //     fileLink.click();
+    //   });
+    // },
     // loadCurriculum(id, row) {
     //   const { subjects } = this.tables;
     //   subjects.isBusy = true;
@@ -1084,41 +1084,41 @@ export default {
       const vNodesMsg = h('ul', errorList);
       showNotification(this, 'danger', vNodesMsg);
     },
-    getCurrentFiles() {
-      const { index: studentIdx } = this.lastActiveEvaluation;
-      const { files } = this.tables?.students?.items[studentIdx];
-      return files;
-    },
-    getCurrentFileIndex() {
-      const { index } = this.lastActiveFile;
-      return index;
-    },
-    onFileNavLeft() {
-      const files = this.getCurrentFiles();
-      let currentIdx = this.getCurrentFileIndex();
-      const isFirst = currentIdx === 0;
-      currentIdx = isFirst ? files.length - 1 : currentIdx - 1;
-      const file = files[currentIdx];
-      const currentFileItem = {
-        ...this.lastActiveFile,
-        index: currentIdx,
-        item: file,
-      };
-      this.previewFile(currentFileItem, this.lastActiveEvaluation);
-    },
-    onFileNavRight() {
-      const files = this.getCurrentFiles();
-      let currentIdx = this.getCurrentFileIndex();
-      const isLast = currentIdx === files.length - 1;
-      currentIdx = isLast ? 0 : currentIdx + 1;
-      const file = files[currentIdx];
-      const currentFileItem = {
-        ...this.lastActiveFile,
-        index: currentIdx,
-        item: file,
-      };
-      this.previewFile(currentFileItem, this.lastActiveEvaluation);
-    },
+    // getCurrentFiles() {
+    //   const { index: studentIdx } = this.lastActiveEvaluation;
+    //   const { files } = this.tables?.students?.items[studentIdx];
+    //   return files;
+    // },
+    // getCurrentFileIndex() {
+    //   const { index } = this.lastActiveFile;
+    //   return index;
+    // },
+    // onFileNavLeft() {
+    //   const files = this.getCurrentFiles();
+    //   let currentIdx = this.getCurrentFileIndex();
+    //   const isFirst = currentIdx === 0;
+    //   currentIdx = isFirst ? files.length - 1 : currentIdx - 1;
+    //   const file = files[currentIdx];
+    //   const currentFileItem = {
+    //     ...this.lastActiveFile,
+    //     index: currentIdx,
+    //     item: file,
+    //   };
+    //   this.previewFile(currentFileItem, this.lastActiveEvaluation);
+    // },
+    // onFileNavRight() {
+    //   const files = this.getCurrentFiles();
+    //   let currentIdx = this.getCurrentFileIndex();
+    //   const isLast = currentIdx === files.length - 1;
+    //   currentIdx = isLast ? 0 : currentIdx + 1;
+    //   const file = files[currentIdx];
+    //   const currentFileItem = {
+    //     ...this.lastActiveFile,
+    //     index: currentIdx,
+    //     item: file,
+    //   };
+    //   this.previewFile(currentFileItem, this.lastActiveEvaluation);
+    // },
     onCategoryFilterChange(item) {
       const { student } = this.filters;
       student.schoolCategoryId = item?.id || 0;

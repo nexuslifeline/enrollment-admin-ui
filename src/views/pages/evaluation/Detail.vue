@@ -50,6 +50,7 @@
                 <StudentAttachments
                   v-if="!!Object.keys(data).length"
                   :studentId="data.student.id"
+                  :owner="data.student"
                 />
               </div>
             </div>
