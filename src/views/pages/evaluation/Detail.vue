@@ -79,6 +79,15 @@
         @onRejected="onEvaluationUpdated"
         @onCancel="isRejectionShown = false"
       />
+
+      <b-modal
+        size="xl"
+        v-if="showCreditGrades"
+        v-model="showCreditGrades"
+        hide-footer
+        title="Accept Transfer Credit">
+        <Transcript :transcriptId="data.academicRecord.transcriptRecordId"/>
+      </b-modal>
      </template>
   </ApprovalView>
 </template>
@@ -88,6 +97,7 @@ import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
 import RejectEvaluation from '../../components/RejectionModals/Evaluation';
 import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
 import { showNotification } from '../../../helpers/forms';
+import Transcript from '../../components/Transcript/Transcript'
 export default {
   mixins: [ EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
   props: {
@@ -97,7 +107,8 @@ export default {
   },
   components: {
     ApproveEvaluation,
-    RejectEvaluation
+    RejectEvaluation,
+    Transcript
   },
   data() {
     return {
@@ -105,6 +116,7 @@ export default {
       isApprovalShown: false,
       isRejectionShown: false,
       isCreatingTranscript: false,
+      showCreditGrades: false
     }
   },
   computed: {
@@ -148,31 +160,13 @@ export default {
     },
     onAcceptTransferCredit() {
       console.log('show modal for transfer credit')
-      console.log(this.data)
-      const { academicRecord, academicRecord: { curriculumId } } = this.data
-
+      const { curriculumId } = this.transcriptRecord
       if(!curriculumId) {
-        showNotification(this,'danger', 'Curriculum is required before accepting credit.')
+        showNotification(this,'danger', 'Curriculum is required before accepting credited grades.')
         return
       }
-      //call active firstcreate transcript
-      this.isCreatingTranscript = true
-      const data = {
-        ...academicRecord
-      }
 
-      this.activeFirstOrCreateTranscriptRecord(data).then(({ data }) => {
-        //patch academic records transcript record id
-        this.patchAcademicRecord({ transcriptRecordId: data.id }, academicRecord.id).then(({ data }) => {
-          this.data.academicRecord = data//udpated acadmic record
-          this.isCreatingTranscript = false
-          //show component here
-        })
-      }).catch((error) => {
-        const errors = error.response.data.errors;
-        console.log(errors)
-        this.isCreatingTranscript = false
-      });
+      this.showCreditGrades = true
     },
     onEvaluationUpdated() {
       this.$router.push(this.previousRoute)
