@@ -5,22 +5,6 @@
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"
     :createButtonVisible="false">
-      <!-- <SchoolCategoryTabs
-        :showAll="true"
-        @loadSchoolCategoryId="
-          (filters.student.schoolCategoryId = $event), loadAcademicRecord()
-        "
-        @clickAll="
-          (filters.student.schoolCategoryId = null),
-            (filters.student.courseId = null),
-            loadAcademicRecord()
-        "
-        @click="
-          (filters.student.schoolCategoryId = $event),
-            (filters.student.courseId = null),
-            loadAcademicRecord()
-        "
-      /> -->
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
@@ -30,17 +14,6 @@
         placeholder="Search"
       >
       </b-form-input>
-      <!--<v-select
-        :options="options.schoolCategories.values"
-        :value="filters.student.schoolCategoryItem"
-        @input="onCategoryFilterChange"
-        label="name"
-        placeholder="School Category"
-        class="mt-2"
-        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
-        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
-        :clearable="checkIfAllowedAll()"
-      />-->
       <SelectCategory
         :value="filters.student.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -247,7 +220,7 @@
               <template v-slot:content>
                 <div>
                   <b-alert :show="!hasTermsSchoolCategory(data.item)" variant="danger" class="mb-3">
-                    No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
+                    sss No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
                   </b-alert>
                   <ActiveViewHeader
                     id="header-current-application"
@@ -1017,6 +990,7 @@ export default {
     this.loadCourseList();
     this.loadFees();
     this.loadAcademicRecord()
+    this.loadTerms()
   },
   methods: {
     loadTerms() {
@@ -1361,7 +1335,6 @@ export default {
       this.loadAcademicRecord();
     },
     hasTermsSchoolCategory(item) {
-      console.log(item)
       const { terms } = this.options
       return terms.items.find(term => term.schoolCategoryId === item.schoolCategoryId)
     },
