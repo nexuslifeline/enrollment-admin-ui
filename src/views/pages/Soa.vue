@@ -874,7 +874,7 @@ import {
 } from '../../helpers/forms';
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import Card from '../components/Card';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import tables from '../../helpers/tables';
 import { copyValue } from '../../helpers/extractor';
 import Access from '../../mixins/utils/Access';

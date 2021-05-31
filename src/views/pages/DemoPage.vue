@@ -69,7 +69,7 @@ import Toggle from '../components/Form/Toggle'
 import ScheduleViewer from '../components/ScheduleViewer'
 import AttachmentList from '../components/Attachment/AttachmentList'
 import StudentApi from '../../mixins/api/Student';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import SelectPaginated from '../components/SelectPaginated';
 import StudentDropdown from '../components/DropdownItems/StudentItem';
 

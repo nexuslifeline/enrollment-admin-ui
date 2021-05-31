@@ -771,7 +771,7 @@ import {
   validate,
 } from '../../helpers/forms';
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import tables from '../../helpers/tables';
 import Card from '../components/Card';
 import { copyValue } from '../../helpers/extractor';

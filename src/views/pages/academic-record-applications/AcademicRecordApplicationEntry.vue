@@ -1485,7 +1485,7 @@ import {
   TranscriptRecordApi,
 } from '../../../mixins/api';
 import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { copyValue } from '../../../helpers/extractor';
 import SelectPaginated from '../../components/SelectPaginated';
 import {

@@ -8,7 +8,7 @@
             v-model="forms.profile.fields.studentNo"
             placeholder="Awaiting Confirmation"
             readonly
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
       <InputContainer>
@@ -22,7 +22,7 @@
             <b-form-input
               v-model="forms.profile.fields.firstName"
               :state="forms.profile.states.firstName"
-              debounce="500" />
+            />
             <b-form-invalid-feedback>
               {{forms.profile.errors.firstName}}
             </b-form-invalid-feedback>
@@ -33,7 +33,7 @@
           <label>Middle Name</label>
           <b-form-input
             v-model="forms.profile.fields.middleName"
-            debounce="500" />
+           />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -44,7 +44,7 @@
           <b-form-input
             v-model="forms.profile.fields.lastName"
             :state="forms.profile.states.lastName"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.profile.errors.lastName}}
           </b-form-invalid-feedback>
@@ -128,7 +128,8 @@ import { copyValue } from '../../../helpers/extractor';
 import { validate, reset, showNotification } from '../../../helpers/forms';
 import { StudentApi } from '../../../mixins/api';
 import AvatarMaker from '../AvatarMaker';
-import { CivilStatuses } from '../../../helpers/enum'
+import { CivilStatuses } from '../../../helpers/enum';
+import debounce from 'lodash/debounce';
 
 const profileFields = {
   id: null,
@@ -183,13 +184,14 @@ export default {
   },
   mounted() {
     const { profile } = this.forms
-    copyValue(this.data, profile.fields)
+    copyValue(this.data, profile.fields);
+    this.$watch('forms.profile.fields', this.autoSave, { deep: true });
   },
   methods: {
+    autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { profile, profile: { fields: { studentNo }} } = this.forms
-      // reset(profile)
 
       profile.fields.studentNo = profile.fields.studentNo === ""
         ? null

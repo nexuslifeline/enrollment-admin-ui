@@ -456,7 +456,7 @@ import {
 import { format } from 'date-fns';
 // import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 import SelectPaginated from '../../components/SelectPaginated';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 const paymentFields = {
   id: null,
