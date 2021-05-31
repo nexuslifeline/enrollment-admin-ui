@@ -30,14 +30,14 @@
         label="name"
         placeholder="School Category"
       />
-      <v-select
+      <!-- <v-select
         :options="options.levels.fixItems"
         :value="filters.curriculum.levelItem"
         @input="onLevelFilterChange"
         label="name"
         placeholder="Level"
         class="mt-2"
-      />
+      /> -->
       <v-select
         v-if="isCourseVisible"
         :options="options.courses.fixItems"
@@ -240,9 +240,9 @@
                           <h6 v-if="data.item.course">
                             {{ `Course : ${data.item.course.name}` }}
                           </h6>
-                          <h6 v-if="data.item.level">
+                          <!-- <h6 v-if="data.item.level">
                             {{ `Level : ${data.item.level.name}` }}
-                          </h6>
+                          </h6> -->
                         </b-col>
                         <b-col md="4">
                           <h6>Description : {{ data.item.description }}</h6>
@@ -475,7 +475,7 @@
                       <b-col md="6">
                         <b-row>
                           <b-col md="6">
-                            <b-form-group>
+                            <!-- <b-form-group>
                               <label class="required">School Category</label>
                               <b-form-select
                                 @change="
@@ -503,7 +503,7 @@
                               <b-form-invalid-feedback>
                                 {{ forms.curriculum.errors.schoolCategoryId }}
                               </b-form-invalid-feedback>
-                            </b-form-group>
+                            </b-form-group> -->
                             <b-form-group>
                               <label>
                                 Course
@@ -517,7 +517,7 @@
                                 :disabled="
                                   (!checkSchoolCategory() &&
                                     !checkSchoolCategory(true)) ||
-                                    forms.curriculum.fields.schoolCategoryId ==
+                                    forms.curriculum.fields.schoolCategories ==
                                       null ||
                                     options.courses.isLoading
                                 "
@@ -543,8 +543,6 @@
                                 {{ forms.curriculum.errors.courseId }}
                               </b-form-invalid-feedback>
                             </b-form-group>
-                          </b-col>
-                          <b-col md="6">
                             <b-form-group>
                               <label class="required">Effective Year</label>
                               <b-form-input
@@ -559,7 +557,7 @@
                                 {{ forms.curriculum.errors.effectiveYear }}
                               </b-form-invalid-feedback>
                             </b-form-group>
-                            <b-form-group>
+                            <!-- <b-form-group>
                               <label>
                                 Level
                                 <v-icon
@@ -595,7 +593,7 @@
                               <b-form-invalid-feedback>
                                 {{ forms.curriculum.errors.levelId }}
                               </b-form-invalid-feedback>
-                            </b-form-group>
+                            </b-form-group> -->
                             <b-form-group>
                               <b-form-checkbox
                                 v-model="forms.curriculum.fields.active"
@@ -605,6 +603,73 @@
                                 New
                               </b-form-checkbox>
                             </b-form-group>
+                            <b-button
+                              @click="showModalSchoolCategory = true"
+                              variant="outline-primary">
+                              Add School Category
+                            </b-button>
+                          </b-col>
+                          <b-col md="6">
+                            <!-- <b-form-group>
+                              <label class="required">Effective Year</label>
+                              <b-form-input
+                                no-wheel
+                                debounce="500"
+                                type="number"
+                                v-model="forms.curriculum.fields.effectiveYear"
+                                :state="forms.curriculum.states.effectiveYear"
+                              >
+                              </b-form-input>
+                              <b-form-invalid-feedback>
+                                {{ forms.curriculum.errors.effectiveYear }}
+                              </b-form-invalid-feedback>
+                            </b-form-group> -->
+                            <!-- <b-form-group>
+                              <label>
+                                Level
+                                <v-icon
+                                  v-if="options.levels.isLoading"
+                                  name="spinner"
+                                  spin
+                                />
+                              </label>
+                              <b-form-select
+                                :disabled="
+                                  checkSchoolCategory() ||
+                                    forms.curriculum.fields.schoolCategoryId ==
+                                      null ||
+                                    options.levels.isLoading
+                                "
+                                @change="getSelectedLevel()"
+                                v-model="forms.curriculum.fields.levelId"
+                                :state="forms.curriculum.states.levelId"
+                              >
+                                <template v-slot:first>
+                                  <b-form-select-option :value="null" disabled
+                                    >-- Level --</b-form-select-option
+                                  >
+                                </template>
+                                <b-form-select-option
+                                  v-for="level in options.levels.items"
+                                  :key="level.id"
+                                  :value="level.id"
+                                >
+                                  {{ level.name }}
+                                </b-form-select-option>
+                              </b-form-select>
+                              <b-form-invalid-feedback>
+                                {{ forms.curriculum.errors.levelId }}
+                              </b-form-invalid-feedback>
+                            </b-form-group> -->
+                            <!-- <b-form-group>
+                              <b-form-checkbox
+                                v-model="forms.curriculum.fields.active"
+                                :value="1"
+                                :unchecked-value="0"
+                              >
+                                New
+                              </b-form-checkbox>
+                            </b-form-group> -->
                           </b-col>
                         </b-row>
                       </b-col>
@@ -659,11 +724,10 @@
                                           class="float-right mb-2"
                                           variant="outline-primary"
                                           @click="
-                                            onAddSubject(level.id, semester.id)
+                                            onAddSubject(level, semester.id)
                                           "
                                         >
-                                          <v-icon name="plus-circle" /> ADD NEW
-                                          SUBJECT
+                                          <v-icon name="plus-circle" /> ADD NEW SUBJECT
                                         </b-button>
                                       </b-col>
                                     </b-row>
@@ -822,7 +886,7 @@
                                       <b-button
                                         class="float-right mb-2"
                                         variant="outline-primary"
-                                        @click="onAddSubject(level.id)"
+                                        @click="onAddSubject(level)"
                                       >
                                         <v-icon name="plus-circle" /> ADD NEW
                                         SUBJECT
@@ -1085,6 +1149,51 @@
       </div>
       <!-- modal footer buttons -->
     </b-modal>
+    <b-modal
+      v-model="showModalSchoolCategory"
+      :noCloseOnEsc="true"
+      :noCloseOnBackdrop="true"
+    >
+      <div slot="modal-title">
+        School Categories
+      </div>
+      <b-table
+        class="c-table"
+        small
+        hover
+        outlined
+        show-empty
+        :fields="tables.schoolCategories.fields"
+        :items.sync="options.schoolCategories.values"
+      >
+        <template v-slot:cell(action)="{ item }">
+          <b-button
+            v-if="!forms.curriculum.fields.schoolCategories.find(sc => sc.id === item.id)"
+            :disabled="checkIfSchoolCategoryCanPair(item)"
+            @click="addSchoolCategory(item)" 
+            size="sm" 
+            variant="success">
+            <v-icon name="plus" />
+          </b-button>
+          <b-button
+            v-else
+            @click="removeSchoolCategory(item)" 
+            size="sm" 
+            variant="danger">
+            <v-icon name="trash" />
+          </b-button>
+        </template>
+      </b-table>
+      <div slot="modal-footer">
+        <b-button
+          class="btn-close"
+          variant="outline-danger"
+          @click="showModalSchoolCategory = false"
+        >
+          Close
+        </b-button>
+      </div>
+    </b-modal>
     <!-- Modal Confirmation -->
     <b-modal
       v-model="showModalConfirmation"
@@ -1156,9 +1265,8 @@ const curriculumFields = {
   id: null,
   name: null,
   description: null,
-  schoolCategoryId: null,
+  schoolCategories: [],
   courseId: null,
-  levelId: null,
   effectiveYear: null,
   notes: null,
   subjects: null,
@@ -1191,6 +1299,7 @@ export default {
       showModalSubjects: false,
       showModalConfirmation: false,
       showEntry: false,
+      showModalSchoolCategory: false,
       entryMode: 'Add',
       isLoading: false,
       forms: {
@@ -1225,10 +1334,18 @@ export default {
               thStyle: { width: '10%' },
             },
             {
-              key: 'schoolCategory.name',
+              key: 'schoolCategories',
               label: 'School',
               tdClass: 'align-middle',
               thStyle: { width: '15%' },
+              formatter: (value) => {
+                let text = '';
+                value.forEach(v => {
+                  text = text + v.name + ', '
+                });
+                text = text.slice(0, -2)
+                return text;
+              }
             },
             {
               key: 'course.name',
@@ -1249,19 +1366,19 @@ export default {
             // 	tdClass: "align-middle",
             // 	thStyle: {width: "10%"}
             // },
-            {
-              key: 'level.name',
-              label: 'Level',
-              tdClass: 'align-middle',
-              thStyle: { width: '8%' },
-              formatter: (value) => {
-                if (value) {
-                  return value;
-                } else {
-                  return 'N/A';
-                }
-              },
-            },
+            // {
+            //   key: 'level.name',
+            //   label: 'Level',
+            //   tdClass: 'align-middle',
+            //   thStyle: { width: '8%' },
+            //   formatter: (value) => {
+            //     if (value) {
+            //       return value;
+            //     } else {
+            //       return 'N/A';
+            //     }
+            //   },
+            // },
             // {
             // 	key: "notes",
             // 	label: "Notes",
@@ -1449,6 +1566,23 @@ export default {
             },
           ],
         },
+        schoolCategories: {
+          fields: [
+            {
+              key: 'name',
+              label: 'NAME',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
+            },
+            {
+              key: 'action',
+              label: '',
+              tdClass: 'align-middle text-center',
+              thStyle: { width: '5%' },
+            },
+          ],
+          items: []
+        }
       },
       paginations: {
         subject: {
@@ -1498,7 +1632,7 @@ export default {
           items: [],
         },
       },
-      levelId: null,
+      level: null,
       schoolCategoryId: null,
       userGroupId: null,
       semesters: [],
@@ -1511,7 +1645,7 @@ export default {
       curriculum.schoolCategoryId =  this.getDefaultSchoolCategory()?.id
       curriculum.schoolCategoryItem =  this.getDefaultSchoolCategory()
     }
-    this.loadLevelList();
+    // this.loadLevelList();
     this.loadCourseList();
     this.loadCurriculums()
     // this.checkRights()
@@ -1532,27 +1666,27 @@ export default {
         curriculums.isBusy = false;
       });
     },
-    loadLevelList() {
-      const { levels } = this.options;
-      const {
-        curriculum,
-        curriculum: { schoolCategoryId },
-      } = this.filters;
-      curriculum.levelId = null;
-      if (schoolCategoryId) {
-        let params = { paginate: false };
-        this.getLevelsOfSchoolCategoryList(schoolCategoryId, params).then(
-          ({ data }) => {
-            levels.fixItems = data;
-          }
-        );
-      } else {
-        let params = { paginate: false, schoolCategoryId };
-        this.getLevelList(params).then(({ data }) => {
-          levels.fixItems = data;
-        });
-      }
-    },
+    // loadLevelList() {
+    //   const { levels } = this.options;
+    //   const {
+    //     curriculum,
+    //     curriculum: { schoolCategoryId },
+    //   } = this.filters;
+    //   curriculum.levelId = null;
+    //   if (schoolCategoryId) {
+    //     let params = { paginate: false };
+    //     this.getLevelsOfSchoolCategoryList(schoolCategoryId, params).then(
+    //       ({ data }) => {
+    //         levels.fixItems = data;
+    //       }
+    //     );
+    //   } else {
+    //     let params = { paginate: false, schoolCategoryId };
+    //     this.getLevelList(params).then(({ data }) => {
+    //       levels.fixItems = data;
+    //     });
+    //   }
+    // },
     loadCourseList() {
       const { courses } = this.options;
       const {
@@ -1577,7 +1711,6 @@ export default {
       }
     },
     loadLevelsOfSchoolCategoryList(getSelectedLevel = false) {
-      this.loadSubjects();
       const {
         fields,
         fields: { schoolCategoryId },
@@ -1605,20 +1738,21 @@ export default {
       let params = { paginate: false };
       const { levels } = this.options;
       levels.isLoading = true;
-      this.getLevelsOfSchoolCategoryList(schoolCategoryId, params)
-        .then(({ data }) => {
-          levels.items = data;
-          levels.isLoading = false;
-          if (getSelectedLevel) {
-            this.getSelectedLevel();
-            return;
-          }
-          fields.levelId = null;
-        })
-        .catch((error) => {
-          levels.isLoading = false;
-          console.log(error);
-        });
+      //to edit
+      // this.getLevelsOfSchoolCategoryList(5, params)
+      //   .then(({ data }) => {
+      //     levels.items = data;
+      //     levels.isLoading = false;
+      //     if (getSelectedLevel) {
+      //       this.getSelectedLevel();
+      //       return;
+      //     }
+      //     fields.levelId = null;
+      //   })
+      //   .catch((error) => {
+      //     levels.isLoading = false;
+      //     console.log(error);
+      //   });
     },
     loadSubjectsOfLevelList() {
       const { subjects } = this.tables;
@@ -1633,8 +1767,7 @@ export default {
         subjects.isBusy = false;
       });
     },
-    loadCoursesOfSchoolCategoryList() {
-      const { schoolCategoryId } = this.forms.curriculum.fields;
+    loadCoursesOfSchoolCategoryList(schoolCategoryId) {
       const { courses } = this.options;
       let params = { paginate: false };
       courses.isLoading = true;
@@ -1654,14 +1787,12 @@ export default {
       // if (items.length > 0) {
       //   fields.description = items.find(i => i.id === courseId).description
       // }
-      if (this.checkSchoolCategory()) {
-        this.isLoading = true;
-        let params = { paginate: false };
-        this.getLevelsOfCourse(courseId, params).then(({ data }) => {
-          this.levels = data;
-          this.isLoading = false;
-        });
-      }
+      this.isLoading = true;
+      let params = { paginate: false };
+      this.getLevelsOfCourse(courseId, params).then(({ data }) => {
+        this.levels = data;
+        this.isLoading = false;
+      });
     },
     setCreate() {
       const {
@@ -1673,9 +1804,8 @@ export default {
       reset(curriculum);
       clearFields(fields);
       this.entryMode = 'Add';
-      fields.schoolCategoryId = null;
+      fields.schoolCategories = [];
       fields.courseId = null;
-      fields.levelId = null;
       fields.subjects = [];
       this.levels = [];
       fields.active = 1;
@@ -1688,25 +1818,39 @@ export default {
         curriculum,
         curriculum: {
           fields,
-          fields: { subjects, ...newFields },
+          fields: { subjects, schoolCategories, ...newFields },
         },
       } = this.forms;
       curriculum.isLoading = true;
       this.getCurriculum(id).then(({ data }) => {
+        console.log(data)
         copyValue(data, fields, Object.keys(newFields));
         data.subjects.forEach((s) => {
           s.prerequisites = s.prerequisites.map((p) => p.id);
         });
+        
+        
         fields.subjects = data.subjects;
-        // copyValue(data, fields)
-        reset(curriculum);
-        let getSelectedLevel = false;
-        if (this.checkSchoolCategory()) {
-          this.loadLevelsOfCourse();
-        } else {
-          getSelectedLevel = true;
+        fields.schoolCategories = data.schoolCategories.map(sc => {
+          const schoolCategory = SchoolCategories.getEnum(sc.id)
+          return {
+            ...schoolCategory
+          }
+        })
+        fields.schoolCategories.forEach(sc => {
+          this.getSelectedLevel(sc.id)
+        })
+        if (data.courseId) {
+          this.loadCoursesOfSchoolCategoryList(fields.schoolCategories[0]?.id)
         }
-        this.loadLevelsOfSchoolCategoryList(getSelectedLevel);
+        
+        // let getSelectedLevel = false;
+        // if (this.checkSchoolCategory()) {
+        //   this.loadLevelsOfCourse();
+        // } else {
+        //   getSelectedLevel = true;
+        // }
+        // this.loadLevelsOfSchoolCategoryList(getSelectedLevel);
         curriculum.isLoading = false;
       });
     },
@@ -1714,7 +1858,7 @@ export default {
       const {
         curriculum,
         curriculum: {
-          fields: { subjects, ...fields },
+          fields: { subjects, schoolCategories, ...fields },
         },
       } = this.forms;
       curriculum.isProcessing = true;
@@ -1722,14 +1866,18 @@ export default {
       let data = {
         subjects: [],
         prerequisites: [],
+        schoolCategories: [],
         ...fields,
       };
+
+      data.schoolCategories = schoolCategories.map(sc => sc.id)
 
       subjects.forEach((s) => {
         data.subjects.push({
           subjectId: s.id,
           levelId: s.pivot.levelId,
           semesterId: s.pivot.semesterId,
+          schoolCategoryId: s.pivot.schoolCategoryId
         });
         s.prerequisites.forEach((p) => {
           data.prerequisites.push({
@@ -1841,8 +1989,8 @@ export default {
         this.showModalConfirmation = false;
       });
     },
-    loadSubjects() {
-      const { schoolCategoryId } = this.forms.curriculum.fields;
+    loadSubjects(schoolCategoryId) {
+      // const { schoolCategoryId } = this.forms.curriculum.fields;
       const { subjects } = this.tables;
       const { subject } = this.paginations;
       subjects.isBusy2 = true;
@@ -1855,10 +2003,11 @@ export default {
         subjects.isBusy2 = false;
       });
     },
-    onAddSubject(levelId, semesterId = null) {
-      this.levelId = levelId;
-      this.semesterId = semesterId;
+    onAddSubject(level, semesterId = null) {
+      this.loadSubjects(level.schoolCategoryId)
       this.showModalSubjects = true;
+      this.level = level;
+      this.semesterId = semesterId;
       this.filters.subject.departmentId = null;
       this.filters.subject.criteria = null;
     },
@@ -1875,7 +2024,8 @@ export default {
         ...item,
         prerequisites: [],
         pivot: {
-          levelId: this.levelId,
+          levelId: this.level.id,
+          schoolCategoryId: this.level.schoolCategoryId,
           semesterId: this.semesterId,
         },
       });
@@ -1904,18 +2054,16 @@ export default {
       });
     },
     checkSchoolCategory(isGradSchoolVoc = false) {
-      const { schoolCategoryId } = this.forms.curriculum.fields;
+      const { schoolCategories: schoolCategoryIds } = this.forms.curriculum.fields;
       const { schoolCategories } = this.options;
       let result = false;
-
+      const ids = schoolCategoryIds.map(s => s.id)
       if (isGradSchoolVoc) {
         result =
-          schoolCategoryId === schoolCategories.GRADUATE_SCHOOL.id ||
-          schoolCategoryId === schoolCategories.VOCATIONAL.id;
+          ids.includes(schoolCategories.GRADUATE_SCHOOL.id) || ids.includes(schoolCategories.VOCATIONAL.id)
       } else {
         result =
-          schoolCategoryId === schoolCategories.SENIOR_HIGH_SCHOOL.id ||
-          schoolCategoryId === schoolCategories.COLLEGE.id;
+          ids.includes(schoolCategories.SENIOR_HIGH_SCHOOL.id) || ids.includes(schoolCategories.COLLEGE.id)
       }
       return result;
     },
@@ -1928,14 +2076,19 @@ export default {
       );
       return filteredSubjects;
     },
-    getSelectedLevel() {
+    getSelectedLevel(schoolCategoryId) {
       this.isLoading = true;
-      this.levels = [
-        this.options.levels.items.find(
-          (level) => level.id === this.forms.curriculum.fields.levelId
-        ),
-      ];
-      this.isLoading = false;
+      // this.levels = [
+      //   this.options.levels.items.find(
+      //     (level) => level.id === this.forms.curriculum.fields.levelId
+      //   ),
+      // ];
+      
+      const params = { schoolCategoryId, paginate: false }
+      this.getLevelList(params).then(({data}) => {
+        this.levels.push(...data)
+        this.isLoading = false;
+      })
       // console.log(this.levels)
     },
     getSemesters(level, event) {
@@ -2046,7 +2199,7 @@ export default {
       curriculum.levelItem = null,
       curriculum.courseId = null
       curriculum.courseItem = null
-      this.loadLevelList()
+      // this.loadLevelList()
       this.loadCourseList()
       this.loadCurriculums();
     },
@@ -2062,6 +2215,43 @@ export default {
       curriculum.courseItem = item;
       this.loadCurriculums();
     },
+    addSchoolCategory(item) {
+      const { schoolCategories } = this.forms.curriculum.fields
+      schoolCategories.push({
+        id: item.id,
+        isCanBePaired: item.isCanBePaired
+      })
+
+      if (item.isCanBePaired) {
+        this.getSelectedLevel(item.id)
+      } else {
+        this.loadCoursesOfSchoolCategoryList(item.id)
+      }
+    },
+    removeSchoolCategory(item) {
+      const { schoolCategories } = this.forms.curriculum.fields
+      const index = schoolCategories.findIndex((i) => i.id === item.id);
+      schoolCategories.splice(index, 1);
+      const levelIds = this.levels.filter(l => l.schoolCategoryId === item.id).map(l => l.id)
+      levelIds.forEach(id => {
+        const levelIndex = this.levels.findIndex((i) => i.id === id)
+        this.levels.splice(levelIndex, 1);
+      })
+  
+    },
+    checkIfSchoolCategoryCanPair(schoolCategory) {
+      if (schoolCategory.isCanBePaired) {
+        const { schoolCategories } = this.options;
+        const { schoolCategories: schoolCategoryIds } = this.forms.curriculum.fields
+        const ids = schoolCategoryIds.filter(sc => !sc.isCanBePaired)
+        if (ids.length > 0) {
+          return true
+        }
+      } else {
+        const { schoolCategories } = this.forms.curriculum.fields
+        return schoolCategories.length > 0 ? true : false
+      }
+    }
   },
   computed: {
     totalUnits() {

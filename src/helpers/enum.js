@@ -43,13 +43,13 @@ export const StudentCategories = new Enum({
 });
 
 export const SchoolCategories = new Enum({
-  PRE_SCHOOL: { id: 1, name: 'Pre-School' },
-  PRIMARY_SCHOOL: { id: 2, name: 'Primary School' },
-  JUNIOR_HIGH_SCHOOL: { id: 3, name: 'Junior High School' },
-  SENIOR_HIGH_SCHOOL: { id: 4, name: 'Senior High School' },
-  COLLEGE: { id: 5, name: 'College' },
-  GRADUATE_SCHOOL: { id: 6, name: 'Graduate School' },
-  VOCATIONAL: { id: 7, name: 'Vocational' }
+  PRE_SCHOOL: { id: 1, name: 'Pre-School', isCanBePaired: true },
+  PRIMARY_SCHOOL: { id: 2, name: 'Primary School', isCanBePaired: true },
+  JUNIOR_HIGH_SCHOOL: { id: 3, name: 'Junior High School', isCanBePaired: true },
+  SENIOR_HIGH_SCHOOL: { id: 4, name: 'Senior High School', isCanBePaired: false },
+  COLLEGE: { id: 5, name: 'College', isCanBePaired: false },
+  GRADUATE_SCHOOL: { id: 6, name: 'Graduate School', isCanBePaired: false },
+  VOCATIONAL: { id: 7, name: 'Vocational', isCanBePaired: false }
 });
 
 export const SchoolFeeCategories = new Enum({
