@@ -1260,6 +1260,7 @@ import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
 import PageContent from '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
+import SchoolCategory from '../../mixins/api/SchoolCategory';
 
 const curriculumFields = {
   id: null,
@@ -1814,6 +1815,7 @@ export default {
     setUpdate(id) {
       this.entryMode = 'Edit';
       this.showEntry = true;
+      this.levels = [];
       const {
         curriculum,
         curriculum: {
