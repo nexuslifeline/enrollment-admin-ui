@@ -799,6 +799,7 @@ export default {
       reset(batchClearance);
       clearFields(fields);
       fields.signatories = [];
+      this.showEntry = false;
       this.showBatchEntry = true;
     },
     addSignatory(isBatch = true) {

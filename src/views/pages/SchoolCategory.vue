@@ -1,6 +1,6 @@
 <template>
   <PageContent
-    title="Department Management"
+    title="School Category Management"
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadSchoolCategories"
     :filterVisible="isFilterVisible"

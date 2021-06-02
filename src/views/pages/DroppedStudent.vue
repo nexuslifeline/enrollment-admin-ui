@@ -36,7 +36,7 @@
         class="mt-2"
       />
       <v-select
-        @input="onSubjectFilterChange"
+        @input="onSubjectFilterChange($event), loadStudents()"
         :options="sectionSubjects"
         v-model="filters.droppedStudent.subjectItem"
         label="name"
