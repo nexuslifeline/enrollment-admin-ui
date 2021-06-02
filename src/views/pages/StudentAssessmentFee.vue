@@ -1373,7 +1373,7 @@ export default {
             item: { fees },
           } = data;
           fees.forEach((fee) => {
-            if (fee.pivot.isInitialFee) {
+            if (fee.pivot.isInitialFee == 1) {
               total += Number(fee.pivot.amount);
             }
           });
