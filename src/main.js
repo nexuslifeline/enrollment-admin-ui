@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import FooterAction from './views/components/ModalFooter/ActionBar';
 import ShowMore from './views/components/CoDepartment/ShowMore';
 import FileViewer from './views/components/FileViewer';
 import ApprovalItem from './views/components/ApprovalContainer/Item';
@@ -224,6 +225,7 @@ Vue.component('ApprovalView', ApprovalView);
 Vue.component('ApprovalItem', ApprovalItem);
 Vue.component('FileViewer', FileViewer);
 Vue.component('ShowMore', ShowMore);
+Vue.component('FooterAction', FooterAction);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)

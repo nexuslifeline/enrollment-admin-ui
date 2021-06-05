@@ -72,7 +72,8 @@ const Soa = () => import('@/views/pages/Soa');
 const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
-const AcademicRecordApplicationList = () => import('@/views/pages/academic-record-applications/AcademicRecordApplicationList')
+const AcademicRecordApplicationList = () => import('@/views/pages/quick-enroll/List')
+const AcademicRecordEntry= () => import('@/views/pages/quick-enroll/Entry')
 const DocumentType = () => import('@/views/pages/DocumentType');
 
 const Collection = () => import('@/views/pages/reports/Collection')
@@ -176,7 +177,14 @@ function configRoutes () {
               path: 'academic-record-applications',
               name: 'Academic Record Applications',
               component: AcademicRecordApplicationList,
-              meta: { requiresAuth: true }
+              meta: { requiresAuth: true },
+              children: [
+                {
+                  path: ':academicRecordId',
+                  name: 'Academic Record Applications Detail',
+                  component: AcademicRecordEntry,
+                }
+              ]
             },
           ]
         },
