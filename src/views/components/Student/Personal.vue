@@ -185,7 +185,7 @@ export default {
   mounted() {
     const { profile } = this.forms
     copyValue(this.data, profile.fields);
-    this.$watch('forms.profile.fields', this.autoSave, { deep: true });
+    // this.$watch('forms.profile.fields', this.autoSave, { deep: true });
   },
   methods: {
     autoSave: debounce(function() { this.onSave() }, 2000),

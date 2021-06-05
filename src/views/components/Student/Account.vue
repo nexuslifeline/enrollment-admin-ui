@@ -6,9 +6,14 @@
     titleSize="m"
     :showAction="!hasAccount">
     <template v-if="hasAccount">
-      <UsernameItem :user="user" />
+      <UsernameItem
+        :user="user"
+        :route="changeUsernameRoute || defaultRoutes.changeUsername"
+      />
       <hr />
-      <PasswordItem />
+      <PasswordItem
+        :route="changePasswordRoute || defaultRoutes.changePassword"
+      />
     </template>
     <div v-else>
       No account found.
@@ -16,11 +21,8 @@
     <router-view
       @onAccountCreated="onAccountCreated"
       :user="user"
-      :previousRoute="{
-        name: 'Student Edit',
-        params: { ...$route.params }
-      }">
-    </router-view>
+      :previousRoute="currentRoute"
+    />
   </Card>
 </template>
 <script>
@@ -35,11 +37,33 @@ export default {
   props: {
     data: {
       type: [Object]
+    },
+    addAccountRoute: {
+      type: [Object],
+    },
+    currentRoute: {
+      type: [Object],
+    },
+    changeUsernameRoute: {
+      type: [Object],
+    },
+    changePasswordRoute: {
+      type: [Object],
     }
   },
   data() {
     return {
-      user: { ...this.data }
+      user: { ...this.data },
+      defaultRoutes: {
+        changeUsername: {
+          name: 'Change Student Username',
+          params: { ...this.$route.params }
+        },
+        changePassword: {
+          name: 'Change Student Password',
+          params: { ...this.$route.params }
+        }
+      }
     }
   },
   computed: {
@@ -49,10 +73,7 @@ export default {
   },
   methods: {
     onAddNew() {
-      this.$router.push({
-        name: 'Create Student Account',
-        params: { studentId: this.$route.params.studentId }
-      });
+      this.$router.push(this.addAccountRoute);
     },
     onAccountCreated(user) {
       this.user = user;

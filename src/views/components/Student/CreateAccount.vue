@@ -66,6 +66,11 @@ export default {
   components: {
     FooterAction
   },
+   props: {
+    previousRoute: {
+      type: [Object],
+    }
+  },
   mixins: [ StudentApi ],
   data() {
     return {
@@ -79,6 +84,9 @@ export default {
           errors: { ...userFields }
         }
       },
+      defaultRoutes: {
+        edit: { name: 'Student Edit', params: { ...this.$route.params } }
+      }
     }
   },
   created() {
@@ -105,10 +113,10 @@ export default {
       })
     },
     onClose() {
-      this.$router.push({
-        name: 'Student Edit',
-        params: { studentId: this.$route.params.studentId }
-      });
+      const route = !!Object.keys(this.previousRoute || {}).length
+        ? this.previousRoute
+        : this.defaultRoutes.edit;
+      this.$router.push(route);
     }
   },
 };

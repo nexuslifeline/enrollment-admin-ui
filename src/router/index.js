@@ -183,6 +183,27 @@ function configRoutes () {
                   path: ':academicRecordId',
                   name: 'Academic Record Applications Detail',
                   component: AcademicRecordEntry,
+                  meta: { requiresAuth: true },
+                  children: [
+                    {
+                      path: 'student/:studentId/account/create',
+                      name: 'Academic Record Add Account',
+                      component: CreateStudentAccount,
+                      meta: { requiresAuth: true },
+                    },
+                    {
+                      path: 'student/:studentId/account/change-username',
+                      name: 'Academic Record Change Username',
+                      component: ChangeUsername,
+                      meta: { requiresAuth: true, hideSubNav: true }
+                    },
+                    {
+                      path: 'student/:studentId/account/change-password',
+                      name: 'Academic Record Change Password',
+                      component: ChangePassword,
+                      meta: { requiresAuth: true, hideSubNav: true }
+                    },
+                  ]
                 }
               ]
             },

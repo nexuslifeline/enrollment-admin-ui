@@ -3,7 +3,11 @@
     <template v-if="!!Object.keys(data).length">
       <BackLink />
       <Personal :data="data" />
-      <Account :data="data.user || {}" />
+      <Account
+        :data="data.user || {}"
+        :currentRoute="{ name: 'Student Edit', params: { ...$route.params } }"
+        :addAccountRoute="{ name: 'Create Student Account', params: { ...$route.params } }"
+      />
       <Family :data="data.family || {}" />
       <Address :data="data.address || {}" />
       <Education :data="data.education || {}"/>

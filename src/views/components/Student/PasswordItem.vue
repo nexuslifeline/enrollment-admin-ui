@@ -22,14 +22,14 @@ export default {
   props: {
     data: {
       type: [Object],
+    },
+    route: {
+      type: [Object],
     }
   },
   methods: {
     onUpdatePassword() {
-      this.$router.push({
-        name: 'Change Student Password',
-        params: { ...this.$route.params }
-      });
+      this.$router.push(this.route);
     }
   }
 };

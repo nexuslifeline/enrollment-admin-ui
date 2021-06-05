@@ -16,7 +16,25 @@
         <div v-if="!!Object.keys(data).length" class="quick-enroll__content-area">
           <template v-if="selectedIndex === 0">
             <Personal :data="data.student || {}" />
-            <Account :data="data.student.user || {}" />
+            <Account
+              :data="data.student.user || {}"
+              :currentRoute="{
+                name: 'Academic Record Applications Detail',
+                params: { ...$route.params }
+              }"
+              :addAccountRoute="{
+                name: 'Academic Record Add Account',
+                params: { academicRecordId, studentId: data.student.id }
+              }"
+              :changeUsernameRoute="{
+                name: 'Academic Record Change Username',
+                params: { academicRecordId, studentId: data.student.id }
+              }"
+              :changePasswordRoute="{
+                name: 'Academic Record Change Password',
+                params: { academicRecordId, studentId: data.student.id }
+              }"
+            />
           </template>
           <template v-else-if="selectedIndex === 1">
 

@@ -24,17 +24,14 @@ export default {
   props: {
     user: {
       type: [Object]
+    },
+    route: {
+      type: [Object],
     }
-  },
-  created() {
-    console.log(this.user)
   },
   methods: {
     onChangeUsername() {
-      this.$router.push({
-        name: 'Change Student Username',
-        params: { ...this.$route.params }
-      });
+      this.$router.push(this.route);
     }
   }
 };
