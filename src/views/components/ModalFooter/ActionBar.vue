@@ -24,6 +24,7 @@
     </b-button>
 
     <b-button
+      v-if="showConfirm"
       variant="primary"
       size="sm"
       @click="$emit('onConfirm')"
@@ -45,6 +46,10 @@ export default {
       default: false
     },
     showCancel: {
+      type: [Boolean],
+      default: true
+    },
+    showConfirm: {
       type: [Boolean],
       default: true
     },

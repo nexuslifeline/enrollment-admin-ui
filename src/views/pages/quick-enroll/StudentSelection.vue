@@ -32,9 +32,10 @@
     <template v-slot:modal-footer>
       <FooterAction
         @onConfirm="onProceed"
-        @onCancel="$emit('update:isShown', false)"
+        @onCancel="resetState"
         :isConfirmBusy="isConfirmBusy"
         confirmText="Proceed"
+        :showConfirm="isStudentShown"
       />
   </template>
   </b-modal>
@@ -60,26 +61,33 @@ export default {
   mixins: [],
   data() {
     return {
-      selectedIndex: 0,
+      selectedIndex: null,
       busyIndexes: [],
       isStudentShown: false,
       isConfirmBusy: false,
       menus: [
         { label: 'Select Existing Student' },
         { label: 'Register New Student' }
-      ]
+      ],
+      academicRecordId: 1 // added hardcoded id for testing only
     }
-  },
-  mounted() {
-    console.log('mounted')
   },
   methods: {
     onProceed() {
-      if (selectedIndex === 0) {
-
-      } else {
-
+      if (this.selectedIndex === 0) {
+        this.$emit('update:isShown', false);
+        this.$router.push({
+          name: 'Academic Record Applications Detail',
+          params: { academicRecordId: this.academicRecordId }
+        });
       }
+    },
+    resetState() {
+      this.selectedIndex = null;
+      this.busyIndexes = [];
+      this.$emit('update:isShown', false);
+      this.isStudentShown = false;
+      this.isConfirmBusy = false;
     },
     onSelectMenu(item) {
       this.busyIndexes = [item.index];
@@ -95,6 +103,12 @@ export default {
 
       // post student here with empty({}) data
       // after posting student, post new academic record here with the new student id
+      // and redirect to enrollment/academic-record-applications/:academicRecordId
+      this.resetState();
+      this.$router.push({
+        name: 'Academic Record Applications Detail',
+        params: { academicRecordId: this.academicRecordId }
+      });
     }
   }
 };

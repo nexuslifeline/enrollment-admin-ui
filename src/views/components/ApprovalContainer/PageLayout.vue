@@ -1,44 +1,59 @@
 <template>
   <div class="approval-view__container">
-    <b-overlay :show="isBusy" rounded="sm">
-      <div class="approval-view__header">
-        <div class="approval-view__header-back">
-          <button @click="$emit('onBack')" class="approval-view__header-action-back">
-            <BIconChevronLeft scale="1" />
-            {{backTitle}}
-          </button>
-        </div>
-        <slot name="header"></slot>
-        <div v-if="showOptions" class="approval-view__header-right-actions">
-          <button @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
-            Approve Request
-          </button>
+    <div class="approval-view__header">
+      <div class="approval-view__header-back">
+        <button @click="$emit('onBack')" class="approval-view__header-action-back">
+          <BIconChevronLeft scale="1" />
+          {{ backTitle }}
+        </button>
+      </div>
+      <slot name="header"></slot>
+      <div v-if="showOptions" class="approval-view__header-right-actions">
+        <button @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
+          Approve Request
+        </button>
 
-          <button @click="$emit('onRejectionRequest')" variant="dark" class="btn-action ml-2">
-            Reject Request
-          </button>
+        <button @click="$emit('onRejectionRequest')" variant="dark" class="btn-action ml-2">
+          Reject Request
+        </button>
+      </div>
+    </div>
+    <div class="approval-view__body">
+      <div v-if="!!$slots.detail" class="approval-view__left-pane">
+        <div class="approval-view__side-content">
+          <slot name="detail"></slot>
         </div>
       </div>
-      <div v-if="!!$slots.detail" class="approval-view__side-content">
-        <slot name="detail"></slot>
+      <div class="approval-view__content">
+        <slot name="content"></slot>
       </div>
-      <div class="approval-view__body">
-        <div class="approval-view__content">
-          <slot name="content"></slot>
-        </div>
-      </div>
-    </b-overlay>
+    </div>
+    <!-- <b-overlay :show="isBusy" rounded="sm">
+      
+    </b-overlay> -->
+    <div v-if="showFooter" class="approval-view__footer">
+      <ActionRow />
+    </div>
   </div>
 </template>
 <script>
+  import ActionRow from './ActionRow';
+
   export default {
     data() {
       return {
         showDropdown: false
       }
     },
+    components: {
+      ActionRow
+    },
     props: {
       isBusy: {
+        type: [Boolean],
+        default: false
+      },
+      showFooter: {
         type: [Boolean],
         default: false
       },
@@ -90,17 +105,16 @@
     height: 100vh;
     background-color: $white;
     z-index: 10;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .approval-view__header {
-    position: fixed;
     background-color: $light-gray-100;
     border-bottom: 1px solid $brand-border-color;
     display: flex;
     flex-direction: row;
     align-items: center;
-    position: fixed;
     left: 0;
     top: 0;
     width: 100%;
@@ -143,12 +157,15 @@
   .approval-view__body {
     width: 100%;
     display: flex;
-    overflow: auto;
-    margin-top: 55px;
     position: relative;
-    padding-left: 420px;
+    background-color: $light-gray;
+    flex: 1;
+    overflow: auto;
+  }
+
+  .approval-view__left-pane {
+    width: 420px;
     min-height: 100vh;
-    background-color: $white;
   }
 
   .approval-view__side-content {
@@ -168,12 +185,10 @@
   }
 
   .approval-view__content {
-    flex: 1;
+    flex-grow: 1;
     padding: 10px 0;
-    //border-left: 1px solid $brand-border-color;
     background-color: $light-gray;
-    position: relative;
-    min-height: 100%;
+    display: block;
   }
 
   .approval-view__right-action {
@@ -246,5 +261,10 @@
       background-color: $black;
       color: $white;
     }
+  }
+
+  .approval-view__footer {
+    width: 100%;
+    height: 60px;
   }
 </style>

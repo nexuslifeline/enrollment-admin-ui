@@ -123,6 +123,7 @@
       <StudentSelection
         :isShown.sync="isStudentShown"
       />
+      <router-view :previousRoute="{ name: 'Academic Record Applications' }" />
     </template>
   </PageContent>
   <!-- main container -->

@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import StageIndicator from './views/components/Wizard/StageIndicator';
 import FooterAction from './views/components/ModalFooter/ActionBar';
 import ShowMore from './views/components/CoDepartment/ShowMore';
 import FileViewer from './views/components/FileViewer';
@@ -226,6 +227,7 @@ Vue.component('ApprovalItem', ApprovalItem);
 Vue.component('FileViewer', FileViewer);
 Vue.component('ShowMore', ShowMore);
 Vue.component('FooterAction', FooterAction);
+Vue.component('StageIndicator', StageIndicator);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
