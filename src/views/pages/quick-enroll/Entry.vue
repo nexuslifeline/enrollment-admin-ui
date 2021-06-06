@@ -37,7 +37,8 @@
             />
           </template>
           <template v-else-if="selectedIndex === 1">
-
+            <AcademicRecord :data="data" />
+            <Enlistment />
           </template>
           <template v-else-if="selectedIndex === 2">
 
@@ -51,6 +52,8 @@
 <script>
 import Personal from '../../components/Student/Personal';
 import Account from '../../components/Student/Account';
+import AcademicRecord from '../../components/AcademicRecord/AcademicRecord';
+import Enlistment from '../../components/SubjectEnlistment/Enlistment';
 import { AcademicRecordApi } from '../../../mixins/api';
 
 export default {
@@ -62,7 +65,9 @@ export default {
   },
   components: {
     Personal,
-    Account
+    Account,
+    AcademicRecord,
+    Enlistment
   },
   data() {
     return {
@@ -72,10 +77,6 @@ export default {
         {
           header: 'Profile and Account',
           description: 'Lorem ipsum dolor sit amet, consectetur adipiscing.'
-        },
-        {
-          header: 'Academic Info',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
         },
         {
           header: 'Subject Enlistment',
