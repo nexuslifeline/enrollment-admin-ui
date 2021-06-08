@@ -32,5 +32,8 @@ export default {
     updateAcademicRecordSubject(id, subjectId, data) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${id}/subjects/${subjectId}`, data);
     },
+    quickEnroll(studentId) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${studentId}/quick-enroll`)
+    },
   }
 }

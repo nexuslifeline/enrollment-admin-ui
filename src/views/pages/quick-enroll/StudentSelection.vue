@@ -42,6 +42,7 @@
 </template>
 <script>
 import { copyValue } from '../../../helpers/extractor';
+import { AcademicRecordApi, StudentApi } from '../../../mixins/api';
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import TileMenu from '../../components/TileSelector/List';
 
@@ -58,7 +59,7 @@ export default {
     FooterAction,
     TileMenu
   },
-  mixins: [],
+  mixins: [ StudentApi, AcademicRecordApi],
   data() {
     return {
       selectedIndex: null,
@@ -77,7 +78,7 @@ export default {
       if (this.selectedIndex === 0) {
         this.$emit('update:isShown', false);
         this.$router.push({
-          name: 'Academic Record Applications Detail',
+          name: 'Quick Enroll',
           params: { academicRecordId: this.academicRecordId }
         });
       }
@@ -105,10 +106,18 @@ export default {
       // after posting student, post new academic record here with the new student id
       // and redirect to enrollment/academic-record-applications/:academicRecordId
       this.resetState();
-      this.$router.push({
-        name: 'Academic Record Applications Detail',
-        params: { academicRecordId: this.academicRecordId }
-      });
+      this.addStudent({})
+      .then(({ data }) => {
+        const studentId = data.id
+        this.quickEnroll(studentId)
+        .then(({ data }) => {
+          const academicRecordId = data.id
+          this.$router.push({
+            name: 'Quick Enroll Entry',
+            params: { academicRecordId, studentId }
+          });
+        })
+      })
     }
   }
 };
