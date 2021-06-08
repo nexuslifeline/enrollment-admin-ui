@@ -23,7 +23,7 @@
             label="name"
             placeholder="Course"
             class="mt-2"
-            :clearable="false"
+            :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.courseId  }"
           />
       </b-form-group>

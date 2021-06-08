@@ -32,14 +32,18 @@
       </ActiveViewItem>
     </ActiveViewItems>
     <ChangeCurriculum
+      v-if="isShowChangeCurriculum"
       @onCancel="isShowChangeCurriculum = false"
       :data.sync="data.transcriptRecord"
       :isShown.sync="isShowChangeCurriculum"
+      :courseId="courseId"
     />
     <ChangeStudentCurriculum
+      v-if="isShowChangeStudentCurriculum"
       @onCancel="isShowChangeStudentCurriculum = false"
       :data.sync="data.transcriptRecord"
       :isShown.sync="isShowChangeStudentCurriculum"
+      :courseId="courseId"
     />
     <ChangeLevel
       @onCancel="isShowChangeLevel = false"
@@ -93,6 +97,9 @@ export default {
   computed: {
     transcriptRecord() {
       return this.data?.transcriptRecord || {};
+    },
+    courseId() {
+      return this.data?.courseId
     }
   },
   methods: {
@@ -128,7 +135,7 @@ export default {
     //     this.isCreatingTranscript = false
     //   });
     // }
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
