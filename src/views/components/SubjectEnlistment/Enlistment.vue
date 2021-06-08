@@ -4,7 +4,9 @@
       title="Subject Enlistment"
       titleSize="m"
       :hasFooter="true">
+      <div>
 
+      </div>
       <template v-slot:footer>
         <CardFooterRow>
           <b-button variant="primary" @click="onSave" :disabled="isProcessing">

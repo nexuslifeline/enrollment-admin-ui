@@ -23,6 +23,7 @@
         </b-dropdown-item>
       </b-dropdown>
       <slot name="header-action"></slot>
+      <span v-if="isCompleted" class="c-card__completion-status">Completed!</span>
     </div>
     <div class="c-card__body" :class="{ noPadding: noPaddingBody }">
       <slot></slot>
@@ -39,6 +40,10 @@ export default {
       type: [String],
     },
     showRefresh: {
+      type: Boolean,
+      default: false,
+    },
+    isCompleted: {
       type: Boolean,
       default: false,
     },
@@ -112,5 +117,30 @@ export default {
   min-height: 60px;
   width: 100%;
   padding: 15px;
+}
+
+.c-card__completion-status {
+  font-weight: 500;
+  color: $green-10;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &::after {
+    content: '\2713​';
+    height: 30px;
+    width: auto;
+    width: 30px;
+    margin-left: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: $white;
+    background-color: $green-10;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    //position: absolute;
+  }
 }
 </style>

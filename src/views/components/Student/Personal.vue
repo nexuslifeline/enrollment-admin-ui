@@ -1,5 +1,8 @@
 <template>
-  <Card title="Personal Information" titleSize="m" :hasFooter="true">
+  <Card title="Personal Information"
+    titleSize="m"
+    :hasFooter="true"
+    :isCompleted="isCompleted">
     <InputGroup>
       <InputContainer>
          <b-form-group v-if="!!forms.profile.fields.studentNo">
@@ -167,11 +170,12 @@ export default {
       return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
     },
     studentId() {
-      return this.$route.params.studentId;
+      return this.$route?.params?.studentId || this?.data?.id;
     }
   },
   data() {
     return {
+      isCompleted: false,
       forms: {
         profile: {
           fields: { ...profileFields },
@@ -182,12 +186,21 @@ export default {
       isProcessing: false,
     }
   },
-  mounted() {
+  created() {
     const { profile } = this.forms
     copyValue(this.data, profile.fields);
-    // this.$watch('forms.profile.fields', this.autoSave, { deep: true });
+    this.registerObservers();
   },
   methods: {
+    registerObservers() {
+      this.$watch('forms.profile.fields', this.autoSave, { deep: true, immediate: false });
+      this.$watch('forms.profile.fields', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      const { firstName, lastName, civilStatusId, birthDate } = this.forms.profile.fields;
+      this.isCompleted = !!firstName && !!lastName && !!civilStatusId && !!birthDate;
+      this.$emit('onCompletionChange', this.isCompleted);
+    },
     autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true

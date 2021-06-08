@@ -15,8 +15,12 @@
         </div>
         <div v-if="!!Object.keys(data).length" class="quick-enroll__content-area">
           <template v-if="selectedIndex === 0">
-            <Personal :data="data.student || {}" />
+            <Personal
+              :data="data.student || {}"
+              @onCompletionChange="onPersonalCompletion"
+            />
             <Account
+               @onCompletionChange="onAccountCompletion"
               :data="data.student.user || {}"
               :currentRoute="{
                 name: 'Academic Record Applications Detail',
@@ -99,6 +103,12 @@ export default {
   methods: {
     onSelectStage(idx) {
       this.selectedIndex = idx;
+    },
+    onPersonalCompletion(isCompleted) {
+      console.log('personal profile completed', isCompleted);
+    },
+    onAccountCompletion(isCompleted) {
+      console.log('user account completed', isCompleted);
     }
   }
 }

@@ -4,6 +4,7 @@
     actionLabel="Create Account"
     @onAddNew="onAddNew"
     titleSize="m"
+    :isCompleted="hasAccount"
     :showAction="!hasAccount">
     <template v-if="hasAccount">
       <UsernameItem
@@ -71,7 +72,16 @@ export default {
       return !!this.user?.username;
     }
   },
+  created() {
+    this.registerObservers();
+  },
   methods: {
+    registerObservers() {
+      this.$watch('user', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      this.$emit('onCompletionChange', this.hasAccount);
+    },
     onAddNew() {
       this.$router.push(this.addAccountRoute);
     },
