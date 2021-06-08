@@ -61,9 +61,9 @@ export default {
     // curriculum: {
     //   type: [Object]
     // },
-    // courseId: {
-    //   type: [Number, String]
-    // }
+    courseId: {
+      type: [Number, String]
+    }
   },
   mixins: [ TranscriptRecordApi ],
   components: {
@@ -83,9 +83,6 @@ export default {
     }
   },
   computed: {
-    courseId() {
-      return this.data?.courseId;
-    },
     levelId() {
       return this.data?.levelId;
     }
