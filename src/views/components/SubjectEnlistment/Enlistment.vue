@@ -3,9 +3,13 @@
     <Card
       title="Subject Enlistment"
       titleSize="m"
+      actionLabel="Add Subject"
+      @onAddNew="onAddSubject"
+      showAction
+      noPaddingBody
       :hasFooter="true">
       <div>
-
+        <SubjectsTable />
       </div>
       <template v-slot:footer>
         <CardFooterRow>
@@ -18,7 +22,12 @@
   </div>
 </template>
 <script>
+import SubjectsTable from './SubjectsTable';
+
 export default {
+  components: {
+    SubjectsTable
+  },
   props: {
     academicRecordId: {
       type: [String, Number]
@@ -26,7 +35,7 @@ export default {
   },
   data() {
     return {
-      isProcessing: false
+      isProcessing: false,
     }
   },
   created() {
@@ -35,6 +44,9 @@ export default {
   methods: {
     onSave() {
       console.log('POST academic records subject to /academic-records/:id/subjects')
+    },
+    onAddSubject() {
+
     }
   }
 };
