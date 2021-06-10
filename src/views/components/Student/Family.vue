@@ -1,5 +1,5 @@
 <template>
-  <Card title="Family" titleSize="m" :hasFooter="true">
+  <Card title="Family" titleSize="m" :isCompleted="isCompleted" :hasFooter="true">
     <InputGroup>
       <InputContainer>
         <b-form-group>
@@ -7,7 +7,7 @@
           <b-form-input
             v-model="forms.family.fields.fatherName"
             :state="forms.family.states.familyFatherName"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.family.errors.familyFatherName}}
           </b-form-invalid-feedback>
@@ -18,7 +18,7 @@
           <label>Contact No.</label>
           <b-form-input
             v-model="forms.family.fields.fatherMobileNo"
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -28,7 +28,7 @@
           <label>Occupation</label>
           <b-form-input
             v-model="forms.family.fields.fatherOccupation"
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
       <InputContainer>
@@ -37,7 +37,7 @@
           <b-form-input
             v-model="forms.family.fields.fatherEmail"
             :state="forms.family.states.familyFatherEmail"
-            debounce="500" />
+           />
           <b-form-invalid-feedback>
             {{forms.family.errors.familyFatherEmail}}
           </b-form-invalid-feedback>
@@ -51,7 +51,7 @@
           <b-form-input
             v-model="forms.family.fields.motherName"
             :state="forms.family.states.familyMotherName"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.family.errors.familyMotherName}}
           </b-form-invalid-feedback>
@@ -62,7 +62,7 @@
           <label>Contact No.</label>
           <b-form-input
             v-model="forms.family.fields.motherMobileNo"
-            debounce="500"/>
+          />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -72,7 +72,7 @@
           <label>Occupation</label>
           <b-form-input
             v-model="forms.family.fields.motherOccupation"
-            debounce="500"/>
+          />
         </b-form-group>
       </InputContainer>
       <InputContainer>
@@ -81,7 +81,7 @@
           <b-form-input
             v-model="forms.family.fields.motherEmail"
             :state="forms.family.states.familyMotherEmail"
-            debounce="500"/>
+          />
           <b-form-invalid-feedback>
             {{forms.family.errors.familyMotherEmail}}
           </b-form-invalid-feedback>
@@ -92,11 +92,11 @@
     <InputGroup>
       <InputContainer>
         <b-form-group>
-          <label class="required">Parent/Guardian</label>
+          <label class="required">Guardian</label>
           <b-form-input
             v-model="forms.family.fields.parentGuardianName"
             :state="forms.family.states.familyParentGuardianName"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.family.errors.familyParentGuardianName}}
           </b-form-invalid-feedback>
@@ -104,11 +104,11 @@
       </InputContainer>
       <InputContainer>
         <b-form-group>
-          <label class="required">Parent/Guardian Contact No.</label>
+          <label class="required">Guardian Contact No.</label>
           <b-form-input
             v-model="forms.family.fields.parentGuardianContactNo"
             :state="forms.family.states.familyParentGuardianContactNo"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.family.errors.familyParentGuardianContactNo}}
           </b-form-invalid-feedback>
@@ -155,6 +155,7 @@ const familyErrorFields = {
 import { StudentApi } from '../../../mixins/api';
 import { copyValue } from '../../../helpers/extractor';
 import { validate, reset, showNotification } from '../../../helpers/forms';
+import debounce from 'lodash/debounce';
 
 export default {
   props: {
@@ -162,9 +163,10 @@ export default {
       type: [Object]
     }
   },
-  mixins: [ StudentApi ],
+  mixins: [StudentApi],
   data() {
     return {
+      isCompleted: false,
       forms: {
         family: {
           fields: { ...familyFields },
@@ -176,9 +178,25 @@ export default {
     }
   },
   created() {
-    copyValue(this.data, this.forms.family.fields)
+    copyValue(this.data, this.forms.family.fields);
+    this.registerObservers();
   },
   methods: {
+    registerObservers() {
+      this.$watch('forms.family.fields', this.autoSave, { deep: true, immediate: false });
+      this.$watch('forms.family.fields', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      const {
+        fatherName,
+        motherName,
+        parentGuardianName,
+        parentGuardianContactNo
+      } = this.forms.family.fields;
+      this.isCompleted = !!fatherName && !!motherName && !!parentGuardianName && !!parentGuardianContactNo;
+      this.$emit('onCompletionChange', this.isCompleted);
+    },
+    autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { family } = this.forms

@@ -1,14 +1,14 @@
 <template>
-  <Card title="Contact" titleSize="m" :hasFooter="true">
+  <Card title="Contact" titleSize="m" :isCompleted="isCompleted" :hasFooter="true">
     <InputGroup>
       <InputContainer>
         <b-form-group>
-          <label>Complete Address</label>
+          <label class="required">Complete Address</label>
           <b-form-textarea
             rows="4"
             v-model="forms.personnel.fields.completeAddress"
             :state="forms.personnel.states.completeAddress"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.completeAddress}}
           </b-form-invalid-feedback>
@@ -21,7 +21,7 @@
           <label>Mobile No</label>
           <b-form-input
             v-model="forms.personnel.fields.mobileNo"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.mobileNo}}
           </b-form-invalid-feedback>
@@ -32,7 +32,7 @@
           <label>Phone No.</label>
           <b-form-input
             v-model="forms.personnel.fields.phoneNo"
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -42,7 +42,7 @@
           <label>Emergency Mobile No</label>
           <b-form-input
             v-model="forms.personnel.fields.emergencyMobileNo"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.emergencyMobileNo}}
           </b-form-invalid-feedback>
@@ -53,7 +53,7 @@
           <label>Emergency Phone No.</label>
           <b-form-input
             v-model="forms.personnel.fields.emergencyPhoneNo"
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -63,7 +63,7 @@
           <label>Facebook URL</label>
           <b-form-input
             v-model="forms.personnel.fields.facebookUrl"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.facebookUrl}}
           </b-form-invalid-feedback>
@@ -76,7 +76,7 @@
           <label>LinkedIn URL</label>
           <b-form-input
             v-model="forms.personnel.fields.linkedinUrl"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.linkedinUrl}}
           </b-form-invalid-feedback>
@@ -89,7 +89,7 @@
           <label>Twitter URL</label>
           <b-form-input
             v-model="forms.personnel.fields.twitterUrl"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.linkedinUrl}}
           </b-form-invalid-feedback>
@@ -102,7 +102,7 @@
           <label>Instagram URL</label>
           <b-form-input
             v-model="forms.personnel.fields.instagramUrl"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.instagramUrl}}
           </b-form-invalid-feedback>
@@ -115,7 +115,7 @@
           <label>Website URL</label>
           <b-form-input
             v-model="forms.personnel.fields.websiteUrl"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.personnel.errors.websiteUrl}}
           </b-form-invalid-feedback>
@@ -146,9 +146,11 @@ const personnelFields = {
   instagramUrl: null,
   websiteUrl: null,
 };
+
 import { PersonnelApi  } from '../../../mixins/api';
 import { copyValue } from '../../../helpers/extractor';
 import { validate, reset, showNotification } from '../../../helpers/forms';
+import debounce from 'lodash/debounce';
 
 export default {
   props: {
@@ -159,6 +161,7 @@ export default {
   mixins: [ PersonnelApi ],
   data() {
     return {
+      isCompleted: false,
       forms: {
         personnel: {
           fields: { ...personnelFields },
@@ -170,9 +173,22 @@ export default {
     }
   },
   created() {
-    copyValue(this.data, this.forms.personnel.fields)
+    copyValue(this.data, this.forms.personnel.fields);
+    this.registerObservers();
   },
   methods: {
+    registerObservers() {
+      this.$watch('forms.personnel.fields', this.autoSave, { deep: true, immediate: false });
+      this.$watch('forms.personnel.fields', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      const {
+        completeAddress
+      } = this.forms.personnel.fields;
+      this.isCompleted = !!completeAddress;
+      this.$emit('onCompletionChange', this.isCompleted);
+    },
+    autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { personnel } = this.forms

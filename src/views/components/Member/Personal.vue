@@ -1,5 +1,5 @@
 <template>
-  <Card title="Personal Information" titleSize="m" :hasFooter="true">
+  <Card title="Personal Information" titleSize="m" :isCompleted="isCompleted" :hasFooter="true">
     <InputGroup>
       <InputContainer>
           <b-form-group>
@@ -7,7 +7,7 @@
             <b-form-input
               v-model="forms.profile.fields.firstName"
               :state="forms.profile.states.firstName"
-              debounce="500" />
+             />
             <b-form-invalid-feedback>
               {{forms.profile.errors.firstName}}
             </b-form-invalid-feedback>
@@ -18,7 +18,7 @@
           <label>Middle Name</label>
           <b-form-input
             v-model="forms.profile.fields.middleName"
-            debounce="500" />
+           />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -29,7 +29,7 @@
           <b-form-input
             v-model="forms.profile.fields.lastName"
             :state="forms.profile.states.lastName"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.profile.errors.lastName}}
           </b-form-invalid-feedback>
@@ -106,12 +106,12 @@
         </b-form-textarea>
       </b-form-group>
     </InputContainer>
-    <InputContainer>
+    <!-- <InputContainer>
       <InputInline class="mt-3 mb-3">
         <Toggle />
         <span class="ml-2">Active</span>
       </InputInline>
-    </InputContainer>
+    </InputContainer> -->
     <LinkVisibilityToggler
       linkText="Upload Personnel Photo"
       hideLinkText="Hide Personnel Photo"
@@ -144,6 +144,7 @@ import { copyValue } from '../../../helpers/extractor';
 import { validate, reset, showNotification } from '../../../helpers/forms';
 import { DepartmentApi, PersonnelApi } from '../../../mixins/api';
 import { CivilStatuses } from '../../../helpers/enum'
+import debounce from 'lodash/debounce';
 
 const profileFields = {
   id: null,
@@ -166,7 +167,7 @@ export default {
       type: [Object]
     }
   },
-  mixins: [ PersonnelApi, DepartmentApi ],
+  mixins: [PersonnelApi, DepartmentApi],
   computed: {
     avatarText() {
       const { fields } = this.forms.profile;
@@ -184,6 +185,7 @@ export default {
   },
   data() {
     return {
+      isCompleted: false,
       forms: {
         profile: {
           fields: { ...profileFields },
@@ -199,22 +201,40 @@ export default {
       }
     }
   },
-  mounted() {
+  created() {
     const { profile } = this.forms
     copyValue(this.data, profile.fields)
 
     profile.fields.civilStatusId = profile.fields.civilStatusId || this.$options.CivilStatuses.SINGLE.id
-    this.loadDepartments()
+    this.loadDepartments();
+    this.registerObservers();
   },
   methods: {
+     registerObservers() {
+      this.$watch('forms.profile.fields', this.autoSave, { deep: true, immediate: false });
+      this.$watch('forms.profile.fields', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      const {
+        firstName,
+        lastName,
+        jobTitle,
+        birthDate,
+        departmentId,
+        civilStatusId
+      } = this.forms.profile.fields;
+      this.isCompleted = !!firstName &&
+        !!lastName &&
+        !!jobTitle &&
+        !!birthDate &&
+        !!departmentId &&
+        !!civilStatusId;
+      this.$emit('onCompletionChange', this.isCompleted);
+    },
+    autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { profile, profile: { fields: { studentNo }} } = this.forms
-      // reset(profile)
-
-      // profile.fields.studentNo = profile.fields.studentNo === ""
-      //   ? null
-      //   : profile.fields.studentNo
 
       const { photo, ...restProps } = profile.fields; // excempt photo property
       const payLoad = {

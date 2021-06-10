@@ -1,5 +1,9 @@
 <template>
-  <Card title="Address" titleSize="m" :hasFooter="true">
+  <Card
+    title="Address"
+    titleSize="m"
+    :isCompleted="isCompleted"
+    :hasFooter="true">
     <InputGroup>
       <InputContainer>
         <b-form-group>
@@ -7,7 +11,7 @@
           <b-form-input
             v-model="forms.address.fields.currentHouseNoStreet"
             :state="forms.address.states.addressCurrentHouseNoStreet"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.address.errors.addressCurrentHouseNoStreet}}
           </b-form-invalid-feedback>
@@ -19,7 +23,7 @@
           <b-form-input
             v-model="forms.address.fields.currentBarangay"
             :state="forms.address.states.addressCurrentBarangay"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.address.errors.addressCurrentBarangay}}
           </b-form-invalid-feedback>
@@ -33,7 +37,7 @@
           <b-form-input
             v-model="forms.address.fields.currentCityTown"
             :state="forms.address.states.addressCurrentCityTown"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.address.errors.addressCurrentCityTown}}
           </b-form-invalid-feedback>
@@ -45,7 +49,7 @@
           <b-form-input
             v-model="forms.address.fields.currentProvince"
             :state="forms.address.states.addressCurrentProvince"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.address.errors.addressCurrentProvince}}
           </b-form-invalid-feedback>
@@ -59,7 +63,7 @@
           <b-form-input
             v-model="forms.address.fields.currentPostalCode"
             :state="forms.address.states.addressCurrentPostalCode"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.address.errors.addressCurrentPostalCode}}
           </b-form-invalid-feedback>
@@ -70,7 +74,7 @@
           <label >District (Current)</label>
           <b-form-input
             v-model="forms.address.fields.currentDistrict"
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
     </InputGroup>
@@ -80,7 +84,7 @@
           <label>Region (Current)</label>
           <b-form-input
             v-model="forms.address.fields.currentRegion"
-            debounce="500"/>
+           />
         </b-form-group>
       </InputContainer>
       <InputContainer>
@@ -110,7 +114,7 @@
           rows="3"
           v-model="forms.address.fields.currentCompleteAddress"
           :state="forms.address.states.addressCurrentCompleteAddress"
-          debounce="500"/>
+         />
         <b-form-invalid-feedback>
           {{forms.address.errors.addressCurrentCompleteAddress}}
         </b-form-invalid-feedback>
@@ -129,7 +133,7 @@
             <b-form-input
               v-model="forms.address.fields.permanentHouseNoStreet"
               :state="forms.address.states.addressPermanentHouseNoStreet"
-              debounce="500"/>
+             />
             <b-form-invalid-feedback>
               {{forms.address.errors.addressPermanentHouseNoStreet}}
             </b-form-invalid-feedback>
@@ -141,7 +145,7 @@
             <b-form-input
               v-model="forms.address.fields.permanentBarangay"
               :state="forms.address.states.addressPermanentBarangay"
-              debounce="500"/>
+             />
             <b-form-invalid-feedback>
               {{forms.address.errors.addressPermanentBarangay}}
             </b-form-invalid-feedback>
@@ -155,7 +159,7 @@
             <b-form-input
               v-model="forms.address.fields.permanentCityTown"
               :state="forms.address.states.addressPermanentCityTown"
-              debounce="500"/>
+             />
             <b-form-invalid-feedback>
               {{forms.address.errors.addressPermanentCityTown}}
             </b-form-invalid-feedback>
@@ -167,7 +171,7 @@
             <b-form-input
               v-model="forms.address.fields.permanentProvince"
               :state="forms.address.states.addressPermanentProvince"
-              debounce="500"/>
+             />
             <b-form-invalid-feedback>
               {{forms.address.errors.addressPermanentProvince}}
             </b-form-invalid-feedback>
@@ -181,7 +185,7 @@
             <b-form-input
               v-model="forms.address.fields.permanentPostalCode"
               :state="forms.address.states.addressPermanentPostalCode"
-              debounce="500"/>
+             />
             <b-form-invalid-feedback>
               {{forms.address.errors.addressPermanentPostalCode}}
             </b-form-invalid-feedback>
@@ -192,7 +196,7 @@
             <label >District (Permanent)</label>
             <b-form-input
               v-model="forms.address.fields.permanentDistrict"
-              debounce="500"/>
+             />
           </b-form-group>
         </InputContainer>
       </InputGroup>
@@ -202,7 +206,7 @@
             <label>Region (Permanent)</label>
             <b-form-input
               v-model="forms.address.fields.permanentRegion"
-              debounce="500"/>
+             />
           </b-form-group>
         </InputContainer>
         <InputContainer>
@@ -231,7 +235,7 @@
             rows="3"
             v-model="forms.address.fields.permanentCompleteAddress"
             :state="forms.address.states.addressPermanentCompleteAddress"
-            debounce="500"/>
+           />
           <b-form-invalid-feedback>
             {{forms.address.errors.addressPermanentCompleteAddress}}
           </b-form-invalid-feedback>
@@ -297,6 +301,7 @@ import { Countries } from '../../../helpers/enum'
 import { StudentApi } from '../../../mixins/api';
 import { copyValue } from '../../../helpers/extractor';
 import { validate, reset, showNotification } from '../../../helpers/forms';
+import debounce from 'lodash/debounce';
 
 export default {
   props: {
@@ -307,6 +312,7 @@ export default {
   mixins: [ StudentApi ],
   data() {
     return {
+      isCompleted: false,
       Countries: Countries.values,
       isSameAddress: true,
       forms: {
@@ -320,9 +326,48 @@ export default {
     }
   },
   created() {
-    copyValue(this.data, this.forms.address.fields)
+    copyValue(this.data, this.forms.address.fields);
+    this.registerObservers();
   },
   methods: {
+    registerObservers() {
+      this.$watch('forms.address.fields', this.autoSave, { deep: true, immediate: false });
+      this.$watch('forms.address.fields', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      const {
+        currentHouseNoStreet,
+        currentBarangay,
+        currentCityTown,
+        currentProvince,
+        currentDistrict,
+        currentPostalCode,
+        currentCountryId,
+        permanentHouseNoStreet,
+        permanentBarangay,
+        permanentCityTown,
+        permanentProvince,
+        permanentDistrict,
+        permanentPostalCode,
+        permanentCountryId
+      } = this.forms.address.fields;
+      this.isCompleted = !!currentHouseNoStreet &&
+        !!currentBarangay &&
+        !!currentCityTown &&
+        !!currentProvince &&
+        !!currentDistrict &&
+        !!currentPostalCode &&
+        !!currentCountryId &&
+        !!permanentHouseNoStreet &&
+        !!permanentBarangay &&
+        !!permanentCityTown &&
+        !!permanentProvince &&
+        !!permanentDistrict &&
+        !!permanentPostalCode &&
+        !!permanentCountryId;
+      this.$emit('onCompletionChange', this.isCompleted);
+    },
+    autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { address } = this.forms
