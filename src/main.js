@@ -29,6 +29,7 @@ import SelectAcademicRecord from './views/components/Dropdowns/SelectAcademicRec
 import AvatarMaker from './views/components/AvatarMaker';
 import vText from './views/components/Text';
 import Card from './views/components/Card';
+import CardNote from './views/components/CardNote';
 import CardFooterRow from './views/components/CardFooterRow';
 import BackLink from './views/components/BackLink/Link';
 import { InputGroup, InputContainer, InputInline } from './views/components/InputGroup';
@@ -115,8 +116,10 @@ import {
   BIconCameraFill,
   BIconPencil,
   BIconArrowLeft,
-  BIconImage
+  BIconImage,
+  BIconTrash
 } from 'bootstrap-vue';
+Vue.component('BIconTrash', BIconTrash);
 Vue.component('BIconImage', BIconImage);
 Vue.component('BIconArrowLeft', BIconArrowLeft);
 Vue.component('BIconPencil', BIconPencil);
@@ -205,6 +208,7 @@ Vue.component('SelectAcademicRecord', SelectAcademicRecord);
 Vue.component('CenterContainer', CenterContainer);
 Vue.component('AvatarMaker', AvatarMaker);
 Vue.component('Card', Card);
+Vue.component('CardNote', CardNote);
 Vue.component('CardFooterRow', CardFooterRow);
 Vue.component('InputGroup', InputGroup);
 Vue.component('InputContainer', InputContainer);
