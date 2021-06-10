@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card
-      title="Subject Enlistment"
+      title="Subjects"
       titleSize="m"
       actionLabel="Add Subject"
       @onAddNew="onAddSubject"
@@ -9,7 +9,7 @@
       noPaddingBody
       :hasFooter="true">
       <div>
-        <SubjectsTable />
+        <SubjectsTable :data="Array.from({ length: 4 })" @onRemove="onRemoveSubject" />
       </div>
       <template v-slot:footer>
         <CardFooterRow>
@@ -46,6 +46,9 @@ export default {
       console.log('POST academic records subject to /academic-records/:id/subjects')
     },
     onAddSubject() {
+
+    },
+    onRemoveSubject(subject) {
 
     }
   }

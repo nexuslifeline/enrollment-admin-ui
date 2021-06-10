@@ -2,8 +2,11 @@
   <Card
     title="Academic Record"
     titleSize="m"
-    actionLabel="Add Term"
     :hasFooter="true">
+    <CardNote v-if="showNotes">
+      It is recommended to complete the <b>Academic Record</b> section first before 
+      adding Subject to be able to find the right subjects for the Student.
+    </CardNote>
     <InputGroup>
       <InputContainer>
         <label class="required">School Category</label>
@@ -85,6 +88,10 @@
     props: {
       data: {
         type: [Object]
+      },
+      showNotes: {
+        type: Boolean,
+        default: true
       }
     },
     data() {
