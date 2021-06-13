@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options.levels.items"
+    :options="options.sections.items"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -9,15 +9,26 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
-    :loading="options.levels.isBusy">
+    :loading="options.sections.isBusy">
     <template #spinner="{ loading }">
       <div v-if="loading" style="border-left-color: rgba(88,151,251,0.71)" class="vs__spinner">
       </div>
     </template>
+    <!-- <template #option="{ name, isActive }">
+      <div class="school-year__option">
+        <div>{{ `${name} ` }}<span v-if="isActive">(Active)</span></div>
+        <v-icon name="check" v-if="isActive"></v-icon>
+      </div>
+    </template>
+    <template #selected-option="{ name, isActive }">
+      <div class="school-year__option">
+        <div>{{ `${name} ` }}<span v-if="isActive">(Active)</span></div>
+      </div>
+    </template> -->
   </v-select>
 </template>
 <script>
-import {  LevelApi } from '../../../mixins/api';
+import {  SectionApi } from '../../../mixins/api';
 
 export default {
   props: {
@@ -51,16 +62,12 @@ export default {
       type: [Boolean],
       default: false
     },
-    schoolCategoryId: {
-      type: [Number],
-      default: null
-    }
   },
-  mixins: [ LevelApi ],
+  mixins: [ SectionApi ],
   data() {
     return {
       options: {
-        levels: {
+        sections: {
           isBusy: false,
           items: []
         }
@@ -68,29 +75,26 @@ export default {
     }
   },
   created() {
-   this.loadLevels()
+    const { sections } = this.options
+    const params = { paginate: false }
+    sections.isBusy = true
+    this.getSectionList(params).then(({ data }) => {
+      sections.items = data
+      sections.isBusy = false
+    })
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     },
-    loadLevels() {
-      const { levels } = this.options
-      const params = { paginate: false, schoolCategoryId: this.schoolCategoryId }
-      levels.isBusy = true
-      this.getLevelList(params).then(({ data }) => {
-        levels.items = data
-        levels.isBusy = false
-      })
-    }
   },
-  watch: {
-    'schoolCategoryId': function() {
-      this.loadLevels()
-    }
-  }
 };
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/scss/shared.scss';
+
+.school-year__option {
+  display: flex;
+  justify-content: space-between;
+}
 </style>

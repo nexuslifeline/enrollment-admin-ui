@@ -10,16 +10,59 @@
     @show="isStudentShown = false"
     @hidden="$emit('update:isShown', false)">
     <div class="selection__container">
-      <template v-if="isStudentShown">
+      <template v-if="isAcademicInfoShow">
+        <template >
         <b-form-group>
-          <label class="required">Student</label>
-          <v-select
-            label="Student"
-            placeholder="Student"
-            :options="[]"
+          <label class="required">School Year</label>
+          <SelectSchoolYear
+            :value="schoolYearId"
+            :reduce="option => option.id"
+            label="name"
+            @input="schoolYearId = $event"
+            :clearable="false"
           />
         </b-form-group>
-      </template>
+        <b-form-group>
+          <label class="required">School Category</label>
+          <SelectCategory
+            :value="schoolCategoryId"
+            :reduce="option => option.id"
+            label="name"
+            @input="schoolCategoryId = $event"
+            :clearable="false"
+          />
+        </b-form-group>
+        </template>
+        <template v-if="isStudentShown">
+        <b-form-group>
+          <label class="required">Student</label>
+          <SelectPaginated
+            class="select-paginated mt-2 "
+            @input="getStudentInfo($event)"
+            :fetchData="getStudentList"
+            placeholder="Select Student"
+          >
+            <template slot="option" slot-scope="data">
+              <div class="select-option">
+                <div class="select-option__avatar">
+                  <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
+                </div>
+                <div class="select-option__info">
+                  <span>{{
+                    data.studentNo ? data.studentNo : 'Awaiting Confirmation'
+                  }}</span>
+                  <span>{{ data.name }}</span>
+                  <span>{{ data.email }}</span>
+                </div>
+              </div>
+            </template>
+            <template slot="loader">
+              <b-spinner label="Loading..." class="loader"></b-spinner>
+            </template>
+        </SelectPaginated>
+        </b-form-group>
+        </template>
+       </template>
       <template v-else>
         <TileMenu
           @onSelect="onSelectMenu"
@@ -35,7 +78,6 @@
         @onCancel="resetState"
         :isConfirmBusy="isConfirmBusy"
         confirmText="Proceed"
-        :showConfirm="isStudentShown"
       />
   </template>
   </b-modal>
@@ -45,6 +87,9 @@ import { copyValue } from '../../../helpers/extractor';
 import { AcademicRecordApi, StudentApi } from '../../../mixins/api';
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import TileMenu from '../../components/TileSelector/List';
+import SelectSchoolYear from '../../components/Dropdowns/SelectSchoolYear'
+import SelectCategory from '../../components/Dropdowns/SelectCategory'
+import SelectPaginated  from '../../components/SelectPaginated.vue'
 
 export default {
   props: {
@@ -57,7 +102,10 @@ export default {
   },
   components: {
     FooterAction,
-    TileMenu
+    TileMenu,
+    SelectSchoolYear,
+    SelectCategory,
+    SelectPaginated
   },
   mixins: [ StudentApi, AcademicRecordApi],
   data() {
@@ -65,7 +113,11 @@ export default {
       selectedIndex: null,
       busyIndexes: [],
       isStudentShown: false,
+      isAcademicInfoShow: false,
       isConfirmBusy: false,
+      schoolYearId: null,
+      schoolCategoryId: null,
+      selectedStudent: null,
       menus: [
         { label: 'Select Existing Student' },
         { label: 'Register New Student' }
@@ -76,10 +128,45 @@ export default {
   methods: {
     onProceed() {
       if (this.selectedIndex === 0) {
-        this.$emit('update:isShown', false);
-        this.$router.push({
-          name: 'Quick Enroll',
-          params: { academicRecordId: this.academicRecordId }
+        //existing student
+        this.isConfirmBusy = true
+        const studentId = this.selectedStudent?.id
+        this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
+          const academicRecordId = data.id
+          this.isConfirmBusy = false
+          this.$router.push({
+            name: 'Academic Record Applications Detail',
+            params: { academicRecordId, studentId }
+          });
+          this.$emit('update:isShown', false);
+        }).catch((error) => {
+          const errors = error.response.data.errors;
+          this.isConfirmBusy = false
+          console.log(errors)
+        });
+      }
+      else if(this.selectedIndex === 1) {
+        // newly registered student
+        // post student here with empty({}) data
+        // after posting student, post new academic record here with the new student id
+        // and redirect to enrollment/academic-record-applications/:academicRecordId
+        this.isConfirmBusy = true
+        // this.resetState();
+        this.addStudent({}).then(({ data }) => {
+          const studentId = data.id
+          this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
+            const academicRecordId = data.id
+            this.isConfirmBusy = false
+            this.$router.push({
+              name: 'Academic Record Applications Detail',
+              params: { academicRecordId, studentId }
+            });
+            this.$emit('update:isShown', false);
+          })
+        }).catch((error) => {
+          const errors = error.response.data.errors;
+          this.isConfirmBusy = false
+          console.log(errors)
         });
       }
     },
@@ -88,44 +175,59 @@ export default {
       this.busyIndexes = [];
       this.$emit('update:isShown', false);
       this.isStudentShown = false;
+      this.isAcademicInfoShow = false;
       this.isConfirmBusy = false;
     },
     onSelectMenu(item) {
       this.busyIndexes = [item.index];
       this.selectedIndex = item.index;
-
-      if (item.index === 0) {
-        setTimeout(() => {
+      setTimeout(() => {
+        if (item.index === 0) {
           this.isStudentShown = true;
-          this.busyIndexes = [];
-        }, 500);
-        return;
-      }
-
-      // post student here with empty({}) data
-      // after posting student, post new academic record here with the new student id
-      // and redirect to enrollment/academic-record-applications/:academicRecordId
-      this.resetState();
-      this.addStudent({})
-      .then(({ data }) => {
-        const studentId = data.id
-        this.quickEnroll(studentId)
-        .then(({ data }) => {
-          const academicRecordId = data.id
-          this.$router.push({
-            name: 'Quick Enroll Entry',
-            params: { academicRecordId, studentId }
-          });
-        })
-      })
-    }
+        }
+        this.isAcademicInfoShow = true;
+        this.busyIndexes = [];
+      }, 500);
+    },
+    getPhoto(option) {
+      const photo = (option && option.photo && option.photo.hashName) || '';
+      return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
+    },
+    getStudentInfo(student) {
+      this.selectedStudent = student;
+    },
   }
 };
 </script>
 <style lang="scss" scoped>
+  @import '../../../assets/scss/_shared.scss';
 
   .selection__container {
     padding: 20px;
+  }
+
+  .select-paginated {
+    width: 100%;
+
+    @include for-size(phone-only) {
+      width: 100%;
+    }
+    .select-option {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .select-option__avatar {
+        width: auto;
+      }
+
+      .select-option__info {
+        flex: 1;
+        margin-left: 10px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
   }
 
 </style>

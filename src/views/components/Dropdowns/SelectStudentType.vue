@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options || schoolCategories"
+    :options="options || StudentTypes"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -12,7 +12,7 @@
   />
 </template>
 <script>
-import { SchoolCategories } from '../../../helpers/enum';
+import { StudentTypes } from '../../../helpers/enum';
 export default {
   props: {
     options: {
@@ -50,9 +50,7 @@ export default {
   },
   data() {
     return {
-      schoolCategories: SchoolCategories?.values?.filter(
-        v => this.$store.state?.user?.userGroup?.schoolCategories?.map(c => c.id).includes(v.id)
-      ) || []
+      StudentTypes: StudentTypes?.values || []
     }
   },
   methods: {

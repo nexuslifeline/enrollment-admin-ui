@@ -29,11 +29,14 @@ export default {
     getAcademicRecordSubjects(id, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/${id}/subjects`, { params: params });
     },
+    syncAcademicRecordSubjects(data, id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${id}/subjects`, data);
+    },
     updateAcademicRecordSubject(id, subjectId, data) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${id}/subjects/${subjectId}`, data);
     },
-    quickEnroll(studentId) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${studentId}/quick-enroll`)
+    quickEnroll(studentId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${studentId}/quick-enroll`, data)
     },
   }
 }

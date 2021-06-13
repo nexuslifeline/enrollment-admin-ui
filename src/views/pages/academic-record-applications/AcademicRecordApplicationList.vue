@@ -40,14 +40,15 @@
         placeholder="Course"
         class="mt-2"
       />
-      <v-select
+      <!-- disabled temporary -->
+      <!-- <v-select
         :options="$options.ManualSteps.values"
         :value="filters.academicRecord.manualStepItem"
         @input="onStatusFilterChange"
         label="name"
         placeholder="Status"
         class="mt-2"
-      />
+      /> -->
     </template>
     <template v-slot:content>
       <!-- <div>
@@ -467,8 +468,8 @@ export default {
         courseId,
         orderBy,
         sort,
-        manualStepId,
-        notManualStepId: this.$options.ManualSteps.COMPLETED.id,
+        // manualStepId, //disabled temporarily
+        // notManualStepId: this.$options.ManualSteps.COMPLETED.id,
         isManual,
         criteria,
       };

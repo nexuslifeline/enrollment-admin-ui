@@ -17,13 +17,13 @@
     <tbody>
       <tr v-for="(v, idx) in data" :key="idx">
         <td>
-          Data Structure
+          {{ v.description }}
         </td>
         <td>
           <SectionColumn />
         </td>
         <td class="align-right">
-          3
+          {{ v.totalUnits }}
         </td>
         <td>
           <button class="action__trash" @click="$emit('onRemove', v)">
@@ -40,7 +40,7 @@ import SectionColumn from './SectionColumn';
 export default {
   props: {
     data: {
-      type: [Object]
+      type: [Array]
     }
   },
   components: {
@@ -48,7 +48,6 @@ export default {
   },
   data() {
     return {
-     
     }
   },
   methods: {

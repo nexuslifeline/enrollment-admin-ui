@@ -29,10 +29,9 @@
       </div>
     </div>
     <!-- <b-overlay :show="isBusy" rounded="sm">
-      
     </b-overlay> -->
     <div v-if="showFooter" class="approval-view__footer">
-      <ActionRow />
+      <ActionRow @onBack="$emit('onActionBack')" @onNext="$emit('onActionNext')"/>
     </div>
   </div>
 </template>

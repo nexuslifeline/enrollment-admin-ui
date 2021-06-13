@@ -60,7 +60,7 @@
           <template v-slot:cell(name)="data">
             <StudentColumn
               :data="data.item"
-              :callback="{ loadDetails: () => setResume(data) }"
+              :callback="{ loadDetails: () => $router.push({name: 'Academic Record Applications Detail', params: { academicRecordId: data.item.id } }) }"
             />
           </template>
           <template v-slot:cell(contact)="data">
@@ -82,7 +82,7 @@
               {{ $options.ManualSteps.getEnum(data.item.manualStepId).name }}
             </b-badge>
           </template>
-          <template v-slot:cell(action)="row">
+          <template v-slot:cell(action)="data">
             <!-- Rights to be added -->
             <b-dropdown
               right
@@ -94,7 +94,7 @@
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>
-              <b-dropdown-item @click="setResume(row)">
+              <b-dropdown-item @click="$router.push({name: 'Academic Record Applications Detail', params: { academicRecordId: data.item.id } })">
                 Resume
               </b-dropdown-item>
             </b-dropdown>
@@ -122,6 +122,7 @@
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <StudentSelection
         :isShown.sync="isStudentShown"
+        v-if="isStudentShown"
       />
       <router-view :previousRoute="{ name: 'Academic Record Applications' }" />
     </template>
@@ -218,8 +219,8 @@ export default {
           schoolCategoryItem: null,
           courseId: null,
           courseItem: null,
-          manualStepId: this.$options.ManualSteps.EVALUATION.id,
-          manualStepItem: this.$options.ManualSteps.EVALUATION,
+          manualStepId: null,
+          manualStepItem: null,
         },
       },
       options: {
@@ -257,14 +258,14 @@ export default {
       const sort = 'DESC';
       let params = {
         paginate: true,
-        perPage,
+        perPage,manualStepId, //disabled temprarily
+        notManualStepId: this.$options.ManualSteps.COMPLETED.id,
         page,
         schoolCategoryId,
         courseId,
         orderBy,
         sort,
-        manualStepId,
-        notManualStepId: this.$options.ManualSteps.COMPLETED.id,
+        
         isManual,
         criteria,
       };

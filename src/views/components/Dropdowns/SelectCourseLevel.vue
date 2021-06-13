@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options.levels.items"
+    :options="options.courses.items"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -9,7 +9,7 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
-    :loading="options.levels.isBusy">
+    :loading="options.courses.isBusy">
     <template #spinner="{ loading }">
       <div v-if="loading" style="border-left-color: rgba(88,151,251,0.71)" class="vs__spinner">
       </div>
@@ -51,7 +51,7 @@ export default {
       type: [Boolean],
       default: false
     },
-    schoolCategoryId: {
+    levelId: {
       type: [Number],
       default: null
     }
@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       options: {
-        levels: {
+        courses: {
           isBusy: false,
           items: []
         }
@@ -68,25 +68,32 @@ export default {
     }
   },
   created() {
-   this.loadLevels()
+   this.loadCourses()
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     },
-    loadLevels() {
-      const { levels } = this.options
-      const params = { paginate: false, schoolCategoryId: this.schoolCategoryId }
-      levels.isBusy = true
-      this.getLevelList(params).then(({ data }) => {
-        levels.items = data
-        levels.isBusy = false
+    loadCourses() {
+      const { courses } = this.options
+      const params = { paginate: false }
+      courses.isBusy = true
+
+      if(!this.levelId) {
+        courses.items = []
+        courses.isBusy = false
+        return
+      }
+
+      this.getCoursesOfLevelList(this.levelId, params).then(({ data }) => {
+        courses.items = data
+        courses.isBusy = false
       })
     }
   },
   watch: {
-    'schoolCategoryId': function() {
-      this.loadLevels()
+    'levelId': function() {
+      this.loadCourses()
     }
   }
 };

@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options.levels.items"
+    :options="options || filteredSemester"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -9,21 +9,19 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
-    :loading="options.levels.isBusy">
-    <template #spinner="{ loading }">
-      <div v-if="loading" style="border-left-color: rgba(88,151,251,0.71)" class="vs__spinner">
-      </div>
-    </template>
-  </v-select>
+  />
 </template>
 <script>
-import {  LevelApi } from '../../../mixins/api';
-
+import { Semesters, SchoolCategories } from '../../../helpers/enum';
 export default {
+  Semesters,
+  SchoolCategories,
   props: {
+    options: {
+      type: [Array]
+    },
     value: {
-      type: [Number, Object],
-      default: null
+      type: [Object, Number]
     },
     label: {
       type: [String]
@@ -56,39 +54,28 @@ export default {
       default: null
     }
   },
-  mixins: [ LevelApi ],
   data() {
     return {
-      options: {
-        levels: {
-          isBusy: false,
-          items: []
-        }
-      }
+      Semesters: []
     }
-  },
-  created() {
-   this.loadLevels()
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     },
-    loadLevels() {
-      const { levels } = this.options
-      const params = { paginate: false, schoolCategoryId: this.schoolCategoryId }
-      levels.isBusy = true
-      this.getLevelList(params).then(({ data }) => {
-        levels.items = data
-        levels.isBusy = false
-      })
-    }
   },
-  watch: {
-    'schoolCategoryId': function() {
-      this.loadLevels()
-    }
-  }
+  computed: {
+    filteredSemester() {
+      const { SENIOR_HIGH_SCHOOL, COLLEGE, GRADUATE_SCHOOL } = this.$options.SchoolCategories
+      if(this.schoolCategoryId) {
+        if([ SENIOR_HIGH_SCHOOL.id, COLLEGE.id, GRADUATE_SCHOOL.id ].includes(this.schoolCategoryId)) {
+          return this.$options.Semesters?.values
+        }
+      }
+      return []
+    },
+
+  },
 };
 </script>
 <style lang="scss" scoped>

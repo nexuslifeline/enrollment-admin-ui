@@ -3,7 +3,7 @@
     <b-button
       variant="dark"
       class="approval-view__back"
-      @click="$emit('onNext')"
+      @click="$emit('onBack')"
       :disabled="isBackDisabled">
       <v-icon name="spinner" spin v-if="isBackBusy" />
       Back

@@ -3,7 +3,9 @@
     :showOptions="false"
     :showFooter="true"
     @onBack="$router.push(previousRoute)"
-    backTitle="Enrollment List">
+    backTitle="Enrollment List"
+    @onActionBack="onActionBack"
+    @onActionNext="onActionNext">
     <template v-slot:content>
       <div class="quick-enroll__body">
         <div class="quick-enroll__side-panel">
@@ -42,7 +44,7 @@
           </template>
           <template v-else-if="selectedIndex === 1">
             <AcademicRecord :data="data" />
-            <Enlistment />
+            <Enlistment :academicRecordId="data.id"/>
           </template>
           <template v-else-if="selectedIndex === 2">
 
@@ -109,6 +111,12 @@ export default {
     },
     onAccountCompletion(isCompleted) {
       console.log('user account completed', isCompleted);
+    },
+    onActionNext(){
+      alert('next')
+    },
+    onActionBack(){
+      alert('back')
     }
   }
 }
