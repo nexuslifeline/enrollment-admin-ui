@@ -6,26 +6,51 @@
     <template v-slot:modal-header>
       Subject List
     </template>
-    <b-row class="mb-4">
+    <b-row class="mb-3">
+      <b-col md=3 offset-md="9">
+        <b-form-input
+          class="float-right"
+          placeholder="Search Here..."
+          debounce="500"
+          @update="loadSubjects()"
+          v-model="filters.subject.criteria">
+        </b-form-input>
+      </b-col>
+    </b-row>
+    <b-row class="mb-2">
       <b-col>
         <SelectLevel
           placeholder="Level"
-          label="name" />
+          label="name"
+          :value="filters.subject.levelId"
+          :reduce="option => option.id"
+          @input="onLevelChanged" />
       </b-col>
       <b-col>
-        <SelectCourse
+        <SelectCourseLevel
           placeholder="Course"
-          label="name" />
+          label="name"
+          :value="filters.subject.courseId"
+          :reduce="option => option.id"
+          :levelId="filters.subject.levelId"
+          @input="onCourseChanged" />
       </b-col>
       <b-col>
         <SelectSemester
           placeholder="Semester"
-          label="name" />
+          label="name"
+          :value="filters.subject.semesterId"
+          :reduce="option => option.id"
+          :levelId="filters.subject.levelId"
+          @input="onSemesterChanged" />
       </b-col>
       <b-col>
         <SelectSection
           placeholder="Section"
-          label="name" />
+          label="name"
+          :value="filters.subject.sectionId"
+          :reduce="option => option.id"
+          @input="onSectionChanged" />
       </b-col>
     </b-row>
     <b-row>
@@ -43,7 +68,7 @@
             <SubjectColumn :data="row.item"/>
           </template>
           <template v-slot:cell(action)="row">
-            <b-button @click="$emit('onAddSubject', row.item)" size="sm" variant="success">
+            <b-button @click="$emit('onAddSubject', { subject: row.item, sectionId: filters.subject.sectionId})" size="sm" variant="success">
               <v-icon name="plus" />
             </b-button>
           </template>
@@ -83,7 +108,7 @@
 import { SubjectApi } from '../../../mixins/api';
 import SubjectColumn from './SubjectColumn'
 import SelectLevel from '../Dropdowns/SelectLevel'
-import SelectCourse from '../Dropdowns/SelectCourse'
+import SelectCourseLevel from '../Dropdowns/SelectCourseLevel'
 import SelectSemester from '../Dropdowns/SelectSemester'
 import SelectSection from '../Dropdowns/SelectSection'
 import SelectCurriculum from '../Dropdowns/SelectCurriculum'
@@ -93,9 +118,25 @@ export default {
     show: {
       type: [Boolean],
       default: false
+    },
+    levelId: {
+      type: [Number],
+      default: null
+    },
+    courseId: {
+      type: [Number],
+      default: null
+    },
+    semesterId: {
+      type: [Number],
+      default: null
+    },
+    sectionId: {
+      type: [Number],
+      default: null
     }
   },
-  components: { SubjectColumn, SelectLevel, SelectCourse, SelectSemester, SelectCurriculum, SelectSection },
+  components: { SubjectColumn, SelectLevel, SelectCourseLevel, SelectSemester, SelectCurriculum, SelectSection },
   mixins: [ SubjectApi ],
   data() {
     return {
@@ -153,17 +194,26 @@ export default {
       filters: {
         subject: {
           criteria: null,
+          levelId: this.levelId,
+          courseId: this.courseId,
+          semesterId: this.semesterId,
+          sectionId: this.sectionId
         },
       }
     }
   },
   created() {
+    // const { subject } = this.filters
+    // subject.levelId = this.levelId
+    // subject.courseId = this.courseId
+    // subject.semesterId = this.semesterId
+    // subject.sectionId = this.sectionId
     this.loadSubjects()
   },
   methods: {
     loadSubjects() {
       const { subjects } = this.tables;
-      const { criteria } = this.filters.subject;
+      const { criteria, levelId, courseId, semesterId, sectionId } = this.filters.subject;
       const { subject, subject: { perPage, page }} = this.paginations;
 
       subjects.isBusy = true;
@@ -171,7 +221,11 @@ export default {
         paginate: true,
         perPage,
         page,
-        criteria
+        criteria,
+        levelId,
+        courseId,
+        semesterId,
+        sectionId
       };
 
       this.getSubjectList(params).then(({ data }) => {
@@ -181,6 +235,25 @@ export default {
         subject.totalRows = data.meta.total;
         subjects.isBusy = false;
       });
+    },
+    onLevelChanged(levelId){
+      const { subject } = this.filters
+      subject.levelId = levelId
+      subject.courseId = null
+      subject.sectionId = null
+      this.loadSubjects()
+    },
+    onCourseChanged(courseId){
+      this.filters.subject.courseId = courseId
+      this.loadSubjects()
+    },
+    onSemesterChanged(semesterId){
+      this.filters.subject.semesterId = semesterId
+      this.loadSubjects()
+    },
+    onSectionChanged(sectionId){
+      this.filters.subject.sectionId = sectionId
+      this.loadSubjects()
     }
   }
 }

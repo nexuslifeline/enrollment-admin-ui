@@ -726,3 +726,30 @@ export const TranscriptRecordStatus = new Enum({
   FINALIZED: { id: 2, name: 'Finalized' }, // completed
   PENDING: { id: 3, name: 'Pending' } // shifted
 });
+
+
+export const Levels = new Enum({
+  KINDER_1: { id: 1, name: 'Kinder 1' },
+  KINDER_2: { id: 2, name: 'Kinder 2' },
+  GRADE_1: { id: 3, name: 'Grade 1' },
+  GRADE_2: { id: 4, name: 'Grade 2' },
+  GRADE_3: { id: 5, name: 'Grade 3' },
+  GRADE_4: { id: 6, name: 'Grade 4' },
+  GRADE_5: { id: 7, name: 'Grade 5' },
+  GRADE_6: { id: 8, name: 'Grade 6' },
+  GRADE_7: { id: 9, name: 'Grade 7' },
+  GRADE_8: { id: 10, name: 'Grade 8' },
+  GRADE_9: { id: 11, name: 'Grade 9' },
+  GRADE_10: { id: 12, name: 'Grade 10' },
+  GRADE_11: { id: 13, name: 'Grade 11' },
+  GRADE_12: { id: 14, name: 'Grade 12' },
+  FIRST_YEAR_COLLEGE: { id: 15, name: 'First Year College' },
+  SECOND_YEAR_COLLEGE: { id: 16, name: 'Second Year College' },
+  THIRD_YEAR_COLLEGE: { id: 17, name: 'Third Year College' },
+  FOURTH_YEAR_COLLEGE: { id: 18, name: 'Fourth Year College' },
+  FIFTH_YEAR_COLLEGE: { id: 19, name: 'Fifth Year College' },
+  MASTERS_DEGREE: { id: 20, name: 'Masters Degree' },
+  DOCTORATE_DEGREE: { id: 21, name: 'Doctorate Degree' },
+  SHORT_TERM_PROGRAM: { id: 22, name: 'Short Term Program' },
+  NURSERY: { id: 23, name: 'Nursery' }
+})

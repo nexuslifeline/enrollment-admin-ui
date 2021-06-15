@@ -19,7 +19,14 @@
         </CardFooterRow>
       </template>
     </Card>
-    <SubjectListModal :show.sync="showSubjectModal" v-if="showSubjectModal" @onAddSubject="onAddSubject" />
+    <SubjectListModal
+      :show.sync="showSubjectModal"
+      v-if="showSubjectModal"
+      @onAddSubject="onAddSubject"
+      :levelId="data.levelId"
+      :courseId="data.courseId"
+      :semesterId="data.semesterId"
+      :sectionId="data.sectionId" />
   </div>
 </template>
 <script>
@@ -36,6 +43,9 @@ export default {
   props: {
     academicRecordId: {
       type: [String, Number]
+    },
+    data: {
+      type: [Object]
     }
   },
   mixins: [ AcademicRecordApi ],
@@ -56,10 +66,9 @@ export default {
   },
   methods: {
     onSave() {
-      console.log('POST academic records subject to /academic-records/:id/subjects')
       this.isProcessing = true
       const data = {
-        subjects: this.subjects.map(s => { return { 'subjectId' : s.id, 'sectionId' : null } })
+        subjects: this.subjects.map(s => { return { 'subjectId' : s.id, 'sectionId' : s.pivot?.sectionId } })
       }
       this.syncAcademicRecordSubjects(data, this.academicRecordId).then(({ data }) => {
         console.log(data)
@@ -71,19 +80,17 @@ export default {
         console.log(errors)
       });
     },
-    onAddSubject(subject) {
-      console.log(subject)
+    onAddSubject(data) {
+      const { subject, sectionId } = data
       if(this.isSubjectAdded(subject)) {
         showNotification(this, 'warning', 'Subject Already Added!')
         return
       }
-      // this.$set(subject,'pivot', { }) //temporary
-      // this.$set(subject.pivot,'sectionId', null) //temporary
-      // this.$set(subject.pivot,'subjectId', subject.id) //temporary
+      this.$set(subject, 'pivot', { sectionId })
       this.subjects.push(subject)
     },
     onRemoveSubject(subject) {
-
+      this.subjects = this.subjects.filter(s => s.id !== subject.id)
     },
     isSubjectAdded(subject) {
       return this.subjects.find(s => s.id === subject.id)

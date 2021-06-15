@@ -44,7 +44,7 @@
           </template>
           <template v-else-if="selectedIndex === 1">
             <AcademicRecord :data="data" />
-            <Enlistment :academicRecordId="data.id"/>
+            <Enlistment :academicRecordId="data.id" :data="data"/>
           </template>
           <template v-else-if="selectedIndex === 2">
 
