@@ -99,7 +99,7 @@ import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../
 import { showNotification } from '../../../helpers/forms';
 import Transcript from '../../components/Transcript/Transcript'
 export default {
-  mixins: [ EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
+  mixins: [EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
   props: {
     previousRoute: {
       type: [Object]
@@ -159,7 +159,6 @@ export default {
       this.isRejectionShown = true;
     },
     onAcceptTransferCredit() {
-      console.log('show modal for transfer credit')
       const { curriculumId } = this.transcriptRecord
       if(!curriculumId) {
         showNotification(this,'danger', 'Curriculum is required before accepting credited grades.')

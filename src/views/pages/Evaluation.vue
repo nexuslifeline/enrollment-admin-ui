@@ -9,7 +9,7 @@
       <b-form-input
         v-model="filters.student.criteria"
         debounce="500"
-        @update="loadEvaluation()"
+        @update="loadEvaluation"
         type="text"
         placeholder="Search"
       >
@@ -31,7 +31,7 @@
       />
       <v-select
         :options="evaluationStatuses.values"
-        :value="filters.student.evaluationStatusItem"
+        :value="filters.student.evaluationStatus"
         @input="onStatusFilterChange"
         label="name"
         placeholder="Status"
@@ -106,27 +106,12 @@
             </b-badge>
           </template>
           <template v-slot:cell(status)="data">
-            <b-badge
-              :variant="
-                data.item.evaluationStatusId ===
-                evaluationStatuses.APPROVED.id || data.item.evaluationStatusId ===
-                evaluationStatuses.COMPLETED.id
-                  ? 'success'
-                  : data.item.evaluationStatusId ===
-                    evaluationStatuses.REJECTED.id
-                  ? 'danger'
-                  : 'warning'
-              "
-            >
-              {{
-                evaluationStatuses.getEnum(data.item.evaluationStatusId).name
-              }}
-            </b-badge>
+            <StatusColumn :data="data.item" />
           </template>
-          <template v-slot:cell(attachments)="data">
+          <!-- <template v-slot:cell(attachments)="data">
             <span>{{ data.item.filesCount }} </span>
             <v-icon name="paperclip" class="ml-2" />
-          </template>
+          </template> -->
           <template v-slot:cell(action)="row">
             <!-- <button type="button" @click="loadDetails(row)" class="btn-invisible">
               <BIconFolder2Open v-if="row.detailsShowing " />
@@ -144,8 +129,7 @@
               <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
               <b-dropdown-item :to="{ name: 'Evaluation Detail', params: { evaluationId: row.item.id }}">
                 {{
-                  row.item.evaluationStatusId !=
-                  evaluationStatuses.SUBMITTED.id
+                  evaluationStatuses.APPROVED.academicRecordStatuses.includes(row.item.academicRecord.academic_record_status_id)
                     ? 'View Record'
                     : 'Review Record'
                 }}
@@ -314,7 +298,7 @@ import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
 import Card from '../components/Card';
-import { StudentColumn, EducationColumn, AddressColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, AddressColumn, StatusColumn } from '../components/ColumnDetails';
 import PageContent from '../components/PageContainer/PageContent';
 import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from '../components/NoAccess';
@@ -359,6 +343,7 @@ export default {
     StudentColumn,
     EducationColumn,
     AddressColumn,
+    StatusColumn,
     PageContent,
     FilterButton,
     NoAccess
@@ -584,8 +569,8 @@ export default {
           schoolCategoryItem: null,
           courseItem: null,
           courseId: null,
-          evaluationStatusId: EvaluationStatuses.SUBMITTED.id,
-          evaluationStatusItem: EvaluationStatuses.SUBMITTED
+          // evaluationStatusId: EvaluationStatuses.SUBMITTED.id,
+          evaluationStatus: EvaluationStatuses.PENDING
         },
         subject: {
           criteria: null,
@@ -761,19 +746,19 @@ export default {
       } = this.paginations;
       students.isBusy = true;
       const {
-        evaluationStatusId,
+        evaluationStatus,
         schoolCategoryId,
         courseId,
         criteria,
       } = this.filters.student;
-      const applicationStatusId = EvaluationStatuses.SUBMITTED.id;
+      // const applicationStatusId = EvaluationStatuses.SUBMITTED.id;
       const orderBy = this.$options.camelToSnakeCase(this.sortBy);
       const sort = this.sortDesc ? 'DESC' : 'ASC';
       let params = {
         paginate: true,
         perPage,
         page,
-        evaluationStatusId,
+        academicRecordStatusId: evaluationStatus?.academicRecordStatuses,
         schoolCategoryId,
         courseId,
         orderBy,
@@ -1127,8 +1112,8 @@ export default {
     },
     onStatusFilterChange(item) {
       const { student } = this.filters;
-      student.evaluationStatusId = item?.id || 0;
-      student.evaluationStatusItem = item;
+      // student.evaluationStatusId = item?.id || 0;
+      student.evaluationStatus = item;
       this.loadEvaluation();
     },
     onCourseFilterChange(item) {

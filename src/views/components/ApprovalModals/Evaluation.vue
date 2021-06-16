@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     onApproveEvaluation() {
-      console.log('put or patch evaluation here')
+
       const { evaluation, evaluation: { fields } } = this.forms
       evaluation.isProcessing = true
 

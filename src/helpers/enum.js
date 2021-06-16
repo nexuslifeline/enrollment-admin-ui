@@ -93,10 +93,24 @@ export const ApplicationStatuses = new Enum({
   COMPLETED: { id: 7, name: 'Completed' },
 });
 
+// export const AcademicRecordStatuses = new Enum({
+//   DRAFT: { id: 1, name: 'Draft' },
+//   FINALIZED: { id: 2, name: 'Finalized' },
+//   ENROLLED: { id: 3, name: 'Enrolled' }
+// });
+
 export const AcademicRecordStatuses = new Enum({
   DRAFT: { id: 1, name: 'Draft' },
-  FINALIZED: { id: 2, name: 'Finalized' },
-  ENROLLED: { id: 3, name: 'Enrolled' }
+  EVALUATION_PENDING: { id: 2, name: 'Evaluation Pending' },
+  EVALUATION_REJECTED: { id: 3, name: 'Evaluation Rejected' },
+  EVALUATION_APPROVED: { id: 4, name: 'Evaluation Approved' },
+  ENLISTMENT_PENDING: { id: 5, name: 'Enlistment Pending' },
+  ENLISTMENT_REJECTED: { id: 6, name: 'Enlistment Rejected' },
+  ENLISTMENT_APPROVED: { id: 7, name: 'Enlistment Approved' },
+  ASSESSMENT_REJECTED: { id: 8, name: 'Assessment Rejected' },
+  ASSESSMENT_APPROVED: { id: 9, name: 'Assessment Approved' },
+  PAYMENT_SUBMITTED: { id: 10, name: 'Payment Submitted' },
+  ENROLLED: { id: 11, name: 'Enrolled' },
 });
 
 export const TranscriptRecordStatuses = new Enum({
@@ -110,18 +124,53 @@ export const StudentFeeStatuses = new Enum({
   APPROVED: { id: 2, name: 'Approved' },
 });
 
+// export const EvaluationStatuses = new Enum({
+//   SUBMITTED: { id: 2, name: 'Pending' },
+//   APPROVED: { id: 3, name: 'Approved' },
+//   REJECTED: { id: 4, name: 'Rejected' },
+//   COMPLETED: { id: 5, name: 'Completed'}
+// })
+
+
 export const EvaluationStatuses = new Enum({
-  SUBMITTED: { id: 2, name: 'Pending' },
-  APPROVED: { id: 3, name: 'Approved' },
-  REJECTED: { id: 4, name: 'Rejected' },
-  COMPLETED: { id: 5, name: 'Completed'}
+  PENDING: {
+    id: 1,
+    name: 'Pending',
+    academicRecordStatuses: [
+      AcademicRecordStatuses.DRAFT.id,
+      AcademicRecordStatuses.EVALUATION_PENDING.id,
+      AcademicRecordStatuses.EVALUATION_REJECTED.id
+    ]
+  },
+  REJECTED: {
+    id: 2,
+    name: 'Rejected',
+    academicRecordStatuses: [
+      AcademicRecordStatuses.EVALUATION_REJECTED.id
+    ]
+  },
+  APPROVED: {
+    id: 3,
+    name: 'Approved',
+    academicRecordStatuses: [
+      AcademicRecordStatuses.EVALUATION_APPROVED.id,
+      AcademicRecordStatuses.ENLISTMENT_PENDING.id,
+      AcademicRecordStatuses.ENLISTMENT_REJECTED.id,
+      AcademicRecordStatuses.ENLISTMENT_APPROVED.id,
+      AcademicRecordStatuses.ASSESSMENT_REJECTED.id,
+      AcademicRecordStatuses.ASSESSMENT_APPROVED.id,
+      AcademicRecordStatuses.PAYMENT_SUBMITTED.id,
+      AcademicRecordStatuses.ENROLLED.id,
+    ]
+  },
 })
+
 
 export const StudentGradeStatuses = new Enum({
   PENDING: { id: 1, name: 'Pending' },
   SUBMITTED: { id: 2, name: 'Submitted' },
   FINALIZED: { id: 3, name: 'Finalized' },
-})
+});
 
 export const Semesters = new Enum({
   FIRST_SEM: { id: 1, name: '1st Semester', description: 'First Semester' },

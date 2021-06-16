@@ -9,6 +9,7 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
+    class="mt-2"
   />
 </template>
 <script>
