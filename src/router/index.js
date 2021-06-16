@@ -29,8 +29,8 @@ const UpdateProfilePassword = () => import('@/views/pages/profile/UpdatePassword
 const MyActivity = () => import('@/views/pages/MyActivity')
 const Evaluation = () => import('@/views/pages/Evaluation')
 const EvaluationDetail = () => import('@/views/pages/evaluation/Detail')
-const StudentAdmission = () => import('@/views/pages/StudentAdmission')
-const StudentAssessmentFee = () => import('@/views/pages/StudentAssessmentFee')
+const Enlistment = () => import('@/views/pages/Enlistment')
+const Assessment = () => import('@/views/pages/Assessment')
 const RateSheet = () => import('@/views/pages/RateSheet')
 const Curriculum = () => import('@/views/pages/Curriculum')
 const Subject = () => import('@/views/pages/Subject')
@@ -158,13 +158,13 @@ function configRoutes () {
             {
               path: 'student-subject-enlisment',
               name: 'Student Subject Enlistment',
-              component: StudentAdmission,
+              component: Enlistment,
               meta: { requiresAuth: true }
             },
             {
               path: 'student-assessment-fee',
               name: 'Student Assessment Fee',
-              component: StudentAssessmentFee,
+              component: Assessment,
               meta: { requiresAuth: true }
             },
             {

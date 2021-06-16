@@ -2,14 +2,14 @@
   <PageContent
     :title="`Subject Enlistment (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadAcademicRecord"
+    @refresh="loadAcademicRecordList"
     :filterVisible="isFilterVisible"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
         debounce="500"
-        @update="loadAcademicRecord()"
+        @update="loadAcademicRecordList()"
         type="text"
         placeholder="Search"
       >
@@ -41,8 +41,8 @@
         class="mt-2"
       />
       <v-select
-        :options="AcademicRecordStatuses.values"
-        :value="filters.student.academicRecordStatusItem"
+        :options="enlistmentStatuses.values"
+        :value="filters.student.enlistmentStatus"
         @input="onStatusFilterChange"
         label="name"
         placeholder="Status"
@@ -90,22 +90,7 @@
             <EducationColumn :data="data.item" :showSchoolYear="false"/>
           </template>
           <template v-slot:cell(status)="data">
-            <b-badge
-              :variant="
-                data.item.academicRecordStatusId ===
-                AcademicRecordStatuses.ENROLLED.id
-                  ? 'success'
-                  : data.item.academicRecordStatusId ===
-                    AcademicRecordStatuses.FINALIZED.id
-                  ? 'primary'
-                  : 'warning'
-              "
-            >
-              {{
-                AcademicRecordStatuses.getEnum(data.item.academicRecordStatusId)
-                  .name
-              }}
-            </b-badge>
+            <EnlistmentStatusColumn :data="data.item" />
           </template>
           <template v-slot:cell(action)="row">
             <b-dropdown
@@ -435,7 +420,7 @@
                       <span>{{
                         row.item.section ? row.item.section.name : ''
                       }}</span
-                      >xxxx
+                      >
                       <span
                         v-if="
                           data.item.academicRecordStatusId ===
@@ -532,7 +517,7 @@
               :per-page="paginations.student.perPage"
               size="sm"
               align="end"
-              @input="loadAcademicRecord()"
+              @input="loadAcademicRecordList()"
             />
           </b-col>
         </b-row>
@@ -887,6 +872,7 @@ import {
   SchoolCategories,
   ApplicationStatuses,
   AcademicRecordStatuses,
+  EnlistmentStatuses,
   StudentFeeStatuses,
   Days,
   UserGroups,
@@ -905,7 +891,7 @@ import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
-import { StudentColumn,AddressColumn , EducationColumn } from '../components/ColumnDetails';
+import { StudentColumn,AddressColumn , EducationColumn, EnlistmentStatusColumn } from '../components/ColumnDetails';
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from "../components/NoAccess";
@@ -958,7 +944,8 @@ export default {
     PageContent,
     FilterButton,
     NoAccess,
-    AddressColumn
+    AddressColumn,
+    EnlistmentStatusColumn
   },
   StudentSubjectPermissions,
   SettingPermissions,
@@ -972,6 +959,7 @@ export default {
       showModalSection: false,
       isLoading: false,
       AcademicRecordStatuses: AcademicRecordStatuses,
+      enlistmentStatuses: EnlistmentStatuses,
       changeSection: false,
       days: Days,
       showTermsAlert: false,
@@ -1295,8 +1283,8 @@ export default {
           schoolCategoryItem: null,
           courseItem: null,
           courseId: null,
-          academicRecordStatusId: AcademicRecordStatuses.DRAFT.id,
-          academicRecordStatusItem: AcademicRecordStatuses.DRAFT
+          // academicRecordStatusId: AcademicRecordStatuses.DRAFT.id,
+          enlistmentStatus: EnlistmentStatuses.PENDING
         },
         subject: {
           criteria: null,
@@ -1351,8 +1339,8 @@ export default {
     this.loadSections();
     this.loadTerms()
     // this.filters.student.academicRecordStatusId = this.AcademicRecordStatuses.DRAFT.id
-    // this.filters.student.academicRecordStatusItem = this.AcademicRecordStatuses.DRAFT
-    this.loadAcademicRecord()
+    // this.filters.student.enlistmentStatus = this.AcademicRecordStatuses.DRAFT
+    this.loadAcademicRecordList()
   },
   methods: {
     loadTerms() {
@@ -1428,7 +1416,7 @@ export default {
           this.isProcessing = false;
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
-          this.loadAcademicRecord();
+          this.loadAcademicRecordList();
           this.$store.state.approvalCount.enlistment--;
         })
         .catch((error) => {
@@ -1473,7 +1461,7 @@ export default {
 
       this.updateAcademicRecord(data, academicRecordId)
         .then(({ data }) => {
-          this.loadAcademicRecord();
+          this.loadAcademicRecordList();
           this.isProcessing = false;
           this.showModalRejection = false;
           showNotification(this, 'success', 'Rejected Successfully.');
@@ -1483,7 +1471,7 @@ export default {
           this.isProcessing = false;
         });
     },
-    loadAcademicRecord() {
+    loadAcademicRecordList() {
       const { students } = this.tables;
       const {
         student,
@@ -1491,22 +1479,27 @@ export default {
       } = this.paginations;
       students.isBusy = true;
       const {
-        academicRecordStatusId,
+        enlistmentStatus,
         schoolCategoryId,
         courseId,
         criteria,
       } = this.filters.student;
-      const notApplicationStatusId = ApplicationStatuses.DRAFT.id;
+      // const notApplicationStatusId = ApplicationStatuses.DRAFT.id;
       const orderBy = 'updated_at';
       const sort = 'DESC';
       let params = {
         paginate: true,
         perPage,
         page,
-        academicRecordStatusId,
+        academicRecordStatusId: enlistmentStatus?.academicRecordStatuses ||
+          [
+            ...this.enlistmentStatuses.PENDING.academicRecordStatuses,
+            ...this.enlistmentStatuses.REJECTED.academicRecordStatuses,
+            ...this.enlistmentStatuses.APPROVED.academicRecordStatuses
+          ],
         schoolCategoryId,
         courseId,
-        notApplicationStatusId,
+        // notApplicationStatusId,
         schoolYearId: this.$store.state.schoolYear.id,
         orderBy,
         sort,
@@ -1665,7 +1658,7 @@ export default {
         this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
         this.schoolCategoryId = userGroup.schoolCategoryId;
       }
-      this.loadAcademicRecord();
+      this.loadAcademicRecordList();
     },
     // filterByDepartment() {
     //   const { subjects } = this.tables
@@ -1769,19 +1762,19 @@ export default {
       const { student } = this.filters;
       student.schoolCategoryId = item?.id || 0;
       student.schoolCategoryItem = item;
-      this.loadAcademicRecord();
+      this.loadAcademicRecordList();
     },
     onStatusFilterChange(item) {
       const { student } = this.filters;
-      student.academicRecordStatusId = item?.id || 0;
-      student.academicRecordStatusItem = item;
-      this.loadAcademicRecord();
+      // student.academicRecordStatusId = item?.id || 0;
+      student.enlistmentStatus = item;
+      this.loadAcademicRecordList();
     },
     onCourseFilterChange(item) {
       const { student } = this.filters;
       student.courseId = item?.id || 0;
       student.courseItem = item;
-      this.loadAcademicRecord();
+      this.loadAcademicRecordList();
     },
     hasTermsSchoolCategory(item) {
       const { terms } = this.options
@@ -1811,7 +1804,7 @@ export default {
   watch: {
     '$store.state.schoolYear': function(newVal) {
       this.loadTerms();
-      this.loadAcademicRecord();
+      this.loadAcademicRecordList();
     },
   },
 };

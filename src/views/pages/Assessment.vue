@@ -31,8 +31,8 @@
       />
       <!-- :options="filteredApplicationsStatuses" -->
       <v-select
-        :options="applicationStatuses.values"
-        :value="filters.student.applicationStatusItem"
+        :options="assessmentStatuses.values"
+        :value="filters.student.asessmentStatus"
         @input="onStatusFilterChange"
         label="name"
         placeholder="Status"
@@ -77,20 +77,7 @@
             <EducationColumn :data="data.item" :showSchoolYear="false"/>
           </template>
           <template v-slot:cell(status)="data">
-            <b-badge
-              :variant="
-                (data.item.applicationId ? data.item.application.applicationStatusId === applicationStatuses.SUBMITTED.id
-                : data.item.admission.applicationStatusId ===
-                  applicationStatuses.SUBMITTED.id)
-                  ? 'warning'
-                  : 'success'
-              "
-            >
-              {{
-                (data.item.applicationId ? applicationStatuses.getEnum(data.item.application.applicationStatusId).name :
-                  applicationStatuses.getEnum(data.item.admission.applicationStatusId).name)
-              }}
-            </b-badge>
+            <AssessmentStatusColumn :data="data.item" />
           </template>
           <template v-slot:cell(action)="row">
             <!-- <v-icon
@@ -107,7 +94,7 @@
                 <v-icon name="ellipsis-v" />
               </template>
               <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
-              <b-dropdown-item @click.prevent="loadDetails(row)">
+              <!-- <b-dropdown-item @click.prevent="loadDetails(row)">
                 {{
                   row.item.application
                     ? getEllipsisCaption(
@@ -115,8 +102,8 @@
                       )
                     : getEllipsisCaption(row.item.admission.applicationStatusId)
                 }}
-              </b-dropdown-item>
-              <b-dropdown-item
+              </b-dropdown-item> -->
+              <!-- <b-dropdown-item
                 v-if="
                   (row.item.application
                     ? row.item.application.applicationStatusId
@@ -125,6 +112,14 @@
                 "
                 @click.prevent="loadAssessmentForm(row.item.id)"
               >
+                Preview Assessment Form
+              </b-dropdown-item> -->
+              <b-dropdown-item @click.prevent="loadDetails(row)">
+                {{ getEllipsisCaption(row.item.academicRecordStatusId) }}
+              </b-dropdown-item>
+               <b-dropdown-item
+                v-if="assessmentStatuses.APPROVED.academicRecordStatuses.includes(row.item.academicRecordStatusId)"
+                @click.prevent="loadAssessmentForm(row.item.id)">
                 Preview Assessment Form
               </b-dropdown-item>
             </b-dropdown>
@@ -683,14 +678,15 @@ import {
   BillingTypes,
   BillingStatuses,
   StudentFeePermissions,
-  SettingPermissions
+  SettingPermissions,
+  AssessmentStatuses
 } from '../../helpers/enum';
 import { showNotification, formatNumber } from '../../helpers/forms';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
 import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import Card from '../components/Card';
-import { StudentColumn, EducationColumn, AddressColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, AddressColumn, AssessmentStatusColumn } from '../components/ColumnDetails';
 
 import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
@@ -736,7 +732,8 @@ export default {
     PageContent,
     FilterButton,
     NoAccess,
-    AddressColumn
+    AddressColumn,
+    AssessmentStatusColumn
   },
   StudentFeePermissions,
   SettingPermissions,
@@ -757,6 +754,7 @@ export default {
       showModalApproval: false,
       approvalNotes: null,
       applicationStatuses: ApplicationStatuses,
+      assessmentStatuses: AssessmentStatuses,
       fees: Fees,
       isProcessing: false,
       showTermsAlert: false,
@@ -959,8 +957,8 @@ export default {
           schoolCategoryItem: null,
           courseItem: null,
           courseId: null,
-          applicationStatusId: ApplicationStatuses.SUBMITTED.id,
-          applicationStatusItem: ApplicationStatuses.SUBMITTED
+          // applicationStatusId: ApplicationStatuses.SUBMITTED.id,
+          asessmentStatus: AssessmentStatuses.PENDING
         },
         fee: {
           criteria: null,
@@ -1060,7 +1058,7 @@ export default {
         id: academicRecordId,
         fees,
         billing: {
-          dueDate: '2020-08-24',
+          dueDate: '2021-08-24',
           totalAmount: enrollmentFee,
           studentId: student.id,
           billingTypeId: BillingTypes.INITIAL_FEE.id,
@@ -1099,22 +1097,29 @@ export default {
       } = this.paginations;
       students.isBusy = true;
       const {
-        applicationStatusId,
+        asessmentStatus,
+        // applicationStatusId,
         schoolCategoryId,
         courseId,
         criteria,
       } = this.filters.student;
       const orderBy = 'updated_at';
       const sort = 'DESC';
-      const notAcademicRecordStatusId = AcademicRecordStatuses.DRAFT.id;
+      // const notAcademicRecordStatusId = AcademicRecordStatuses.DRAFT.id;
       let params = {
         paginate: true,
         perPage,
         page,
-        notAcademicRecordStatusId,
+        academicRecordStatusId: asessmentStatus?.academicRecordStatuses ||
+          [
+            ...this.asessmentStatus.PENDING.academicRecordStatuses,
+            ...this.asessmentStatus.REJECTED.academicRecordStatuses,
+            ...this.asessmentStatus.APPROVED.academicRecordStatuses
+          ],
+        // notAcademicRecordStatusId,
         schoolCategoryId,
         courseId,
-        applicationStatusId,
+        // applicationStatusId,
         schoolYearId: this.$store.state.schoolYear.id,
         orderBy,
         sort,
@@ -1294,12 +1299,12 @@ export default {
       }
       return src;
     },
-    getEllipsisCaption(applicationStatusId) {
-      if (applicationStatusId === ApplicationStatuses.APPROVED_ASSESSMENT.id) {
-        return 'Review Record';
+    getEllipsisCaption(academicRecordStatusId) {
+      if (this.assessmentStatuses?.APPROVED?.academicRecordStatuses?.includes(academicRecordStatusId)) {
+        return 'View Details';
       }
 
-      return 'View Details';
+      return 'Review Record';
     },
     loadAssessmentForm(academicRecordId) {
       this.file.type = null;
@@ -1324,8 +1329,8 @@ export default {
     },
     onStatusFilterChange(item) {
       const { student } = this.filters;
-      student.applicationStatusId = item?.id || 0;
-      student.applicationStatusItem = item;
+      // student.applicationStatusId = item?.id || 0;
+      student.asessmentStatus = item;
       this.loadAcademicRecord();
     },
     onCourseFilterChange(item) {
@@ -1398,14 +1403,14 @@ export default {
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
-    filteredApplicationsStatuses() {
-      return this.applicationStatuses.values.filter(e =>
-        e.id === this.applicationStatuses.SUBMITTED.id ||
-        e.id === this.applicationStatuses.APPROVED.id ||
-        e.id === this.applicationStatuses.REJECTED.id ||
-        e.id === this.applicationStatuses.COMPLETED.id
-      )
-    },
+    // filteredApplicationsStatuses() {
+    //   return this.applicationStatuses.values.filter(e =>
+    //     e.id === this.applicationStatuses.SUBMITTED.id ||
+    //     e.id === this.applicationStatuses.APPROVED.id ||
+    //     e.id === this.applicationStatuses.REJECTED.id ||
+    //     e.id === this.applicationStatuses.COMPLETED.id
+    //   )
+    // },
   },
 };
 </script>
