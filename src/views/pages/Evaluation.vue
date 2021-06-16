@@ -20,7 +20,7 @@
         label="name"
         placeholder="School Category"
       />
-      <v-select
+      <!-- <v-select
         v-if="isCourseVisible"
         :options="options.courses.items"
         :value="filters.student.courseItem"
@@ -28,6 +28,15 @@
         label="name"
         placeholder="Course"
         class="mt-2"
+      /> -->
+      <SelectCourse
+        v-if="isCourseVisible"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+        :schoolCategoryId="filters.student.schoolCategoryId"
       />
       <v-select
         :options="evaluationStatuses.values"
@@ -1304,6 +1313,7 @@ import { StudentColumn, EducationColumn, AddressColumn } from '../components/Col
 import PageContent from '../components/PageContainer/PageContent';
 import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from '../components/NoAccess';
+import SelectCourse from '../components/Dropdowns/SelectCourse'
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -1347,7 +1357,8 @@ export default {
     AddressColumn,
     PageContent,
     FilterButton,
-    NoAccess
+    NoAccess,
+    SelectCourse
   },
   EvaluationAndAdmissionPermissions,
   data() {
@@ -2118,6 +2129,8 @@ export default {
       const { student } = this.filters;
       student.schoolCategoryId = item?.id || 0;
       student.schoolCategoryItem = item;
+      student.courseItem = null
+      student.courseId = null
       this.loadEvaluation();
     },
     onStatusFilterChange(item) {
