@@ -32,7 +32,7 @@
       <!-- :options="filteredApplicationsStatuses" -->
       <v-select
         :options="assessmentStatuses.values"
-        :value="filters.student.asessmentStatus"
+        :value="filters.student.assessmentStatus"
         @input="onStatusFilterChange"
         label="name"
         placeholder="Status"
@@ -958,7 +958,7 @@ export default {
           courseItem: null,
           courseId: null,
           // applicationStatusId: ApplicationStatuses.SUBMITTED.id,
-          asessmentStatus: AssessmentStatuses.PENDING
+          assessmentStatus: AssessmentStatuses.PENDING
         },
         fee: {
           criteria: null,
@@ -1097,7 +1097,7 @@ export default {
       } = this.paginations;
       students.isBusy = true;
       const {
-        asessmentStatus,
+        assessmentStatus,
         // applicationStatusId,
         schoolCategoryId,
         courseId,
@@ -1110,11 +1110,11 @@ export default {
         paginate: true,
         perPage,
         page,
-        academicRecordStatusId: asessmentStatus?.academicRecordStatuses ||
+        academicRecordStatusId: assessmentStatus?.academicRecordStatuses ||
           [
-            ...this.asessmentStatus.PENDING.academicRecordStatuses,
-            ...this.asessmentStatus.REJECTED.academicRecordStatuses,
-            ...this.asessmentStatus.APPROVED.academicRecordStatuses
+            ...this.assessmentStatuses.PENDING.academicRecordStatuses,
+            ...this.assessmentStatuses.REJECTED.academicRecordStatuses,
+            ...this.assessmentStatuses.APPROVED.academicRecordStatuses
           ],
         // notAcademicRecordStatusId,
         schoolCategoryId,
@@ -1330,7 +1330,7 @@ export default {
     onStatusFilterChange(item) {
       const { student } = this.filters;
       // student.applicationStatusId = item?.id || 0;
-      student.asessmentStatus = item;
+      student.assessmentStatus = item;
       this.loadAcademicRecord();
     },
     onCourseFilterChange(item) {
