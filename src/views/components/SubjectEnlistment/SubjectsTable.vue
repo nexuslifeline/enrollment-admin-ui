@@ -20,7 +20,7 @@
           {{ v.description }}
         </td>
         <td>
-          <SectionColumn />
+          <SectionColumn :data="v.section || {}"/>
         </td>
         <td class="align-right">
           {{ v.totalUnits }}

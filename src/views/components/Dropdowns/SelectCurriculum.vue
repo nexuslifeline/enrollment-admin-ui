@@ -78,19 +78,29 @@ export default {
     }
   },
   created() {
-    const { curriculums } = this.options
-    const params = { paginate: false, courseId: this.courseId }
-    curriculums.isBusy = true
-    this.getCurriculumList(params).then(({ data }) => {
-      curriculums.items = data
-      curriculums.isBusy = false
-    })
+    this.loadCurriculums()
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     },
+    loadCurriculums() {
+      const { curriculums } = this.options
+      const params = { paginate: false, courseId: this.courseId }
+      curriculums.isBusy = true
+      this.getCurriculumList(params).then(({ data }) => {
+        console.log('cur')
+        console.log(data)
+        curriculums.items = data
+        curriculums.isBusy = false
+      })
+    }
   },
+  watch: {
+    'courseId': function() {
+      this.loadCurriculums()
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

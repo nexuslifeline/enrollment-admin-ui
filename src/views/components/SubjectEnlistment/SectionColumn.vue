@@ -1,6 +1,6 @@
 <template>
   <div>
-    BSIT-1A
+   {{ data && data.name }}
   </div>
 </template>
 <script>

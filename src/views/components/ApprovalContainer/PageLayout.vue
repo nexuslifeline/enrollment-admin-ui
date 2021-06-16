@@ -31,7 +31,13 @@
     <!-- <b-overlay :show="isBusy" rounded="sm">
     </b-overlay> -->
     <div v-if="showFooter" class="approval-view__footer">
-      <ActionRow @onBack="$emit('onActionBack')" @onNext="$emit('onActionNext')"/>
+      <ActionRow
+        @onBack="$emit('onActionBack')"
+        @onNext="$emit('onActionNext')"
+        :isBackDisabled="isBackDisabled"
+        :isNextDisabled="isNextDisabled"
+        :isBackBusy="isBackBusy"
+        :isNextBusy="isNextBusy"/>
     </div>
   </div>
 </template>
@@ -70,7 +76,23 @@
       showActionBar: {
         type: [Boolean],
         default: true
-      }
+      },
+      isBackDisabled: {
+        type: [Boolean],
+        default: false
+      },
+      isNextDisabled: {
+        type: [Boolean],
+        default: false
+      },
+      isBackBusy: {
+        type: [Boolean],
+        default: false
+      },
+      isNextBusy: {
+        type: [Boolean],
+        default: false
+      },
     },
     mounted() {
       const body = document.querySelector('body');

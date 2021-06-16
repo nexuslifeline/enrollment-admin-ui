@@ -607,6 +607,11 @@ export const ManualSteps = new Enum({
   COMPLETED: { id: 4, name: 'Completed' }
 });
 
+export const QuickEnrollSteps = new Enum({
+  PROFILE_AND_ACCOUNT: { id: 1, name: 'Profile And Account' },
+  SUBJECT_ENLISTMENT: { id: 2, name: 'Subject Enlistment' },
+});
+
 export const DepartmentPermissions = new Enum({
   ADD: { id: 101, name: 'Add' },
   EDIT: { id: 102, name: 'Edit' },
