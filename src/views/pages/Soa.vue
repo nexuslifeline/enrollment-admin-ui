@@ -416,7 +416,7 @@
           </b-col>
         </b-row>
         <b-link @click="showOtherFees = !showOtherFees">{{ showOtherFees ? 'Hide' : 'Post' }} Other Fees</b-link>
-        <div v-if="showOtherFees">
+        <div v-show="showOtherFees">
           <b-row class="mb-3">
             <b-col md="4">
               <h5 class="pt-2">OTHER FEES</h5>
