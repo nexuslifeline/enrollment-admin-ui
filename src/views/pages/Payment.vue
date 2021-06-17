@@ -386,9 +386,6 @@
                       >
                         {{ data.item.billing.billingNo }}
                       </b-link>
-                      <p>
-                        {{ data.item.billing.billingNo }}
-                      </p>
                     </ActiveViewItem>
                     <ActiveViewItem label="Total Amount: ">
                       <p>
