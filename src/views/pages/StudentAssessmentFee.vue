@@ -20,7 +20,7 @@
         label="name"
         placeholder="School Category"
       />
-      <v-select
+      <!-- <v-select
         v-if="isCourseVisible"
         :options="options.courses.items"
         :value="filters.student.courseItem"
@@ -28,6 +28,15 @@
         label="name"
         placeholder="Course"
         class="mt-2"
+      /> -->
+      <SelectCourse
+        v-if="isCourseVisible"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+        :schoolCategoryId="filters.student.schoolCategoryId"
       />
       <!-- :options="filteredApplicationsStatuses" -->
       <v-select
@@ -308,7 +317,7 @@
                   />
                   <b-row class="mb-1 mt-4">
                     <b-col md="4">
-                      <h5 class="pt-2">STUDENT FEES</h5>
+                      <h5 class="pt-2">OTHER STUDENT FEES</h5>
                     </b-col>
                     <b-col md="4" class="text-center">
                       <span
@@ -704,6 +713,7 @@ import { format } from 'date-fns';
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from "../components/PageContainer/FilterButton";
 import NoAccess from "../components/NoAccess";
+import SelectCourse from '../components/Dropdowns/SelectCourse'
 
 export default {
   name: 'StudentFee',
@@ -736,7 +746,8 @@ export default {
     PageContent,
     FilterButton,
     NoAccess,
-    AddressColumn
+    AddressColumn,
+    SelectCourse
   },
   StudentFeePermissions,
   SettingPermissions,
@@ -805,7 +816,7 @@ export default {
               key: 'name',
               label: 'Subject Code',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
+              thStyle: { width: '12%' },
             },
             {
               key: 'description',
@@ -815,34 +826,34 @@ export default {
             },
             {
               key: 'units',
-              label: 'LEC UNITS',
+              label: 'LEC UNIT',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '8%' },
             },
             {
               key: 'amountPerUnit',
-              label: 'AMOUNT PER LEC UNIT',
+              label: 'AMOUNT / LEC UNIT',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              thStyle: { width: '13%' },
+              thStyle: { width: '15%' },
               formatter: (value) => {
                 return formatNumber(value);
               },
             },
             {
               key: 'labs',
-              label: 'LAB UNITS',
+              label: 'LAB UNIT',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '8%' },
             },
             {
               key: 'amountPerLab',
-              label: 'AMOUNT PER LAB',
+              label: 'AMOUNT / LAB UNIT',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              thStyle: { width: '13%' },
+              thStyle: { width: '15%' },
               formatter: (value) => {
                 return formatNumber(value);
               },
@@ -1320,6 +1331,8 @@ export default {
       const { student } = this.filters;
       student.schoolCategoryId = item?.id || 0;
       student.schoolCategoryItem = item;
+      student.courseId = null
+      student.courseItem = null
       this.loadAcademicRecord();
     },
     onStatusFilterChange(item) {

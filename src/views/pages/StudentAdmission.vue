@@ -31,7 +31,7 @@
         label="name"
         placeholder="School Category"
       />
-      <v-select
+      <!-- <v-select
         v-if="isCourseVisible"
         :options="options.courses.items"
         :value="filters.student.courseItem"
@@ -39,6 +39,15 @@
         label="name"
         placeholder="Course"
         class="mt-2"
+      /> -->
+       <SelectCourse
+        v-if="isCourseVisible"
+        :value="filters.student.courseItem"
+        @input="onCourseFilterChange"
+        label="name"
+        placeholder="Course"
+        class="mt-2"
+        :schoolCategoryId="filters.student.schoolCategoryId"
       />
       <v-select
         :options="AcademicRecordStatuses.values"
@@ -210,7 +219,7 @@
                           {{
                             !data.item.sectionId
                               ? 'No Section'
-                              : data.item.sectionId
+                              : data.item.section.name
                           }}
                           <!---- get section value here -->
                           <span class="ml-2"
@@ -435,7 +444,7 @@
                       <span>{{
                         row.item.section ? row.item.section.name : ''
                       }}</span
-                      >xxxx
+                      >
                       <span
                         v-if="
                           data.item.academicRecordStatusId ===
@@ -466,7 +475,7 @@
                     <template v-slot:custom-foot>
                       <b-tr class="font-weight-bold">
                         <b-td class="text-right">
-                          <span class="text-danger">Total Units </span>
+                          <span class="text-danger">LEC & LAB</span>
                         </b-td>
                         <b-td class="text-center">
                           <span class="text-danger">
@@ -909,6 +918,7 @@ import { StudentColumn,AddressColumn , EducationColumn } from '../components/Col
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from "../components/NoAccess";
+import SelectCourse from '../components/Dropdowns/SelectCourse'
 
 
 const acdemicRecordFields = {
@@ -958,7 +968,8 @@ export default {
     PageContent,
     FilterButton,
     NoAccess,
-    AddressColumn
+    AddressColumn,
+    SelectCourse
   },
   StudentSubjectPermissions,
   SettingPermissions,
@@ -1067,7 +1078,7 @@ export default {
             },
             {
               key: 'totalUnits',
-              label: 'Total Units',
+              label: 'LEC & LAB',
               tdClass: 'align-middle text-center',
               thClass: 'align middle text-center',
               thStyle: { width: '15%' },
@@ -1769,6 +1780,8 @@ export default {
       const { student } = this.filters;
       student.schoolCategoryId = item?.id || 0;
       student.schoolCategoryItem = item;
+      student.courseId = null
+      student.courseItem = null
       this.loadAcademicRecord();
     },
     onStatusFilterChange(item) {
