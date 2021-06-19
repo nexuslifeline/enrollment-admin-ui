@@ -35,8 +35,7 @@ import { EvaluationStatuses } from '../../../helpers/enum'
 import { EvaluationApi } from '../../../mixins/api';
 
 const evaluationFields = {
-  disapprovalNotes: null,
-  evaluationStatusId: null
+  disapprovalNotes: null
 }
 export default {
   props: {
@@ -77,9 +76,7 @@ export default {
 
       reset(evaluation)
 
-      fields.evaluationStatusId  = this.$options.EvaluationStatuses.REJECTED.id
-
-      this.updateEvaluation(fields, this.evaluationId).then(({ data }) => {
+      this.rejectEvaluation(fields, this.evaluationId).then(({ data }) => {
         evaluation.isProcessing = false
         showNotification(this, 'warning', 'Evaluation has been reject.')
         this.$emit('onRejected')

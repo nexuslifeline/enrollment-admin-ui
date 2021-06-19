@@ -35,8 +35,7 @@ import { EvaluationStatuses } from '../../../helpers/enum'
 import { EvaluationApi } from '../../../mixins/api';
 
 const evaluationFields = {
-  approvalNotes: null,
-  evaluationStatusId: null
+  approvalNotes: null
 }
 export default {
   props: {
@@ -78,9 +77,7 @@ export default {
 
       reset(evaluation)
 
-      fields.evaluationStatusId  = this.$options.EvaluationStatuses.APPROVED.id
-
-      this.updateEvaluation(fields, this.evaluationId).then(({ data }) => {
+      this.approveEvaluation(fields, this.evaluationId).then(({ data }) => {
         evaluation.isProcessing = false
         showNotification(this, 'success', 'Evaluation has been approved.')
         this.$emit('update: isShown', false)

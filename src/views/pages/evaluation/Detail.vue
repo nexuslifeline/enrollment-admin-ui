@@ -3,7 +3,8 @@
     @onBack="$router.push(previousRoute)"
     @onApproveRequest="onApproveRequest"
     @onRejectionRequest="onRejectionRequest"
-    backTitle="Evaluation">
+    backTitle="Evaluation"
+    :showOptions="showOptions">
      <template v-slot:detail>
        <div class="mt-2">
          <b-tabs content-class="mt-3">
@@ -33,7 +34,7 @@
         <b-tabs content-class="mt-3">
           <b-tab title="Request">
             <div class="tab__content">
-              <button @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
+              <button v-if="showOptions" @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
                 <BIconPlus scale="1.2" class="mr-1" v-if="!isCreatingTranscript"/>
                 <v-icon name="spinner" spin v-if="isCreatingTranscript"></v-icon>
                 Accept Transfer Credit
@@ -98,7 +99,9 @@ import RejectEvaluation from '../../components/RejectionModals/Evaluation';
 import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
 import { showNotification } from '../../../helpers/forms';
 import Transcript from '../../components/Transcript/Transcript'
+import { EvaluationStatuses } from "../../../helpers/enum";
 export default {
+  EvaluationStatuses,
   mixins: [EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
   props: {
     previousRoute: {
@@ -138,6 +141,15 @@ export default {
     },
     transcriptRecord() {
       return this.data?.academicRecord?.transcriptRecord
+    },
+    academicRecord() {
+      return this.data?.academicRecord
+    },
+    showOptions() {
+      if(!this.academicRecord)
+      return false //avoid flicker
+
+      return this.academicRecord && this.$options.EvaluationStatuses.PENDING.academicRecordStatuses.includes(this.academicRecord.academicRecordStatusId)
     }
   },
   created() {

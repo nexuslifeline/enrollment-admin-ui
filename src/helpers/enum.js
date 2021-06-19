@@ -139,7 +139,7 @@ export const EvaluationStatuses = new Enum({
     academicRecordStatuses: [
       AcademicRecordStatuses.DRAFT.id,
       AcademicRecordStatuses.EVALUATION_PENDING.id,
-      AcademicRecordStatuses.EVALUATION_REJECTED.id
+      // AcademicRecordStatuses.EVALUATION_REJECTED.id
     ]
   },
   REJECTED: {
@@ -860,3 +860,15 @@ export const Levels = new Enum({
   SHORT_TERM_PROGRAM: { id: 22, name: 'Short Term Program' },
   NURSERY: { id: 23, name: 'Nursery' }
 })
+
+export const OnBoardingSteps = new Enum({
+  PROFILE: { id: 1, name: 'Profile' },
+  ADDRESS: { id: 2, name: 'Address' },
+  FAMILY: { id: 3, name: 'Family' },
+  REQUEST_EVALUATION: { id: 4, name: 'Request Evaluation' },
+  EVALUATION_IN_REVIEW: { id: 5, name: 'Evaluation in Review' },
+  ACADEMIC_RECORD_APPLICATION: { id: 6, name: 'Academic Record Application' },
+  ACADEMIC_RECORD_IN_REVIEW: { id: 7, name: 'Academic Record in Review' },
+  PAYMENTS: { id: 8, name: 'Payments' },
+  PAYMENT_IN_REVIEW: { id: 9, name: 'Payment in Review' },
+});
