@@ -17,6 +17,9 @@ export default {
     updateStudent(data, id) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/students/` + id, data)
     },
+    patchStudent(data, id) {
+      return this.$authHttp.patch(`${apiPrefix}/${apiVersion}/students/` + id, data)
+    },
     deleteStudent(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/students/` + id)
     },

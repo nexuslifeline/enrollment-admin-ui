@@ -18,8 +18,8 @@
               class="m-auto"
             />
             <StudentView
-              v-if="data && data.student && data.academicRecord"
-              :data="data.student"
+              v-if="data && student"
+              :data="student"
               :studentCategory="data.academicRecord.studentCategory"
             />
           </b-tab>
@@ -50,7 +50,7 @@
               <div class="p-3">
                 <StudentAttachments
                   v-if="!!Object.keys(data).length"
-                  :studentId="data.student.id"
+                  :studentId="data.academicRecord.student.id"
                   :owner="data.student"
                 />
               </div>
@@ -126,30 +126,30 @@ export default {
     evaluationId() {
       return this.$route.params.evaluationId;
     },
+    academicRecord() {
+      return this.data?.academicRecord
+    },
     studentPhoto() {
-      const { student } = this.data;
-      const path = student?.photo?.hashName || '';
+      const path = this.student?.photo?.hashName || '';
       return path ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${path}` : '';
     },
     studentAvatarText() {
-      const { student } = this.data;
-      return `${student?.firstName?.charAt(0)}${student?.lastName?.charAt(0)}`;
+      return this.student && `${this.student?.firstName?.charAt(0)}${this.student?.lastName?.charAt(0)}` || '';
     },
     userId() {
-      const { student } = this.data;
-      return student?.user?.id;
+      return this.student && this.student?.user?.id || 0;
     },
     transcriptRecord() {
       return this.data?.academicRecord?.transcriptRecord
-    },
-    academicRecord() {
-      return this.data?.academicRecord
     },
     showOptions() {
       if(!this.academicRecord)
       return false //avoid flicker
 
       return this.academicRecord && this.$options.EvaluationStatuses.PENDING.academicRecordStatuses.includes(this.academicRecord.academicRecordStatusId)
+    },
+    student() {
+      return this.data?.academicRecord?.student
     }
   },
   created() {

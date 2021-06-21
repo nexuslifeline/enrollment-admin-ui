@@ -14,17 +14,6 @@
         placeholder="Search"
       >
       </b-form-input>
-      <!--<v-select
-        :options="options.schoolCategories.values"
-        :value="filters.student.schoolCategoryItem"
-        @input="onCategoryFilterChange"
-        label="name"
-        placeholder="School Category"
-        class="mt-2"
-        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
-        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
-        :clearable="checkIfAllowedAll()"
-      />-->
       <SelectCategory
         :value="filters.student.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -112,14 +101,8 @@
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
-              :showOptions="
-                data.item.academicRecordStatusId ===
-                  AcademicRecordStatuses.DRAFT.id
-              "
-              :showActionBar="
-                data.item.academicRecordStatusId ===
-                  AcademicRecordStatuses.DRAFT.id
-              "
+              :showOptions="showOptions(data.item)"
+              :showActionBar="showOptions(data.item)"
               :options="[
                 {
                   label: 'Approve',
@@ -575,7 +558,7 @@
     </b-modal>
     <!-- Modal Preview -->
     <!-- Modal Approval -->
-    <b-modal
+    <!-- <b-modal
       v-model="showModalApproval"
       centered
       header-bg-variant="success"
@@ -584,23 +567,18 @@
       :noCloseOnBackdrop="true"
     >
       <div slot="modal-title">
-        <!-- modal title -->
         Finalize Approval
       </div>
-      <!-- modal title -->
       <b-row>
-        <!-- modal body -->
         <b-col md="12">
           <label>Notes</label>
           <b-textarea
-            v-model="forms.applicationAdmission.fields.approvalNotes"
+            v-model="forms.application.fields.approvalNotes"
             rows="7"
           />
         </b-col>
       </b-row>
-      <!-- modal body -->
       <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
         <b-button class="float-left" @click="showModalApproval = false">
           Cancel
         </b-button>
@@ -614,11 +592,10 @@
           Confirm
         </b-button>
       </div>
-      <!-- modal footer buttons -->
-    </b-modal>
+    </b-modal> -->
     <!-- Modal Approval -->
     <!-- Modal Reject -->
-    <b-modal
+    <!-- <b-modal
       v-model="showModalRejection"
       centered
       header-bg-variant="danger"
@@ -627,23 +604,18 @@
       :noCloseOnBackdrop="true"
     >
       <div slot="modal-title">
-        <!-- modal title -->
         Confirm Rejection
       </div>
-      <!-- modal title -->
       <b-row>
-        <!-- modal body -->
         <b-col md="12">
           <label>Reason</label>
           <b-textarea
-            v-model="forms.applicationAdmission.fields.disapprovalNotes"
+            v-model="forms.application.fields.disapprovalNotes"
             rows="7"
           />
         </b-col>
       </b-row>
-      <!-- modal body -->
       <div slot="modal-footer" class="w-100">
-        <!-- modal footer buttons -->
         <b-button class="float-left" @click="showModalRejection = false">
           Cancel
         </b-button>
@@ -657,8 +629,7 @@
           Confirm
         </b-button>
       </div>
-      <!-- modal footer buttons -->
-    </b-modal>
+    </b-modal> -->
     <!-- Modal Reject -->
     <!-- Modal Subject -->
     <b-modal
@@ -677,21 +648,6 @@
         <b-col md="12">
           <b-row class="mb-2">
             <b-col md="4">
-              <!-- <b-form-select
-                v-if="showDepartment"
-                @change="filterByDepartment()"
-                v-model="filters.subject.departmentId">
-                <template v-slot:first>
-                  <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
-                </template>
-                <b-form-select-option :value="null">None</b-form-select-option>
-                <b-form-select-option
-                  v-for="department in options.departments.items"
-                  :key="department.id"
-                  :value="department.id">
-                  {{department.name}}
-                </b-form-select-option>
-              </b-form-select> -->
             </b-col>
             <b-col offset-md="4" md="4">
               <b-form-input
@@ -851,6 +807,21 @@
         Notes : {{ file.notes }}
       </div>
     </div>
+
+    <EnlistmentApproval
+      v-if="showModalApproval"
+      :isShown.sync="showModalApproval"
+      :academicRecordId="selectedAcademicRecord.id"
+      :subjects="selectedAcademicRecord.subjects"
+      @onCancel="showModalApproval = false"
+      @onApproved="onEnlistmentApproved"/>
+
+    <EnlistmentRejection
+        v-if="showModalRejection"
+        :isShown.sync="showModalRejection"
+        :academicRecordId="selectedAcademicRecord.id"
+        @onCancel="showModalRejection = false"
+        @onRejected="onEnlistmentRejected"/>
     </template>
     <!-- Modal Subject -->
   </PageContent>
@@ -877,7 +848,8 @@ import {
   Days,
   UserGroups,
   StudentSubjectPermissions,
-  SettingPermissions
+  SettingPermissions,
+  OnBoardingSteps
 } from '../../helpers/enum';
 import { showNotification, formatNumber } from '../../helpers/forms';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
@@ -895,6 +867,8 @@ import { StudentColumn,AddressColumn , EducationColumn, EnlistmentStatusColumn }
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from "../components/NoAccess";
+import EnlistmentApproval from "../components/ApprovalModals/Enlistment";
+import EnlistmentRejection from "../components/RejectionModals/Enlistment";
 
 
 const acdemicRecordFields = {
@@ -945,12 +919,15 @@ export default {
     FilterButton,
     NoAccess,
     AddressColumn,
-    EnlistmentStatusColumn
+    EnlistmentStatusColumn,
+    EnlistmentApproval,
+    EnlistmentRejection
   },
   StudentSubjectPermissions,
   SettingPermissions,
   data() {
     return {
+      selectedAcademicRecord: null,
       isFilterVisible: true,
       showModalPreview: false,
       showModalApproval: false,
@@ -960,6 +937,7 @@ export default {
       isLoading: false,
       AcademicRecordStatuses: AcademicRecordStatuses,
       enlistmentStatuses: EnlistmentStatuses,
+      OnBoardingSteps: OnBoardingSteps,
       changeSection: false,
       days: Days,
       showTermsAlert: false,
@@ -978,7 +956,7 @@ export default {
         studentFee: {
           fields: { ...studentFeeFields },
         },
-        applicationAdmission: {
+        application: {
           fields: { ...applicationAdmissionFields },
         },
         subjects: [],
@@ -1343,6 +1321,16 @@ export default {
     this.loadAcademicRecordList()
   },
   methods: {
+    onEnlistmentApproved() {
+      this.loadAcademicRecordList()
+      this.selectedAcademicRecord = null
+      this.showModalApproval = false
+    },
+    onEnlistmentRejected() {
+      this.loadAcademicRecordList()
+      this.selectedAcademicRecord = null
+      this.showModalRejection= false
+    },
     loadTerms() {
       const { terms } = this.options
       const params = { paginate: false, schoolYearId: this.$store.state.schoolYear.id }
@@ -1352,7 +1340,7 @@ export default {
       })
     },
     setApproval(row) {
-      this.forms.applicationAdmission.fields.approvalNotes = null;
+      this.forms.application.fields.approvalNotes = null;
       if (!row.item.subjects) {
         const { id: academicRecordId } = row.item;
         const params = { paginate: false };
@@ -1362,10 +1350,12 @@ export default {
             this.$set(row.item, 'isBusy', false);
             this.row = row.item;
             this.showModalApproval = true;
+            this.selectedAcademicRecord = row.item
           }
         );
       } else {
         this.row = row.item;
+        this.selectedAcademicRecord = row.item
         this.showModalApproval = true;
       }
     },
@@ -1373,15 +1363,15 @@ export default {
       const { id: academicRecordId, applicationId, admissionId } = this.row;
 
       const {
-        applicationAdmission: { fields: application },
-        applicationAdmission: { fields: admission },
+        application: { fields: application },
+        // application: { fields: admission },
         academicRecord: { fields: academicRecord },
         studentFee: { fields: studentFee },
       } = this.forms;
 
-      const applicationAdmission = [{ application }, { admission }];
+      // const application = [{ application }, { admission }];
 
-      const index = applicationId ? 0 : 1;
+      // const index = applicationId ? 0 : 1;
 
       let subjects = this.row.subjects.map((subject) => {
         const {
@@ -1392,18 +1382,18 @@ export default {
       });
 
       (studentFee.schoolYearId = this.row.schoolYearId),
-        (studentFee.semesterId = this.row.semesterId),
-        (studentFee.levelId = this.row.levelId),
-        (studentFee.courseId = this.row.courseId),
-        (studentFee.studentFeeStatusId = StudentFeeStatuses.DRAFT.id);
+      (studentFee.semesterId = this.row.semesterId),
+      (studentFee.levelId = this.row.levelId),
+      (studentFee.courseId = this.row.courseId),
+      (studentFee.studentFeeStatusId = StudentFeeStatuses.DRAFT.id);
       studentFee.academicRecordId = academicRecordId;
 
-      academicRecord.academicRecordStatusId =
-        AcademicRecordStatuses.FINALIZED.id;
+      academicRecord.academicRecordStatusId = AcademicRecordStatuses.ENLISTMENT_APPROVED.id;
       academicRecord.sectionId = this.row.sectionId;
 
       const data = {
-        ...applicationAdmission[index],
+        // ...application[index],
+        ...application,
         studentFee,
         ...academicRecord,
         subjects,
@@ -1412,12 +1402,11 @@ export default {
       this.isProcessing = true;
       this.updateAcademicRecord(data, academicRecordId)
         .then(({ data }) => {
-          this.row.academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id;
-          this.isProcessing = false;
+          //this.row.academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id;
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
           this.loadAcademicRecordList();
-          this.$store.state.approvalCount.enlistment--;
+
         })
         .catch((error) => {
           const errors = error.response.data.errors;
@@ -1429,8 +1418,9 @@ export default {
         });
     },
     setDisapproval(row) {
-      this.forms.applicationAdmission.fields.disapprovalNotes = null;
+      this.forms.application.fields.disapprovalNotes = null;
       this.row = row.item;
+      this.selectedAcademicRecord = row.item
       this.showModalRejection = true;
     },
     onDisapproval() {
@@ -1438,8 +1428,8 @@ export default {
       const { id: academicRecordId, applicationId, admissionId } = this.row;
 
       const {
-        applicationAdmission: { fields: application },
-        applicationAdmission: { fields: admission },
+        application: { fields: application },
+        application: { fields: admission },
         academicRecord: { fields: academicRecord },
       } = this.forms;
 
@@ -1447,24 +1437,26 @@ export default {
         ? {
             application: {
               ...application,
-              applicationStatusId: ApplicationStatuses.REJECTED.id,
-              applicationStepId: this.row.application.applicationStepId - 1,
+              // applicationStatusId: ApplicationStatuses.REJECTED.id,
+              // applicationStepId: this.row.application.applicationStepId - 1,
             },
           }
         : {
             admission: {
               ...admission,
-              applicationStatusId: ApplicationStatuses.REJECTED.id,
-              admissionStepId: this.row.admission.admissionStepId - 1,
+              // applicationStatusId: ApplicationStatuses.REJECTED.id,
+              // admissionStepId: this.row.admission.admissionStepId - 1,
             },
           };
 
       this.updateAcademicRecord(data, academicRecordId)
         .then(({ data }) => {
-          this.loadAcademicRecordList();
-          this.isProcessing = false;
-          this.showModalRejection = false;
-          showNotification(this, 'success', 'Rejected Successfully.');
+          this.patchStudent({ onboardingStepId: this.OnBoardingSteps.ACADEMIC_RECORD_APPLICATION.id}, data.studentId).then(({ data }) => {
+            this.loadAcademicRecordList();
+            this.isProcessing = false;
+            this.showModalRejection = false;
+            showNotification(this, 'success', 'Rejected Successfully.');
+          })
         })
         .catch((error) => {
           console.log(error);
@@ -1789,6 +1781,12 @@ export default {
         0
       )
     },
+    showOptions(academicRecord) {
+      if(!academicRecord)
+      return false //avoid flicker
+
+      return this.enlistmentStatuses.PENDING.academicRecordStatuses.includes(academicRecord.academicRecordStatusId)
+    }
   },
   computed: {
     isCourseVisible() {
@@ -1799,7 +1797,7 @@ export default {
         schoolCategories.COLLEGE.id,
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
-    }
+    },
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {

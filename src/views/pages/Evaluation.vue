@@ -71,17 +71,17 @@
             </span>
             <v-icon name="paperclip" />
           </template>
-          <template v-slot:cell(name)="data">
+          <template v-slot:cell(name)="{ item: { id: evaluationId, academicRecord }}">
             <StudentColumn
               :showIsManual="true"
-              :data="data.item"
+              :data="academicRecord"
               :callback="{ loadDetails: () =>
-                $router.push({ name: 'Evaluation Detail', params: { evaluationId: data.item.id } })
+                $router.push({ name: 'Evaluation Detail', params: { evaluationId: evaluationId } })
               }"
             />
           </template>
-          <template v-slot:cell(address)="data">
-            <AddressColumn :data="data.item" />
+          <template v-slot:cell(address)="{ item: { academicRecord }}">
+            <AddressColumn :data="academicRecord" />
           </template>
           <template v-slot:cell(education)="data">
             <EducationColumn :data="data.item.academicRecord" />

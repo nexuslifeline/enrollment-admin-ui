@@ -38,5 +38,11 @@ export default {
     quickEnroll(studentId, data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${studentId}/quick-enroll`, data)
     },
+    approveEnlistment(academicRecordId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/approve-enlistment`, data)
+    },
+    rejectEnlistment(academicRecordId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/reject-enlistment`, data)
+    },
   }
 }
