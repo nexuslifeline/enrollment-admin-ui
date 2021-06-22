@@ -144,7 +144,7 @@
               :variant="
                 data.item.paymentStatusId === paymentStatuses.APPROVED.id
                   ? 'success'
-                  : data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
+                  : data.item.paymentStatusId === paymentStatuses.PENDING.id
                   ? 'warning'
                   : 'danger'
               "
@@ -246,7 +246,7 @@
                     <b-row
                       v-if="
                         data.item.paymentStatusId ===
-                          paymentStatuses.SUBMITTED.id
+                          paymentStatuses.PENDING.id
                       "
                     >
                       <b-col md="12">
@@ -284,11 +284,11 @@
               @onBack="data.toggleDetails()"
               :showOptions="
                 isAccessible($options.StudentPaymentPermissions.APPROVAL.id) &&
-                  data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
+                  data.item.paymentStatusId === paymentStatuses.PENDING.id
               "
               :showActionBar="
                 isAccessible($options.StudentPaymentPermissions.APPROVAL.id) &&
-                  data.item.paymentStatusId === paymentStatuses.SUBMITTED.id
+                  data.item.paymentStatusId === paymentStatuses.PENDING.id
               "
               :options="[
                 {
@@ -1012,8 +1012,8 @@ export default {
       filters: {
         payment: {
           criteria: null,
-          paymentStatusId: PaymentStatuses.SUBMITTED.id,
-          paymentStatusItem: PaymentStatuses.SUBMITTED,
+          paymentStatusId: PaymentStatuses.PENDING.id,
+          paymentStatusItem: PaymentStatuses.PENDING,
           dateFrom: new Date(),
           dateTo: new Date()
         },

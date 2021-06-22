@@ -345,7 +345,10 @@
                         unchecked-value="0"
                         v-model="row.item.pivot.isInitialFee"
                       /> -->
-                      <Toggle :value="row.item.pivot.isInitialFee" :isDisabled="!showOptions"/>
+                      <Toggle
+                        @input="row.item.pivot.isInitialFee = $event ? 1 : 0"
+                        :value="row.item.pivot.isInitialFee"
+                        :isDisabled="!showOptions"/>
                     </template>
                     <template v-slot:cell(pivot.amount)="row">
                       <vue-autonumeric
@@ -400,7 +403,7 @@
                         <vue-autonumeric
                           disabled
                           class="form-control text-right"
-                          :value="initialFeeTotal(data)"
+                          :value="initialFeeSum"
                           :options="[
                             {
                               minimumValue: 0,
@@ -1404,6 +1407,18 @@ export default {
           return newValue;
         };
       },
+    },
+    initialFeeSum() {
+
+      if(!this.selectedAcademicRecord)
+      return 0
+
+      const { fees } = this.selectedAcademicRecord
+      if(fees && fees.length > 0) {
+        return fees.reduce((acc, curr) => {
+          return acc += parseInt(curr.pivot.isInitialFee) === 1 ? parseFloat(curr.pivot.amount) : 0
+        }, 0)
+      }
     },
     isCourseVisible() {
       const { schoolCategoryId } = this.filters.student;
