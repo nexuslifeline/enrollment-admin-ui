@@ -44,5 +44,11 @@ export default {
     rejectEnlistment(academicRecordId, data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/reject-enlistment`, data)
     },
+    approveAssessment(academicRecordId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/approve-assessment`, data)
+    },
+    rejectAssessment(academicRecordId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/reject-assessment`, data)
+    },
   }
 }

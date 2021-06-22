@@ -2,14 +2,14 @@
   <PageContent
     :title="`Student Assessment Fee (${$store.state.schoolYear.name})`"
     @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadAcademicRecord"
+    @refresh="loadAcademicRecords"
     :filterVisible="isFilterVisible"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
         v-model="filters.student.criteria"
         debounce="500"
-        @update="loadAcademicRecord()"
+        @update="loadAcademicRecords()"
         type="text"
         placeholder="Search"
       >
@@ -130,29 +130,22 @@
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
               :showOptions="
-                !isAccessible($options.StudentFeePermissions.APPROVAL.id)
-                  ? false
-                  : data.item.applicationId
-                  ? data.item.application.applicationStatusId ===
-                    applicationStatuses.SUBMITTED.id
-                  : data.item.admission.applicationStatusId ===
-                    applicationStatuses.SUBMITTED.id
-              "
+                isAccessible($options.StudentFeePermissions.APPROVAL.id) && showOptions"
               :showActionBar="
-                !isAccessible($options.StudentFeePermissions.APPROVAL.id)
-                  ? false
-                  : data.item.applicationId
-                  ? data.item.application.applicationStatusId ===
-                    applicationStatuses.SUBMITTED.id
-                  : data.item.admission.applicationStatusId ===
-                    applicationStatuses.SUBMITTED.id
-              "
+                isAccessible($options.StudentFeePermissions.APPROVAL.id) && showOptions"
               :options="[
                 {
                   label: 'Approve',
                   callback: () => setApproveFees(data),
                   isAllowed: isAccessible(
                     $options.StudentFeePermissions.APPROVAL.id
+                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
+                },
+                {
+                  label: 'Reject',
+                  callback: () => setRejectFees(data),
+                  isAllowed: isAccessible(
+                    $options.StudentFeePermissions.DISAPPROVAL.id
                   ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
                 },
               ]"
@@ -315,13 +308,7 @@
                     <b-col md="4">
                       <b-button
                         @click="onAddFees(data.item.fees)"
-                        v-if="
-                          data.item.applicationId
-                            ? data.item.application.applicationStatusId ===
-                              applicationStatuses.SUBMITTED.id
-                            : data.item.admission.applicationStatusId ===
-                              applicationStatuses.SUBMITTED.id
-                        "
+                        v-if="showOptions"
                         variant="outline-primary"
                         class="float-right"
                       >
@@ -348,40 +335,24 @@
                     <template v-slot:cell(pivot.notes)="row">
                       <b-form-input
                         v-model="row.item.pivot.notes"
-                        :disabled="
-                          data.item.application
-                            ? data.item.application.applicationStatusId !==
-                              applicationStatuses.SUBMITTED.id
-                            : data.item.admission.applicationStatusId !==
-                              applicationStatuses.SUBMITTED.id
-                        "
+                        :disabled="!showOptions"
                       />
                     </template>
                     <template v-slot:cell(pivot.isInitialFee)="row">
-                      <b-form-checkbox
-                        :disabled="
-                          data.item.application
-                            ? data.item.application.applicationStatusId !==
-                              applicationStatuses.SUBMITTED.id
-                            : data.item.admission.applicationStatusId !==
-                              applicationStatuses.SUBMITTED.id
-                        "
+                      <!-- <b-form-checkbox
+                        :disabled="!showOptions"
                         value="1"
                         unchecked-value="0"
                         v-model="row.item.pivot.isInitialFee"
-                      />
+                      /> -->
+                      <Toggle :value="row.item.pivot.isInitialFee" :isDisabled="!showOptions"/>
                     </template>
                     <template v-slot:cell(pivot.amount)="row">
                       <vue-autonumeric
                         :disabled="
                           (row.item.id === fees.TUITION_FEE.id &&
                             data.item.isComputedByUnits === 1) ||
-                            (data.item.application
-                              ? data.item.application.applicationStatusId !==
-                                applicationStatuses.SUBMITTED.id
-                              : data.item.admission.applicationStatusId !==
-                                applicationStatuses.SUBMITTED.id)
-                        "
+                            !showOptions"
                         v-model="row.item.pivot.amount"
                         class="form-control text-right"
                         :options="[
@@ -396,14 +367,7 @@
                     </template>
                     <template v-slot:cell(action)="row">
                       <b-button
-                        v-if="
-                          (data.item.applicationId
-                            ? data.item.application.applicationStatusId ===
-                              applicationStatuses.SUBMITTED.id
-                            : data.item.admission.applicationStatusId ===
-                              applicationStatuses.SUBMITTED.id) &&
-                            row.item.id !== fees.TUITION_FEE.id
-                        "
+                        v-if="showOptions && row.item.id !== fees.TUITION_FEE.id"
                         @click="removeFee(data.item.fees, row)"
                         size="sm"
                         variant="danger"
@@ -471,6 +435,7 @@
                         <vue-autonumeric
                           class="form-control text-right"
                           v-model="data.item.previousBalance"
+                          :disabled="!showOptions"
                           :options="[
                             {
                               minimumValue: 0,
@@ -495,12 +460,19 @@
               </template>
 
               <template v-slot:actionBar>
-                <div class="float-right">
+                <div class="float-right" v-if="showOptions">
                   <b-button
                     @click="setApproveFees(data)"
-                    class="mr-2" variant="outline-primary"
+                    class="mr-2 ml-2" variant="outline-primary"
                     v-if="isAccessible($options.StudentFeePermissions.APPROVAL.id)"
                     :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"> Approve</b-button>
+                  <b-button
+                    v-if="isAccessible($options.StudentFeePermissions.DISAPPROVAL.id)"
+                    :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"
+                    @click="setRejectFees(data)"
+                    variant="outline-danger"
+                    >Reject</b-button
+                  >
                 </div>
               </template>
             </ActiveRowViewer>
@@ -520,7 +492,7 @@
               :per-page="paginations.student.perPage"
               size="sm"
               align="end"
-              @input="loadAcademicRecord()"
+              @input="loadAcademicRecords()"
             />
           </b-col>
         </b-row>
@@ -608,7 +580,7 @@
         <!-- modal footer buttons -->
       </b-modal>
       <!-- Modal Approval -->
-      <b-modal
+      <!-- <b-modal
         v-model="showModalApproval"
         centered
         header-bg-variant="success"
@@ -617,20 +589,20 @@
         :noCloseOnBackdrop="true"
       >
         <div slot="modal-title">
-          <!-- modal title -->
+        
           Finalize Approval
         </div>
-        <!-- modal title -->
+   
         <b-row>
-          <!-- modal body -->
+
           <b-col md="12">
             <label>Notes</label>
             <b-textarea v-model="approvalNotes" rows="7" />
           </b-col>
         </b-row>
-        <!-- modal body -->
+
         <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
+
           <b-button class="float-left" @click="showModalApproval = false">
             Cancel
           </b-button>
@@ -643,8 +615,8 @@
             Confirm
           </b-button>
         </div>
-        <!-- modal footer buttons -->
-      </b-modal>
+
+      </b-modal> -->
       <!-- Modal Approval -->
       <FileViewer
         :show="fileViewer.show"
@@ -652,6 +624,23 @@
         :owner="file.owner"
         :isBusy="file.isLoading"
         @close="fileViewer.show = false"
+      />
+
+      <AssessmentApproval
+        v-if="showModalApproval"
+        :isShown.sync="showModalApproval"
+        :academicRecordId="selectedAcademicRecord.id"
+        :fees="selectedAcademicRecord && selectedAcademicRecord.fees || []"
+        :previousBalance="selectedAcademicRecord && selectedAcademicRecord.previousBalance || 0"
+        @onCancel="showModalApproval = false"
+        @onApproved="onAssesmentApproved"
+      />
+      <AssessmentRejection
+        v-if="showModalRejection"
+        :isShown.sync="showModalRejection"
+        :academicRecordId="selectedAcademicRecord.id"
+        @onCancel="showModalRejection = false"
+        @onRejected="onAssesmentRejected"
       />
     </template>
   </PageContent>
@@ -679,7 +668,8 @@ import {
   BillingStatuses,
   StudentFeePermissions,
   SettingPermissions,
-  AssessmentStatuses
+  AssessmentStatuses,
+  EnlistmentStatuses,
 } from '../../helpers/enum';
 import { showNotification, formatNumber } from '../../helpers/forms';
 import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
@@ -700,6 +690,9 @@ import { format } from 'date-fns';
 import PageContent from "../components/PageContainer/PageContent";
 import FilterButton from "../components/PageContainer/FilterButton";
 import NoAccess from "../components/NoAccess";
+import AssessmentApproval from '../components/ApprovalModals/Assessment'
+import AssessmentRejection from '../components/RejectionModals/Assessment'
+import Toggle from '../components/Form/Toggle'
 
 export default {
   name: 'StudentFee',
@@ -733,12 +726,16 @@ export default {
     FilterButton,
     NoAccess,
     AddressColumn,
-    AssessmentStatusColumn
+    AssessmentStatusColumn,
+    AssessmentApproval,
+    AssessmentRejection,
+    Toggle
   },
   StudentFeePermissions,
   SettingPermissions,
   data() {
     return {
+      selectedAcademicRecord: null,
       isFilterVisible: true,
       fileViewer: {
         show: false,
@@ -752,9 +749,12 @@ export default {
       },
       showModalFees: false,
       showModalApproval: false,
+      showModalRejection: false,
       approvalNotes: null,
       applicationStatuses: ApplicationStatuses,
       assessmentStatuses: AssessmentStatuses,
+      enlismentStatuses: EnlistmentStatuses,
+      academicRecordStatuses: AcademicRecordStatuses,
       fees: Fees,
       isProcessing: false,
       showTermsAlert: false,
@@ -987,10 +987,20 @@ export default {
     }
     this.loadCourseList();
     this.loadFees();
-    this.loadAcademicRecord()
+    this.loadAcademicRecords()
     this.loadTerms()
   },
   methods: {
+    onAssesmentApproved() {
+      this.selectedAcademicRecord = null
+      this.showModalApproval = false
+      this.loadAcademicRecords()
+    },
+    onAssesmentRejected() {
+      this.selectedAcademicRecord = null
+      this.showModalRejection = false
+      this.loadAcademicRecords()
+    },
     loadTerms() {
       const { terms } = this.options
       const params = { paginate: false, schoolYearId: this.$store.state.schoolYear.id }
@@ -1001,8 +1011,12 @@ export default {
     },
     setApproveFees(row) {
       this.approvalNotes = null;
-      this.row = row;
+      this.row = row
       this.showModalApproval = true;
+    },
+    setRejectFees(row) {
+      this.row = row
+      this.showModalRejection = true;
     },
     approveFees() {
       const {
@@ -1079,7 +1093,7 @@ export default {
           const form = applicationId ? 'application' : 'admission';
           item[form].applicationStatusId = ApplicationStatuses.APPROVED.id;
           this.isProcessing = false;
-          this.loadAcademicRecord();
+          this.loadAcademicRecords();
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
           this.$store.state.approvalCount.assessment--;
@@ -1089,7 +1103,7 @@ export default {
           this.isProcessing = false;
         });
     },
-    loadAcademicRecord() {
+    loadAcademicRecords() {
       const { students } = this.tables;
       const {
         student,
@@ -1145,6 +1159,7 @@ export default {
       if (!row.detailsShowing) {
         const {
           id: academicRecordId,
+          academicRecordStatusId,
           levelId,
           courseId,
           semesterId,
@@ -1158,16 +1173,11 @@ export default {
         this.getSubjectsOfAcademicRecord(academicRecordId, params).then(
           ({ data }) => {
             this.$set(row.item, 'subjects', data);
-            let applicationStatusId = null;
-            if (application) {
-              applicationStatusId = application.applicationStatusId;
-            } else {
-              applicationStatusId = admission.applicationStatusId;
-            }
-            if (applicationStatusId === ApplicationStatuses.SUBMITTED.id) {
+            if (academicRecordStatusId === this.academicRecordStatuses.ENLISTMENT_APPROVED.id  || academicRecordStatusId === this.academicRecordStatuses.ASSESSMENT_REJECTED.id) {
               const rateSheetParams = { levelId, courseId, semesterId };
               this.getRateSheetList(rateSheetParams).then(({ data }) => {
                 const res = data.data;
+                console.log(data)
                 this.$set(
                   row.item,
                   'enrollmentFee',
@@ -1227,6 +1237,7 @@ export default {
                 }
               );
             }
+            this.selectedAcademicRecord = row.item;
           }
         );
       }
@@ -1290,7 +1301,7 @@ export default {
         this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
         this.schoolCategoryId = userGroup.schoolCategoryId;
       }
-      this.loadAcademicRecord();
+      this.loadAcademicRecords();
     },
     avatar(student) {
       let src = '';
@@ -1325,19 +1336,19 @@ export default {
       const { student } = this.filters;
       student.schoolCategoryId = item?.id || 0;
       student.schoolCategoryItem = item;
-      this.loadAcademicRecord();
+      this.loadAcademicRecords();
     },
     onStatusFilterChange(item) {
       const { student } = this.filters;
       // student.applicationStatusId = item?.id || 0;
       student.assessmentStatus = item;
-      this.loadAcademicRecord();
+      this.loadAcademicRecords();
     },
     onCourseFilterChange(item) {
       const { student } = this.filters;
       student.courseId = item?.id || 0;
       student.courseItem = item;
-      this.loadAcademicRecord();
+      this.loadAcademicRecords();
     },
     hasTermsSchoolCategory(item) {
       const { terms } = this.options
@@ -1347,7 +1358,7 @@ export default {
   watch: {
     '$store.state.schoolYear': function(newVal) {
       this.loadTerms();
-      this.loadAcademicRecord();
+      this.loadAcademicRecords();
     },
   },
   computed: {
@@ -1411,6 +1422,12 @@ export default {
     //     e.id === this.applicationStatuses.COMPLETED.id
     //   )
     // },
+    showOptions() {
+      //for pending statuses
+      if(!this.selectedAcademicRecord)
+      return false //avoid flicker
+      return this.selectedAcademicRecord.academicRecordStatusId === this.academicRecordStatuses.ENLISTMENT_APPROVED.id
+    }
   },
 };
 </script>

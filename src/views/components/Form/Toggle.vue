@@ -1,6 +1,6 @@
 <template>
   <label class="toggle-switch">
-    <input type="checkbox" @input="onInput" :checked="value" />
+    <input type="checkbox" @input="onInput" :checked="value" :disabled="isDisabled"/>
     <span class="toggle-switch__slider round" />
   </label>
 </template>
@@ -8,7 +8,11 @@
 <script>
 export default {
   props: {
-    value: [Boolean, Number]
+    value: [Boolean, Number],
+    isDisabled: {
+      type: [Boolean],
+      default: false
+    }
   },
   methods: {
     onInput(e) {
