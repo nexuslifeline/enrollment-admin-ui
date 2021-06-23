@@ -1,11 +1,16 @@
 <template>
   <Card
-    title="Academic Record"
+    :title="title"
     titleSize="m"
     :hasFooter="true">
     <CardNote v-if="showNotes">
-      It is recommended to complete the <b>Academic Record</b> section first before
-      adding Subject to be able to find the right subjects for the Student.
+      <template v-if="!!notes">
+        {{ notes }}
+      </template>
+      <template v-else>
+        It is recommended to complete the <b>Academic Record</b> section first before
+        adding Subject to be able to find the right subjects for the Student.
+      </template>
     </CardNote>
     <InputGroup>
       <InputContainer>
@@ -86,7 +91,7 @@
         />
       </InputContainer>
       <InputContainer>
-        <label class="required">Section</label>
+        <label>Section</label>
         <SelectSection
           :value="data.sectionId"
           :reduce="option => option.id"
@@ -94,6 +99,18 @@
           @input="data.sectionId = $event"
         />
       </InputContainer>
+    </InputGroup>
+    <InputGroup v-if="allowChangeStatus">
+      <InputContainer>
+        <label>Status</label>
+        <SelectAcademicStatus
+          :value="data.academicRecordStatusId"
+          @input="data.academicRecordStatusId = $event"
+          :reduce="option => option.id"
+          label="name"
+        />
+      </InputContainer>
+      <InputContainer />
     </InputGroup>
     <template v-slot:footer>
       <CardFooterRow>
@@ -134,11 +151,31 @@ const academicRecordFields = {
       },
       showNotes: {
         type: Boolean,
-        default: true
+        default: false
+      },
+      allowChangeStatus: {
+        type: Boolean,
+        default: false
+      },
+      title: {
+        type: String,
+        default: 'Academic Record'
+      },
+      notes: {
+        type: String
       }
     },
-    mixins: [ AcademicRecordApi, TranscriptRecordApi ],
-    components: { SelectCategory, SelectSchoolYear, SelectLevel, SelectCourseLevel, SelectSemester, SelectCurriculum, SelectStudentType, SelectSection },
+    mixins: [AcademicRecordApi, TranscriptRecordApi],
+    components: {
+      SelectCategory,
+      SelectSchoolYear,
+      SelectLevel,
+      SelectCourseLevel,
+      SelectSemester,
+      SelectCurriculum,
+      SelectStudentType,
+      SelectSection
+    },
     data() {
       return {
         isProcessing: false,
@@ -152,8 +189,19 @@ const academicRecordFields = {
     },
     methods: {
       onSave() {
-        console.log('PUT academic record here /academic-records/:id')
-        const { id: academicRecordId, schoolCategoryId, schoolYearId, levelId, courseId, semesterId, studentTypeId, sectionId, transcriptRecordId, transcriptRecord: { curriculumId } } = this.data
+        const {
+          id: academicRecordId,
+          schoolCategoryId,
+          schoolYearId,
+          levelId,
+          courseId,
+          semesterId,
+          studentTypeId,
+          sectionId,
+          transcriptRecordId,
+          academicRecordStatusId,
+          transcriptRecord: { curriculumId }
+        } = this.data
         const { academicRecord } = this.forms
         const academicRecordData = {
           schoolCategoryId,
@@ -163,6 +211,7 @@ const academicRecordFields = {
           semesterId,
           studentTypeId,
           sectionId,
+          ...(this.allowChangeStatus && { academicRecordStatusId }) // if allow status change, add academic record status to payload
         }
         reset(academicRecord)
         this.isProcessing = true

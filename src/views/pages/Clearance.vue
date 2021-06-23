@@ -31,6 +31,7 @@
         v-model="filters.clearance.schoolCategoryItem"
         label="name"
         placeholder="School Category"
+        class="mt-2"
       />
       <v-select
         v-if="isCourseVisible"
@@ -188,6 +189,7 @@
               :reduce="item => item.id"
               label="name"
               placeholder="School Category"
+              class="mt-2"
             />
             <!-- <v-select
               @input="loadFormSections()"

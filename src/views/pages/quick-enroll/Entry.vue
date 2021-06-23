@@ -45,7 +45,7 @@
             />
           </template>
           <template v-else-if="manualStepId === $options.QuickEnrollSteps.SUBJECT_ENLISTMENT.id">
-            <AcademicRecord :data="data" />
+            <AcademicRecord :data="data" :showNotes="true" />
             <Enlistment :academicRecordId="data.id" :data="data"/>
           </template>
         </div>

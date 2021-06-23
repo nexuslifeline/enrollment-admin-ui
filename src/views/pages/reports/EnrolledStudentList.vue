@@ -221,6 +221,7 @@
         label="name"
         placeholder="School Category"
         :clearable="false"
+        class="mt-2"
       />
       <v-select
         :options="options.levels.items"

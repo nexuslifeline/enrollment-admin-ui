@@ -29,6 +29,7 @@
         @input="onStatusFilterChange"
         label="name"
         placeholder="School Category"
+        class="mt-2"
       />
     </template>
     <template v-slot:content>

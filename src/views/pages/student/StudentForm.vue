@@ -13,12 +13,21 @@
       <Education :data="data.education || {}"/>
       <Subjects :studentId="$route.params.studentId" />
       <OnboardingSettings :data="data" />
+      <AcademicRecord
+        v-if="!!Object.keys(data).length && data.hasOpenAcademicRecord"
+        :data="data.activeAcademicRecord"
+        :showNotes="true"
+        :allowChangeStatus="true"
+        notes="This setting is only visible if student has a record that is not yet mark as Enrolled."
+        title="Active Academic Record"
+      />
     </template>
   </CenterContainer>
 </template>
 
 <script>
-import OnboardingSettings from '../../components/OnboardingSettings/Onboarding.vue';
+import AcademicRecord from '../../components/AcademicRecord/AcademicRecord';
+import OnboardingSettings from '../../components/OnboardingSettings/Onboarding';
 import Personal from '../../components/Student/Personal';
 import Account from '../../components/Student/Account';
 import Address from '../../components/Student/Address';
@@ -35,7 +44,8 @@ export default {
     Education,
     Family,
     Subjects,
-    OnboardingSettings
+    OnboardingSettings,
+    AcademicRecord
   },
   mixins: [ StudentApi ],
   data() {

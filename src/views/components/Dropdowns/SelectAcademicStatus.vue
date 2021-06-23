@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options || schoolCategories"
+    :options="$options.AcademicRecordStatuses.values"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -9,11 +9,13 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
+    :disabled="disabled"
   />
 </template>
 <script>
-import { SchoolCategories } from '../../../helpers/enum';
+import { AcademicRecordStatuses } from '../../../helpers/enum';
 export default {
+  AcademicRecordStatuses,
   props: {
     options: {
       type: [Array]
@@ -47,18 +49,28 @@ export default {
       type: [Boolean],
       default: false
     },
+    schoolCategoryId: {
+      type: [Number],
+      default: null
+    },
+    levelId: {
+      type: [Number],
+      default: null
+    },
+    disabled: {
+      type: [Boolean],
+      default: false
+    },
   },
   data() {
     return {
-      schoolCategories: SchoolCategories?.values?.filter(
-        v => this.$store.state?.user?.userGroup?.schoolCategories?.map(c => c.id).includes(v.id)
-      ) || []
+      Semesters: [],
     }
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
-    }
+    },
   }
 };
 </script>

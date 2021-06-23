@@ -17,6 +17,7 @@
         v-model="filters.droppedStudent.schoolCategoryItem"
         label="name"
         placeholder="School Category"
+        class="mt-2"
       />
       <v-select
         v-if="isCourseVisible"

@@ -111,6 +111,7 @@ export const AcademicRecordStatuses = new Enum({
   ASSESSMENT_APPROVED: { id: 9, name: 'Assessment Approved' },
   PAYMENT_SUBMITTED: { id: 10, name: 'Payment Submitted' },
   ENROLLED: { id: 11, name: 'Enrolled' },
+  CLOSED: { id: 12, name: 'Closed' },
 });
 
 export const TranscriptRecordStatuses = new Enum({

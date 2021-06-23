@@ -19,6 +19,7 @@
         @input="onCategoryFilterChange"
         label="name"
         placeholder="School Category"
+        class="mt-2"
       />
       <v-select
         v-if="isCourseVisible"

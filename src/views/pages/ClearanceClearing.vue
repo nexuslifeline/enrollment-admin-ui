@@ -19,6 +19,7 @@
         v-model="filters.clearance.schoolCategoryItem"
         label="name"
         placeholder="School Category"
+        class="mt-2"
       />
       <!-- <v-select
         @input="loadSections()"
