@@ -209,7 +209,7 @@
               <template v-slot:content>
                 <div>
                   <b-alert :show="!hasTermsSchoolCategory(data.item)" variant="danger" class="mb-3">
-                    sss No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
+                    No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
                   </b-alert>
                   <ActiveViewHeader
                     id="header-current-application"
@@ -317,7 +317,7 @@
                       </b-button>
                     </b-col>
                   </b-row>
-                  <b-table
+                  <!-- <b-table
                     hover
                     outlined
                     small
@@ -340,12 +340,6 @@
                       />
                     </template>
                     <template v-slot:cell(pivot.isInitialFee)="row">
-                      <!-- <b-form-checkbox
-                        :disabled="!showOptions"
-                        value="1"
-                        unchecked-value="0"
-                        v-model="row.item.pivot.isInitialFee"
-                      /> -->
                       <Toggle
                         @input="row.item.pivot.isInitialFee = $event ? 1 : 0"
                         :value="row.item.pivot.isInitialFee"
@@ -379,15 +373,10 @@
                         <v-icon name="trash" />
                       </b-button>
                     </template>
-                  </b-table>
+                  </b-table> -->
+                  <FeesTable :studentFees="selectedAcademicRecord.fees" :isDisabled="showOptions"/>
                   <b-row>
                     <b-col md="4">
-                      <!-- <b-form-group
-                        label="INITIAL FEE TOTAL :"
-                        label-for="enrollmentFee"
-                        label-class="font-weight-bold"
-                        label-cols="4"
-                      > -->
                       <div class="footer-info">
                         <label
                           >INITIAL FEE TOTAL :
@@ -593,10 +582,8 @@
         :noCloseOnBackdrop="true"
       >
         <div slot="modal-title">
-        
           Finalize Approval
         </div>
-   
         <b-row>
 
           <b-col md="12">
@@ -697,6 +684,7 @@ import NoAccess from "../components/NoAccess";
 import AssessmentApproval from '../components/ApprovalModals/Assessment'
 import AssessmentRejection from '../components/RejectionModals/Assessment'
 import Toggle from '../components/Form/Toggle'
+import FeesTable from '../components/Assessment/FeesTable'
 
 export default {
   name: 'StudentFee',
@@ -733,7 +721,8 @@ export default {
     AssessmentStatusColumn,
     AssessmentApproval,
     AssessmentRejection,
-    Toggle
+    Toggle,
+    FeesTable
   },
   StudentFeePermissions,
   SettingPermissions,

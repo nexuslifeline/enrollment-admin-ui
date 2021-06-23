@@ -1014,8 +1014,8 @@ export default {
           criteria: null,
           paymentStatusId: PaymentStatuses.PENDING.id,
           paymentStatusItem: PaymentStatuses.PENDING,
-          dateFrom: new Date(),
-          dateTo: new Date()
+          dateFrom: this.$options.format(new Date(), 'yyyy-MM-dd'),
+          dateTo: this.$options.format(new Date(), 'yyyy-MM-dd'),
         },
       },
       isProcessing: false,
