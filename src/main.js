@@ -25,6 +25,7 @@ import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems'
 import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
 import PageContent from './views/components/PageContainer/PageContent';
 import SelectCategory from './views/components/Dropdowns/SelectCategory';
+import SelectOnboardingSteps from './views/components/Dropdowns/SelectOnboardingSteps';
 import SelectAcademicRecord from './views/components/Dropdowns/SelectAcademicRecord';
 import AvatarMaker from './views/components/AvatarMaker';
 import vText from './views/components/Text';
@@ -204,6 +205,7 @@ Vue.component('v-select', vSelect)
 Vue.component('vText', vText);
 Vue.component('BackLink', BackLink);
 Vue.component('SelectCategory', SelectCategory);
+Vue.component('SelectOnboardingSteps', SelectOnboardingSteps);
 Vue.component('SelectAcademicRecord', SelectAcademicRecord);
 Vue.component('CenterContainer', CenterContainer);
 Vue.component('AvatarMaker', AvatarMaker);

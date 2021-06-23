@@ -12,11 +12,13 @@
       <Address :data="data.address || {}" />
       <Education :data="data.education || {}"/>
       <Subjects :studentId="$route.params.studentId" />
+      <OnboardingSettings :data="data" />
     </template>
   </CenterContainer>
 </template>
 
 <script>
+import OnboardingSettings from '../../components/OnboardingSettings/Onboarding.vue';
 import Personal from '../../components/Student/Personal';
 import Account from '../../components/Student/Account';
 import Address from '../../components/Student/Address';
@@ -32,7 +34,8 @@ export default {
     Address,
     Education,
     Family,
-    Subjects
+    Subjects,
+    OnboardingSettings
   },
   mixins: [ StudentApi ],
   data() {

@@ -1,0 +1,71 @@
+<template>
+  <Card
+    title="Onboarding Settings"
+    titleSize="m"
+    :hasFooter="true">
+    <CardNote>
+      If student is mark as <b>Onboarding</b>, 
+      the student will need to fill up the details in onboarding stages to be able to access the main dashboard. 
+    </CardNote>
+    <InputGroup>
+      <InputContainer>
+        <InputInline>
+          <Toggle v-model="isOnboarding" />
+          <span class="ml-2">Onboarding</span>
+        </InputInline>
+      </InputContainer>
+      <InputContainer>
+        <SelectOnboardingSteps
+          v-model="onboardingStepId"
+          :reduce="option => option.id"
+          :clearable="false"
+          label="name"
+          :disabled="!isOnboarding"
+        />
+      </InputContainer>
+    </InputGroup>
+    <template v-slot:footer>
+      <CardFooterRow>
+        <b-button variant="primary" @click="onSave" :disabled="isProcessing">
+          <v-icon v-if="isProcessing" name="spinner" spin /> Save Changes
+        </b-button>
+      </CardFooterRow>
+    </template>
+  </Card>
+</template>
+<script>
+  import { StudentApi } from '../../../mixins/api';
+  export default {
+    mixins: [StudentApi],
+    props: {
+      data: {
+        type: [Object]
+      }
+    },
+    data() {
+      return {
+        isProcessing: false,
+        isOnboarding: false,
+        onboardingStepId: 1
+      }
+    },
+    created() {
+      this.onboardingStepId = this.data?.onboardingStepId || 1;
+      this.isOnboarding = this.data?.isOnboarding;
+    },
+    methods: {
+      onSave() {
+        this.isProcessing = true;
+        const { isOnboarding, onboardingStepId } = this;
+        this.patchStudent({ isOnboarding, onboardingStepId }, this.data?.id).then(() => {
+          this.isProcessing = false;
+        }).catch((error) => {
+          console.warn(error);
+        });
+      }
+    },
+  }
+</script>
+<style lang="scss" scoped>
+  @import "../../../assets/scss/shared.scss";
+</style>
