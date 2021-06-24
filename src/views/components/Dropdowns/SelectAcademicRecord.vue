@@ -8,7 +8,8 @@
     :placeholder="placeholder"
     :searchable="searchable"
     :selectable="selectable"
-    :clearable="clearable">
+    :clearable="clearable"
+    :disabled="disabled">
     <template v-slot:selected-option="data">
       {{ formatOption(data) }}
     </template>
@@ -55,6 +56,10 @@ export default {
     },
     studentId: {
       type: [String, Number],
+      default: false
+    },
+    disabled: {
+      type: [Boolean],
       default: false
     },
   },

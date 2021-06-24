@@ -5,15 +5,18 @@
       titleSize="m"
       actionLabel="Add Subject"
       @onAddNew="showSubjectModal = true"
-      showAction
+      :showAction="!isReadOnly"
       noPaddingBody
       :hasFooter="true">
-      <div>
+      <div v-if="subjects.length > 0">
         <SubjectsTable :data="subjects" @onRemove="onRemoveSubject" />
+      </div>
+      <div v-else class="empty-container">
+        No subject(s) found.
       </div>
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onSave" :disabled="isProcessing">
+          <b-button v-if="!isReadOnly" variant="primary" @click="onSave" :disabled="isProcessing">
             <v-icon v-if="isProcessing" name="spinner" spin /> Save Changes
           </b-button>
         </CardFooterRow>
@@ -46,6 +49,10 @@ export default {
     },
     data: {
       type: [Object]
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   mixins: [ AcademicRecordApi ],
@@ -57,10 +64,8 @@ export default {
     }
   },
   created() {
-    //console.log('GET subjects here in /academic-records/:id/subjects based on provided academicRecordId props')
     const params = { paginate: false}
     this.getAcademicRecordSubjects(this.academicRecordId, params).then(({ data }) => {
-      console.log(data)
       this.subjects = data
     })
   },
@@ -100,6 +105,13 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "../../../assets/scss/shared.scss";
+  @import "../../../assets/scss/shared.scss";
 
+  .empty-container {
+    min-height: 80px;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+  }
 </style>

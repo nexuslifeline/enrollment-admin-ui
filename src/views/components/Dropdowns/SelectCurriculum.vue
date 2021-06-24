@@ -9,6 +9,7 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
+    :disabled="disabled"
     :loading="options.curriculums.isBusy">
     <!-- <template v-slot:selected-option="data">
       {{ formatOption(data) }}
@@ -64,6 +65,10 @@ export default {
     },
     levelId: {
       type: [String, Number]
+    },
+    disabled: {
+      type: [Boolean],
+      default: false
     },
   },
   mixins: [ CurriculumApi ],

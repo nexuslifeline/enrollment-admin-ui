@@ -9,7 +9,8 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
-    :loading="options.courses.isBusy">
+    :loading="options.courses.isBusy"
+    :disabled="disabled">
     <template #spinner="{ loading }">
       <div v-if="loading" style="border-left-color: rgba(88,151,251,0.71)" class="vs__spinner">
       </div>
@@ -48,6 +49,10 @@ export default {
       default: option => option,
     },
     appendToBody: {
+      type: [Boolean],
+      default: false
+    },
+    disabled: {
       type: [Boolean],
       default: false
     },

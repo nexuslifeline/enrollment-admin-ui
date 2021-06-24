@@ -65,23 +65,25 @@
             />
           </template>
           <template v-slot:cell(contact)="data">
-            Email : {{ data.item.student.email }} <br />
+            <ContactColumn :data="data.item" />
+            <!-- Email : {{ data.item.student.email }} <br />
             <small>Phone : {{ data.item.student.phoneNo }}</small> <br />
-            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br />
+            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br /> -->
           </template>
           <template v-slot:cell(education)="data">
             <EducationColumn :data="data.item" />
           </template>
           <template v-slot:cell(step)="data">
-            <b-badge
+            <ManualStageColumn :data="data.item" />
+            <!-- <b-badge
               :variant="
-                data.item.manualStepId === $options.ManualSteps.EVALUATION.id
+                data.item.manualStepId === $options.ManualSteps.SUBJECT_ENLISTMENT.id
                   ? 'warning'
                   : 'primary'
               "
             >
               {{ $options.ManualSteps.getEnum(data.item.manualStepId).name }}
-            </b-badge>
+            </b-badge> -->
           </template>
           <template v-slot:cell(action)="data">
             <!-- Rights to be added -->
@@ -144,7 +146,7 @@ import { copyValue } from '../../../helpers/extractor';
 import Access from '../../../mixins/utils/Access';
 import PageContent from '../../components/PageContainer/PageContent'
 import NoAccess from '../../components/NoAccess'
-import { StudentColumn, EducationColumn } from "../../components/ColumnDetails";
+import { StudentColumn, EducationColumn, ContactColumn, ManualStageColumn } from "../../components/ColumnDetails";
 import StudentSelection from './StudentSelection';
 
 export default {
@@ -155,6 +157,8 @@ export default {
     NoAccess,
     StudentColumn,
     EducationColumn,
+    ContactColumn,
+    ManualStageColumn,
     StudentSelection
   },
   mixins: [AcademicRecordApi, CourseApi, Access],
@@ -260,7 +264,7 @@ export default {
       let params = {
         paginate: true,
         perPage,manualStepId, //disabled temprarily
-        notManualStepId: this.$options.ManualSteps.COMPLETED.id,
+        notManualStepId: this.$options.ManualSteps.ASSESSMENT.id,
         page,
         schoolCategoryId,
         courseId,

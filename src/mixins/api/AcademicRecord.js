@@ -50,5 +50,8 @@ export default {
     rejectAssessment(academicRecordId, data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/reject-assessment`, data)
     },
+    requestAssessment(academicRecordId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/request-assessment`, data)
+    },
   }
 }

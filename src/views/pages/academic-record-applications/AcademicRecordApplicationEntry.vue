@@ -23,7 +23,7 @@
                 :class="{
                   active: forms.academicRecord.fields.manualStepId === step.id,
                 }"
-                v-if="step.id !== $options.ManualSteps.COMPLETED.id"
+                v-if="step.id !== $options.ManualSteps.ASSESSMENT.id"
               >
                 {{ step.name }}
                 <v-icon
@@ -42,7 +42,7 @@
           <div
             v-if="
               forms.academicRecord.fields.manualStepId ===
-                $options.ManualSteps.STUDENT_REGISTRATION.id
+                $options.ManualSteps.PROFILE_AND_ACCOUNT.id
             "
           >
             <!-- <div class="academic-entry__headline-container">
@@ -200,7 +200,7 @@
                   v-if="
                     (forms.student.fields.id === null || forms.student.fields.id === 0) &&
                       forms.academicRecord.fields.manualStepId ===
-                        $options.ManualSteps.STUDENT_REGISTRATION.id
+                        $options.ManualSteps.PROFILE_AND_ACCOUNT.id
                   "
                   class="academic-entry__info"
                 >
@@ -210,7 +210,7 @@
                   v-if="
                     (forms.student.fields.id === null || forms.student.fields.id === 0)  &&
                       forms.academicRecord.fields.manualStepId ===
-                        $options.ManualSteps.STUDENT_REGISTRATION.id
+                        $options.ManualSteps.PROFILE_AND_ACCOUNT.id
                   "
                 >
                   <b-col md="3">
@@ -389,7 +389,7 @@
           <div
             v-if="
               forms.academicRecord.fields.manualStepId ===
-                $options.ManualSteps.EVALUATION.id
+                $options.ManualSteps.SUBJECT_ENLISTMENT.id
             "
           >
             <!-- <div class="academic-entry__headline-container">
@@ -1250,7 +1250,7 @@
               class="academic-entry__back-action"
               @click="
                 forms.academicRecord.fields.manualStepId !==
-                $options.ManualSteps.STUDENT_REGISTRATION.id
+                $options.ManualSteps.PROFILE_AND_ACCOUNT.id
                   ? forms.academicRecord.fields.manualStepId--
                   : ''
               "
@@ -2082,7 +2082,7 @@ export default {
       reset(academicRecordForm);
       reset(evaluationForm);
       reset(transcriptRecordForm);
-      if (academicRecord.manualStepId === ManualSteps.STUDENT_REGISTRATION.id) {
+      if (academicRecord.manualStepId === ManualSteps.PROFILE_AND_ACCOUNT.id) {
         const { id, ...evaluationFields } = evaluation;
         const {
           id: transcriptRecordId,
@@ -2113,7 +2113,7 @@ export default {
           user: student.id === null ? user : null,
           academicRecord: {
             ...academicRecordDataSet,
-            manualStepId: ManualSteps.EVALUATION.id,
+            manualStepId: ManualSteps.SUBJECT_ENLISTMENT.id,
             academicRecordStatusId: AcademicRecordStatuses.DRAFT.id,
             isManual: 1,
           },
@@ -2152,7 +2152,7 @@ export default {
             validate(academicRecordForm, errors);
             this.isProcessing = false;
           });
-      } else if (academicRecord.manualStepId === ManualSteps.EVALUATION.id) {
+      } else if (academicRecord.manualStepId === ManualSteps.SUBJECT_ENLISTMENT.id) {
         const { subjects, ...transcriptData } = transcriptRecord;
         evaluation.curriculumId = transcriptData.curriculumId;
         evaluation.studentCurriculumId = transcriptData.studentCurriculumId;
@@ -2248,7 +2248,7 @@ export default {
           academicRecord: {
             ...academicRecordData,
             academicRecordStatusId: AcademicRecordStatuses.FINALIZED.id,
-            manualStepId: ManualSteps.COMPLETED.id,
+            manualStepId: ManualSteps.ASSESSMENT.id,
           },
           studentFee,
           application,

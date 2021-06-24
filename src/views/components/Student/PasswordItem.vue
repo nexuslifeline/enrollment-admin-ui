@@ -9,7 +9,7 @@
         <vText size="s" color="light" type="p" align="right">**********</vText>
         <vText size="s" color="light" type="p" align="right">Last updated January 16, 2021</vText>
       </div>
-      <b-button @click="onUpdatePassword" type="button" variant="outline-primary">
+      <b-button v-if="!isReadOnly" @click="onUpdatePassword" type="button" variant="outline-primary">
         Change
       </b-button>
     </div>
@@ -25,6 +25,10 @@ export default {
     },
     route: {
       type: [Object],
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   methods: {

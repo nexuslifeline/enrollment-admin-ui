@@ -11,7 +11,7 @@
         <vText size="s" weight="bold" type="p" align="right">{{ user.username || '' }}</vText>
         <vText size="s" color="light" type="p" align="right">Student</vText>
       </div>
-      <b-button @click="onChangeUsername" type="button" variant="outline-primary">
+      <b-button v-if="!isReadOnly" @click="onChangeUsername" type="button" variant="outline-primary">
         Change
       </b-button>
     </div>
@@ -27,6 +27,10 @@ export default {
     },
     route: {
       type: [Object],
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   methods: {

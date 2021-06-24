@@ -21,6 +21,7 @@
           label="name"
           @input="data.schoolCategoryId = $event"
           :clearable="false"
+          :disabled="isReadOnly"
         />
       </InputContainer>
       <InputContainer>
@@ -31,6 +32,7 @@
           label="name"
           @input="data.schoolYearId = $event"
           :clearable="false"
+          :disabled="isReadOnly"
         />
       </InputContainer>
     </InputGroup>
@@ -43,6 +45,7 @@
           label="name"
           @input="data.levelId = $event"
           :schoolCategoryId="data.schoolCategoryId"
+          :disabled="isReadOnly"
         />
       </InputContainer>
     </InputGroup>
@@ -55,6 +58,7 @@
           label="description"
           @input="data.courseId = $event"
           :levelId="data.levelId"
+          :disabled="isReadOnly"
         />
       </InputContainer>
       <InputContainer>
@@ -65,6 +69,7 @@
           label="description"
           @input="data.semesterId = $event"
           :schoolCategoryId="data.schoolCategoryId"
+          :disabled="isReadOnly"
         />
       </InputContainer>
     </InputGroup>
@@ -77,6 +82,7 @@
           :reduce="option => option.id"
           label="name"
           @input="data.transcriptRecord.curriculumId = $event"
+          :disabled="isReadOnly"
         />
       </InputContainer>
     </InputGroup>
@@ -88,6 +94,7 @@
           :reduce="option => option.id"
           label="name"
           @input="data.studentTypeId = $event"
+          :disabled="isReadOnly"
         />
       </InputContainer>
       <InputContainer>
@@ -97,6 +104,7 @@
           :reduce="option => option.id"
           label="name"
           @input="data.sectionId = $event"
+          :disabled="isReadOnly"
         />
       </InputContainer>
     </InputGroup>
@@ -108,13 +116,14 @@
           @input="data.academicRecordStatusId = $event"
           :reduce="option => option.id"
           label="name"
+          :disabled="isReadOnly"
         />
       </InputContainer>
       <InputContainer />
     </InputGroup>
     <template v-slot:footer>
       <CardFooterRow>
-        <b-button variant="primary" @click="onSave" :disabled="isProcessing">
+        <b-button v-if="!isReadOnly" variant="primary" @click="onSave" :disabled="isProcessing">
           <v-icon v-if="isProcessing" name="spinner" spin /> Save Changes
         </b-button>
       </CardFooterRow>
@@ -163,7 +172,11 @@ const academicRecordFields = {
       },
       notes: {
         type: String
-      }
+      },
+      isReadOnly: {
+        type: Boolean,
+        default: false
+      },
     },
     mixins: [AcademicRecordApi, TranscriptRecordApi],
     components: {

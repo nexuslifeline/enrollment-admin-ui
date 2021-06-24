@@ -83,8 +83,8 @@
                 :value="step.id"
                 :key="step.id"
                 v-if="
-                  step.id !== $options.ManualSteps.COMPLETED.id &&
-                    step.id !== $options.ManualSteps.STUDENT_REGISTRATION.id
+                  step.id !== $options.ManualSteps.ASSESSMENT.id &&
+                    step.id !== $options.ManualSteps.PROFILE_AND_ACCOUNT.id
                 "
               >
                 {{ step.name }}
@@ -176,7 +176,7 @@
           <template v-slot:cell(step)="data">
             <b-badge
               :variant="
-                data.item.manualStepId === $options.ManualSteps.EVALUATION.id
+                data.item.manualStepId === $options.ManualSteps.SUBJECT_ENLISTMENT.id
                   ? 'warning'
                   : 'primary'
               "
@@ -424,7 +424,7 @@ export default {
           schoolCategoryItem: null,
           courseId: null,
           courseItem: null,
-          manualStepId: this.$options.ManualSteps.EVALUATION.id,
+          manualStepId: this.$options.ManualSteps.SUBJECT_ENLISTMENT.id,
           manualStepItem: this.$options.ManualSteps.EVALUATION,
         },
       },
@@ -470,7 +470,7 @@ export default {
         orderBy,
         sort,
         // manualStepId, //disabled temporarily
-        // notManualStepId: this.$options.ManualSteps.COMPLETED.id,
+        // notManualStepId: this.$options.ManualSteps.ASSESSMENT.id,
         isManual,
         criteria,
       };

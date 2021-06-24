@@ -10,7 +10,7 @@
     </template>
     <div class="student-name">
       <b-link @click="callback.loadDetails">
-        {{ (data.student && data.student.name) || 'No Name' }}
+        {{ studentName }}
       </b-link>
       <div class="label__badges-container">
         <span
@@ -62,6 +62,9 @@ export default {
     photoHashName() {
       const { photo } = this.data.student;
       return photo?.hashName || '';
+    },
+    studentName() {
+      return this.data?.student?.name?.trim() || 'No Name';
     }
   },
 };

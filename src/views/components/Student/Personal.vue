@@ -25,6 +25,7 @@
             <b-form-input
               v-model="forms.profile.fields.firstName"
               :state="forms.profile.states.firstName"
+              :disabled="isReadOnly"
             />
             <b-form-invalid-feedback>
               {{forms.profile.errors.firstName}}
@@ -36,6 +37,7 @@
           <label>Middle Name</label>
           <b-form-input
             v-model="forms.profile.fields.middleName"
+            :disabled="isReadOnly"
            />
         </b-form-group>
       </InputContainer>
@@ -47,6 +49,7 @@
           <b-form-input
             v-model="forms.profile.fields.lastName"
             :state="forms.profile.states.lastName"
+            :disabled="isReadOnly"
            />
           <b-form-invalid-feedback>
             {{forms.profile.errors.lastName}}
@@ -58,7 +61,9 @@
           <label class="required">Date of Birth</label>
           <b-form-input type="date"
             v-model="forms.profile.fields.birthDate"
-            :state="forms.profile.states.birthDate" />
+            :state="forms.profile.states.birthDate"
+            :disabled="isReadOnly"
+          />
           <b-form-invalid-feedback>
             {{forms.profile.errors.birthDate}}
           </b-form-invalid-feedback>
@@ -76,6 +81,7 @@
             :mask="['(', '+', '6', '3', ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]"
             :guide="false"
             :showMask="false"
+            :disabled="isReadOnly"
             placeholderChar="_">
           </masked-input>
         </b-form-group>
@@ -84,8 +90,9 @@
         <b-form-group>
           <label class="required">Civil Status</label>
           <b-form-select
+            :disabled="isReadOnly"
             v-model="forms.profile.fields.civilStatusId"
-            :state="forms.profile.states.civilStatusId" >
+            :state="forms.profile.states.civilStatusId">
             <template v-slot:first>
               <b-form-select-option :value='null' disabled>--Select Civil Status --</b-form-select-option>
             </template>
@@ -112,14 +119,14 @@
             :text="avatarText"
             :src="userPhoto"
             :borderSize="3"
-            enableUpload
+            :enableUpload="!isReadOnly"
           />
         </div>
       </template>
     </LinkVisibilityToggler>
     <template v-slot:footer>
       <CardFooterRow>
-        <b-button variant="primary" @click="onSave" :disabled="isProcessing">
+        <b-button v-if="!isReadOnly" variant="primary" @click="onSave" :disabled="isProcessing">
           <v-icon name="spinner" spin v-if="isProcessing"/> Save Profile
         </b-button>
       </CardFooterRow>
@@ -153,6 +160,10 @@ export default {
   props: {
     data: {
       type: [Object]
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   components: {
