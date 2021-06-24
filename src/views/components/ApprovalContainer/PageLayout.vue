@@ -30,6 +30,7 @@
     </div>
     <!-- <b-overlay :show="isBusy" rounded="sm">
     </b-overlay> -->
+    <slot name="footer"></slot>
     <div v-if="showFooter" class="approval-view__footer">
       <ActionRow
         @onBack="$emit('onActionBack')"

@@ -9,6 +9,7 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
+    :disabled="disabled"
   />
 </template>
 <script>
@@ -57,7 +58,11 @@ export default {
     levelId: {
       type: [Number],
       default: null
-    }
+    },
+    disabled: {
+      type: [Boolean],
+      default: false
+    },
   },
   data() {
     return {

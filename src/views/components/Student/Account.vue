@@ -5,15 +5,17 @@
     @onAddNew="onAddNew"
     titleSize="m"
     :isCompleted="hasAccount"
-    :showAction="!hasAccount">
+    :showAction="!hasAccount && !isReadOnly">
     <template v-if="hasAccount">
       <UsernameItem
         :user="user"
         :route="changeUsernameRoute || defaultRoutes.changeUsername"
+        :isReadOnly="isReadOnly"
       />
       <hr />
       <PasswordItem
         :route="changePasswordRoute || defaultRoutes.changePassword"
+        :isReadOnly="isReadOnly"
       />
     </template>
     <div v-else>
@@ -50,6 +52,10 @@ export default {
     },
     changePasswordRoute: {
       type: [Object],
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   data() {

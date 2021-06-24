@@ -9,6 +9,7 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
+    :disabled="disabled"
   />
 </template>
 <script>
@@ -44,6 +45,10 @@ export default {
       default: option => option,
     },
     appendToBody: {
+      type: [Boolean],
+      default: false
+    },
+    disabled: {
       type: [Boolean],
       default: false
     },

@@ -1,0 +1,45 @@
+<template>
+  <div>
+    <template v-if="data.academicRecordStatusId === AcademicRecordStatuses.ENLISTMENT_APPROVED.id">
+      <b-badge variant="success">
+        Assessment Review
+      </b-badge>
+    </template>
+    <template v-else>
+      <b-badge
+        v-if="data.manualStepId === ManualSteps.PROFILE_AND_ACCOUNT.id"
+        variant="success">
+        Profile & Account
+      </b-badge>
+      <b-badge
+        v-else-if="data.manualStepId === ManualSteps.SUBJECT_ENLISTMENT.id"
+        variant="success">
+        Subject Enlistment
+      </b-badge>
+    </template>
+  </div>
+</template>
+
+<script>
+  import { ManualSteps, AcademicRecordStatuses } from '../../../helpers/enum';
+  export default {
+    ManualSteps,
+    props: {
+      data: {
+        type: [Object]
+      }
+    },
+    data() {
+      return {
+        ManualSteps,
+        AcademicRecordStatuses
+      }
+    },
+    created() {
+      console.log('test', this.data)
+    }
+  }
+</script>
+<style lang="scss" scoped>
+  @import "../../../assets/scss/shared.scss";
+</style>

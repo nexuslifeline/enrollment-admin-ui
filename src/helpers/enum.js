@@ -602,15 +602,15 @@ export const CivilStatuses = new Enum({
 });
 
 export const ManualSteps = new Enum({
-  STUDENT_REGISTRATION: { id: 1, name: 'Student Registration' },
-  EVALUATION: { id: 2, name: 'Evaluation' },
-  SUBJECT_ENLISTMENT: { id: 3, name: 'Subject Enlistment' },
-  COMPLETED: { id: 4, name: 'Completed' }
+  PROFILE_AND_ACCOUNT: { id: 1, name: 'Student Registration' },
+  SUBJECT_ENLISTMENT: { id: 2, name: 'Subject Enlistment' },
+  ASSESSMENT: { id: 3, name: 'Assessment' }
 });
 
 export const QuickEnrollSteps = new Enum({
   PROFILE_AND_ACCOUNT: { id: 1, name: 'Profile And Account' },
   SUBJECT_ENLISTMENT: { id: 2, name: 'Subject Enlistment' },
+  ASSESSMENT: { id: 3, name: 'Assessment' },
 });
 
 export const DepartmentPermissions = new Enum({
