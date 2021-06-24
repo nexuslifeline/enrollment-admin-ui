@@ -528,7 +528,7 @@
       />
       <!-- Modal Preview -->
       <!-- Modal Approval Confirmation -->
-      <b-modal
+      <!-- <b-modal
         v-model="showModalApproval"
         centered
         header-bg-variant="success"
@@ -537,12 +537,9 @@
         :noCloseOnBackdrop="true"
       >
         <div slot="modal-title">
-          <!-- modal title -->
           Finalize Approval
         </div>
-        <!-- modal title -->
         <b-row class="mb-2">
-          <!-- modal body -->
           <b-col md="12">
             <h5>
               Attach Official or Acknowledge Receipt
@@ -607,9 +604,7 @@
             <b-textarea v-model="forms.payment.fields.approvalNotes" rows="7" />
           </b-col>
         </b-row>
-        <!-- modal body -->
         <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
           <b-button class="float-left" @click="showModalApproval = false">
             Cancel
           </b-button>
@@ -623,11 +618,10 @@
             Confirm
           </b-button>
         </div>
-        <!-- modal footer buttons -->
-      </b-modal>
+      </b-modal> -->
       <!-- Modal Approval Confirmation -->
       <!-- Modal Reject -->
-      <b-modal
+      <!-- <b-modal
         v-model="showModalRejection"
         centered
         header-bg-variant="danger"
@@ -636,12 +630,9 @@
         :noCloseOnBackdrop="true"
       >
         <div slot="modal-title">
-          <!-- modal title -->
           Confirm Rejection
         </div>
-        <!-- modal title -->
         <b-row>
-          <!-- modal body -->
           <b-col md="12">
             <label>Reason</label>
             <b-textarea
@@ -650,9 +641,7 @@
             />
           </b-col>
         </b-row>
-        <!-- modal body -->
         <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
           <b-button class="float-left" @click="showModalRejection = false">
             Cancel
           </b-button>
@@ -666,9 +655,8 @@
             Confirm
           </b-button>
         </div>
-        <!-- modal footer buttons -->
-      </b-modal>
-      <!-- Modal Reject -->
+      </b-modal> -->
+
       <b-modal
         v-model="showPaymentReceiptFileModal"
         centered
@@ -736,6 +724,23 @@
         :isBusy="file.isLoading"
         @close="fileViewer.show = false"
       />
+
+      <PaymentApproval
+        v-if="showModalApproval"
+        :isShown.sync="showModalApproval"
+        :paymentId="selectedPayment.id"
+        :studentId="selectedPayment.studentId"
+        @onCancel="showModalApproval = false"
+        @onApproved="onPaymentApproved"
+      />
+
+      <PaymentRejection
+        v-if="showModalRejection"
+        :isShown.sync="showModalRejection"
+        :paymentId="selectedPayment.id"
+        @onCancel="showModalRejection = false"
+        @onRejected="onPaymentRejected"
+      />
     </template>
   </PageContent>
   <!-- main container -->
@@ -790,6 +795,8 @@ import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import AttachmentList from '../components/Attachment/AttachmentList';
 import AvatarMaker from '../components/AvatarMaker';
 import PageContent from "../components/PageContainer/PageContent";
+import PaymentApproval from "../components/ApprovalModals/Payment";
+import PaymentRejection from '../components/RejectionModals/Payment'
 
 export default {
   name: 'Payment',
@@ -816,7 +823,9 @@ export default {
     ActiveViewItem,
     ActiveViewLinks,
     AvatarMaker,
-    PageContent
+    PageContent,
+    PaymentApproval,
+    PaymentRejection
   },
   format,
   StudentPaymentPermissions,
@@ -824,6 +833,7 @@ export default {
   data() {
     return {
       isFilterVisible: true,
+      selectedPayment: null,
       fileViewer: {
         paymentFile: {
           isActiveNavEnabled: false,
@@ -1026,6 +1036,16 @@ export default {
     this.loadPaymentList();
   },
   methods: {
+    onPaymentApproved() {
+      this.selectedPayment = null
+      this.showModalApproval = false
+      this.loadPaymentList()
+    },
+    onPaymentRejected() {
+      this.selectedPayment = null
+      this.showModalRejection = false
+      this.loadPaymentList()
+    },
     loadPaymentList() {
       const { payments } = this.tables;
       const {
@@ -1141,6 +1161,7 @@ export default {
             row.item.isLoading = false;
           });
       }
+      this.selectedPayment = row.item
       row.toggleDetails();
     },
     setupActiveFileViewer(row, data) {

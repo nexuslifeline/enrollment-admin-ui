@@ -16,6 +16,12 @@ export default {
     },
     deletePayment(id) {
       return this.$authHttp.delete(`${apiPrefix}/${apiVersion}/payments/${id}`);
-    }
+    },
+    approvePayment(data, id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/payments/${id}/approve`, data);
+    },
+    rejectPayment(data, id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/payments/${id}/reject`, data);
+    },
   }
 }
