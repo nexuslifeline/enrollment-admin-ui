@@ -171,7 +171,7 @@
                       {{ data.item.student.email }}
                     </p>
                   </div>
-                  <p class="active-view__header-date">
+                  <!-- <p class="active-view__header-date">
                     <BIconAlarm />
                     {{
                       $options.format(
@@ -183,7 +183,7 @@
                         'MMMM dd, yyyy'
                       )
                     }}
-                  </p>
+                  </p> -->
                 </div>
               </template>
 
@@ -1158,7 +1158,7 @@ export default {
           semesterId,
           schoolCategoryId,
           application,
-          admission,
+          // admission,
         } = row.item;
 
         const params = { paginate: false };

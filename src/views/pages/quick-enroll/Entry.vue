@@ -146,7 +146,13 @@ export default {
       return this.stages.findIndex(s => s.id === this.manualStepId)
     },
     isReadOnly() {
-      return this.data.academicRecordStatusId === AcademicRecordStatuses.ENLISTMENT_APPROVED.id;
+      return [
+        AcademicRecordStatuses.ENLISTMENT_APPROVED.id,
+        AcademicRecordStatuses.ASSESSMENT_APPROVED.id,
+        AcademicRecordStatuses.PAYMENT_SUBMITTED.id,
+        AcademicRecordStatuses.ENROLLED.id,
+        AcademicRecordStatuses.CLOSED.id,
+      ].includes(this.data?.academicRecordStatusId);
     }
   },
   created() {

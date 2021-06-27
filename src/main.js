@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import SelectPaginated from './views/components/SelectPaginated';
 import StageIndicator from './views/components/Wizard/StageIndicator';
 import FooterAction from './views/components/ModalFooter/ActionBar';
 import ShowMore from './views/components/CoDepartment/ShowMore';
@@ -25,6 +26,7 @@ import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems'
 import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
 import PageContent from './views/components/PageContainer/PageContent';
 import SelectCategory from './views/components/Dropdowns/SelectCategory';
+import SelectStudent from './views/components/Dropdowns/SelectStudent';
 import SelectOnboardingSteps from './views/components/Dropdowns/SelectOnboardingSteps';
 import SelectAcademicRecord from './views/components/Dropdowns/SelectAcademicRecord';
 import SelectAcademicStatus from './views/components/Dropdowns/SelectAcademicStatus';
@@ -205,6 +207,7 @@ Vue.component('v-select', vSelect)
 
 Vue.component('vText', vText);
 Vue.component('BackLink', BackLink);
+Vue.component('SelectStudent', SelectStudent);
 Vue.component('SelectCategory', SelectCategory);
 Vue.component('SelectOnboardingSteps', SelectOnboardingSteps);
 Vue.component('SelectAcademicStatus', SelectAcademicStatus);
@@ -236,6 +239,7 @@ Vue.component('FileViewer', FileViewer);
 Vue.component('ShowMore', ShowMore);
 Vue.component('FooterAction', FooterAction);
 Vue.component('StageIndicator', StageIndicator);
+Vue.component('SelectPaginated', SelectPaginated);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)

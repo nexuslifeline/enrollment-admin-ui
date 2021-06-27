@@ -8,6 +8,7 @@
     @search="debounceSearch"
     :value="value"
     @input="onInputSelect"
+    :reduce="reduce"
     :placeholder="placeholder"
   >
     <template slot="selected-option" slot-scope="data">
@@ -39,9 +40,24 @@ export default {
       default: 'name',
     },
     placeholder: {
-      type: [String],
-      default: '',
-    }
+      type: [String]
+    },
+    searchable: {
+      type: [Boolean],
+      default: true
+    },
+    selectable: {
+      type: [Function],
+      default: option => true
+    },
+    clearable: {
+      type: [Boolean],
+      default: true
+    },
+    reduce: {
+      type: [Function],
+      default: option => option,
+    },
   },
   data() {
     return {
@@ -56,6 +72,7 @@ export default {
   methods: {
     onInputSelect(v) {
       this.$emit('input', v);
+      // this.$emit('update:value', v);
     },
     async loadMore(params, clearResults = false) {
       const { data } = await this.fetchData(params);

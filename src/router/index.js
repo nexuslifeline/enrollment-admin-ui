@@ -304,7 +304,7 @@ function configRoutes () {
                   path: 'add',
                   name: 'Payment Add',
                   component: PaymentEntry,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: { requiresAuth: true, userType: 0, hideSubNav: true }
                 },
               ]
             },

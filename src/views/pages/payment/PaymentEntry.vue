@@ -1,293 +1,76 @@
 <template>
-  <div class="payment-list__container">
-    <b-overlay :show="isLoading" rounded="sm">
-      <div class="page-content__title-container">
-        <h4 class="page-content__title">Payment Entry</h4>
-      </div>
-      <div class="search-container">
-        <!-- <b-form-input :value="selectedStudent ? selectedStudent.studentNo : ''"/> -->
-        <SelectPaginated
-          class="select-paginated"
-          @input="getStudentInfo($event)"
-          :fetchData="getStudentList"
-        >
-          <template slot="option" slot-scope="data">
-            <div class="select-option">
-              <div class="select-option__avatar">
-                <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
-              </div>
-              <div class="select-option__info">
-                <span>{{
-                  data.studentNo ? data.studentNo : 'Awaiting Confirmation'
-                }}</span>
-                <span>{{ data.name }}</span>
-                <span>{{ data.email }}</span>
-              </div>
-            </div>
-          </template>
-          <template slot="loader">
-            <b-spinner label="Loading..." class="loader"></b-spinner>
-          </template>
-        </SelectPaginated>
-      </div>
-      <div class="payment-entry__body">
-        <div class="payment-entry__top-pane">
-          <div class="payment-details">
-            <!-- <h5>STUDENT DETAILS</h5> -->
-            <div class="student-no-container">
-              <b-form-group
-                label="Student No"
-                class="student-no"
-                label-class="required"
-              >
-                <b-form-input
-                  disabled
-                  :value="
-                    selectedStudent
-                      ? selectedStudent.studentNo || 'Awaiting Confirmation'
-                      : ''
-                  "
-                />
-              </b-form-group>
-              <!-- <b-button class="student-browse" variant="outline-primary" @click="onShowModalStudent">...</b-button> -->
-            </div>
-            <b-form-group label="Student">
-              <b-form-input
-                disabled
-                :value="selectedStudent ? selectedStudent.name : ''"
-                :state="forms.payment.states.studentId"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.studentId }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group label="Address">
-              <b-form-textarea
-                rows="3"
-                disabled
-                :value="selectedStudent ? selectedStudent.currentAddress : ''"
-              />
-            </b-form-group>
-          </div>
-          <div class="payment-details">
-            <!-- <h5>PAYMENT DETAILS</h5> -->
-            <!-- <b-form-group
-              label="Transaction No"
-              label-class="required" >
-              <b-form-input
-                v-model="forms.payment.fields.transactionNo"
-                :state="forms.payment.states.transactionNo"/>
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.transactionNo }}
-              </b-form-invalid-feedback>
-            </b-form-group> -->
-            <b-form-group label="Reference No" label-class="required">
-              <b-form-input
-                v-model="forms.payment.fields.referenceNo"
-                :state="forms.payment.states.referenceNo"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.referenceNo }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group label="Payment Mode" label-class="required">
-              <b-form-select
-                v-model="forms.payment.fields.paymentModeId"
-                :state="forms.payment.states.paymentModeId"
-              >
-                <template v-slot:first>
-                  <b-form-select-option :value="null"
-                    >-- N/A --</b-form-select-option
-                  >
-                </template>
-                <b-form-select-option
-                  v-for="paymentMode in options.paymentModes.items"
-                  :key="paymentMode.id"
-                  :value="paymentMode.id"
+  <CenterContainer>
+    <BackLink :previousRoute="{ name: 'PaymentList' }" />
+    <Card title="Payment Information" titleSize="m" hasFooter>
+      <InputContainer>
+        <b-form-group>
+          <label class="required">Student</label>
+          <SelectStudent
+            v-model="forms.payment.fields.studentId"
+            @input="onStudentSelect"
+          />
+        </b-form-group>
+      </InputContainer>
+      <InputGroup>
+        <InputContainer>
+          <b-form-group>
+            <label class="required">Reference No</label>
+            <b-form-input
+              v-model="forms.payment.fields.referenceNo"
+              :state="forms.payment.states.referenceNo"
+            />
+            <b-form-invalid-feedback>
+              {{ forms.payment.errors.referenceNo }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </InputContainer>
+        <InputContainer>
+          <b-form-group>
+            <label class="required">Date of Payment</label>
+            <b-form-datepicker
+              v-model="forms.payment.fields.datePaid"
+              :state="forms.payment.states.datePaid"
+            />
+            <b-form-invalid-feedback>
+              {{ forms.payment.errors.datePaid }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </InputContainer>
+      </InputGroup>
+      <InputGroup>
+        <InputContainer>
+          <b-form-group>
+            <label class="required">Payment Mode</label>
+            <b-form-select
+              v-model="forms.payment.fields.paymentModeId"
+              :state="forms.payment.states.paymentModeId">
+              <template v-slot:first>
+                <b-form-select-option :value="null"
+                  >-- N/A --</b-form-select-option
                 >
-                  {{ paymentMode.name }}
-                </b-form-select-option>
-              </b-form-select>
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.paymentModeId }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group label="Payment Date" label-class="required">
-              <b-form-datepicker
-                v-model="forms.payment.fields.datePaid"
-                :state="forms.payment.states.datePaid"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.datePaid }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </div>
-          <div class="payment-details">
-            <b-form-group label="Amount Tendered" label-class="required">
-              <vue-autonumeric
-                ref="totalAmount"
-                v-model="forms.payment.fields.amount"
-                :state="forms.payment.states.amount"
-                class="form-control text-right"
-                :class="
-                  forms.payment.states.amount === false ? 'is-invalid' : ''
-                "
-                debounce="500"
-                :options="[
-                  {
-                    minimumValue: 0,
-                    modifyValueOnWheel: false,
-                    emptyInputBehavior: 0,
-                  },
-                ]"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.amount }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group label="Notes">
-              <b-form-textarea
-                rows="3"
-                v-model="forms.payment.fields.notes"
-                :state="forms.payment.states.notes"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.payment.errors.notes }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </div>
-        </div>
-        <div class="payment-entry__bottom-pane">
-          <h5>Current Billings</h5>
-          <p>Please select a billing to pay.</p>
-          <p>
-            <small
-              v-show="forms.payment.states.billingId === false"
-              style="color:red;"
-            >
-              You have to select atleast 1 billing.
-            </small>
-          </p>
-          <b-table
-            ref="billings"
-            class="billings-table"
-            small
-            hover
-            outlined
-            show-empty
-            selectable
-            :fields="tables.billings.fields"
-            :busy="tables.billings.isBusy"
-            :items="tables.billings.items"
-            selected-variant="primary"
-            select-mode="single"
-            @row-selected="onRowSelected"
-          >
-            <template v-slot:cell(selected)="{ rowSelected }">
-              <!-- <v-icon :name="rowSelected ? 'check' : ''"></v-icon> -->
-              <template v-if="rowSelected">
-                <v-icon :name="rowSelected ? 'check' : ''" />
               </template>
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="row">
-              <button type="button" class="btn-invisible">
-                <v-icon
-                  :name="row.detailsShowing ? 'chevron-down' : 'chevron-left'"
-                  @click="loadDetails(row)"
-                  scale="1"
-                />
-              </button>
-            </template>
-            <template v-slot:row-details="data">
-              <b-overlay :show="data.item.isLoading" rounded="sm">
-                <div class="row-details-container">
-                  <div
-                    v-if="
-                      data.item.termBillings &&
-                        data.item.termBillings.length > 0
-                    "
-                  >
-                    <b-table
-                      small
-                      hover
-                      outlined
-                      show-empty
-                      :fields="tables.soaBillings.fields"
-                      :busy="tables.soaBillings.isBusy"
-                      :items="data.item.termBillings"
-                    >
-                      <template v-slot:table-busy>
-                        <div class="text-center my-2">
-                          <v-icon name="spinner" spin class="mr-2" />
-                          <strong>Loading...</strong>
-                        </div>
-                      </template>
-                    </b-table>
-                  </div>
-                  <div
-                    v-if="
-                      data.item.otherBillings &&
-                        data.item.otherBillings.length > 0
-                    "
-                  >
-                    <b-table
-                      small
-                      hover
-                      outlined
-                      show-empty
-                      :fields="tables.otherBillings.fields"
-                      :busy="tables.otherBillings.isBusy"
-                      :items="data.item.otherBillings"
-                    >
-                      <template v-slot:table-busy>
-                        <div class="text-center my-2">
-                          <v-icon name="spinner" spin class="mr-2" />
-                          <strong>Loading...</strong>
-                        </div>
-                      </template>
-                    </b-table>
-                  </div>
-                  <div
-                    v-if="
-                      data.item.billingTypeId ===
-                        $options.BillingTypes.INITIAL_FEE.id
-                    "
-                  >
-                    <b-table
-                      small
-                      hover
-                      outlined
-                      show-empty
-                      :fields="tables.initialBillings.fields"
-                      :busy="tables.initialBillings.isBusy"
-                      :items="data.item.initialBillings"
-                    >
-                      <template v-slot:table-busy>
-                        <div class="text-center my-2">
-                          <v-icon name="spinner" spin class="mr-2" />
-                          <strong>Loading...</strong>
-                        </div>
-                      </template>
-                    </b-table>
-                  </div>
-                </div>
-              </b-overlay>
-            </template>
-          </b-table>
-          <div class="total-container">
-            <strong>TOTAL REMAINING BALANCE :</strong>
+              <b-form-select-option
+                v-for="paymentMode in options.paymentModes.items"
+                :key="paymentMode.id"
+                :value="paymentMode.id"
+              >
+                {{ paymentMode.name }}
+              </b-form-select-option>
+            </b-form-select>
+          </b-form-group>
+        </InputContainer>
+        <InputContainer>
+          <b-form-group>
+            <label class="required font-weight-bold">Amount to Pay</label>
             <vue-autonumeric
-              :disabled="true"
               ref="totalAmount"
-              :value="getTotalBilling"
-              class="total-billing-amount"
-              :class="'form-control'"
+              v-model="forms.payment.fields.amount"
+              :state="forms.payment.states.amount"
+              class="form-control text-right font-weight-bold"
+              :class="
+                forms.payment.states.amount === false ? 'is-invalid' : ''
+              "
+              debounce="500"
               :options="[
                 {
                   minimumValue: 0,
@@ -295,143 +78,147 @@
                   emptyInputBehavior: 0,
                 },
               ]"
-            >
-            </vue-autonumeric>
-          </div>
-        </div>
-      </div>
-      <div class="action-container mt-2">
-        <b-button
-          class="float-right ml-2"
-          :to="`/finance/post-payment`"
-          variant="outline-danger"
-          :disabled="isProcessing"
-        >
-          Cancel
-        </b-button>
-        <b-button
-          class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
-          @click="onSavePayment"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Save
-        </b-button>
-      </div>
-    </b-overlay>
-    <b-modal
-      size="xl"
-      v-model="showModalStudent"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Student List
-      </div>
-      <b-row class="mb-2">
-        <b-col md="4" offset-md="8">
-          <b-form-input
-            v-model="filters.student.criteria"
-            type="text"
-            placeholder="Search"
-            debounce="500"
-            @update="loadStudents()"
-          >
-          </b-form-input>
-        </b-col>
-      </b-row>
-      <b-table
-        small
-        hover
-        outlined
-        show-empty
-        :fields="tables.students.fields"
-        :busy="tables.students.isBusy"
-        :items="tables.students.items"
-      >
-        <template v-slot:cell(name)="data">
-          <b-media>
-            <template v-slot:aside>
-              <b-avatar
-                rounded
-                blank
-                size="64"
-                :text="
-                  data.item.firstName.charAt(0) +
-                    '' +
-                    data.item.lastName.charAt(0)
-                "
-                :src="avatar(data.item)"
+            />
+            <b-form-invalid-feedback>
+              {{ forms.payment.errors.amount }}
+            </b-form-invalid-feedback>
+          </b-form-group>
+        </InputContainer>
+      </InputGroup>
+       <LinkVisibilityToggler
+        linkText="Add Payment Notes"
+        hideLinkText="Hide Payment Notes"
+        :hideOnContentShow="true">
+        <InputGroup>
+          <InputContainer>
+            <b-form-group>
+              <label class="required">Amount to Pay</label>
+              <b-form-textarea
+                rows="2"
+                v-model="forms.payment.fields.notes"
+                :state="forms.payment.states.notes"
               />
-            </template>
-            <span>{{ data.item.name }}</span
-            ><br />
-            <small
-              >Student no.:
-              {{
-                data.item.studentNo
-                  ? data.item.studentNo
-                  : 'Awaiting Confirmation'
-              }}</small
-            ><br />
-            <small
-              >Address :
-              {{
-                data.item.address
-                  ? data.item.currentAddress
-                    ? data.item.currentAddress
-                    : data.item.address.currentCompleteAddress
-                  : ''
-              }}
-            </small>
-          </b-media>
-        </template>
-        <template v-slot:cell(contact)="data">
-          Email : {{ data.item.email }} <br />
-          <small>Phone : {{ data.item.phoneNo }}</small> <br />
-          <small>Mobile : {{ data.item.mobileNo }}</small> <br />
-        </template>
-        <template v-slot:table-busy>
-          <div class="text-center my-2">
-            <v-icon name="spinner" spin class="mr-2" />
-            <strong>Loading...</strong>
-          </div>
-        </template>
-        <template v-slot:cell(action)="row">
-          <b-button variant="outline-primary" @click="onSelectedStudent(row)"
-            ><v-icon name="check"
-          /></b-button>
-        </template>
-      </b-table>
-      <b-row>
-        <b-col md="6">
-          Showing {{ paginations.student.from }} to
-          {{ paginations.student.to }} of
-          {{ paginations.student.totalRows }} records.
-        </b-col>
-        <b-col md="6">
-          <b-pagination
-            v-model="paginations.student.page"
-            :total-rows="paginations.student.totalRows"
-            :per-page="paginations.student.perPage"
-            size="sm"
-            align="end"
-            @input="loadStudents()"
-          />
-        </b-col>
-      </b-row>
-      <div slot="modal-footer">
-        <b-button
-          variant="outline-danger"
-          class="btn-close"
-          @click="showModalStudent = false"
+            </b-form-group>
+          </InputContainer>
+        </InputGroup>
+      </LinkVisibilityToggler>
+      <template v-slot:footer>
+        <CardFooterRow>
+          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing">
+            <v-icon name="spinner" spin v-if="isProcessing"/> Submit Payment
+          </b-button>
+        </CardFooterRow>
+      </template>
+    </Card>
+    <Card title="List of Billing(s)" titleSize="m" noPaddingBody hasFooter>
+      <div>
+        <b-table
+          ref="billings"
+          class="card__billings-table"
+          small
+          hover
+          outlined
+          show-empty
+          selectable
+          :fields="tables.billings.fields"
+          :busy="tables.billings.isBusy"
+          :items="tables.billings.items"
+          selected-variant="primary"
+          select-mode="single"
+          @row-selected="onRowSelected"
         >
-          Close
-        </b-button>
+          <template v-slot:cell(selected)="{ rowSelected }">
+            <template v-if="rowSelected">
+              <v-icon :name="rowSelected ? 'check' : ''" />
+            </template>
+          </template>
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(action)="row">
+            <button type="button" class="btn-invisible">
+              <v-icon
+                :name="row.detailsShowing ? 'chevron-down' : 'chevron-left'"
+                @click="loadDetails(row)"
+                scale="1"
+              />
+            </button>
+          </template>
+          <template v-slot:row-details="data">
+            <b-overlay :show="data.item.isLoading" rounded="sm">
+              <div class="row-details-container">
+                <div v-if="data.item.termBillings && data.item.termBillings.length > 0">
+                  <b-table
+                    small
+                    hover
+                    outlined
+                    show-empty
+                    :fields="tables.soaBillings.fields"
+                    :busy="tables.soaBillings.isBusy"
+                    :items="data.item.termBillings"
+                  >
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon name="spinner" spin class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                  </b-table>
+                </div>
+                <div
+                  v-if="data.item.otherBillings && data.item.otherBillings.length > 0">
+                  <b-table
+                    small
+                    hover
+                    outlined
+                    show-empty
+                    :fields="tables.otherBillings.fields"
+                    :busy="tables.otherBillings.isBusy"
+                    :items="data.item.otherBillings"
+                  >
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon name="spinner" spin class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                  </b-table>
+                </div>
+                <div v-if="data.item.billingTypeId === $options.BillingTypes.INITIAL_FEE.id">
+                  <b-table
+                    small
+                    hover
+                    outlined
+                    show-empty
+                    :fields="tables.initialBillings.fields"
+                    :busy="tables.initialBillings.isBusy"
+                    :items="data.item.initialBillings"
+                  >
+                    <template v-slot:table-busy>
+                      <div class="text-center my-2">
+                        <v-icon name="spinner" spin class="mr-2" />
+                        <strong>Loading...</strong>
+                      </div>
+                    </template>
+                  </b-table>
+                </div>
+              </div>
+            </b-overlay>
+          </template>
+        </b-table>
       </div>
-    </b-modal>
-  </div>
+      <template v-slot:footer>
+        <CardFooterRow>
+          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing">
+            <v-icon name="spinner" spin v-if="isProcessing"/> Submit Payment
+          </b-button>
+        </CardFooterRow>
+      </template>
+    </Card>
+ </CenterContainer>
 </template>
 
 <script>
@@ -454,14 +241,11 @@ import {
   reset,
 } from '../../../helpers/forms';
 import { format } from 'date-fns';
-// import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 import SelectPaginated from '../../components/SelectPaginated';
-import debounce from 'lodash/debounce';
 
 const paymentFields = {
   id: null,
   referenceNo: null,
-  // transactionNo: null,
   billingId: null,
   studentId: null,
   amount: null,
@@ -483,7 +267,7 @@ export default {
       isLoading: false,
       isProcessing: false,
       selectedStudent: null,
-      studentQuery: null,
+      // studentQuery: null,
       forms: {
         payment: {
           fields: { ...paymentFields },
@@ -494,30 +278,27 @@ export default {
       tables: {
         billings: {
           fields: [
-            {
-              key: 'selected',
-              label: '',
-              tdClass: 'align-middle',
-              thStyle: { minWidth: '45px' },
-            },
+            // {
+            //   key: 'selected',
+            //   label: '',
+            //   tdClass: 'align-middle'
+            // },
             {
               key: 'billingNo',
               label: 'Billing No',
               tdClass: 'align-middle',
-              thStyle: { width: '17%' },
             },
             {
               key: 'dueDate',
               label: 'Due Date',
               tdClass: 'align-middle',
-              thStyle: { width: '10%' },
+              formatter: (v) => format(new Date(v), 'MMMM dd, yyyy')
             },
             {
               key: 'previousBalance',
-              label: 'Previous Balance',
+              label: 'Previous',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              thStyle: { width: '15%' },
               formatter: (value) => {
                 if (Math.sign(value) < 0) {
                   return `(${Math.abs(value)})`;
@@ -525,25 +306,24 @@ export default {
                 return formatNumber(value);
               },
             },
-            {
-              key: 'totalAmount',
-              label: 'Current Due ',
-              tdClass: 'align-middle text-right',
-              thClass: 'text-right',
-              thStyle: { width: '15%' },
-              formatter: (value) => {
-                if (Math.sign(value) < 0) {
-                  return `(${formatNumber(Math.abs(value))})`;
-                }
-                return formatNumber(value);
-              },
-            },
+            // {
+            //   key: 'totalAmount',
+            //   label: 'Current Due ',
+            //   tdClass: 'align-middle text-right',
+            //   thClass: 'text-right',
+            //   thStyle: { width: '15%' },
+            //   formatter: (value) => {
+            //     if (Math.sign(value) < 0) {
+            //       return `(${formatNumber(Math.abs(value))})`;
+            //     }
+            //     return formatNumber(value);
+            //   },
+            // },
             {
               key: 'total',
-              label: 'Total Amount ',
+              label: 'Current',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              thStyle: { width: '15%' },
               formatter: (value, key, item) => {
                 const total =
                   parseFloat(item.previousBalance) +
@@ -556,7 +336,7 @@ export default {
             },
             {
               key: 'totalPaid',
-              label: 'Paid ',
+              label: 'Paid',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '15%' },
@@ -569,7 +349,7 @@ export default {
             },
             {
               key: 'remainingBalance',
-              label: 'Balance ',
+              label: 'Total Due',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '15%' },
@@ -657,7 +437,7 @@ export default {
           fields: [
             {
               key: 'schoolFee.name',
-              label: 'Fees',
+              label: 'Item',
               tdClass: 'align-middle',
               thStyle: { width: '85%' },
             },
@@ -679,7 +459,7 @@ export default {
           fields: [
             {
               key: 'item',
-              label: 'Fees',
+              label: 'Item',
               tdClass: 'align-middle',
               thStyle: { width: '85%' },
             },
@@ -723,50 +503,70 @@ export default {
     };
   },
   created() {
+    this.showDefaultStudent();
     this.getActiveSchoolYear();
     this.forms.payment.fields.amount = 0;
     this.forms.payment.fields.datePaid = format(new Date(), 'yyyy-MM-dd');
   },
   methods: {
-    loadStudents() {
-      const { students } = this.tables;
-      const { criteria } = this.filters.student;
-      const {
-        student,
-        student: { perPage, page },
-      } = this.paginations;
-
-      students.isBusy = true;
-
-      let params = { paginate: true, perPage, page, criteria };
-      this.getStudentList(params).then(({ data }) => {
-        students.items = data.data;
-        student.from = data.meta.from;
-        student.to = data.meta.to;
-        student.totalRows = data.meta.total;
-        students.isBusy = false;
-      });
-    },
-    avatar(student) {
-      let src = '';
-      if (student.photo) {
-        src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
+    onStudentSelect(student) {
+      if (!student?.id) {
+        this.tables.billings.items = [];
+        return;
       }
-      return src;
+      this.loadBillings(student?.id);
     },
-    onShowModalStudent() {
-      this.showModalStudent = true;
-      this.filters.student.criteria = null;
-      this.paginations.student.page = 1;
-      this.loadStudents();
+    showDefaultStudent() {
+      const { studentId } = this.$route.query;
+      if (studentId) {
+        this.loadBillings(studentId);
+        this.getStudent(studentId).then(({ data }) => {
+          this.forms.payment.fields.studentId = data;
+        });
+      }
     },
-    onSelectedStudent(row) {
-      this.showModalStudent = false;
-      this.selectedStudent = row.item;
-      this.forms.payment.fields.studentId = row.item.id;
-      this.studentQuery = row.item.studentNo;
-      this.loadBillings(row.item.id);
-    },
+    // onStudentSelect(e) {
+    //   console.log('onStudentSelect', e)
+    // },
+    // loadStudents() {
+    //   const { students } = this.tables;
+    //   const { criteria } = this.filters.student;
+    //   const {
+    //     student,
+    //     student: { perPage, page },
+    //   } = this.paginations;
+
+    //   students.isBusy = true;
+
+    //   let params = { paginate: true, perPage, page, criteria };
+    //   this.getStudentList(params).then(({ data }) => {
+    //     students.items = data.data;
+    //     student.from = data.meta.from;
+    //     student.to = data.meta.to;
+    //     student.totalRows = data.meta.total;
+    //     students.isBusy = false;
+    //   });
+    // },
+    // avatar(student) {
+    //   let src = '';
+    //   if (student.photo) {
+    //     src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
+    //   }
+    //   return src;
+    // },
+    // onShowModalStudent() {
+    //   this.showModalStudent = true;
+    //   this.filters.student.criteria = null;
+    //   this.paginations.student.page = 1;
+    //   this.loadStudents();
+    // },
+    // onSelectedStudent(row) {
+    //   this.showModalStudent = false;
+    //   this.selectedStudent = row.item;
+    //   this.forms.payment.fields.studentId = row.item.id;
+    //   // this.studentQuery = row.item.studentNo;
+    //   this.loadBillings(row.item.id);
+    // },
     async loadBillings(studentId) {
       const { billings } = this.tables;
       billings.isBusy = true;
@@ -788,7 +588,7 @@ export default {
         payment.fields.amount = remainingBalance > 0 ? remainingBalance : 0;
       }
     },
-    onSavePayment() {
+    onSubmitPayment() {
       this.isProcessing = true;
       const {
         payment,
@@ -796,9 +596,9 @@ export default {
       } = this.forms;
       fields.schoolYearId = this.activeSchoolYear.id;
       reset(payment);
-      this.addPayment(fields)
+      const studentId = fields?.studentId?.id ||  fields?.studentId;
+      this.addPayment({ ...fields, studentId })
         .then(({ data }) => {
-          // console.log(data);
           this.isProcessing = false;
           this.$router.push('/finance/post-payment');
         })
@@ -808,22 +608,22 @@ export default {
           validate(payment, errors);
         });
     },
-    getStudentInfo(student) {
-      this.selectedStudent = student;
-      this.forms.payment.fields.studentId = student.id;
-      this.loadBillings(student.id);
-    },
-    loadStudentsTypeAhead() {
-      const { students } = this.options;
-      const { studentQuery } = this.studentQuery;
-      const params = {
-        paginate: false,
-        criteria: studentQuery,
-      };
-      this.getStudentList(params).then(({ data }) => {
-        students.items = data;
-      });
-    },
+    // getStudentInfo(student) {
+    //   this.selectedStudent = student;
+    //   this.forms.payment.fields.studentId = student.id;
+    //   this.loadBillings(student.id);
+    // },
+    // loadStudentsTypeAhead() {
+    //   const { students } = this.options;
+    //   const { studentQuery } = this.studentQuery;
+    //   const params = {
+    //     paginate: false,
+    //     criteria: studentQuery,
+    //   };
+    //   this.getStudentList(params).then(({ data }) => {
+    //     students.items = data;
+    //   });
+    // },
     loadDetails(row) {
       const { item } = row;
       this.$set(item, 'isLoading', true);
@@ -886,16 +686,44 @@ export default {
       return formatNumber(sum, 2);
     },
   },
-  watch: {
-    studentQuery: debounce(function() {
-      this.loadStudentsTypeAhead();
-    }, 500),
-  },
+  // watch: {
+  //   studentQuery: debounce(function() {
+  //     this.loadStudentsTypeAhead();
+  //   }, 500),
+  // },
 };
 </script>
 
 <style lang="scss">
 @import '../../../assets/scss/_shared.scss';
+
+.card__billings-table {
+  border: 0 !important;
+
+  th {
+    border: 0 !important;
+    height: 30px;
+  }
+
+  tr {
+    &:last-child {
+      border-bottom: 1px solid $light-gray-10;
+    }
+
+    &.b-table-row-selected {
+      td {
+        background-color: $blue !important;
+        color: $white;
+
+        svg {
+          color: $white;
+        }
+      }
+    }
+  }
+}
+
+
 .payment-list__container {
   height: 100%;
   width: 100%;
@@ -1012,6 +840,6 @@ export default {
 .row-details-container {
   width: 100%;
   height: 100%;
-  padding: 10px 45px;
+  // padding: 10px 45px;
 }
 </style>
