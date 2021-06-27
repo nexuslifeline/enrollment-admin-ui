@@ -97,8 +97,17 @@
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>
-              <b-dropdown-item @click="$router.push({name: 'Academic Record Applications Detail', params: { academicRecordId: data.item.id } })">
+              <b-dropdown-item @click="$router.push({
+                  name: 'Academic Record Applications Detail',
+                  params: { academicRecordId: data.item.id }
+                })">
                 Resume
+              </b-dropdown-item>
+              <b-dropdown-item v-if="true" @click="$router.push({
+                  name: 'Payment Add',
+                  query: { studentId: data.item && data.item.student && data.item.student.id }
+                })">
+                Post Payment
               </b-dropdown-item>
             </b-dropdown>
           </template>
