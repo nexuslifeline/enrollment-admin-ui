@@ -41,7 +41,7 @@
       />
     </template>
      <template v-slot:extra-buttons>
-      <div class="ml-1 drop-down__container" >
+      <!-- <div class="ml-1 drop-down__container" >
          <b-dropdown
           v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
           variant="primary"
@@ -53,6 +53,23 @@
           <b-dropdown-item @click="setCreateBatchOtherFee(), showEntry = false"
             >Batch Generate Other Billing</b-dropdown-item
           >
+        </b-dropdown>
+      </div> -->
+      <div class="ml-1 drop-down__container" >
+         <b-dropdown
+          v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
+          text="Generate"
+          variant="outline-primary"
+          split-variant="outline-primary"
+          class="other__drop-down"
+          split>
+          <b-dropdown-item
+            @click="setCreateOtherFee(), showBatchEntry=false">
+            Single Other Billing
+          </b-dropdown-item>
+          <b-dropdown-item @click="setCreateBatchOtherFee(), showEntry=false">
+            Batch Other billing
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </template>
@@ -153,7 +170,7 @@
           <template v-slot:cell(name)="data">
             <StudentColumn
               :data="data.item"
-              :callback="{ loadDetails: () => previewBilling(data.item.id) }"
+              :callback="{ loadDetails: () => null }"
             />
           </template>
           <template v-slot:cell(action)="row">
@@ -265,6 +282,7 @@
                     @input="getStudentInfo($event)"
                     :value="forms.billing.fields.student"
                     :fetchData="getStudentList"
+                    :selectable="option => isSelectable(option)"
                   >
                     <template v-slot:selected-option="data">
                       <div class="select-option">
@@ -287,6 +305,10 @@
                           }}</span>
                           <span>{{ data.name }}</span>
                           <span>{{ data.email }}</span>
+                        </div>
+                        <div class="is-enrolled">
+                          <b-badge v-if="isSelectable(data)" variant="success">Enrolled</b-badge>
+                          <b-badge v-else variant="warning">Not Enrolled</b-badge>
                         </div>
                       </div>
                     </template>
@@ -753,6 +775,7 @@ import {
   BillingStatuses,
   BillingTypes,
   OtherBillingPermissions,
+  AcademicRecordStatuses
 } from '../../helpers/enum';
 import {
   TermApi,
@@ -834,6 +857,7 @@ export default {
   Semesters,
   BillingStatuses,
   OtherBillingPermissions,
+  AcademicRecordStatuses,
   data() {
     return {
       isFilterVisible: true,
@@ -1353,6 +1377,9 @@ export default {
       billing.billingStatusItem = item;
       this.loadBillings();
     },
+    isSelectable(student) {
+      return student?.latestAcademicRecord?.academicRecordStatusId === this.$options.AcademicRecordStatuses.ENROLLED.id
+    }
   },
   computed: {
     totalAmount() {
@@ -1385,16 +1412,23 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../assets/scss/_shared.scss';
+
   .drop-down__container {
     display: flex;
-
+    align-items: center;
   }
 
   .other__drop-down {
     height: 24px;
+
+    .btn-outline-primary {
+      display: flex!important;
+      align-items: center!important;
+    }
   }
+
   .search-container {
     display: flex;
     align-items: center;

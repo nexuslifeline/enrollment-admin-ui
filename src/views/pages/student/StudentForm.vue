@@ -15,7 +15,7 @@
       <OnboardingSettings :data="data" />
       <AcademicRecord
         v-if="!!Object.keys(data).length && data.hasOpenAcademicRecord"
-        :data="data.activeAcademicRecord"
+        :data="data.latestAcademicRecord"
         :showNotes="true"
         :allowChangeStatus="true"
         notes="This setting is only visible if student has a record that is not yet mark as Enrolled."

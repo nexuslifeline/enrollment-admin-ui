@@ -272,6 +272,7 @@
                   @input="getStudentInfo($event)"
                   :value="forms.billing.fields.student"
                   :fetchData="getStudentList"
+                  :selectable="option => isSelectable(option)"
                 >
                   <template v-slot:selected-option="data">
                     <div class="select-option">
@@ -294,6 +295,11 @@
                         }}</span>
                         <span>{{ data.name }}</span>
                         <span>{{ data.email }}</span>
+                      </div>
+
+                      <div class="is-enrolled">
+                        <b-badge v-if="isSelectable(data)" variant="success">Enrolled</b-badge>
+                        <b-badge v-else variant="warning">Not Enrolled</b-badge>
                       </div>
                     </div>
                   </template>
@@ -417,7 +423,7 @@
           </b-col>
         </b-row>
         <b-link @click="showOtherFees = !showOtherFees">{{ showOtherFees ? 'Hide' : 'Post' }} Other Fees</b-link>
-        <div v-if="showOtherFees">
+        <div v-show="showOtherFees">
           <b-row class="mb-3">
             <b-col md="4">
               <h5 class="pt-2">OTHER FEES</h5>
@@ -854,6 +860,7 @@ import {
   BillingStatuses,
   BillingTypes,
   StatementOfAccountPermissions,
+  AcademicRecordStatuses
 } from '../../helpers/enum';
 import {
   TermApi,
@@ -943,6 +950,7 @@ export default {
   Semesters,
   BillingStatuses,
   StatementOfAccountPermissions,
+  AcademicRecordStatuses,
   data() {
     return {
       isFilterVisible: true,
@@ -1550,6 +1558,9 @@ export default {
       billing.billingStatusItem = item;
       this.loadBillings();
     },
+    isSelectable(student) {
+      return student?.latestAcademicRecord?.academicRecordStatusId === this.$options.AcademicRecordStatuses.ENROLLED.id
+    }
   },
   watch: {
     'forms.billing.studentQuery': debounce(function() {
@@ -1601,6 +1612,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
 
         .select-option__avatar {
           width: auto;
@@ -1611,6 +1623,12 @@ export default {
           margin-left: 10px;
           display: flex;
           flex-direction: column;
+        }
+
+        .is-enrolled {
+          position: absolute;
+          top: 0;
+          right: 10px;
         }
       }
     }

@@ -390,7 +390,7 @@ export default {
     },
     onStudentChange(item) {
       const { fields } = this.forms.droppedStudent
-      fields.academicRecordId = item.latestAcademicRecord.id
+      fields.academicRecordId = item.latestAcademicRecord?.id
     },
     onDroppedStudent() {
       const { academicRecordId } = this.forms.droppedStudent.fields
