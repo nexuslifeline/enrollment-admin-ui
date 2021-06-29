@@ -104,13 +104,13 @@
       </LinkVisibilityToggler>
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing">
+          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing || tables.billings.items.length === 0">
             <v-icon name="spinner" spin v-if="isProcessing"/> Submit Payment
           </b-button>
         </CardFooterRow>
       </template>
     </Card>
-    <Card title="List of Billing(s)" titleSize="m" noPaddingBody hasFooter>
+    <Card title="Billing Statement(s)" titleSize="m" noPaddingBody hasFooter>
       <div>
         <b-table
           ref="billings"
@@ -126,12 +126,17 @@
           selected-variant="primary"
           select-mode="single"
           @row-selected="onRowSelected"
+          foot-clone
         >
-          <template v-slot:cell(selected)="{ rowSelected }">
+           <!-- <template v-slot:foot>
+            <div class="font-weight-bold">Total Due:</div>
+          </template> -->
+
+          <!-- <template v-slot:cell(selected)="{ rowSelected }">
             <template v-if="rowSelected">
               <v-icon :name="rowSelected ? 'check' : ''" />
             </template>
-          </template>
+          </template> -->
           <template v-slot:table-busy>
             <div class="text-center my-2">
               <v-icon name="spinner" spin class="mr-2" />
@@ -208,11 +213,21 @@
               </div>
             </b-overlay>
           </template>
+
+          <template #foot(totalPaid)="data">
+            <b>Total: </b>
+          </template>
+          <template #foot(totalRemainingDue)="data">
+            <b>{{ grandTotalRemainingDue }}</b>
+          </template>
+          <template #foot()="data">
+            <span> </span>
+          </template>
         </b-table>
       </div>
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing">
+          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing || tables.billings.items.length === 0">
             <v-icon name="spinner" spin v-if="isProcessing"/> Submit Payment
           </b-button>
         </CardFooterRow>
@@ -239,12 +254,12 @@ import {
   clearFields,
   validate,
   reset,
+  formatAccountingNumber
 } from '../../../helpers/forms';
 import { format } from 'date-fns';
 import SelectPaginated from '../../components/SelectPaginated';
 
 const paymentFields = {
-  id: null,
   referenceNo: null,
   billingId: null,
   studentId: null,
@@ -263,14 +278,14 @@ export default {
   data() {
     return {
       activeSchoolYear: null,
-      showModalStudent: false,
+      // showModalStudent: false,
       isLoading: false,
       isProcessing: false,
-      selectedStudent: null,
+      // selectedStudent: null,
       // studentQuery: null,
       forms: {
         payment: {
-          fields: { ...paymentFields },
+          fields: { ...paymentFields, paymentModeId: PaymentModes.CASH.id },
           states: { ...paymentFields },
           errors: { ...paymentFields },
         },
@@ -299,40 +314,14 @@ export default {
               label: 'Previous',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              formatter: (value) => {
-                if (Math.sign(value) < 0) {
-                  return `(${Math.abs(value)})`;
-                }
-                return formatNumber(value);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
-            // {
-            //   key: 'totalAmount',
-            //   label: 'Current Due ',
-            //   tdClass: 'align-middle text-right',
-            //   thClass: 'text-right',
-            //   thStyle: { width: '15%' },
-            //   formatter: (value) => {
-            //     if (Math.sign(value) < 0) {
-            //       return `(${formatNumber(Math.abs(value))})`;
-            //     }
-            //     return formatNumber(value);
-            //   },
-            // },
             {
-              key: 'total',
+              key: 'totalAmount',
               label: 'Current',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              formatter: (value, key, item) => {
-                const total =
-                  parseFloat(item.previousBalance) +
-                  parseFloat(item.totalAmount);
-                if (Math.sign(total) < 0) {
-                  return `(${formatNumber(Math.abs(total))})`;
-                }
-                return formatNumber(total);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
             {
               key: 'totalPaid',
@@ -340,29 +329,15 @@ export default {
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '15%' },
-              formatter: (value) => {
-                if (Math.sign(value) < 0) {
-                  return `(${formatNumber(Math.abs(value))})`;
-                }
-                return formatNumber(value);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
             {
-              key: 'remainingBalance',
+              key: 'totalRemainingDue',
               label: 'Total Due',
-              tdClass: 'align-middle text-right',
+              tdClass: 'align-middle text-right font-weight-bold',
               thClass: 'text-right',
               thStyle: { width: '15%' },
-              formatter: (value, key, item) => {
-                const remBalance =
-                  parseFloat(item.previousBalance) +
-                  parseFloat(item.totalAmount) -
-                  item.totalPaid;
-                if (Math.sign(remBalance) < 0) {
-                  return `(${formatNumber(Math.abs(remBalance))})`;
-                }
-                return formatNumber(remBalance);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
             {
               key: 'action',
@@ -374,30 +349,30 @@ export default {
           ],
           items: [],
         },
-        students: {
-          isBusy: false,
-          fields: [
-            {
-              key: 'name',
-              label: 'Name',
-              tdClass: 'align-middle',
-              thStyle: { width: '50%' },
-            },
-            {
-              key: 'contact',
-              label: 'Contact Info',
-              tdClass: 'align-middle',
-              thStyle: { width: '45%' },
-            },
-            {
-              key: 'action',
-              label: '',
-              tdClass: 'align-middle',
-              thStyle: { width: '40px' },
-            },
-          ],
-          items: [],
-        },
+        // students: {
+        //   isBusy: false,
+        //   fields: [
+        //     {
+        //       key: 'name',
+        //       label: 'Name',
+        //       tdClass: 'align-middle',
+        //       thStyle: { width: '50%' },
+        //     },
+        //     {
+        //       key: 'contact',
+        //       label: 'Contact Info',
+        //       tdClass: 'align-middle',
+        //       thStyle: { width: '45%' },
+        //     },
+        //     {
+        //       key: 'action',
+        //       label: '',
+        //       tdClass: 'align-middle',
+        //       thStyle: { width: '40px' },
+        //     },
+        //   ],
+        //   items: [],
+        // },
         soaBillings: {
           isBusy: false,
           fields: [
@@ -425,9 +400,7 @@ export default {
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '15%' },
-              formatter: (value) => {
-                return formatNumber(value);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
           ],
           items: [],
@@ -447,9 +420,7 @@ export default {
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '15%' },
-              formatter: (value) => {
-                return formatNumber(value);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
           ],
           items: [],
@@ -469,9 +440,7 @@ export default {
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
               thStyle: { width: '15%' },
-              formatter: (value) => {
-                return formatNumber(value);
-              },
+              formatter: (value) => formatAccountingNumber(value),
             },
           ],
           items: [],
@@ -495,10 +464,10 @@ export default {
         paymentModes: {
           items: PaymentModes.values,
         },
-        students: {
-          isLoading: false,
-          items: [],
-        },
+        // students: {
+        //   isLoading: false,
+        //   items: [],
+        // },
       },
     };
   },
@@ -588,16 +557,35 @@ export default {
         payment.fields.amount = remainingBalance > 0 ? remainingBalance : 0;
       }
     },
+    // onSubmitPayment() {
+    //   this.isProcessing = true;
+    //   const {
+    //     payment,
+    //     payment: { fields },
+    //   } = this.forms;
+    //   fields.schoolYearId = this.activeSchoolYear.id;
+    //   reset(payment);
+    //   const studentId = fields?.studentId?.id ||  fields?.studentId;
+    //   this.addPayment({ ...fields, studentId })
+    //     .then(({ data }) => {
+    //       this.isProcessing = false;
+    //       this.$router.push('/finance/post-payment');
+    //     })
+    //     .catch((error) => {
+    //       const errors = error.response.data.errors;
+    //       this.isProcessing = false;
+    //       validate(payment, errors);
+    //     });
+    // },
     onSubmitPayment() {
       this.isProcessing = true;
       const {
         payment,
-        payment: { fields },
+        payment: { fields: { billingId, amount, datePaid, paymentModeId, notes, referenceNo } },
       } = this.forms;
-      fields.schoolYearId = this.activeSchoolYear.id;
+      // fields.schoolYearId = this.activeSchoolYear.id;
       reset(payment);
-      const studentId = fields?.studentId?.id ||  fields?.studentId;
-      this.addPayment({ ...fields, studentId })
+      this.postPayment({ amount, datePaid, paymentModeId, notes, referenceNo }, billingId)
         .then(({ data }) => {
           this.isProcessing = false;
           this.$router.push('/finance/post-payment');
@@ -665,32 +653,11 @@ export default {
     },
   },
   computed: {
-    getTotalBilling() {
+    grandTotalRemainingDue() {
       const { billings } = this.tables;
-      var sum = billings.items.reduce((sum, current) => {
-        return (
-          sum +
-          (parseFloat(current.totalAmount) +
-            parseFloat(current.previousBalance) -
-            parseFloat(current.totalPaid))
-        );
-      }, 0);
-
-      return formatNumber(sum, 2);
+      return formatAccountingNumber(billings?.items?.reduce((accum, item) => accum + item?.totalRemainingDue, 0.0) || 0);
     },
-    getTotalTerms(items) {
-      var sum = items.reduce((sum, current) => {
-        return sum + parseFloat(current.amount);
-      }, 0);
-
-      return formatNumber(sum, 2);
-    },
-  },
-  // watch: {
-  //   studentQuery: debounce(function() {
-  //     this.loadStudentsTypeAhead();
-  //   }, 500),
-  // },
+  }
 };
 </script>
 

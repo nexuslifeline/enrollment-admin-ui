@@ -26,5 +26,8 @@ export default {
     batchOtherBilling(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/batch-other-billing`, data);
     },
+    postPayment(data, id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/${id}/post-payment`, data);
+    },
   }
 }

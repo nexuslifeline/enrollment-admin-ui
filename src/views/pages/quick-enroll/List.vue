@@ -61,7 +61,10 @@
           <template v-slot:cell(name)="data">
             <StudentColumn
               :data="data.item"
-              :callback="{ loadDetails: () => $router.push({name: 'Academic Record Applications Detail', params: { academicRecordId: data.item.id } }) }"
+              :callback="{ loadDetails: () => $router.push({
+                name: 'Academic Record Applications Detail',
+                params: { academicRecordId: data.item.id }
+              }) }"
             />
           </template>
           <template v-slot:cell(contact)="data">

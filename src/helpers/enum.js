@@ -733,6 +733,8 @@ export const PaymentModes = new Enum({
   OTHERS: { id: 3, name: 'Others' },
   E_WALLET: { id: 4, name: 'E-Wallet (GCash, Paymaya, PayPal, Coins.ph)' },
   PERA_PADALA: { id: 5, name: 'Pera Padala' },
+  CASH: { id: 6, name: 'Cash' },
+  CHECK: { id: 7, name: 'Check' },
 });
 
 export const ManualEnrollmentPermissions = new Enum({
