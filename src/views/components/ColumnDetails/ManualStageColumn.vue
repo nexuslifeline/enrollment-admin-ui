@@ -1,19 +1,24 @@
 <template>
   <div>
     <template v-if="data.academicRecordStatusId === AcademicRecordStatuses.ENLISTMENT_APPROVED.id">
-      <b-badge variant="success">
+      <b-badge variant="warning">
         Assessment Review
+      </b-badge>
+    </template>
+    <template v-else-if="data.academicRecordStatusId === AcademicRecordStatuses.ENROLLED.id">
+      <b-badge variant="success">
+        Enrolled
       </b-badge>
     </template>
     <template v-else>
       <b-badge
         v-if="data.manualStepId === ManualSteps.PROFILE_AND_ACCOUNT.id"
-        variant="success">
+        variant="warning">
         Profile & Account
       </b-badge>
       <b-badge
         v-else-if="data.manualStepId === ManualSteps.SUBJECT_ENLISTMENT.id"
-        variant="success">
+        variant="warning">
         Subject Enlistment
       </b-badge>
     </template>

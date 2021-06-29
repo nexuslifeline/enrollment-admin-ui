@@ -104,9 +104,11 @@
                   name: 'Academic Record Applications Detail',
                   params: { academicRecordId: data.item.id }
                 })">
-                Resume
+                Continue
               </b-dropdown-item>
-              <b-dropdown-item v-if="true" @click="$router.push({
+              <b-dropdown-item
+                v-if="![AcademicRecordStatuses.ENROLLED.id, AcademicRecordStatuses.CLOSED.id].includes(data.item.academicRecordStatusId)"
+                @click="$router.push({
                   name: 'Payment Add',
                   query: { studentId: data.item && data.item.student && data.item.student.id }
                 })">
@@ -160,6 +162,7 @@ import PageContent from '../../components/PageContainer/PageContent'
 import NoAccess from '../../components/NoAccess'
 import { StudentColumn, EducationColumn, ContactColumn, ManualStageColumn } from "../../components/ColumnDetails";
 import StudentSelection from './StudentSelection';
+import { AcademicRecordStatuses } from '../../../helpers/enum';
 
 export default {
   components: {
@@ -179,6 +182,7 @@ export default {
   ManualEnrollmentPermissions,
   data() {
     return {
+      AcademicRecordStatuses,
       isStudentShown: false,
       isFilterVisible: true,
       tables: {
