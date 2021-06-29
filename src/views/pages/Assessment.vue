@@ -67,6 +67,7 @@
           <template v-slot:cell(name)="data">
             <StudentColumn
               :showIsManual="true"
+              :isManual="data.item.isManual"
               :data="data.item"
               :callback="{ loadDetails: () => loadDetails(data) }"
             />
@@ -94,31 +95,20 @@
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>
-              <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
-              <!-- <b-dropdown-item @click.prevent="loadDetails(row)">
-                {{
-                  row.item.application
-                    ? getEllipsisCaption(
-                        row.item.application.applicationStatusId
-                      )
-                    : getEllipsisCaption(row.item.admission.applicationStatusId)
-                }}
-              </b-dropdown-item> -->
-              <!-- <b-dropdown-item
-                v-if="
-                  (row.item.application
-                    ? row.item.application.applicationStatusId
-                    : row.item.admission.applicationStatusId) !==
-                    applicationStatuses.SUBMITTED.id
-                "
-                @click.prevent="loadAssessmentForm(row.item.id)"
-              >
-                Preview Assessment Form
-              </b-dropdown-item> -->
               <b-dropdown-item @click.prevent="loadDetails(row)">
                 {{ getEllipsisCaption(row.item.academicRecordStatusId) }}
               </b-dropdown-item>
-               <b-dropdown-item
+              <b-dropdown-item
+                v-if="assessmentStatuses.APPROVED.academicRecordStatuses.includes(row.item.academicRecordStatusId)
+                  && row.item.academicRecordStatusId !== academicRecordStatuses.ENROLLED.id
+                  && row.item.isManual"
+                @click.prevent="$router.push({
+                  name: 'Payment Add',
+                  query: { studentId: row.item && row.item.student && row.item.student.id }
+                })">
+                Post Payment
+              </b-dropdown-item>
+              <b-dropdown-item
                 v-if="assessmentStatuses.APPROVED.academicRecordStatuses.includes(row.item.academicRecordStatusId)"
                 @click.prevent="loadAssessmentForm(row.item.id)">
                 Preview Assessment Form
@@ -127,11 +117,10 @@
           </template>
           <template v-slot:row-details="data">
             <ActiveRowViewer
+              :key="detailsKey"
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
-              :showOptions="
-                isAccessible($options.StudentFeePermissions.APPROVAL.id) && showOptions"
               :showActionBar="
                 isAccessible($options.StudentFeePermissions.APPROVAL.id) && showOptions"
               :options="[
@@ -140,14 +129,22 @@
                   callback: () => setApproveFees(data),
                   isAllowed: isAccessible(
                     $options.StudentFeePermissions.APPROVAL.id
-                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
+                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item) && showOptions,
                 },
                 {
                   label: 'Reject',
                   callback: () => setRejectFees(data),
                   isAllowed: isAccessible(
                     $options.StudentFeePermissions.DISAPPROVAL.id
-                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
+                  ) && !showTermsAlert && hasTermsSchoolCategory(data.item) && showOptions,
+                },
+                {
+                  label: 'Post Payment',
+                  callback: () => setPostPayment(data),
+                  isAllowed: assessmentStatuses.APPROVED.academicRecordStatuses.includes(data.item.academicRecordStatusId)
+                    && data.item.academicRecordStatusId !== academicRecordStatuses.ENROLLED.id
+                    && data.item.isManual
+                    && !showTermsAlert && hasTermsSchoolCategory(data.item),
                 },
               ]"
             >
@@ -374,7 +371,7 @@
                       </b-button>
                     </template>
                   </b-table> -->
-                  <FeesTable :studentFees="selectedAcademicRecord.fees" :isDisabled="showOptions"/>
+                  <FeesTable :studentFees="selectedAcademicRecord && selectedAcademicRecord.fees || []" :isDisabled="showOptions"/>
                   <b-row>
                     <b-col md="4">
                       <div class="footer-info">
@@ -633,6 +630,16 @@
         @onCancel="showModalRejection = false"
         @onRejected="onAssesmentRejected"
       />
+
+      <PostPaymentConfirmation
+        @onYes="$router.push({name: 'Payment Add',
+                  query: { studentId: selectedAcademicRecord && selectedAcademicRecord.student && selectedAcademicRecord.student.id }})"
+        :isShown.sync="showPostPayment"
+        @onCancel="showPostPayment = false">
+        <template #modal-body>
+          Are you sure you want to post payment for this student ?
+        </template>
+      </PostPaymentConfirmation>
     </template>
   </PageContent>
   <!-- main container -->
@@ -685,6 +692,7 @@ import AssessmentApproval from '../components/ApprovalModals/Assessment'
 import AssessmentRejection from '../components/RejectionModals/Assessment'
 import Toggle from '../components/Form/Toggle'
 import FeesTable from '../components/Assessment/FeesTable'
+import PostPaymentConfirmation from '../components/ConfirmationModal'
 
 export default {
   name: 'StudentFee',
@@ -722,7 +730,8 @@ export default {
     AssessmentApproval,
     AssessmentRejection,
     Toggle,
-    FeesTable
+    FeesTable,
+    PostPaymentConfirmation
   },
   StudentFeePermissions,
   SettingPermissions,
@@ -743,6 +752,7 @@ export default {
       showModalFees: false,
       showModalApproval: false,
       showModalRejection: false,
+      showPostPayment: false,
       approvalNotes: null,
       applicationStatuses: ApplicationStatuses,
       assessmentStatuses: AssessmentStatuses,
@@ -969,6 +979,7 @@ export default {
       schoolCategoryId: null,
       studentFees: [],
       row: [],
+      detailsKey: 0
     };
   },
   created() {
@@ -985,8 +996,12 @@ export default {
   },
   methods: {
     onAssesmentApproved() {
-      this.selectedAcademicRecord = null
       this.showModalApproval = false
+      if(this.selectedAcademicRecord?.isManual) {
+        this.showPostPayment = true
+        this.selectedAcademicRecord.academicRecordStatusId = this.academicRecordStatuses.ASSESSMENT_APPROVED.id
+        return
+      }
       this.loadAcademicRecords()
     },
     onAssesmentRejected() {
@@ -1010,6 +1025,9 @@ export default {
     setRejectFees(row) {
       this.row = row
       this.showModalRejection = true;
+    },
+    setPostPayment() {
+      this.showPostPayment = true;
     },
     approveFees() {
       const {

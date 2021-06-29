@@ -14,7 +14,7 @@
       </b-link>
       <div class="label__badges-container">
         <span
-          v-if="showIsManual && data.student.isManual"
+          v-if="showIsManual && isManual"
           v-b-tooltip.hover
           :title="`Student is manually registered.`"
           class="label__student-no">
@@ -49,6 +49,10 @@ export default {
     },
     showIsManual: {
       type: [Boolean]
+    },
+    isManual: {
+      type: [Boolean, Number],
+      default: false
     }
   },
   components: {
