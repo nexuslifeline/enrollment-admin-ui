@@ -1,42 +1,20 @@
 <template>
   <b-modal
     :visible="isShown"
-    size="md"
+    :size="isShownStudent || isShownAcademic ? 'lg' : 'md'"
     title="Select Student"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     bodyClass="modal-body__container"
     :centered="true"
-    @show="isStudentShown = false"
+    @show="isShownStudent = false"
     @hidden="$emit('update:isShown', false)">
     <div class="selection__container">
-      <template v-if="isAcademicInfoShow">
-        <template >
-        <b-form-group>
-          <label class="required">School Year</label>
-          <SelectSchoolYear
-            :value="schoolYearId"
-            :reduce="option => option.id"
-            label="name"
-            @input="schoolYearId = $event"
-            :clearable="false"
-          />
-        </b-form-group>
-        <b-form-group>
-          <label class="required">School Category</label>
-          <SelectCategory
-            :value="schoolCategoryId"
-            :reduce="option => option.id"
-            label="name"
-            @input="schoolCategoryId = $event"
-            :clearable="false"
-          />
-        </b-form-group>
-        </template>
-        <template v-if="isStudentShown">
+      <template v-if="isShownStudent">
         <b-form-group>
           <label class="required">Student</label>
-          <SelectPaginated
+          <SelectStudent v-model="selectedStudent" />
+          <!-- <SelectPaginated
             class="select-paginated mt-2 "
             @input="getStudentInfo($event)"
             :fetchData="getStudentList"
@@ -59,8 +37,37 @@
             <template slot="loader">
               <b-spinner label="Loading..." class="loader"></b-spinner>
             </template>
-        </SelectPaginated>
+        </SelectPaginated> -->
         </b-form-group>
+      </template>
+      <template v-if="isShownAcademic">
+        <template >
+          <InputGroup>
+            <InputContainer>
+              <b-form-group>
+              <label class="required">School Year</label>
+              <SelectSchoolYear
+                :value="schoolYearId"
+                :reduce="option => option.id"
+                label="name"
+                @input="schoolYearId = $event"
+                :clearable="false"
+              />
+            </b-form-group>
+            </InputContainer>
+            <InputContainer>
+              <b-form-group>
+                <label class="required">School Category</label>
+                <SelectCategory
+                  :value="schoolCategoryId"
+                  :reduce="option => option.id"
+                  label="name"
+                  @input="schoolCategoryId = $event"
+                  :clearable="false"
+                />
+              </b-form-group>
+            </InputContainer>
+          </InputGroup>
         </template>
        </template>
       <template v-else>
@@ -112,8 +119,8 @@ export default {
     return {
       selectedIndex: null,
       busyIndexes: [],
-      isStudentShown: false,
-      isAcademicInfoShow: false,
+      isShownStudent: false,
+      isShownAcademic: false,
       isConfirmBusy: false,
       schoolYearId: null,
       schoolCategoryId: null,
@@ -144,12 +151,7 @@ export default {
           this.isConfirmBusy = false
           console.log(errors)
         });
-      }
-      else if(this.selectedIndex === 1) {
-        // newly registered student
-        // post student here with empty({}) data
-        // after posting student, post new academic record here with the new student id
-        // and redirect to enrollment/academic-record-applications/:academicRecordId
+      }  else if (this.selectedIndex === 1) {
         this.isConfirmBusy = true
         // this.resetState();
         this.addStudent({}).then(({ data }) => {
@@ -174,8 +176,8 @@ export default {
       this.selectedIndex = null;
       this.busyIndexes = [];
       this.$emit('update:isShown', false);
-      this.isStudentShown = false;
-      this.isAcademicInfoShow = false;
+      this.isShownStudent = false;
+      this.isShownAcademic = false;
       this.isConfirmBusy = false;
     },
     onSelectMenu(item) {
@@ -183,9 +185,9 @@ export default {
       this.selectedIndex = item.index;
       setTimeout(() => {
         if (item.index === 0) {
-          this.isStudentShown = true;
+          this.isShownStudent = true;
         }
-        this.isAcademicInfoShow = true;
+        this.isShownAcademic = true;
         this.busyIndexes = [];
       }, 500);
     },

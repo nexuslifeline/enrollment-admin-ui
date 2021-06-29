@@ -37,7 +37,7 @@
       </InputContainer>
     </InputGroup>
     <InputGroup>
-       <InputContainer>
+      <InputContainer>
         <label class="required">Level</label>
         <SelectLevel
           :value="data.levelId"
@@ -45,6 +45,16 @@
           label="name"
           @input="data.levelId = $event"
           :schoolCategoryId="data.schoolCategoryId"
+          :disabled="isReadOnly"
+        />
+      </InputContainer>
+      <InputContainer>
+        <label class="required">Student Category</label>
+        <SelectStudentCategory
+          :value="data.studentCategoryId"
+          :reduce="option => option.id"
+          label="name"
+          @input="data.studentCategoryId = $event"
           :disabled="isReadOnly"
         />
       </InputContainer>
@@ -213,6 +223,7 @@ const academicRecordFields = {
           sectionId,
           transcriptRecordId,
           academicRecordStatusId,
+          studentCategoryId,
           transcriptRecord: { curriculumId }
         } = this.data
         const { academicRecord } = this.forms
@@ -224,6 +235,7 @@ const academicRecordFields = {
           semesterId,
           studentTypeId,
           sectionId,
+          studentCategoryId,
           ...(this.allowChangeStatus && { academicRecordStatusId }) // if allow status change, add academic record status to payload
         }
         reset(academicRecord)
