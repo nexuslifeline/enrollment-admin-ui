@@ -74,14 +74,6 @@
       </div>
     </template>
     <template v-slot:content>
-        <!-- <SchoolCategoryTabs
-          :showAll="true"
-          @loadSchoolCategoryId="
-            (filters.billing.schoolCategoryId = $event), loadBillings()
-          "
-          @clickAll="(filters.billing.schoolCategoryId = null), loadBillings()"
-          @click="(filters.billing.schoolCategoryId = $event), loadBillings()"
-        /> -->
       <div v-if="!showEntry && !showBatchEntry && checkIfHasSchoolCategoryAccess()">
         <!-- <b-row class="mb-2">
           <b-col md="8">
