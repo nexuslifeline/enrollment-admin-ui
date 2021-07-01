@@ -4,7 +4,7 @@
     <div class="attachment-item__details" @click="$emit('onView', data)">
       <div class="attachment-item__title">{{ data.name }}</div>
       <div class="attachment-item__size">
-        <span>300KB</span>
+        <span>{{ data.size }} KB</span>
       </div>
     </div>
     <div class="attachment-item__actions">

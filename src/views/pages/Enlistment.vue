@@ -151,27 +151,31 @@
 
                   <ActiveViewItems>
                     <ActiveViewItem label="Level: ">
-                      <p>
+                      <!-- <p>
                         {{ getName(data.item, 'level') }}
-                      </p>
+                      </p> -->
+                      {{ data.item.level && data.item.level.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem label="Course: ">
-                      <p>
+                      <!-- <p>
                         {{ getName(data.item, 'course') }}
-                      </p>
+                      </p> -->
+                      {{ data.item.course && data.item.course.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem
-                      v-if="!!getName(data.item, 'course')"
+                      v-if="!!data.item.course"
                       label="Semester: "
                     >
-                      <p>
+                      <!-- <p>
                         {{ getName(data.item, 'semester') }}
-                      </p>
+                      </p> -->
+                      {{ data.item.semester && data.item.semester.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem label="School Year: ">
-                      <p>
+                      <!-- <p>
                         {{ getName(data.item, 'schoolYear') }}
-                      </p>
+                      </p> -->
+                      {{ data.item.schoolYear && data.item.schoolYear.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem label="Section: ">
                       <p>
@@ -179,7 +183,7 @@
                           {{
                             !data.item.sectionId
                               ? 'No Section'
-                              : data.item.sectionId
+                              : data.item.section.name
                           }}
                           <!---- get section value here -->
                           <span class="ml-2"
@@ -219,12 +223,8 @@
                   <div class="details__section-button-container">
                     <button
                       class="btn btn-outline-primary add-subject-button"
-                      v-if="
-                        data.item.academicRecordStatusId ===
-                          AcademicRecordStatuses.DRAFT.id
-                      "
-                      @click="onAddSubject(data.item)"
-                    >
+                      v-if="showOptions"
+                      @click="onAddSubject(data.item)">
                       <v-icon name="plus-circle" /> ADD SUBJECT
                     </button>
                   </div>
@@ -1829,7 +1829,7 @@ export default {
   width: 100%;
   height: auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 15px;
 

@@ -783,7 +783,7 @@ import FileItem from '../components/FileItem';
 import { copyValue } from '../../helpers/extractor';
 import FileViewer from '../components/FileViewer';
 import Access from '../../mixins/utils/Access';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import Card from '../components/Card';
 import { StudentColumn, ContactColumn } from '../components/ColumnDetails';
 
@@ -828,6 +828,8 @@ export default {
     PaymentRejection
   },
   format,
+  startOfMonth,
+  endOfMonth,
   StudentPaymentPermissions,
   PaymentPermissions,
   data() {
@@ -890,11 +892,6 @@ export default {
               label: 'Student',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
-              // formatter: (value, key, item) => {
-              //   item.student.middleName = item.student.middleName ? item.student.middleName : ''
-              //   item.student.name = item.student.firstName + ' ' + item.student.middleName + ' ' + item.student.lastName
-              //   return item.student.name
-              // }
             },
             {
               key: 'contact',
@@ -913,18 +910,6 @@ export default {
                 return format(new Date(value), 'MM/dd/yyyy');
               },
             },
-            // {
-            // 	key: "referenceNo",
-            // 	label: "Ref No.",
-            // 	tdClass: "align-middle",
-            // 	thStyle: { width: "12%"}
-            // },
-            // {
-            // 	key: "paymentMode.name",
-            // 	label: "Payment Mode",
-            // 	tdClass: "align-middle",
-            //   thStyle: { width: "18%"}
-            // },
             {
               key: 'amount',
               label: 'Amount',
@@ -935,19 +920,6 @@ export default {
                 return formatNumber(value);
               },
             },
-            // {
-            // 	key: "submittedDate",
-            // 	label: "Submitted",
-            //   tdClass: "align-middle text-center",
-            //   thClass: "text-center",
-            //   thStyle: { width: "10%"},
-            //   formatter: (value, key, item) => {
-            //     if(!value)
-            //     return ''
-
-            //     return format(new Date(value), 'MM/dd/yyyy')
-            //   }
-            // },
             {
               key: 'paymentStatusId',
               label: 'Status',
@@ -1024,8 +996,8 @@ export default {
           criteria: null,
           paymentStatusId: PaymentStatuses.PENDING.id,
           paymentStatusItem: PaymentStatuses.PENDING,
-          dateFrom: this.$options.format(new Date(), 'yyyy-MM-dd'),
-          dateTo: this.$options.format(new Date(), 'yyyy-MM-dd'),
+          dateFrom: this.$options.format(this.$options.startOfMonth(new Date()), 'yyyy-MM-dd'),
+          dateTo: this.$options.format(this.$options.endOfMonth(new Date()), 'yyyy-MM-dd'),
         },
       },
       isProcessing: false,
@@ -1079,12 +1051,12 @@ export default {
     setApproval(row) {
       clearFields(this.forms.payment);
       reset(this.forms.payment);
-      const params = { paginate: false };
+      // const params = { paginate: false };
       this.row = row.item;
-      this.getPaymentReceiptFiles(row.item.id, params).then(({ data }) => {
-        this.paymentReceiptFiles = data;
-        this.showModalApproval = true;
-      });
+      // this.getPaymentReceiptFiles(row.item.id, params).then(({ data }) => {
+      //   this.paymentReceiptFiles = data;
+      // });
+      this.showModalApproval = true;
     },
     onApproval() {
       this.isProcessing = true;
