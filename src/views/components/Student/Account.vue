@@ -16,6 +16,7 @@
       <PasswordItem
         :route="changePasswordRoute || defaultRoutes.changePassword"
         :isReadOnly="isReadOnly"
+        :data="user"
       />
     </template>
     <div v-else>

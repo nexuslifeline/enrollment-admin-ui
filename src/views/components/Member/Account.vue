@@ -8,7 +8,7 @@
     <template v-if="hasAccount">
       <UsernameItem :user="user" />
       <hr />
-      <PasswordItem />
+      <PasswordItem :data="user"/>
     </template>
     <div v-else>
       No account found.

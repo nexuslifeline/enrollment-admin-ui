@@ -107,7 +107,8 @@
                 Continue
               </b-dropdown-item>
               <b-dropdown-item
-                v-if="![AcademicRecordStatuses.ENROLLED.id, AcademicRecordStatuses.CLOSED.id].includes(data.item.academicRecordStatusId)"
+                v-if="![AcademicRecordStatuses.ENROLLED.id, AcademicRecordStatuses.CLOSED.id].includes(data.item.academicRecordStatusId)
+                  && data.item.academicRecordStatusId === AcademicRecordStatuses.ASSESSMENT_APPROVED.id"
                 @click="$router.push({
                   name: 'Payment Add',
                   query: { studentId: data.item && data.item.student && data.item.student.id }

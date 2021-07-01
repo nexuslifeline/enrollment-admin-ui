@@ -3,7 +3,7 @@
     <div class="items__list">
       <EmailRow :username="user.username" :userGroup="user.userGroup.name"/>
       <hr />
-      <PasswordRow />
+      <PasswordRow :data="user"/>
     </div>
   </Card>
 </template>

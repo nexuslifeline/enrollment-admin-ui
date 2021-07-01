@@ -7,7 +7,7 @@
     <div class="item__action">
       <div class="item__details">
         <vText size="s" color="light" type="p" align="right">**********</vText>
-        <vText size="s" color="light" type="p" align="right">Last updated January 16, 2021</vText>
+        <vText size="s" color="light" type="p" align="right">Last Updated {{ passwordLastUpdateDate  }}</vText>
       </div>
       <b-button v-if="!isReadOnly" @click="onUpdatePassword" type="button" variant="outline-primary">
         Change
@@ -17,8 +17,9 @@
 </template>
 <script>
 
-
+import { format } from "date-fns";
 export default {
+  format,
   props: {
     data: {
       type: [Object],
@@ -34,6 +35,22 @@ export default {
   methods: {
     onUpdatePassword() {
       this.$router.push(this.route);
+    }
+  },
+  computed: {
+    passwordLastUpdateDate() {
+      if(!this.data)
+      return null
+
+      const { updatedAt, createdAt } = this.data
+
+      if(updatedAt) {
+        return this.$options.format(new Date(updatedAt), 'MMMM dd yyyy')
+      }
+
+      if(createdAt) {
+        return this.$options.format(new Date(createdAt), 'MMMM dd yyyy')
+      }
     }
   }
 };

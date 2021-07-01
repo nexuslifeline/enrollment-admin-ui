@@ -1,6 +1,11 @@
 <template>
   <div>
-    <template v-if="data.academicRecordStatusId === AcademicRecordStatuses.ENLISTMENT_APPROVED.id">
+    <template v-if="data.academicRecordStatusId === AcademicRecordStatuses.ASSESSMENT_APPROVED.id">
+      <b-badge variant="success">
+        Assessment Approved
+      </b-badge>
+    </template>
+    <template v-else-if="data.academicRecordStatusId === AcademicRecordStatuses.ENLISTMENT_APPROVED.id">
       <b-badge variant="warning">
         Assessment Review
       </b-badge>
