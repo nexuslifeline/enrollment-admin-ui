@@ -20,7 +20,7 @@
           {{ v.description }}
         </td>
         <td>
-          <SectionColumn :data="v.section || {}"/>
+          <SectionColumn :data="v.section || null" @onSelectSection="$emit('onSelectSection', v)" @onClearSection="$emit('onClearSection', v)"/>
         </td>
         <td class="align-right">
           {{ v.totalUnits }}
@@ -32,6 +32,13 @@
         </td>
       </tr>
     </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" class="align-right text-bold">TOTAL UNITS</td>
+        <td class="align-right text-bold">{{ totalUnits }}</td>
+        <td></td>
+      </tr>
+    </tfoot>
   </table>
 </template>
 <script>
@@ -52,6 +59,13 @@ export default {
   },
   methods: {
 
+  },
+  computed: {
+    totalUnits() {
+     return this.data.reduce((total, subject)  =>{
+        return total += parseFloat(subject.totalUnits)
+      }, 0)
+    }
   }
 };
 </script>
@@ -96,6 +110,10 @@ export default {
     background-color: black;
     color: $white;
   }
+}
+
+.text-bold {
+  font-weight: bold;
 }
 
 </style>

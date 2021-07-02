@@ -9,7 +9,7 @@
       noPaddingBody
       :hasFooter="true">
       <div v-if="subjects.length > 0">
-        <SubjectsTable :data="subjects" @onRemove="onRemoveSubject" />
+        <SubjectsTable :data="subjects" @onRemove="onRemoveSubject" @onSelectSection="onSelectSection" @onClearSection="onClearSection"/>
       </div>
       <div v-else class="empty-container">
         No subject(s) found.
@@ -29,7 +29,13 @@
       :level="data.level"
       :course="data.course"
       :semester="data.semester"
-      :section="data.section" />
+      :section="data.section"/>
+    <SectionsOfSubject
+      :show.sync="showSectionModal"
+      v-if="showSectionModal"
+      :subject="selectedSubject"
+      @onSectionSelected="onSectionSelected"
+    />
   </div>
 </template>
 <script>
@@ -37,11 +43,13 @@ import { showNotification } from '../../../helpers/forms';
 import { AcademicRecordApi } from '../../../mixins/api';
 import SubjectsTable from './SubjectsTable';
 import SubjectListModal from '../SubjectModal/SubjectList'
+import SectionsOfSubject from './SectionsOfSubject'
 
 export default {
   components: {
     SubjectsTable,
-    SubjectListModal
+    SubjectListModal,
+    SectionsOfSubject
   },
   props: {
     academicRecordId: {
@@ -60,7 +68,9 @@ export default {
     return {
       isProcessing: false,
       subjects: [],
-      showSubjectModal: false
+      showSubjectModal: false,
+      showSectionModal: false,
+      selectedSubject: null
     }
   },
   created() {
@@ -91,8 +101,8 @@ export default {
         showNotification(this, 'warning', 'Subject Already Added!')
         return
       }
-      this.$set(subject, 'section', { ...section })
-      this.$set(subject, 'pivot', { sectionId: section?.id })
+      this.$set(subject, 'section', section ? { ...section } : null)
+      this.$set(subject, 'pivot', { sectionId: section ? section.id : null })
       this.subjects.push(subject)
     },
     onRemoveSubject(subject) {
@@ -100,6 +110,25 @@ export default {
     },
     isSubjectAdded(subject) {
       return this.subjects.find(s => s.id === subject.id)
+    },
+    onClearSection(subject) {
+      let sub = this.subjects.find(s=> s.id === subject.id)
+      if(sub) {
+        sub.section = null
+        sub.pivot.sectionId = null
+      }
+    },
+    onSelectSection(subject) {
+      this.selectedSubject = subject
+      this.showSectionModal = true
+    },
+    onSectionSelected(section) {
+      const sub = this.subjects.find(s=> s.id === this.selectedSubject.id)
+      if(section && sub) {
+        this.$set(sub, 'section', { ...section })
+        this.$set(sub, 'pivot', { sectionId: section?.id })
+        this.selectedSubject = null
+      }
     }
   },
 

@@ -142,7 +142,7 @@
         :isShown.sync="isStudentShown"
         v-if="isStudentShown"
       />
-      <router-view :previousRoute="{ name: 'Academic Record Applications' }" />
+      <router-view :previousRoute="{ name: 'Academic Record Applications' }" @onAssessmentRequested="onAssessmentRequested"/>
     </template>
   </PageContent>
   <!-- main container -->
@@ -352,6 +352,9 @@ export default {
       academicRecord.courseItem = item;
       this.loadAcademicRecord();
     },
+    onAssessmentRequested(){
+      this.loadAcademicRecord()
+    }
   },
   computed: {
     isCourseVisible() {

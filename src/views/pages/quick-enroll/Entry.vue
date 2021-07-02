@@ -196,6 +196,8 @@ export default {
       this.requestAssessment(this.academicRecordId).then(({ data }) => {
         this.data.manualStepId = data.manualStepId
         this.isBusy = false
+        this.$emit('onAssessmentRequested')
+        this.$router.push(this.previousRoute)
       }).catch((error) => {
         const errors = error.response.data.errors;
         this.isBusy = false

@@ -253,6 +253,7 @@ export default {
     },
     onSectionChanged(section){
       const { subject } = this.filters
+
       subject.section = section
       subject.sectionId = section?.id
       this.loadSubjects()
