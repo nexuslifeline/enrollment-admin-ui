@@ -26,10 +26,10 @@
       :show.sync="showSubjectModal"
       v-if="showSubjectModal"
       @onAddSubject="onAddSubject"
-      :levelId="data.levelId"
-      :courseId="data.courseId"
-      :semesterId="data.semesterId"
-      :sectionId="data.sectionId" />
+      :level="data.level"
+      :course="data.course"
+      :semester="data.semester"
+      :section="data.section" />
   </div>
 </template>
 <script>
@@ -86,12 +86,13 @@ export default {
       });
     },
     onAddSubject(data) {
-      const { subject, sectionId } = data
+      const { subject, section } = data
       if(this.isSubjectAdded(subject)) {
         showNotification(this, 'warning', 'Subject Already Added!')
         return
       }
-      this.$set(subject, 'pivot', { sectionId })
+      this.$set(subject, 'section', { ...section })
+      this.$set(subject, 'pivot', { sectionId: section?.id })
       this.subjects.push(subject)
     },
     onRemoveSubject(subject) {

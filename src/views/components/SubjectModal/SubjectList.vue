@@ -22,34 +22,30 @@
         <SelectLevel
           placeholder="Level"
           label="name"
-          :value="filters.subject.levelId"
-          :reduce="option => option.id"
+          :value="filters.subject.level"
           @input="onLevelChanged" />
       </b-col>
       <b-col>
         <SelectCourseLevel
           placeholder="Course"
           label="name"
-          :value="filters.subject.courseId"
-          :reduce="option => option.id"
-          :levelId="filters.subject.levelId"
+          :value="filters.subject.course"
+          :levelId="filters.subject.level && filters.subject.level.id || null"
           @input="onCourseChanged" />
       </b-col>
       <b-col>
         <SelectSemester
           placeholder="Semester"
           label="name"
-          :value="filters.subject.semesterId"
-          :reduce="option => option.id"
-          :levelId="filters.subject.levelId"
+          :value="filters.subject.semester"
+          :levelId="filters.subject.level && filters.subject.level.id || null"
           @input="onSemesterChanged" />
       </b-col>
       <b-col>
         <SelectSection
           placeholder="Section"
           label="name"
-          :value="filters.subject.sectionId"
-          :reduce="option => option.id"
+          :value="filters.subject.section"
           @input="onSectionChanged" />
       </b-col>
     </b-row>
@@ -68,7 +64,7 @@
             <SubjectColumn :data="row.item"/>
           </template>
           <template v-slot:cell(action)="row">
-            <b-button @click="$emit('onAddSubject', { subject: row.item, sectionId: filters.subject.sectionId})" size="sm" variant="success">
+            <b-button @click="$emit('onAddSubject', { subject: row.item, section: filters.subject.section })" size="sm" variant="success">
               <v-icon name="plus" />
             </b-button>
           </template>
@@ -119,20 +115,20 @@ export default {
       type: [Boolean],
       default: false
     },
-    levelId: {
-      type: [Number],
+    level: {
+      type: [Object],
       default: null
     },
-    courseId: {
-      type: [Number],
+    course: {
+      type: [Object],
       default: null
     },
-    semesterId: {
-      type: [Number],
+    semester: {
+      type: [Object],
       default: null
     },
-    sectionId: {
-      type: [Number],
+    section: {
+      type: [Object],
       default: null
     }
   },
@@ -194,10 +190,10 @@ export default {
       filters: {
         subject: {
           criteria: null,
-          levelId: this.levelId,
-          courseId: this.courseId,
-          semesterId: this.semesterId,
-          sectionId: this.sectionId
+          level: this.level,
+          course: this.course,
+          semester: this.semester,
+          section: this.section
         },
       }
     }
@@ -213,7 +209,7 @@ export default {
   methods: {
     loadSubjects() {
       const { subjects } = this.tables;
-      const { criteria, levelId, courseId, semesterId, sectionId } = this.filters.subject;
+      const { criteria, level, course, semester, section } = this.filters.subject;
       const { subject, subject: { perPage, page }} = this.paginations;
 
       subjects.isBusy = true;
@@ -222,10 +218,10 @@ export default {
         perPage,
         page,
         criteria,
-        levelId,
-        courseId,
-        semesterId,
-        sectionId
+        levelId: level?.id,
+        courseId: course?.id,
+        semesterId: semester?.id,
+        sectionId: section?.id
       };
 
       this.getSubjectList(params).then(({ data }) => {
@@ -236,23 +232,29 @@ export default {
         subjects.isBusy = false;
       });
     },
-    onLevelChanged(levelId){
+    onLevelChanged(level){
       const { subject } = this.filters
-      subject.levelId = levelId
-      subject.courseId = null
-      subject.sectionId = null
+      subject.level = level?.id
+      subject.course = null
+      subject.section = null
       this.loadSubjects()
     },
-    onCourseChanged(courseId){
-      this.filters.subject.courseId = courseId
+    onCourseChanged(course){
+      const { subject } = this.filters
+      subject.course = course
+      subject.courseId = course?.id
       this.loadSubjects()
     },
-    onSemesterChanged(semesterId){
-      this.filters.subject.semesterId = semesterId
+    onSemesterChanged(semester){
+      const { subject } = this.filters
+      subject.semester = semester
+      subject.semesterId = semester?.id
       this.loadSubjects()
     },
-    onSectionChanged(sectionId){
-      this.filters.subject.sectionId = sectionId
+    onSectionChanged(section){
+      const { subject } = this.filters
+      subject.section = section
+      subject.sectionId = section?.id
       this.loadSubjects()
     }
   }

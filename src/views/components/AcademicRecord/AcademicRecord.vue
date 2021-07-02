@@ -16,10 +16,9 @@
       <InputContainer>
         <label class="required">School Category</label>
         <SelectCategory
-          :value="data.schoolCategoryId"
-          :reduce="option => option.id"
+          :value="data.schoolCategory"
           label="name"
-          @input="data.schoolCategoryId = $event"
+          @input="onSchoolCategoryChanged"
           :clearable="false"
           :disabled="isReadOnly"
         />
@@ -27,10 +26,9 @@
       <InputContainer>
         <label class="required">School Year</label>
         <SelectSchoolYear
-          :value="data.schoolYearId"
-          :reduce="option => option.id"
+          :value="data.schoolYear"
           label="name"
-          @input="data.schoolYearId = $event"
+          @input="onSchoolYearChanged"
           :clearable="false"
           :disabled="isReadOnly"
         />
@@ -40,10 +38,9 @@
       <InputContainer>
         <label class="required">Level</label>
         <SelectLevel
-          :value="data.levelId"
-          :reduce="option => option.id"
+          :value="data.level"
           label="name"
-          @input="data.levelId = $event"
+          @input="onLevelChanged"
           :schoolCategoryId="data.schoolCategoryId"
           :disabled="isReadOnly"
         />
@@ -63,10 +60,9 @@
       <InputContainer>
         <label class="required">Course</label>
          <SelectCourseLevel
-          :value="data.courseId"
-          :reduce="option => option.id"
+          :value="data.course"
           label="description"
-          @input="data.courseId = $event"
+          @input="onCourseChanged"
           :levelId="data.levelId"
           :disabled="isReadOnly"
         />
@@ -74,10 +70,9 @@
       <InputContainer>
         <label class="required">Semester</label>
         <SelectSemester
-          :value="data.semesterId"
-          :reduce="option => option.id"
+          :value="data.semester"
           label="description"
-          @input="data.semesterId = $event"
+          @input="onSemesterChanged"
           :schoolCategoryId="data.schoolCategoryId"
           :disabled="isReadOnly"
         />
@@ -87,11 +82,11 @@
        <InputContainer>
         <label class="required">Curriculum</label>
         <SelectCurriculum
-          :value="data.transcriptRecord.curriculumId"
+          :value="data.transcriptRecord.curriculum"
           :courseId="data.courseId"
-          :reduce="option => option.id"
+          :schoolCategoryId="data.schoolCategoryId"
           label="name"
-          @input="data.transcriptRecord.curriculumId = $event"
+          @input="onCurriculumChanged"
           :disabled="isReadOnly"
         />
       </InputContainer>
@@ -110,11 +105,15 @@
       <InputContainer>
         <label>Section</label>
         <SelectSection
-          :value="data.sectionId"
-          :reduce="option => option.id"
+          :value="data.section"
           label="name"
-          @input="data.sectionId = $event"
+          @input="onSectionChanged"
           :disabled="isReadOnly"
+          :schoolYearId="data.schoolYearId"
+          :schoolCategoryId="data.schoolCategoryId"
+          :levelId="data.levelId"
+          :courseId="data.courseId"
+          :semesterId="data.semesterId"
         />
       </InputContainer>
     </InputGroup>
@@ -251,6 +250,76 @@ const academicRecordFields = {
         this.isProcessing = false;
         validate(academicRecord, errors);
       });
+      },
+      onSchoolYearChanged(schoolYear) {
+        this.data.schoolYearId = schoolYear?.id
+        this.data.schoolYear = schoolYear
+      },
+      onSchoolCategoryChanged(schoolCategory) {
+        this.data.schoolCategoryId = schoolCategory?.id
+        this.data.schoolCategory = schoolCategory
+
+        //reset data fields
+        this.data.levelId = null
+        this.data.level = null
+
+        this.data.courseId = null
+        this.data.course = null
+
+        this.data.semesterId = null
+        this.data.semester = null
+
+        this.data.sectionId = null
+        this.data.section = null
+
+        this.data.transcriptRecord.curriculum = null
+        this.data.transcriptRecord.curriculumId = null
+      },
+      onLevelChanged(level) {
+        this.data.levelId = level?.id
+        this.data.level = level
+
+        //reset data fields
+        this.data.courseId = null
+        this.data.course = null
+
+        this.data.semesterId = null
+        this.data.semester = null
+
+        this.data.sectionId = null
+        this.data.section = null
+
+        this.data.transcriptRecord.curriculum = null
+        this.data.transcriptRecord.curriculumId = null
+      },
+      onCourseChanged(course) {
+        this.data.courseId = course?.id
+        this.data.course = course
+
+        //reset data fields
+        this.data.semesterId = null
+        this.data.semester = null
+
+        this.data.sectionId = null
+        this.data.section = null
+
+        this.data.transcriptRecord.curriculum = null
+        this.data.transcriptRecord.curriculumId = null
+      },
+      onSemesterChanged(semester) {
+        this.data.semesterId = semester?.id
+        this.data.semester = semester
+
+        this.data.sectionId = null
+        this.data.section = null
+      },
+      onSectionChanged(section) {
+        this.data.sectionId = section?.id
+        this.data.section = section
+      },
+      onCurriculumChanged(curriculum) {
+        this.data.transcriptRecord.curriculumId = curriculum?.id
+        this.data.transcriptRecord.curriculum = curriculum
       }
     },
   }

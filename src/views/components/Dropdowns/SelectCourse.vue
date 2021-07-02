@@ -56,6 +56,14 @@ export default {
       type: [Boolean],
       default: false
     },
+    levelId: {
+      type: [Number],
+      default: null
+    },
+    schoolCategoryId: {
+      type: [Number],
+      default: null
+    }
   },
   mixins: [ CourseApi ],
   data() {
@@ -70,8 +78,8 @@ export default {
   },
   created() {
     const { courses } = this.options
-    const params = { paginate: false }
     courses.isBusy = true
+    const params = { paginate: false,  schoolCategoryId: this.schoolCategoryId, levelId: this.levelId }
     this.getCourseList(params).then(({ data }) => {
       courses.items = data
       courses.isBusy = false
@@ -82,6 +90,14 @@ export default {
       this.$emit('input', item);
     },
   },
+  watch: {
+    'levelId': function() {
+      this.loadCourses()
+    },
+    'schoolCategoryId': function() {
+      this.loadCourses()
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

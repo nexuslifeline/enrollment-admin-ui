@@ -70,6 +70,9 @@ export default {
       type: [Boolean],
       default: false
     },
+    schoolCategoryId: {
+      type: [String, Number],
+    }
   },
   mixins: [ CurriculumApi ],
   data() {
@@ -91,11 +94,11 @@ export default {
     },
     loadCurriculums() {
       const { curriculums } = this.options
-      const params = { paginate: false, courseId: this.courseId }
+      const params = { paginate: false, schoolCategoryId: this.schoolCategoryId, courseId: this.courseId }
       curriculums.isBusy = true
       this.getCurriculumList(params).then(({ data }) => {
-        console.log('cur')
-        console.log(data)
+        // console.log('cur')
+        // console.log(data)
         curriculums.items = data
         curriculums.isBusy = false
       })
@@ -103,6 +106,9 @@ export default {
   },
   watch: {
     'courseId': function() {
+      this.loadCurriculums()
+    },
+    'schoolCateoryId': function() {
       this.loadCurriculums()
     }
   }

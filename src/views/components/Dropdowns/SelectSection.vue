@@ -67,6 +67,21 @@ export default {
       type: [Boolean],
       default: false
     },
+    schoolYearId: {
+      type: [String, Number]
+    },
+    schoolCategoryId: {
+      type: [String, Number]
+    },
+    levelId: {
+      type: [String, Number]
+    },
+    courseId: {
+      type: [String, Number]
+    },
+    semesterId: {
+      type: [String, Number]
+    }
   },
   mixins: [ SectionApi ],
   data() {
@@ -80,19 +95,40 @@ export default {
     }
   },
   created() {
-    const { sections } = this.options
-    const params = { paginate: false }
-    sections.isBusy = true
-    this.getSectionList(params).then(({ data }) => {
-      sections.items = data
-      sections.isBusy = false
-    })
+    this.loadSections()
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     },
+    loadSections() {
+      const { sections } = this.options
+      const params = { paginate: false, schoolYearId: this.schoolYearId,
+      schoolCategoryId: this.schoolCategoryId, levelId: this.levelId, courseId: this.courseId, semesterId: this.semesterId  }
+      sections.isBusy = true
+      this.getSectionList(params).then(({ data }) => {
+        sections.items = data
+        sections.isBusy = false
+      })
+    }
   },
+  watch: {
+    'schoolYearId': function() {
+      this.loadSections()
+    },
+    'schoolCateoryId': function() {
+      this.loadSections()
+    },
+    'levelId': function() {
+      this.loadSections()
+    },
+    'courseId': function() {
+      this.loadSections()
+    },
+    'semesterId': function() {
+      this.loadSections()
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
