@@ -57,7 +57,7 @@
         </div>
       </div>
     </template>
-    <template v-slot:footer>
+    <template v-if="!isReadOnly" v-slot:footer>
       <div class="approval-view__footer">
         <div class="approval-view__actions">
           <b-button

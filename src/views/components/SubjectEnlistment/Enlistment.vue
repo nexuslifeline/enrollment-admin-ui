@@ -9,7 +9,11 @@
       noPaddingBody
       :hasFooter="true">
       <div v-if="subjects.length > 0">
-        <SubjectsTable :data="subjects" @onRemove="onRemoveSubject" @onSelectSection="onSelectSection" @onClearSection="onClearSection"/>
+        <SubjectsTable :data="subjects"
+          @onRemove="onRemoveSubject"
+          @onSelectSection="onSelectSection"
+          @onClearSection="onClearSection"
+          :isReadOnly="isReadOnly"/>
       </div>
       <div v-else class="empty-container">
         No subject(s) found.
@@ -34,6 +38,7 @@
       :show.sync="showSectionModal"
       v-if="showSectionModal"
       :subject="selectedSubject"
+      :schoolYearId="data.schoolYearId"
       @onSectionSelected="onSectionSelected"
     />
   </div>

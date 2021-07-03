@@ -716,3 +716,14 @@ legend.required:before {
     border-color: red!important;
   }
 }
+
+.vs--disabled .vs__dropdown-toggle .vs__selected-options input {
+  background-color: transparent!important;
+}
+
+.v-select .vs__dropdown-toggle .vs__selected-options .vs__selected {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}

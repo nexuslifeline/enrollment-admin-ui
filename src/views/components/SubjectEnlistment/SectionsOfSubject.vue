@@ -170,9 +170,8 @@ export default {
       this.showModalSection = true
       const { sections } = this.tables
       const { section } = this.paginations
-      const schoolYearId = 1
 
-      const params = { paginate: false, perPage: section.perPage, subjectId: this.subject?.id, schoolYearId }
+      const params = { paginate: false, perPage: section.perPage, subjectId: this.subject?.id, schoolYearId: this.schoolYearId }
       sections.isBusy = true
 
       this.getSectionsOfSubject(params, this.subject?.id).then(({ data }) => {

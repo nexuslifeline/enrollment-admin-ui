@@ -20,13 +20,13 @@
           {{ v.description }}
         </td>
         <td>
-          <SectionColumn :data="v.section || null" @onSelectSection="$emit('onSelectSection', v)" @onClearSection="$emit('onClearSection', v)"/>
+          <SectionColumn :isReadOnly="isReadOnly" :data="v.section || null" @onSelectSection="$emit('onSelectSection', v)" @onClearSection="$emit('onClearSection', v)"/>
         </td>
         <td class="align-right">
           {{ v.totalUnits }}
         </td>
         <td>
-          <button class="action__trash" @click="$emit('onRemove', v)">
+          <button v-if="!isReadOnly" class="action__trash" @click="$emit('onRemove', v)">
             <BIconTrash />
           </button>
         </td>
@@ -48,6 +48,10 @@ export default {
   props: {
     data: {
       type: [Array]
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   components: {
