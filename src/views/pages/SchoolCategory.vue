@@ -50,7 +50,7 @@
                   :per-page="paginations.schoolCategory.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.schoolCategory)" />
+                  @input="paginate(paginations.schoolCategory)" />
                 </b-col>
               </b-row>
           </b-col>
@@ -129,7 +129,7 @@ export default {
       this.getSchoolCategoryList(params).then(({ data }) => {
         schoolCategories.items = data
         schoolCategory.totalRows = data.length
-        this.recordDetails(schoolCategory)
+        this.paginate(schoolCategory)
         schoolCategories.isBusy = false
       }).catch(error => {
         schoolCategories.isBusy = false

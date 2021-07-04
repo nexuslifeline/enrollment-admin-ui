@@ -26,6 +26,7 @@ import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems'
 import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
 import PageContent from './views/components/PageContainer/PageContent';
 import SelectCategory from './views/components/Dropdowns/SelectCategory';
+import SelectStudentBillingTerms from './views/components/Dropdowns/SelectStudentBillingTerms';
 import SelectStudentCategory from './views/components/Dropdowns/SelectStudentCategory';
 import SelectStudent from './views/components/Dropdowns/SelectStudent';
 import SelectOnboardingSteps from './views/components/Dropdowns/SelectOnboardingSteps';
@@ -211,6 +212,7 @@ Vue.component('BackLink', BackLink);
 Vue.component('SelectStudent', SelectStudent);
 Vue.component('SelectStudentCategory', SelectStudentCategory);
 Vue.component('SelectCategory', SelectCategory);
+Vue.component('SelectStudentBillingTerms', SelectStudentBillingTerms);
 Vue.component('SelectOnboardingSteps', SelectOnboardingSteps);
 Vue.component('SelectAcademicStatus', SelectAcademicStatus);
 Vue.component('SelectAcademicRecord', SelectAcademicRecord);

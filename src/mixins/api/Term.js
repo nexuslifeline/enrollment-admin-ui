@@ -20,7 +20,7 @@ export default {
     addOrUpdateMultipleTerm(data) {
         return this.$authHttp.post(`${apiPrefix}/${apiVersion}/terms/update-multiple`, data);
     },
-    getStudentFeeTermsOfStudent(studentId, params) {
+    getStudentBillingTerms(studentId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/terms`, { params: params });
     }
   }

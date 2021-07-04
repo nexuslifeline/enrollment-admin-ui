@@ -1388,7 +1388,7 @@ export default {
     //     (filter.schoolYearId ? s.schoolYearId === filter.schoolYearId : true)
     //   )
     //   paginate.totalRows = sections.filteredItems.length;
-    //   this.recordDetails(paginate);
+    //   this.paginate(paginate);
     // },
     addSchedule() {
       const {

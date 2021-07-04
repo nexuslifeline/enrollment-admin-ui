@@ -116,7 +116,7 @@
                   :per-page="paginations.peraPadalaAccount.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.peraPadalaAccount)"
+                  @input="paginate(paginations.peraPadalaAccount)"
                 />
               </b-col>
             </b-row>
@@ -354,7 +354,7 @@ export default {
       this.getPeraPadalaAccountList(params).then(({ data }) => {
         peraPadalaAccounts.items = data;
         peraPadalaAccount.totalRows = data.length;
-        this.recordDetails(peraPadalaAccount);
+        this.paginate(peraPadalaAccount);
         peraPadalaAccounts.isBusy = false;
       });
     },

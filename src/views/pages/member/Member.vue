@@ -133,7 +133,7 @@
                   :per-page="paginations.user.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.user)"
+                  @input="paginate(paginations.user)"
                 />
               </b-col>
             </b-row>
@@ -369,7 +369,7 @@ export default {
       this.getPersonnelList(params).then(({ data }) => {
         users.items = data;
         user.totalRows = data.length;
-        this.recordDetails(user);
+        this.paginate(user);
         users.isBusy = false;
       });
     },

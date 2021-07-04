@@ -99,7 +99,7 @@
                   :per-page="paginations.schoolYear.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.schoolYear)"
+                  @input="paginate(paginations.schoolYear)"
                 />
               </b-col>
             </b-row>
@@ -263,7 +263,7 @@ export default {
         .then(({ data }) => {
           schoolYears.items = data;
           schoolYear.totalRows = data.length;
-          this.recordDetails(schoolYear);
+          this.paginate(schoolYear);
           schoolYears.isBusy = false;
         })
         .catch((error) => {

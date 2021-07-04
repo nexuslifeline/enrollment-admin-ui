@@ -54,7 +54,7 @@
                 :per-page="paginations.section.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.section)"
+                @input="paginate(paginations.section)"
               />
             </b-col>
         </b-row>
@@ -177,7 +177,7 @@ export default {
       this.getSectionsOfSubject(params, this.subject?.id).then(({ data }) => {
         sections.items = data
         section.totalRows = data.length
-        this.recordDetails(section)
+        this.paginate(section)
         sectionsOfSubjects.isBusy = false
       }).catch((error) => {
         sections.isBusy = false

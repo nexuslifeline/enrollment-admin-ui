@@ -77,7 +77,7 @@
                   :per-page="paginations.semester.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.semester)"
+                  @input="paginate(paginations.semester)"
                 />
               </b-col>
             </b-row>
@@ -218,7 +218,7 @@ export default {
         .then(({ data }) => {
           semesters.items = data;
           semester.totalRows = data.length;
-          this.recordDetails(semester);
+          this.paginate(semester);
           semesters.isBusy = false;
         })
         .catch((error) => {

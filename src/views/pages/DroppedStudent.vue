@@ -101,7 +101,7 @@
                   :per-page="paginations.droppedStudent.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.droppedStudent)"
+                  @input="paginate(paginations.droppedStudent)"
                 />
               </b-col>
             </b-row>

@@ -116,7 +116,7 @@
                   :per-page="paginations.eWalletAccount.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.eWalletAccount)"
+                  @input="paginate(paginations.eWalletAccount)"
                 />
               </b-col>
             </b-row>
@@ -354,7 +354,7 @@ export default {
       this.getEWalletAccountList(params).then(({ data }) => {
         eWalletAccounts.items = data;
         eWalletAccount.totalRows = data.length;
-        this.recordDetails(eWalletAccount);
+        this.paginate(eWalletAccount);
         eWalletAccounts.isBusy = false;
       });
     },

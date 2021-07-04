@@ -120,7 +120,7 @@
                   v-model="paginations.course.page"
                   :total-rows="paginations.course.totalRows"
                   :per-page="paginations.course.perPage"
-                  @input="recordDetails(paginations.course)"
+                  @input="paginate(paginations.course)"
                   size="sm"
                   align="end"
                 />
@@ -382,7 +382,7 @@ export default {
       this.getCourseList(params).then(({ data }) => {
         courses.items = data;
         course.totalRows = data.length;
-        this.recordDetails(course);
+        this.paginate(course);
         courses.isBusy = false;
       });
     },

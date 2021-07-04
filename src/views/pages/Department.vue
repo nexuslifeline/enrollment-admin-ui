@@ -133,7 +133,7 @@
                 :per-page="paginations.department.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.department)"
+                @input="paginate(paginations.department)"
               />
             </b-col>
           </b-row>
@@ -352,7 +352,7 @@ export default {
       this.getDepartmentList(params).then(({ data }) => {
         departments.items = data;
         department.totalRows = data.length;
-        this.recordDetails(department);
+        this.paginate(department);
         departments.isBusy = false;
       });
     },

@@ -767,7 +767,7 @@
                 :per-page="paginations.addSubject.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.addSubject)"
+                @input="paginate(paginations.addSubject)"
               />
             </b-col>
           </b-row>
@@ -1103,7 +1103,7 @@ export default {
       this.getSubjectList(params).then(({ data }) => {
         addSubjects.items = data;
         addSubject.totalRows = data.length;
-        this.recordDetails(addSubject);
+        this.paginate(addSubject);
         addSubjects.isBusy = false;
         this.isLoadingCurriculum = false;
       });

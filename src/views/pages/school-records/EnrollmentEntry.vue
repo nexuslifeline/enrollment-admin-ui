@@ -447,7 +447,7 @@
                 :per-page="paginations.subject.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.subject)"
+                @input="paginate(paginations.subject)"
               />
             </b-col>
           </b-row>
@@ -521,7 +521,7 @@
                 :per-page="paginations.fee.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.fee)"
+                @input="paginate(paginations.fee)"
               />
             </b-col>
           </b-row>
@@ -860,7 +860,7 @@ export default {
       this.getSchoolFeeList(params).then(({ data }) => {
         fees.items = data;
         fee.totalRows = data.length;
-        this.recordDetails(fee);
+        this.paginate(fee);
         fees.isBusy = false;
       });
     },
@@ -875,7 +875,7 @@ export default {
       this.getSubjectList(params).then(({ data }) => {
         subjects.items = data;
         subject.totalRows = data.length;
-        this.recordDetails(subject);
+        this.paginate(subject);
         subjects.isBusy = false;
       });
     },

@@ -409,7 +409,7 @@
                     :per-page="paginations.curriculum.perPage"
                     size="sm"
                     align="end"
-                    @input="recordDetails(paginations.curriculum)"
+                    @input="paginate(paginations.curriculum)"
                   />
                 </b-col>
               </b-row>
@@ -1131,7 +1131,7 @@
                 :per-page="paginations.subject.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails(paginations.subject)"
+                @input="paginate(paginations.subject)"
               />
             </b-col>
           </b-row>
@@ -1664,7 +1664,7 @@ export default {
       this.getCurriculumList(params).then(({ data }) => {
         curriculums.items = data;
         curriculum.totalRows = data.length;
-        this.recordDetails(curriculum);
+        this.paginate(curriculum);
         curriculums.isBusy = false;
       });
     },
@@ -2002,7 +2002,7 @@ export default {
         subjects.items = data;
         // subjects.filteredItems = data
         subject.totalRows = data.length;
-        this.recordDetails(subject);
+        this.paginate(subject);
         subjects.isBusy2 = false;
       });
     },

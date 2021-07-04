@@ -792,7 +792,7 @@
                 :per-page="paginations.fee.perPage"
                 size="sm"
                 align="end"
-                @input="recordDetails()"
+                @input="paginate()"
               />
             </b-col>
           </b-row>
@@ -1231,7 +1231,7 @@ export default {
       this.getSchoolFeeList(params).then(({ data }) => {
         fees.items = data;
         fee.totalRows = data.length;
-        this.recordDetails(fee);
+        this.paginate(fee);
         fees.isBusy = false;
       });
     },
@@ -1327,7 +1327,7 @@ export default {
         paginate: false,
       };
       terms.isLoading = true;
-      this.getStudentFeeTermsOfStudent(studentId, params).then(({ data }) => {
+      this.getStudentBillingTerms(studentId, params).then(({ data }) => {
         terms.items = data;
         terms.isLoading = false;
         this.getTermInfo();

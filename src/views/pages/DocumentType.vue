@@ -127,7 +127,7 @@
                   :per-page="paginations.documentType.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.documentType)"
+                  @input="paginate(paginations.documentType)"
                 />
               </b-col>
             </b-row>
@@ -323,7 +323,7 @@ export default {
       this.getDocumentTypeList(params).then(({ data }) => {
         documentTypes.items = data;
         documentType.totalRows = data.length;
-        this.recordDetails(documentType);
+        this.paginate(documentType);
         documentTypes.isBusy = false;
       });
     },

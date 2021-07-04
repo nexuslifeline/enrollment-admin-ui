@@ -507,7 +507,7 @@
                   :per-page="paginations.subject.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.subject)"
+                  @input="paginate(paginations.subject)"
                 />
               </b-col>
             </b-row>
@@ -768,7 +768,7 @@ export default {
         subjects.items = data;
         // subjects.filteredItems = data
         subject.totalRows = data.length;
-        this.recordDetails(subject);
+        this.paginate(subject);
         subjects.isBusy2 = false;
       });
     },

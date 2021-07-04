@@ -131,7 +131,7 @@
                   :per-page="paginations.schoolFeeCategory.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.schoolFeeCategory)"
+                  @input="paginate(paginations.schoolFeeCategory)"
                 />
               </b-col>
             </b-row>
@@ -354,7 +354,7 @@ export default {
       this.getSchoolFeeCategoryList(params).then(({ data }) => {
         schoolFeeCategories.items = data;
         schoolFeeCategory.totalRows = data.length;
-        this.recordDetails(schoolFeeCategory);
+        this.paginate(schoolFeeCategory);
         schoolFeeCategories.isBusy = false;
       });
     },

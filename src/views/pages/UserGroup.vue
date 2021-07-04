@@ -116,7 +116,7 @@
                   :per-page="paginations.userGroup.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.userGroup)"
+                  @input="paginate(paginations.userGroup)"
                 />
               </b-col>
             </b-row>
@@ -358,7 +358,7 @@ export default {
       this.getUserGroupList(params).then(({ data }) => {
         userGroups.items = data;
         userGroup.totalRows = data.length;
-        this.recordDetails(userGroup);
+        this.paginate(userGroup);
         userGroups.isBusy = false;
       });
     },

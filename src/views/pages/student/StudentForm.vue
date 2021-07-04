@@ -14,12 +14,10 @@
       <Subjects :studentId="$route.params.studentId" />
       <OnboardingSettings :data="data" />
       <AcademicRecord
-        v-if="!!Object.keys(data).length && data.hasOpenAcademicRecord"
+        v-if="!!Object.keys(data.latestAcademicRecord).length"
         :data="data.latestAcademicRecord"
-        :showNotes="true"
         :allowChangeStatus="true"
-        notes="This setting is only visible if student has a record that is not yet mark as Enrolled."
-        title="Active Academic Record"
+        title="Latest Academic Record"
       />
     </template>
   </CenterContainer>

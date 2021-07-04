@@ -111,7 +111,7 @@
                   :per-page="paginations.schoolFee.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.schoolFee)" />
+                  @input="paginate(paginations.schoolFee)" />
                 </b-col>
               </b-row>
           </b-col>
@@ -352,7 +352,7 @@ export default {
       this.getSchoolFeeList(params).then(({ data }) =>{
         schoolFees.items = data
         schoolFee.totalRows = data.length
-        this.recordDetails(schoolFee)
+        this.paginate(schoolFee)
         schoolFees.isBusy = false
       })
     },

@@ -122,7 +122,7 @@
                   :per-page="paginations.bankAccount.perPage"
                   size="sm"
                   align="end"
-                  @input="recordDetails(paginations.bankAccount)"
+                  @input="paginate(paginations.bankAccount)"
                 />
               </b-col>
             </b-row>
@@ -361,7 +361,7 @@ export default {
       this.getBankAccountList(params).then(({ data }) => {
         bankAccounts.items = data;
         bankAccount.totalRows = data.length;
-        this.recordDetails(bankAccount);
+        this.paginate(bankAccount);
         bankAccounts.isBusy = false;
       });
     },
