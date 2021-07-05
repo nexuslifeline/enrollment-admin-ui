@@ -14,93 +14,133 @@
     </CardNote>
     <InputGroup>
       <InputContainer>
-        <label class="required">School Category</label>
-        <SelectCategory
-          :value="data.schoolCategory"
-          label="name"
-          @input="onSchoolCategoryChanged"
-          :clearable="false"
-          :disabled="isReadOnly"
-        />
+        <b-form-group
+          label="School Category"
+          labelClass="required"
+          :state="forms.academicRecord.states.schoolCategoryId"
+          :invalid-feedback="forms.academicRecord.errors.schoolCategoryId">
+          <SelectCategory
+            :value="data.schoolCategory"
+            label="name"
+            @input="onSchoolCategoryChanged"
+            :clearable="false"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
       </InputContainer>
       <InputContainer>
-        <label class="required">School Year</label>
-        <SelectSchoolYear
-          :value="data.schoolYear"
-          label="name"
-          @input="onSchoolYearChanged"
-          :clearable="false"
-          :disabled="isReadOnly"
-        />
-      </InputContainer>
-    </InputGroup>
-    <InputGroup>
-      <InputContainer>
-        <label class="required">Level</label>
-        <SelectLevel
-          :value="data.level"
-          label="name"
-          @input="onLevelChanged"
-          :schoolCategoryId="data.schoolCategoryId"
-          :disabled="isReadOnly"
-        />
-      </InputContainer>
-      <InputContainer>
-        <label class="required">Student Category</label>
-        <SelectStudentCategory
-          :value="data.studentCategoryId"
-          :reduce="option => option.id"
-          label="name"
-          @input="data.studentCategoryId = $event"
-          :disabled="isReadOnly"
-        />
+        <b-form-group
+          label="School Year"
+          labelClass="required"
+          :state="forms.academicRecord.states.schoolYearId"
+          :invalid-feedback="forms.academicRecord.errors.schoolYearId">
+          <SelectSchoolYear
+            :value="data.schoolYear"
+            label="name"
+            @input="onSchoolYearChanged"
+            :clearable="false"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
       </InputContainer>
     </InputGroup>
     <InputGroup>
       <InputContainer>
-        <label class="required">Course</label>
-         <SelectCourseLevel
-          :value="data.course"
-          label="description"
-          @input="onCourseChanged"
-          :levelId="data.levelId"
-          :disabled="isReadOnly"
-        />
+        <b-form-group
+          label="Level"
+          labelClass="required"
+          :state="forms.academicRecord.states.levelId"
+          :invalid-feedback="forms.academicRecord.errors.levelId">
+          <SelectLevel
+            :value="data.level"
+            label="name"
+            @input="onLevelChanged"
+            :schoolCategoryId="data.schoolCategoryId"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
       </InputContainer>
       <InputContainer>
-        <label class="required">Semester</label>
-        <SelectSemester
-          :value="data.semester"
-          label="description"
-          @input="onSemesterChanged"
-          :schoolCategoryId="data.schoolCategoryId"
-          :disabled="isReadOnly"
-        />
+        <b-form-group
+          label="Student Categroy"
+          labelClass="required"
+          :state="forms.academicRecord.states.studentCategoryId"
+          :invalid-feedback="forms.academicRecord.errors.studentCategoryId">
+          <SelectStudentCategory
+            :value="data.studentCategoryId"
+            :reduce="option => option.id"
+            label="name"
+            @input="data.studentCategoryId = $event"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
+      </InputContainer>
+    </InputGroup>
+    <InputGroup>
+      <InputContainer>
+        <b-form-group
+          label="Course"
+          labelClass="required"
+          :state="forms.academicRecord.states.courseId"
+          :invalid-feedback="forms.academicRecord.errors.courseId">
+          <SelectCourseLevel
+            :value="data.course"
+            label="description"
+            @input="onCourseChanged"
+            :levelId="data.levelId"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
+      </InputContainer>
+      <InputContainer>
+        <b-form-group
+          label="Semester"
+          labelClass="required"
+          :state="forms.academicRecord.states.semesterId"
+          :invalid-feedback="forms.academicRecord.errors.semesterId">
+          <SelectSemester
+            :value="data.semester"
+            label="description"
+            @input="onSemesterChanged"
+            :schoolCategoryId="data.schoolCategoryId"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
       </InputContainer>
     </InputGroup>
      <InputGroup>
        <InputContainer>
-        <label class="required">Curriculum</label>
-        <SelectCurriculum
-          :value="data.transcriptRecord.curriculum"
-          :courseId="data.courseId"
-          :schoolCategoryId="data.schoolCategoryId"
-          label="name"
-          @input="onCurriculumChanged"
-          :disabled="isReadOnly"
-        />
+        <b-form-group
+          label="Curriculum"
+          labelClass="required"
+          :state="forms.academicRecord.states.transcriptRecord"
+          :invalid-feedback="forms.academicRecord.errors.transcriptRecord">
+          <SelectCurriculum
+            :value="data.transcriptRecord.curriculum"
+            :courseId="data.courseId"
+            :schoolCategoryId="data.schoolCategoryId"
+            label="name"
+            @input="onCurriculumChanged"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
       </InputContainer>
     </InputGroup>
     <InputGroup>
       <InputContainer>
-        <label class="required">Student Type</label>
-        <SelectStudentType
-          :value="data.studentTypeId"
-          :reduce="option => option.id"
-          label="name"
-          @input="data.studentTypeId = $event"
-          :disabled="isReadOnly"
-        />
+        <b-form-group
+          label="Student Type"
+          labelClass="required"
+          :state="forms.academicRecord.states.studentTypeId"
+          :invalid-feedback="forms.academicRecord.errors.studentTypeId">
+          <SelectStudentType
+            :value="data.studentTypeId"
+            :reduce="option => option.id"
+            label="name"
+            @input="data.studentTypeId = $event"
+            :disabled="isReadOnly"
+          />
+        </b-form-group>
       </InputContainer>
       <InputContainer>
         <label>Section</label>
@@ -151,6 +191,7 @@ import SelectStudentType from '../Dropdowns/SelectStudentType'
 import SelectSection from '../Dropdowns/SelectSection'
 import { reset, showNotification, validate } from '../../../helpers/forms'
 import { AcademicRecordApi, TranscriptRecordApi } from '../../../mixins/api'
+import debounce from 'lodash/debounce';
 
 const academicRecordFields = {
   schoolCategoryId: null,
@@ -159,7 +200,9 @@ const academicRecordFields = {
   courseId: null,
   semesterId: null,
   studentTypeId: null,
-  sectionId: null
+  sectionId: null,
+  studentCaregoryId: null,
+  transcriptRecord: null
 }
 
   export default {
@@ -209,7 +252,11 @@ const academicRecordFields = {
         }
       }
     },
+    created() {
+      this.$watch('data', this.autoSave, { deep: true, immediate: false });
+    },
     methods: {
+      autoSave: debounce(function() { this.onSave() }, 2000),
       onSave() {
         const {
           id: academicRecordId,
@@ -225,7 +272,7 @@ const academicRecordFields = {
           studentCategoryId,
           transcriptRecord: { curriculumId }
         } = this.data
-        const { academicRecord } = this.forms
+        const { academicRecord, transcriptRecord } = this.forms
         const academicRecordData = {
           schoolCategoryId,
           schoolYearId,
@@ -235,21 +282,36 @@ const academicRecordFields = {
           studentTypeId,
           sectionId,
           studentCategoryId,
-          ...(this.allowChangeStatus && { academicRecordStatusId }) // if allow status change, add academic record status to payload
+          ...(this.allowChangeStatus && { academicRecordStatusId }), // if allow status change, add academic record status to payload
+          transcriptRecord: { curriculumId }
         }
         reset(academicRecord)
         this.isProcessing = true
         this.updateAcademicRecord(academicRecordData, academicRecordId).then(({ data }) => {
           //need to call transript record own update for the observer to run in backend
-          this.updateTranscriptRecord(transcriptRecordId, { curriculumId }).then(({ data }) => {
-            showNotification(this, 'success', 'Academic Record Saved!.')
-            this.isProcessing = false
-          })
-      }).catch((error) => {
-        const errors = error.response.data.errors;
-        this.isProcessing = false;
-        validate(academicRecord, errors);
-      });
+          showNotification(this, 'success', 'Academic Record Saved!.')
+          this.isProcessing = false
+          // this.updateTranscriptRecord(transcriptRecordId, { curriculumId }).then(({ data }) => {
+            
+          //   })
+        }).catch((error) => {
+          const errors = error.response.data.errors;
+          console.log(error)
+          this.isProcessing = false;
+          validate(academicRecord, errors);
+        });
+        // Promise.all([
+        //   this.updateAcademicRecord(academicRecordData, academicRecordId),
+        //   this.updateTranscriptRecord(transcriptRecordId, { curriculumId })
+        // ]).then(([{ data }, { data: transcriptRecord  }]) => {
+        //   showNotification(this, 'success', 'Academic Record Saved!.')
+        //   this.isProcessing = false
+        // }).catch((error) => {
+        //   const errors = error.response.data.errors;
+        //   this.isProcessing = false;
+        //   validate(academicRecord, errors);
+        //   validate(transcriptRecord, errors);
+        // });
       },
       onSchoolYearChanged(schoolYear) {
         this.data.schoolYearId = schoolYear?.id

@@ -102,8 +102,8 @@
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
-              :showOptions="showOptions(data.item)"
-              :showActionBar="showOptions(data.item)"
+              :showOptions="showOptions"
+              :showActionBar="showOptions"
               :options="[
                 {
                   label: 'Approve',
@@ -249,10 +249,7 @@
                     </template>
                     <template v-slot:cell(action)="row">
                       <b-button
-                        v-if="
-                          data.item.academicRecordStatusId ===
-                            AcademicRecordStatuses.DRAFT.id
-                        "
+                        v-if="showOptions"
                         @click="removeSubject(data.item.subjects, row)"
                         size="sm"
                         variant="danger"
@@ -261,7 +258,7 @@
                       </b-button>
                     </template>
                     <template v-slot:cell(section)="row">
-                      <div class="cell-section-container">
+                      <!-- <div class="cell-section-container">
                          <div class="cell-section">{{
                             row.item.section ? row.item.section.name : ''
                           }}</div>
@@ -271,27 +268,24 @@
                             toggle-class="text-decoration-none"
                             no-caret
                             class="cell-section-action"
+                            boundary="window"
                           >
                             <template v-slot:button-content>
                               <v-icon name="ellipsis-v" />
                             </template>
-                            <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
                             <b-dropdown-item
-                              v-if="
-                                data.item.academicRecordStatusId ===
-                                  AcademicRecordStatuses.DRAFT.id
-                              "
+                              v-if="data.item.section && showOptions"
                               @click.prevent="onShowModalSection(row.item, data)"
                             >
-                              Change
+                              {{ row.item.section ? 'Change' : 'Select' }}
                             </b-dropdown-item>
                             <b-dropdown-item
-                              @click.prevent="onSectionSubjectClear(row)"
-                            >
+                              @click.prevent="onSectionSubjectClear(row)">
                               Clear
                             </b-dropdown-item>
                           </b-dropdown>
-                      </div>
+                      </div> -->
+                      <SectionColumn :isReadOnly="!showOptions" :data="row.item.section" @onSelectSection="onShowModalSection(row.item, data)" @onClearSection="onSectionSubjectClear(row)"/>
                     </template>
                     <template v-slot:table-busy>
                       <div class="text-center my-2">
@@ -870,6 +864,7 @@ import FilterButton from '../components/PageContainer/FilterButton';
 import NoAccess from "../components/NoAccess";
 import EnlistmentApproval from "../components/ApprovalModals/Enlistment";
 import EnlistmentRejection from "../components/RejectionModals/Enlistment";
+import SectionColumn from '../components/SubjectEnlistment/SectionColumn'
 
 
 const acdemicRecordFields = {
@@ -922,7 +917,8 @@ export default {
     AddressColumn,
     EnlistmentStatusColumn,
     EnlistmentApproval,
-    EnlistmentRejection
+    EnlistmentRejection,
+    SectionColumn
   },
   StudentSubjectPermissions,
   SettingPermissions,
@@ -1059,7 +1055,7 @@ export default {
               key: 'name',
               label: 'Subject Code',
               tdClass: 'align-middle',
-              thStyle: { width: '35%%' },
+              thStyle: { width: '55%%' },
             },
             {
               key: 'description',
@@ -1093,7 +1089,7 @@ export default {
               label: '',
               tdClass: 'align-middle text-center',
               thClass: 'align middle text-center',
-              thStyle: { width: '30px%' },
+              thStyle: { width: '30px' },
             },
           ],
           items: [],
@@ -1546,6 +1542,8 @@ export default {
         // 			this.isLoading = false
         // 	})
         // }
+
+        this.selectedAcademicRecord = row.item
       }
       row.toggleDetails();
     },
@@ -1782,12 +1780,6 @@ export default {
         0
       )
     },
-    showOptions(academicRecord) {
-      if(!academicRecord)
-      return false //avoid flicker
-
-      return this.enlistmentStatuses.PENDING.academicRecordStatuses.includes(academicRecord.academicRecordStatusId)
-    }
   },
   computed: {
     isCourseVisible() {
@@ -1799,6 +1791,13 @@ export default {
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
+    showOptions() {
+      //for pending statuses
+      if(!this.selectedAcademicRecord)
+      return false //avoid flicker
+
+      return this.enlistmentStatuses.PENDING.academicRecordStatuses.includes(this.selectedAcademicRecord.academicRecordStatusId)
+    }
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {
