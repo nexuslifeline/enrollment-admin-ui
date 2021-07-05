@@ -23,7 +23,8 @@ export default {
       type: [Object, Number]
     },
     label: {
-      type: [String]
+      type: [String],
+      default: 'name'
     },
     placeholder: {
       type: [String]

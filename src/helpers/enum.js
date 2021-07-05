@@ -43,13 +43,13 @@ export const StudentCategories = new Enum({
 });
 
 export const SchoolCategories = new Enum({
-  PRE_SCHOOL: { id: 1, name: 'Pre-School', isCanBePaired: true },
-  PRIMARY_SCHOOL: { id: 2, name: 'Primary School', isCanBePaired: true },
-  JUNIOR_HIGH_SCHOOL: { id: 3, name: 'Junior High School', isCanBePaired: true },
-  SENIOR_HIGH_SCHOOL: { id: 4, name: 'Senior High School', isCanBePaired: false },
-  COLLEGE: { id: 5, name: 'College', isCanBePaired: false },
-  GRADUATE_SCHOOL: { id: 6, name: 'Graduate School', isCanBePaired: false },
-  VOCATIONAL: { id: 7, name: 'Vocational', isCanBePaired: false }
+  PRE_SCHOOL: { id: 1, name: 'Pre-School', isCanBePaired: true, hasCourse: false, hasSemester: false },
+  PRIMARY_SCHOOL: { id: 2, name: 'Primary School', isCanBePaired: true, hasCourse: false, hasSemester: false },
+  JUNIOR_HIGH_SCHOOL: { id: 3, name: 'Junior High School', isCanBePaired: true, hasCourse: false, hasSemester: false },
+  SENIOR_HIGH_SCHOOL: { id: 4, name: 'Senior High School', isCanBePaired: false, hasCourse: true, hasSemester: true },
+  COLLEGE: { id: 5, name: 'College', isCanBePaired: false, hasCourse: true, hasSemester: true },
+  GRADUATE_SCHOOL: { id: 6, name: 'Graduate School', isCanBePaired: false, hasCourse: true, hasSemester: true },
+  VOCATIONAL: { id: 7, name: 'Vocational', isCanBePaired: false, hasCourse: true, hasSemester: false }
 });
 
 export const SchoolFeeCategories = new Enum({

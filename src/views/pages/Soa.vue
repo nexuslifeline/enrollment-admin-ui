@@ -51,10 +51,10 @@
           class="soa__drop-down"
           split>
           <b-dropdown-item
-            @click="setCreateSoa(), showBatchEntry=false">
-            Single SOA
+            @click="$router.push({ name: 'Individual SOA'})">
+            Individual SOA
           </b-dropdown-item>
-          <b-dropdown-item @click="setCreateBatchSoa(), showEntry=false">
+          <b-dropdown-item @click="$router.push({ name: 'Batch SOA'})">
             Batch SOA
           </b-dropdown-item>
         </b-dropdown>
