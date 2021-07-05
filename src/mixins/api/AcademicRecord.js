@@ -53,8 +53,8 @@ export default {
     requestAssessment(academicRecordId, data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/request-assessment`, data)
     },
-    generateSoa(academicRecordId, data) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/generate-soa`, data)
+    generateBilling(academicRecordId, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/generate-billing`, data)
     },
   }
 }

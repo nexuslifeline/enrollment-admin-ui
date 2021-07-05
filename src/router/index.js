@@ -69,7 +69,8 @@ const BankAccount = () => import('@/views/pages/BankAccount')
 const PeraPadalaAccount = () => import('@/views/pages/PeraPadalaAccount')
 const EWalletAccount = () => import('@/views/pages/EWalletAccount')
 const Soa = () => import('@/views/pages/Soa');
-const SoaSingle = () => import('@/views/pages/soa/SingleGenerate');
+const GenerateStatement = () => import('@/views/pages/soa/GenerateStatement');
+const GenerateBatch = () => import('@/views/pages/soa/GenerateBatch');
 const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
@@ -285,9 +286,15 @@ function configRoutes () {
               meta: { requiresAuth: true, userType: 2 }
             },
             {
-              path: 'soa/generate-single',
-              name: 'Single SOA',
-              component: SoaSingle,
+              path: 'soa/generate',
+              name: 'Individual SOA',
+              component: GenerateStatement,
+              meta: { requiresAuth: true, userType: 2, hideSubNav: true }
+            },
+            {
+              path: 'soa/generate-batch',
+              name: 'Batch SOA',
+              component: GenerateBatch,
               meta: { requiresAuth: true, userType: 2, hideSubNav: true }
             },
             {

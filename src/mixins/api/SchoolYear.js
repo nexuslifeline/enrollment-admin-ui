@@ -20,5 +20,8 @@ export default {
     patchSchoolYear(data, id) {
       return this.$authHttp.patch(`${apiPrefix}/${apiVersion}/school-years/${id}`, data);
     },
+    generateBatchBilling(data, id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/school-years/${id}/generate-batch-billing`, data);
+    },
   }
 }
