@@ -84,6 +84,10 @@
         hideLinkText="Hide Other Fees"
         :hideOnContentShow="false">
         <template>
+          <CardNote class="mt-2">
+            Typically, what is included in the Statement of Account are those fees in the Billing Schedule of the Student.
+            If you want to include <b>Other Fees</b> in the Statement of Account you can add it here.
+          </CardNote>
           <OtherFeesTable :items.sync="tables.otherFees.items" />
         </template>
       </LinkVisibilityToggler>

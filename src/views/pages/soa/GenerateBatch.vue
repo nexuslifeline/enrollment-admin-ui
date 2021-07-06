@@ -38,7 +38,11 @@
         <InputInline class="mb-3">
           <Toggle v-model="isSelectedAll" />
           <span class="ml-2">Generate Statement of Account to all levels
-            {{ ` in ${forms.billing.fields.schoolCategory && forms.billing.fields.schoolCategory.name}` || ' in Current School Category'}}
+            {{ ` in ` }}
+            <b v-if="forms.billing.fields.schoolCategory">
+              {{ forms.billing.fields.schoolCategory.name }}
+            </b>
+            <span v-else>Current School Category</span>
           </span>
         </InputInline>
       </InputGroup>
@@ -76,6 +80,10 @@
         hideLinkText="Hide Other Fees"
         :hideOnContentShow="false">
         <template>
+          <CardNote class="mt-2">
+            Typically, what is included in the Statement of Account are those fees in the Billing Schedule of the Student.
+            If you want to include <b>Other Fees</b> in the Statement of Account you can add it here.
+          </CardNote>
           <OtherFeesTable :items.sync="tables.otherFees.items" />
         </template>
       </LinkVisibilityToggler>

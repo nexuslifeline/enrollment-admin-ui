@@ -40,11 +40,11 @@
       <template v-slot:custom-foot>
         <b-tr>
           <b-td colspan="2" class="text-right">
-            <span class="font-weight-bold">Total Amount </span>
+            <span class="font-weight-bold">Total (Other Fees) </span>
           </b-td>
           <b-td class="text-right">
-            <span class="text-danger font-weight-bold">
-              {{ totalAmount }}
+            <span class="font-weight-bold">
+              {{ $options.formatNumber(totalOtherFees) }}
             </span>
           </b-td>
           <b-td></b-td>
@@ -132,12 +132,13 @@
 </template>
 
 <script>
-  import { showNotification } from '../../../helpers/forms';
+  import { showNotification, formatNumber } from '../../../helpers/forms';
   import { SchoolFeeApi } from '../../../mixins/api';
   import Tables from '../../../helpers/tables';
 
   export default {
     mixins: [SchoolFeeApi, Tables],
+    formatNumber,
     props: {
       items: {
         type: [Array]
@@ -221,8 +222,8 @@
       }
     },
     computed: {
-      totalAmount() {
-        return 0;
+      totalOtherFees() {
+        return this.items.reduce((total, { amount })  => total += parseFloat(amount || 0), 0);
       }
     },
     created() {
