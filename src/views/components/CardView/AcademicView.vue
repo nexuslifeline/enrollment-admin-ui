@@ -20,11 +20,11 @@
           {{ data.level && data.level.name || 'No Level' }}
         </p>
       </ActiveViewItem>
-       <ActiveViewItem label="Student Curriculum" @onEdit="onEditStudentCurriculum" isEditable>
+       <!-- <ActiveViewItem label="Student Curriculum" @onEdit="onEditStudentCurriculum" isEditable>
         <p>
           {{ transcriptRecord.studentCurriculum && transcriptRecord.studentCurriculum.name || 'No Curriculum' }}
         </p>
-      </ActiveViewItem>
+      </ActiveViewItem> -->
       <ActiveViewItem v-if="data.semester" label="Semester">
         <p>
           {{ data.semester && data.semester.name || 'No Semester' }}
