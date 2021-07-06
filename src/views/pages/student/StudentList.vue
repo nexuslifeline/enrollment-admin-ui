@@ -141,12 +141,12 @@
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
                   </template>
-                  <b-dropdown-item
+                  <!-- <b-dropdown-item
                     v-if="showRowActionButton"
                     :to="`/master-files/student/${row.item.id}/school-records`"
                   >
                     Update School Records
-                  </b-dropdown-item>
+                  </b-dropdown-item> -->
                   <b-dropdown-item
                     v-if="
                       isAccessible($options.StudentPermissions.EDIT.id) &&
@@ -577,13 +577,13 @@ export default {
               thClass: 'align-middle',
               thStyle: { width: '20%' },
             },
-            {
-              key: 'requirementPercentage',
-              label: 'Requirement %',
-              tdClass: 'align-middle',
-              thClass: 'align-middle',
-              thStyle: { width: '20%' },
-            },
+            // {
+            //   key: 'requirementPercentage',
+            //   label: 'Requirement %',
+            //   tdClass: 'align-middle',
+            //   thClass: 'align-middle',
+            //   thStyle: { width: '20%' },
+            // },
             {
               key: 'action',
               label: '',
