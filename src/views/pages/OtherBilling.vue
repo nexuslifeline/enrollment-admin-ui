@@ -64,11 +64,11 @@
           class="other__drop-down"
           split>
           <b-dropdown-item
-            @click="setCreateOtherFee(), showBatchEntry=false">
-            Single Other Billing
+            @click="$router.push({ name: 'Individual Other Billing' })">
+            Individual Billing
           </b-dropdown-item>
-          <b-dropdown-item @click="setCreateBatchOtherFee(), showEntry=false">
-            Batch Other billing
+          <b-dropdown-item @click="$router.push({ name: 'Batch Other Billing' })">
+            Batch billing
           </b-dropdown-item>
         </b-dropdown>
       </div>

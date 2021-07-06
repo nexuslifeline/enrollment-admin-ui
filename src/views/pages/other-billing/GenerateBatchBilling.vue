@@ -23,14 +23,16 @@
             />
           </b-form-group>
         </InputContainer>
-        <InputContainer v-if="schoolCategoryId && hasSemester && levelId">
-          <b-form-group>
-            <label class="required">Enrolled in Semester</label>
-            <SelectSemester
-              :schoolCategoryId="schoolCategoryId"
-              v-model="forms.billing.fields.semester"
-              label="description"
+         <InputContainer>
+           <b-form-group>
+            <label class="required">Due Date</label>
+            <b-form-datepicker
+              :state="forms.billing.states.dueDate"
+              v-model="forms.billing.fields.dueDate"
             />
+            <b-form-invalid-feedback>
+              {{ forms.billing.errors.dueDate }}
+            </b-form-invalid-feedback>
           </b-form-group>
         </InputContainer>
       </InputGroup>
@@ -46,51 +48,10 @@
           </span>
         </InputInline>
       </InputGroup>
-      <InputGroup>
-        <InputContainer v-if="schoolCategoryId && ((hasSemester && semesterId) || !hasSemester)">
-          <b-form-group>
-            <label class="required">
-              Billing Term
-            </label>
-            <SelectCategoryBillingTerms
-              :schoolCategoryId="schoolCategoryId"
-              :schoolYearId="activeSchoolYearId"
-              v-model="forms.billing.fields.term"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.billing.errors.termId }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </InputContainer>
-        <InputContainer>
-           <b-form-group>
-            <label class="required">Due Date</label>
-            <b-form-datepicker
-              :state="forms.billing.states.dueDate"
-              v-model="forms.billing.fields.dueDate"
-            />
-            <b-form-invalid-feedback>
-              {{ forms.billing.errors.dueDate }}
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </InputContainer>
-      </InputGroup>
-      <LinkVisibilityToggler
-        linkText="Add Other Fees"
-        hideLinkText="Hide Other Fees"
-        :hideOnContentShow="false">
-        <template>
-          <CardNote class="mt-2">
-            Typically, what is included in the Statement of Account are those fees in the Billing Schedule of the Student.
-            If you want to include <b>Other Fees</b> in the Statement of Account you can add it here.
-          </CardNote>
-          <OtherFeesTable :items.sync="tables.otherFees.items" />
-        </template>
-      </LinkVisibilityToggler>
-
+      <OtherFeesTable :items.sync="tables.otherFees.items" />
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onGenerate" :disabled="isProcessing || !termId">
+          <b-button variant="primary" @click="onGenerate" :disabled="isProcessing">
             <v-icon name="spinner" spin v-if="isProcessing"/> Generate
           </b-button>
         </CardFooterRow>
@@ -145,18 +106,10 @@
     },
     methods: {
       onGenerate() {
-        const {
-          term,
-          dueDate
-        } = this.forms.billing.fields;
+        const { dueDate } = this.forms.billing.fields;
 
         if (!this.activeSchoolYearId) {
           console.warn('No active school year found!');
-          return;
-        }
-
-        if (!this.termId) {
-          console.warn('No latest term id found!');
           return;
         }
 
@@ -164,9 +117,9 @@
 
         const payload = {
           dueDate,
-          termId: this.termId,
           otherFees,
-          billingTypeId: BillingTypes.SOA.id,
+          schoolCategoryId: this.schoolCategoryId,
+          billingTypeId: BillingTypes.BILLING.id,
           ...(!this.isSelectedAll && { levelId: this.levelId }) // include level id in the payload if switch toggle is not selected
         };
 
@@ -177,33 +130,20 @@
           this.$router.push({ name: 'Soa' });
         }).catch((error) => {
           const errors = error.response.data.errors;
-          validate(this.forms.billing, errors);
+          validate(this.forms.billing, errors, this);
           this.isProcessing = false;
         })
-      },
-      onBillingTermChange(v) {
-        this.forms.billing.fields.amount = v?.pivot?.amount || 0;
-        this.forms.billing.fields.previousBalance = v?.previousBalance || 0;
       }
     },
     computed: {
       schoolCategoryId() {
         return this.forms?.billing?.fields?.schoolCategory?.id;
       },
-      hasSemester() {
-        return this.forms?.billing?.fields?.schoolCategory?.hasSemester;
-      },
       activeSchoolYearId() {
         return this.$store.state?.schoolYear?.id;
       },
-      termId() {
-        return this.forms?.billing?.fields?.term?.id;
-      },
       levelId() {
         return this.forms?.billing?.fields?.level?.id;
-      },
-      semesterId() {
-        return this.forms?.billing?.fields?.semester?.id;
       }
     }
   }

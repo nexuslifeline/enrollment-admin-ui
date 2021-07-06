@@ -177,7 +177,7 @@
           this.$router.push({ name: 'Soa' });
         }).catch((error) => {
           const errors = error.response.data.errors;
-          validate(this.forms.billing, errors);
+          validate(this.forms.billing, errors, this);
           this.isProcessing = false;
         })
       },
