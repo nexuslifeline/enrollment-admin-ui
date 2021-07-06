@@ -90,7 +90,7 @@
 
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onGenerate" :disabled="isProcessing || !hasSelectedAcademicId">
+          <b-button variant="primary" @click="onGenerate" :disabled="isProcessing || !hasSelectedAcademicId || !termId">
             <v-icon name="spinner" spin v-if="isProcessing"/> Generate
           </b-button>
         </CardFooterRow>
@@ -150,7 +150,7 @@
           return;
         }
 
-        if (!term || !term?.id) {
+        if (!this.termId) {
           console.warn('No latest term id found!');
           return;
         }
@@ -160,7 +160,7 @@
         const payload = {
           amount,
           dueDate,
-          termId: term?.id,
+          termId: this.termId,
           otherFees,
           previousBalance,
           billingTypeId: BillingTypes.SOA.id
@@ -185,6 +185,9 @@
     computed: {
       studentId() {
         return this.forms?.billing?.fields?.student?.id;
+      },
+      termId() {
+        return this.forms?.billing?.fields?.term?.id;
       },
       activeSchoolYearId() {
         return this.$store.state?.schoolYear?.id;

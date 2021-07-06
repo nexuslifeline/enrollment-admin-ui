@@ -30,6 +30,11 @@
         <b-badge v-if="data.pivot.isBilled" variant="warning">
           Billed
         </b-badge>
+        <span v-if="data.schoolYear && data.semester" class="select-term-details">
+          {{ data.schoolYear.name }}
+          -
+          {{ data.semester.name }}
+        </span>
       </div>
     </template>
     <template #spinner="{ loading }">
@@ -153,6 +158,11 @@ export default {
 
   .select-option-name {
     flex: 1;
+  }
+
+  .select-term-details {
+    margin-left: 10px;
+    color: $gray;
   }
 
 </style>
