@@ -72,7 +72,12 @@ export default {
         });
     },
     loadApprovalCount() {
-       const params = {
+      if (!this.$store.state?.schoolYear?.id) {
+        console.warn('No selected School Year found!');
+        return;
+      }
+
+      const params = {
         schoolYearId: this.$store.state.schoolYear.id,
       };
       this.getApprovalCount(params).then(({ data }) => {

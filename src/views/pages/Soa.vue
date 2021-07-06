@@ -582,6 +582,11 @@ export default {
     //   return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
     // },
     loadBillings() {
+      if (!this.$store.state?.schoolYear?.id) {
+        console.warn('No selected School Year found!');
+        return;
+      }
+
       const {
         schoolCategoryId,
         criteria,

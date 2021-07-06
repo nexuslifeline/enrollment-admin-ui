@@ -740,6 +740,11 @@ export default {
     //     });
     // },
     loadEvaluation() {
+      if (!this.$store.state?.schoolYear?.id) {
+        console.warn('No selected School Year found!');
+        return;
+      }
+
       const { students } = this.tables;
       const {
         student,
