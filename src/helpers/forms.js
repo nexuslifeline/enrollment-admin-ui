@@ -1,9 +1,12 @@
-export const validate = (form, errors) => {
+export const validate = (form, errors, parentIntance) => {
   if (errors) {
     Object.keys(errors).forEach((key) => {
       form.states[key] = false;
       form.errors[key] = errors[key].length && errors[key][0];
     });
+    if (parentIntance && errors?.nonFieldError) {
+      showNotification(parentIntance, 'danger', errors?.nonFieldError, 'Something went wrong!');
+    }
   }
 }
 
@@ -14,9 +17,9 @@ export const reset = (form) => {
   });
 }
 
-export const showNotification = (instance, variant, msg, autoHideDelay=2000) => {
+export const showNotification = (instance, variant, msg, title = 'Notification', autoHideDelay = 5000) => {
   instance.$bvToast.toast(msg, {
-    title: "Notification",
+    title,
     variant: variant,
     solid: true,
     autoHideDelay: autoHideDelay,

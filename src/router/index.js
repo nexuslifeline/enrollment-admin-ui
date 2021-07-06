@@ -71,6 +71,8 @@ const EWalletAccount = () => import('@/views/pages/EWalletAccount')
 const Soa = () => import('@/views/pages/Soa');
 const GenerateStatement = () => import('@/views/pages/soa/GenerateStatement');
 const GenerateBatch = () => import('@/views/pages/soa/GenerateBatch');
+const GenerateBilling = () => import('@/views/pages/other-billing/GenerateBilling');
+const GenerateBatchBilling = () => import('@/views/pages/other-billing/GenerateBatchBilling');
 const OtherBilling = () => import('@/views/pages/OtherBilling');
 const PaymentList = () => import('@/views/pages/payment/PaymentList')
 const PaymentEntry = () => import('@/views/pages/payment/PaymentEntry')
@@ -302,6 +304,18 @@ function configRoutes () {
               name: 'Other Billing',
               component: OtherBilling,
               meta: { requiresAuth: true, userType: 2 }
+            },
+            {
+              path: 'other-billing/generate',
+              name: 'Individual Other Billing',
+              component: GenerateBilling,
+              meta: { requiresAuth: true, userType: 2, hideSubNav: true }
+            },
+            {
+              path: 'other-billing/generate-batch',
+              name: 'Batch Other Billing',
+              component: GenerateBatchBilling,
+              meta: { requiresAuth: true, userType: 2, hideSubNav: true }
             },
             {
               path: 'post-payment',
