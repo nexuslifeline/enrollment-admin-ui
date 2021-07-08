@@ -54,6 +54,10 @@ export default {
       type: [Number],
       default: 0
     },
+    enrollmentFee: {
+      type: [Number],
+      default: 0
+    }
   },
   mixins: [ AcademicRecordApi, StudentApi ],
   components: {
@@ -108,12 +112,12 @@ export default {
     }
   },
   computed: {
-    enrollmentFee() {
-      //is initial fee
-      return this.fees.reduce((acc, curr) => {
-        return acc += parseInt(curr.pivot.isInitialFee) === 1 ? parseFloat(curr.pivot.amount) : 0
-      }, 0)
-    },
+    // enrollmentFee() {
+    //   //is initial fee
+    //   return this.fees.reduce((acc, curr) => {
+    //     return acc += parseInt(curr.pivot.isInitialFee) === 1 ? parseFloat(curr.pivot.amount) : 0
+    //   }, 0)
+    // },
     totalFee() {
       //total amount of fees
       return this.fees.reduce((acc, curr) => {

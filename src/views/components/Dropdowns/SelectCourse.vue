@@ -77,18 +77,21 @@ export default {
     }
   },
   created() {
-    const { courses } = this.options
-    courses.isBusy = true
-    const params = { paginate: false,  schoolCategoryId: this.schoolCategoryId, levelId: this.levelId }
-    this.getCourseList(params).then(({ data }) => {
-      courses.items = data
-      courses.isBusy = false
-    })
+    this.loadCourses()
   },
   methods: {
     onInput(item) {
       this.$emit('input', item);
     },
+    loadCourses() {
+      const { courses } = this.options
+      courses.isBusy = true
+      const params = { paginate: false,  schoolCategoryId: this.schoolCategoryId, levelId: this.levelId }
+      this.getCourseList(params).then(({ data }) => {
+        courses.items = data
+        courses.isBusy = false
+      })
+    }
   },
   watch: {
     'levelId': function() {

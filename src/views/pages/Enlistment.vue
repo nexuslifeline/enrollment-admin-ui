@@ -149,6 +149,8 @@
                     No Terms(Grading Period) has been configured. It is recommended to setup this first before approving student enrollment requests. <span v-if="isAccessible($options.SettingPermissions.TERM.id)">To setup Terms click  <router-link to="/setting/terms-setting">here</router-link></span>.
                   </b-alert>
 
+                  <AssessmentRejectedAlert :show="isRejectedAssessment" :data="data.item.studentFee" />
+
                   <ActiveViewItems>
                     <ActiveViewItem label="Level: ">
                       <!-- <p>
@@ -865,6 +867,7 @@ import NoAccess from "../components/NoAccess";
 import EnlistmentApproval from "../components/ApprovalModals/Enlistment";
 import EnlistmentRejection from "../components/RejectionModals/Enlistment";
 import SectionColumn from '../components/SubjectEnlistment/SectionColumn'
+import AssessmentRejectedAlert from '../components/AlertNotifications/AssessmentRejected'
 
 
 const acdemicRecordFields = {
@@ -918,7 +921,8 @@ export default {
     EnlistmentStatusColumn,
     EnlistmentApproval,
     EnlistmentRejection,
-    SectionColumn
+    SectionColumn,
+    AssessmentRejectedAlert
   },
   StudentSubjectPermissions,
   SettingPermissions,
@@ -1802,6 +1806,12 @@ export default {
       return false //avoid flicker
 
       return this.enlistmentStatuses.PENDING.academicRecordStatuses.includes(this.selectedAcademicRecord.academicRecordStatusId)
+    },
+    isRejectedAssessment() {
+      if(!this.selectedAcademicRecord)
+      return false 
+
+      return this.selectedAcademicRecord?.academicRecordStatusId === this.AcademicRecordStatuses.ASSESSMENT_REJECTED.id
     }
   },
   watch: {

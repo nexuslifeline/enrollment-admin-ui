@@ -82,10 +82,6 @@
             <AssessmentStatusColumn :data="data.item" />
           </template>
           <template v-slot:cell(action)="row">
-            <!-- <v-icon
-              :name="row.detailsShowing ? 'caret-down' : 'caret-left'"
-              @click="loadDetails(row)" /> -->
-
             <b-dropdown
               right
               variant="link"
@@ -371,7 +367,7 @@
                       </b-button>
                     </template>
                   </b-table> -->
-                  <FeesTable :studentFees="selectedAcademicRecord && selectedAcademicRecord.fees || []" :isDisabled="showOptions"/>
+                  <FeesTable :studentFees="selectedAcademicRecord && selectedAcademicRecord.fees || []" :isDisabled="showOptions" @onIsInitialToggled="onIsInitialToggled"/>
                   <b-row>
                     <b-col md="4">
                       <div class="footer-info">
@@ -388,9 +384,9 @@
                           />
                         </label>
                         <vue-autonumeric
-                          disabled
+                          :disabled="!showOptions"
                           class="form-control text-right"
-                          :value="initialFeeSum"
+                          v-model="data.item.enrollmentFee"
                           :options="[
                             {
                               minimumValue: 0,
@@ -620,6 +616,7 @@
         :academicRecordId="selectedAcademicRecord.id"
         :fees="selectedAcademicRecord && selectedAcademicRecord.fees || []"
         :previousBalance="selectedAcademicRecord && selectedAcademicRecord.previousBalance || 0"
+        :enrollmentFee="selectedAcademicRecord && selectedAcademicRecord.enrollmentFee || 0"
         @onCancel="showModalApproval = false"
         @onApproved="onAssesmentApproved"
       />
@@ -1370,6 +1367,20 @@ export default {
       const { terms } = this.options
       return terms.items.find(term => term.schoolCategoryId === item.schoolCategoryId)
     },
+    onIsInitialToggled(isInitial, amount) {
+      if(!this.selectedAcademicRecord)
+      return
+
+      if(isInitial) {
+        this.selectedAcademicRecord.enrollmentFee += amount
+      }
+      else {
+        if(this.selectedAcademicRecord.enrollmentFee > amount)
+         this.selectedAcademicRecord.enrollmentFee -= amount
+        else
+          this.selectedAcademicRecord.enrollmentFee = 0
+      }
+    }
   },
   watch: {
     '$store.state.schoolYear': function(newVal) {

@@ -30,7 +30,7 @@
           v-model="row.item.pivot.isInitialFee"
         /> -->
         <Toggle
-          @input="row.item.pivot.isInitialFee = $event ? 1 : 0"
+          @input="$emit('onIsInitialToggled', $event, row.item.pivot.amount), row.item.pivot.isInitialFee = $event ? 1 : 0"
           :value="row.item.pivot.isInitialFee"
           :isDisabled="!isDisabled"/>
       </template>

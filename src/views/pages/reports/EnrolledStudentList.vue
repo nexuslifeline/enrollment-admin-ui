@@ -195,8 +195,7 @@
     :showPlaceholder="!isFileReady"
     :filterVisible="isFilterVisible">
     <template v-slot:filters>
-      <v-select
-        :options="options.schoolYears.items"
+      <SelectSchoolYear
         :value="filters.academicRecord.schoolYearItem"
         @input="onSchoolYearFilterChange"
         label="name"
@@ -223,33 +222,35 @@
         :clearable="false"
         class="mt-2"
       />
-      <v-select
-        :options="options.levels.items"
+      <SelectLevel
         :value="filters.academicRecord.levelItem"
         @input="onLevelFilterChange"
         label="name"
         placeholder="Level"
         class="mt-2"
+        :schoolCategoryId="filters.academicRecord.schoolCategoryId"
       />
-      <v-select
+      <SelectCourse
         v-if="isCourseVisible"
-        :options="options.courses.items"
         :value="filters.academicRecord.courseItem"
         @input="onCourseFilterChange"
         label="name"
         placeholder="Course"
         class="mt-2"
+        :schoolCategoryId="filters.academicRecord.schoolCategoryId"
+        :levelId="filters.academicRecord.levelId"
       />
-      <v-select
+      <SelectSemester
           v-if="isCourseVisible"
-          :options="options.semesters.items"
           :value="filters.academicRecord.semesterItem"
           @input="onSemesterFilterChange"
           label="name"
           placeholder="Semester"
           class="mt-2"
-          :clearable="false"
+          :clearable="true"
           :searchable="false"
+          :schoolCategoryId="filters.academicRecord.schoolCategoryId"
+          :levelId="filters.academicRecord.levelId"
         />
       <b-button
         class="mt-4"
@@ -274,6 +275,11 @@ import EducationColumn from '../../components/ColumnDetails/EducationColumn';
 import ReportContent from "../../components/PageContainer/ReportContainer";
 import ReportViewer from "../../components/ReportViewer/ReportViewer";
 
+import SelectSchoolYear from '../../components/Dropdowns/SelectSchoolYear'
+import SelectLevel from '../../components/Dropdowns/SelectLevel'
+import SelectCourse from '../../components/Dropdowns/SelectCourse'
+import SelectSemester from '../../components/Dropdowns/SelectSemester'
+
 import {
   AcademicRecordStatuses,
   SchoolCategories,
@@ -296,7 +302,11 @@ export default {
     EducationColumn,
     FileViewer,
     ReportContent,
-    ReportViewer
+    ReportViewer,
+    SelectSchoolYear,
+    SelectLevel,
+    SelectCourse,
+    SelectSemester
   },
   mixins: [SchoolYearApi, LevelApi, CourseApi, AcademicRecordApi, ReportApi, Access],
   data() {
@@ -477,7 +487,7 @@ export default {
       this.showModalPreview = true;
       // const { dateFrom, dateTo, criteria } = this.filters.payment
       // const params = { dateFrom, dateTo, criteria, paymentStatusId: PaymentStatuses.APPROVED.id }
-      this.previewEnrolledList(params).then((response) => {
+      this.previewEnrolledList(params, schoolYearId).then((response) => {
         this.file.type = response.headers.contentType;
         const file = new Blob([response.data], { type: 'application/pdf' });
         const reader = new FileReader();

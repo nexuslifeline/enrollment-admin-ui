@@ -171,7 +171,8 @@ export const EnlistmentStatuses = new Enum({
     id: 1,
     name: 'Pending',
     academicRecordStatuses: [
-      AcademicRecordStatuses.ENLISTMENT_PENDING.id
+      AcademicRecordStatuses.ENLISTMENT_PENDING.id,
+      AcademicRecordStatuses.ASSESSMENT_REJECTED.id
     ]
   },
   REJECTED: {
@@ -186,7 +187,7 @@ export const EnlistmentStatuses = new Enum({
     name: 'Approved',
     academicRecordStatuses: [
       AcademicRecordStatuses.ENLISTMENT_APPROVED.id,
-      AcademicRecordStatuses.ASSESSMENT_REJECTED.id,
+      //AcademicRecordStatuses.ASSESSMENT_REJECTED.id,
       AcademicRecordStatuses.ASSESSMENT_APPROVED.id,
       AcademicRecordStatuses.PAYMENT_SUBMITTED.id,
       AcademicRecordStatuses.ENROLLED.id

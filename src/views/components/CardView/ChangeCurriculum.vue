@@ -1,7 +1,7 @@
 <template>
   <b-modal
     :visible="isShown"
-    size="md"
+    size="lg"
     title="Change Curriculum"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"

@@ -24,8 +24,8 @@ export default {
         responseType: 'blob'
       });
     },
-    previewEnrolledList(params) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/enrolled-list`, {
+    previewEnrolledList(params, schoolYearId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/school-years/${schoolYearId}/enrolled`, {
         params: params,
         responseType: 'blob'
       });
