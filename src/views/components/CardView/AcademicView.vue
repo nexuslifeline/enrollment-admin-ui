@@ -1,7 +1,7 @@
 <template>
   <div>
      <ActiveViewItems>
-      <ActiveViewItem label="Curriculum" @onEdit="onEditCurriculum" isEditable>
+      <ActiveViewItem label="Curriculum" @onEdit="onEditCurriculum" :isEditable="isEditable">
         <p>
           {{ transcriptRecord.curriculum && transcriptRecord.curriculum.name || 'No Curriculum' }}
         </p>
@@ -10,12 +10,12 @@
         v-if="data.course"
         label="Course"
         @onEdit="onEditCourse"
-        isEditable>
+        :isEditable="isEditable">
         <p>
           {{ data.course && data.course.name || 'No Course' }}
         </p>
       </ActiveViewItem>
-      <ActiveViewItem label="Level" @onEdit="onEditLevel" isEditable>
+      <ActiveViewItem label="Level" @onEdit="onEditLevel" :isEditable="isEditable">
         <p>
           {{ data.level && data.level.name || 'No Level' }}
         </p>
@@ -68,6 +68,10 @@ export default {
   props: {
     data: {
       type: [Object]
+    },
+    isEditable: {
+      type: [Boolean],
+      default: true
     }
   },
   mixins: [ CurriculumApi, AcademicRecordApi ],

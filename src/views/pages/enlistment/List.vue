@@ -109,14 +109,14 @@
                   label: 'Approve',
                   callback: () => setApproval(data),
                   isAllowed: isAccessible(
-                    $options.StudentSubjectPermissions.APPROVAL.id
+                    $options.EnlistmentPermissions.APPROVAL.id
                   ) && !showTermsAlert && hasTermsSchoolCategory(data.item),
                 },
                 {
                   label: 'Reject',
                   callback: () => setDisapproval(data),
                   isAllowed: isAccessible(
-                    $options.StudentSubjectPermissions.DISAPPROVAL.id
+                    $options.EnlistmentPermissions.DISAPPROVAL.id
                   ),
                 },
               ]"
@@ -326,12 +326,12 @@
                   <b-button
                     @click="setApproval(data)"
                     class="mr-2" variant="outline-primary"
-                    v-if="isAccessible($options.StudentSubjectPermissions.APPROVAL.id)"
+                    v-if="isAccessible($options.EnlistmentPermissions.APPROVAL.id)"
                     :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"> Approve</b-button>
                   <b-button variant="outline-danger"
                     @click="setDisapproval(data)"
                     v-if="isAccessible(
-                    $options.StudentSubjectPermissions.DISAPPROVAL.id)"> Reject</b-button>
+                    $options.EnlistmentPermissions.DISAPPROVAL.id)"> Reject</b-button>
                 </div>
               </template>
             </ActiveRowViewer>
@@ -457,7 +457,7 @@
               <b-button
                 v-if="
                   !isAccessible(
-                    $options.StudentSubjectPermissions.DISAPPROVAL.id
+                    $options.EnlistmentPermissions.DISAPPROVAL.id
                   )
                     ? false
                     : data.item.academicRecordStatusId ===
@@ -470,7 +470,7 @@
               >
               <b-button
                 v-if="
-                  !isAccessible($options.StudentSubjectPermissions.APPROVAL.id)
+                  !isAccessible($options.EnlistmentPermissions.APPROVAL.id)
                     ? false
                     : data.item.academicRecordStatusId ===
                       AcademicRecordStatuses.DRAFT.id
@@ -835,7 +835,7 @@ import {
   SectionApi,
   SchoolYearApi,
   TermApi
-} from '../../mixins/api';
+} from '../../../mixins/api';
 import {
   SchoolCategories,
   ApplicationStatuses,
@@ -844,30 +844,30 @@ import {
   StudentFeeStatuses,
   Days,
   UserGroups,
-  StudentSubjectPermissions,
+  EnlistmentPermissions,
   SettingPermissions,
   OnBoardingSteps
-} from '../../helpers/enum';
-import { showNotification, formatNumber } from '../../helpers/forms';
-import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
-import Tables from '../../helpers/tables';
-import Access from '../../mixins/utils/Access';
-import Card from '../components/Card';
-import AvatarMaker from '../components/AvatarMaker';
-import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
-import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
-import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
-import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
-import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
-import AttachmentList from '../components/Attachment/AttachmentList';
-import { StudentColumn,AddressColumn , EducationColumn, EnlistmentStatusColumn } from '../components/ColumnDetails';
-import PageContent from "../components/PageContainer/PageContent";
-import FilterButton from '../components/PageContainer/FilterButton';
-import NoAccess from "../components/NoAccess";
-import EnlistmentApproval from "../components/ApprovalModals/Enlistment";
-import EnlistmentRejection from "../components/RejectionModals/Enlistment";
-import SectionColumn from '../components/SubjectEnlistment/SectionColumn'
-import AssessmentRejectedAlert from '../components/AlertNotifications/AssessmentRejected'
+} from '../../../helpers/enum';
+import { showNotification, formatNumber } from '../../../helpers/forms';
+import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
+import Tables from '../../../helpers/tables';
+import Access from '../../../mixins/utils/Access';
+import Card from '../../components/Card';
+import AvatarMaker from '../../components/AvatarMaker';
+import ActiveRowViewer from '../../components/ActiveRowViewer/ActiveRowViewer';
+import ActiveViewHeader from '../../components/ActiveRowViewer/ActiveViewHeader';
+import ActiveViewItems from '../../components/ActiveRowViewer/ActiveViewItems';
+import ActiveViewItem from '../../components/ActiveRowViewer/ActiveViewItem';
+import ActiveViewLinks from '../../components/ActiveRowViewer/ActiveViewLinks';
+import AttachmentList from '../../components/Attachment/AttachmentList';
+import { StudentColumn,AddressColumn , EducationColumn, EnlistmentStatusColumn } from '../../components/ColumnDetails';
+import PageContent from "../../components/PageContainer/PageContent";
+import FilterButton from '../../components/PageContainer/FilterButton';
+import NoAccess from "../../components/NoAccess";
+import EnlistmentApproval from "../../components/ApprovalModals/Enlistment";
+import EnlistmentRejection from "../../components/RejectionModals/Enlistment";
+import SectionColumn from '../../components/SubjectEnlistment/SectionColumn'
+import AssessmentRejectedAlert from '../../components/AlertNotifications/AssessmentRejected'
 
 
 const acdemicRecordFields = {
@@ -924,7 +924,7 @@ export default {
     SectionColumn,
     AssessmentRejectedAlert
   },
-  StudentSubjectPermissions,
+  EnlistmentPermissions,
   SettingPermissions,
   data() {
     return {
@@ -1823,7 +1823,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-@import '../../assets/scss/shared.scss';
+@import '../../../assets/scss/shared.scss';
 
 .preview__modal-description {
   z-index: 5000;

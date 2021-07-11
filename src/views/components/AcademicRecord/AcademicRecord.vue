@@ -256,7 +256,7 @@ const academicRecordFields = {
       this.$watch('data', this.autoSave, { deep: true, immediate: false });
     },
     methods: {
-      autoSave: debounce(function() { this.onSave() }, 2000),
+      autoSave: debounce(function() { this.onSave() }, 4000),
       onSave() {
         const {
           id: academicRecordId,

@@ -3,10 +3,12 @@ import { UserGroups, SchoolCategories } from '../../helpers/enum';
 export default {
   SchoolCategories,
   methods: {
-    isAccessible(currentPermissionId) {
-      if (!currentPermissionId) { // if no permission mapper provided, allow it for the meantime
+    isAccessible(actionPermissionId) {
+      if (!actionPermissionId) { // if no permission mapper provided, allow it for the meantime
         return true;
       }
+
+      console.log('actionPermissionId', actionPermissionId)
 
       const { user } = this.$store.state;
       if (this.checkIfSuperUser()) {
@@ -14,9 +16,9 @@ export default {
       }
 
       const permissions = user?.userGroup?.permissions;
-      const ids = Array.isArray(currentPermissionId)
-        ? currentPermissionId
-        : [currentPermissionId];
+      const ids = Array.isArray(actionPermissionId)
+        ? actionPermissionId
+        : [actionPermissionId];
 
       if (!!permissions?.length) {
         return !!permissions?.some(v => ids.includes(v.id));
@@ -86,6 +88,7 @@ export default {
       if (!!schoolCategories?.length) {
         return true
       }
+
       return false;
     }
   },

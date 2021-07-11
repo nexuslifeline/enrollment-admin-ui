@@ -690,12 +690,13 @@ export const CoursePermissions = new Enum({
   DELETE: { id: 223, name: 'Delete' }
 });
 
-export const EvaluationAndAdmissionPermissions = new Enum({
+export const EvaluationPermissions = new Enum({
   APPROVAL: { id: 231, name: 'Approval' },
-  DISAPPROVAL: { id: 232, name: 'Disapproval' }
+  DISAPPROVAL: { id: 232, name: 'Disapproval' },
+  ACCEPT_CREDITS: { id: 233, name: 'Accept Transfer Credits' },
 });
 
-export const StudentSubjectPermissions = new Enum({
+export const EnlistmentPermissions = new Enum({
   APPROVAL: { id: 241, name: 'Approval' },
   DISAPPROVAL: { id: 242, name: 'Disapproval' }
 });

@@ -9,11 +9,11 @@
       </div>
       <slot name="header"></slot>
       <div v-if="showOptions" class="approval-view__header-right-actions">
-        <button @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
+        <button v-if="showApprove" @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
           Approve Request
         </button>
 
-        <button @click="$emit('onRejectionRequest')" variant="dark" class="btn-action ml-2">
+        <button v-if="showReject" @click="$emit('onRejectionRequest')" variant="dark" class="btn-action ml-2">
           Reject Request
         </button>
       </div>
@@ -62,6 +62,14 @@
       showFooter: {
         type: [Boolean],
         default: false
+      },
+      showApprove: {
+        type: [Boolean],
+        default: true
+      },
+      showReject: {
+        type: [Boolean],
+        default: true
       },
       showOptions: {
         type: [Boolean],

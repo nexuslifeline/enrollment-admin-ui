@@ -117,8 +117,6 @@
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
-              :showActionBar="
-                isAccessible($options.StudentFeePermissions.APPROVAL.id) && showOptions"
               :options="[
                 {
                   label: 'Approve',
@@ -367,7 +365,11 @@
                       </b-button>
                     </template>
                   </b-table> -->
-                  <FeesTable :studentFees="selectedAcademicRecord && selectedAcademicRecord.fees || []" :isDisabled="showOptions" @onIsInitialToggled="onIsInitialToggled"/>
+                  <FeesTable 
+                    :studentFees="selectedAcademicRecord && selectedAcademicRecord.fees || []"
+                    :isDisabled="showOptions"
+                    @onIsInitialToggled="onIsInitialToggled"
+                  />
                   <b-row>
                     <b-col md="4">
                       <div class="footer-info">
@@ -629,12 +631,14 @@
       />
 
       <PostPaymentConfirmation
-        @onYes="$router.push({name: 'Payment Add',
-                  query: { studentId: selectedAcademicRecord && selectedAcademicRecord.student && selectedAcademicRecord.student.id }})"
+        @onYes="$router.push({
+          name: 'Payment Add',
+          query: { studentId: selectedAcademicRecord && selectedAcademicRecord.student && selectedAcademicRecord.student.id }
+        })"
         :isShown.sync="showPostPayment"
         @onCancel="showPostPayment = false">
         <template #modal-body>
-          Are you sure you want to post payment for this student ?
+          Are you sure you want to post payment for this student?
         </template>
       </PostPaymentConfirmation>
     </template>
@@ -651,7 +655,7 @@ import {
   ReportApi,
   SchoolYearApi,
   TermApi,
-} from '../../mixins/api';
+} from '../../../mixins/api';
 import {
   SchoolCategories,
   AcademicRecordStatuses,
@@ -665,31 +669,31 @@ import {
   SettingPermissions,
   AssessmentStatuses,
   EnlistmentStatuses,
-} from '../../helpers/enum';
-import { showNotification, formatNumber } from '../../helpers/forms';
-import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
-import Tables from '../../helpers/tables';
-import Access from '../../mixins/utils/Access';
-import Card from '../components/Card';
-import { StudentColumn, EducationColumn, AddressColumn, AssessmentStatusColumn } from '../components/ColumnDetails';
+} from '../../../helpers/enum';
+import { showNotification, formatNumber } from '../../../helpers/forms';
+import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
+import Tables from '../../../helpers/tables';
+import Access from '../../../mixins/utils/Access';
+import Card from '../../components/Card';
+import { StudentColumn, EducationColumn, AddressColumn, AssessmentStatusColumn } from '../../components/ColumnDetails';
 
-import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
-import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
-import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
-import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
-import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
-import AttachmentList from '../components/Attachment/AttachmentList';
-import AvatarMaker from '../components/AvatarMaker';
-import FileViewer from '../components/FileViewer';
+import ActiveRowViewer from '../../components/ActiveRowViewer/ActiveRowViewer';
+import ActiveViewHeader from '../../components/ActiveRowViewer/ActiveViewHeader';
+import ActiveViewItems from '../../components/ActiveRowViewer/ActiveViewItems';
+import ActiveViewItem from '../../components/ActiveRowViewer/ActiveViewItem';
+import ActiveViewLinks from '../../components/ActiveRowViewer/ActiveViewLinks';
+import AttachmentList from '../../components/Attachment/AttachmentList';
+import AvatarMaker from '../../components/AvatarMaker';
+import FileViewer from '../../components/FileViewer';
 import { format } from 'date-fns';
-import PageContent from "../components/PageContainer/PageContent";
-import FilterButton from "../components/PageContainer/FilterButton";
-import NoAccess from "../components/NoAccess";
-import AssessmentApproval from '../components/ApprovalModals/Assessment'
-import AssessmentRejection from '../components/RejectionModals/Assessment'
-import Toggle from '../components/Form/Toggle'
-import FeesTable from '../components/Assessment/FeesTable'
-import PostPaymentConfirmation from '../components/ConfirmationModal'
+import PageContent from "../../components/PageContainer/PageContent";
+import FilterButton from "../../components/PageContainer/FilterButton";
+import NoAccess from "../../components/NoAccess";
+import AssessmentApproval from '../../components/ApprovalModals/Assessment'
+import AssessmentRejection from '../../components/RejectionModals/Assessment'
+import Toggle from '../../components/Form/Toggle'
+import FeesTable from '../../components/Assessment/FeesTable'
+import PostPaymentConfirmation from '../../components/ConfirmationModal'
 
 export default {
   name: 'StudentFee',
@@ -1463,8 +1467,7 @@ export default {
     // },
     showOptions() {
       //for pending statuses
-      if(!this.selectedAcademicRecord)
-      return false //avoid flicker
+      if(!this.selectedAcademicRecord) return false;
       return this.selectedAcademicRecord.academicRecordStatusId === this.academicRecordStatuses.ENLISTMENT_APPROVED.id
     }
   },
@@ -1472,7 +1475,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../assets/scss/shared.scss';
+@import '../../../assets/scss/shared.scss';
 .footer-info {
   display: flex;
   width: 100%;

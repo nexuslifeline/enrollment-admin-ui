@@ -40,9 +40,6 @@
       />
     </template>
     <template v-slot:content>
-      <!-- <div class="mb-2">
-        <FilterButton />
-      </div> -->
       <div v-if="checkIfHasSchoolCategoryAccess()">
         <b-table
           class="c-table"
@@ -157,103 +154,7 @@
           </b-col>
         </b-row>
       </div>
-      <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
-      <!-- <FileViewer
-        :show="fileViewer.show"
-        :file="file"
-        :owner="file.owner"
-        :isBusy="file.isLoading"
-        @close="fileViewer.show = false"
-        @onNavLeft="onFileNavLeft"
-        @onNavRight="onFileNavRight"
-        :navCount="fileViewer.activeNavCount"
-        :navActiveIndex="fileViewer.activeNavIndex"
-        :enableArrowNav="fileViewer.isActiveNavEnabled"
-      /> -->
-      <b-modal
-        v-model="showModalApproval"
-        centered
-        header-bg-variant="success"
-        header-text-variant="light"
-        :noCloseOnEsc="true"
-        :noCloseOnBackdrop="true"
-      >
-        <div slot="modal-title">
-          <!-- modal title -->
-          Finalize Approval
-        </div>
-        <!-- modal title -->
-        <b-row>
-          <!-- modal body -->
-          <b-col md="12">
-            <label>Notes</label>
-            <b-textarea
-              v-model="forms.evaluation.fields.approvalNotes"
-              rows="7"
-            />
-          </b-col>
-        </b-row>
-        <!-- modal body -->
-        <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
-          <b-button class="float-left" @click="showModalApproval = false">
-            Cancel
-          </b-button>
-          <b-button
-            @click="onApproval()"
-            class="float-right"
-            variant="outline-primary"
-            :disabled="isProcessing"
-          >
-            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-            Confirm
-          </b-button>
-        </div>
-        <!-- modal footer buttons -->
-      </b-modal>
-      <!-- Modal Approval -->
-      <!-- Modal Reject -->
-      <b-modal
-        v-model="showModalRejection"
-        centered
-        header-bg-variant="danger"
-        header-text-variant="light"
-        :noCloseOnEsc="true"
-        :noCloseOnBackdrop="true"
-      >
-        <div slot="modal-title">
-          <!-- modal title -->
-          Confirm Rejection
-        </div>
-        <!-- modal title -->
-        <b-row>
-          <!-- modal body -->
-          <b-col md="12">
-            <label>Reason</label>
-            <b-textarea
-              v-model="forms.evaluation.fields.disapprovalNotes"
-              rows="7"
-            />
-          </b-col>
-        </b-row>
-        <!-- modal body -->
-        <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
-          <b-button class="float-left" @click="showModalRejection = false">
-            Cancel
-          </b-button>
-          <b-button
-            @click="onDisapproval()"
-            class="float-right"
-            variant="outline-primary"
-            :disabled="isProcessing"
-          >
-            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-            Confirm
-          </b-button>
-        </div>
-        <!-- modal footer buttons -->
-      </b-modal>
+      <NoAccess v-else />
       <router-view
         :previousRoute="{ name: 'Evaluation' }"
         @onEvaluationUpdated="loadEvaluation"></router-view>
@@ -269,40 +170,27 @@ import {
   CourseApi,
   TranscriptRecordApi,
   SchoolYearApi,
-} from '../../mixins/api';
+} from '../../../mixins/api';
 import {
   SchoolCategories,
   EvaluationStatuses,
   Semesters,
   UserGroups,
   StudentCategories,
-  EvaluationAndAdmissionPermissions,
-} from '../../helpers/enum';
-import {
-  showNotification,
-  formatNumber,
-  clearFields,
-} from '../../helpers/forms';
-import Tables from '../../helpers/tables';
-import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
-import { copyValue } from '../../helpers/extractor';
-//import FileViewer from '../components/FileViewer';
-import Access from '../../mixins/utils/Access';
-import { camelToSnakeCase } from '../../helpers/utils';
+  EvaluationPermissions,
+} from '../../../helpers/enum';
+import Tables from '../../../helpers/tables';
+import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
+import Access from '../../../mixins/utils/Access';
+import { camelToSnakeCase } from '../../../helpers/utils';
 import { format } from 'date-fns';
-import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
-// import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
-// import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
-// import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
-// import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
-// import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
-import AttachmentList from '../components/Attachment/AttachmentList';
-import AvatarMaker from '../components/AvatarMaker';
-import Card from '../components/Card';
-import { StudentColumn, EducationColumn, AddressColumn, StatusColumn } from '../components/ColumnDetails';
-import PageContent from '../components/PageContainer/PageContent';
-import FilterButton from '../components/PageContainer/FilterButton';
-import NoAccess from '../components/NoAccess';
+import { colorFactory, getColorFactoryLength } from '../../../helpers/colors';;
+import AvatarMaker from '../../components/AvatarMaker';
+import Card from '../../components/Card';
+import { StudentColumn, EducationColumn, AddressColumn, StatusColumn } from '../../components/ColumnDetails';
+import PageContent from '../../components/PageContainer/PageContent';
+import FilterButton from '../../components/PageContainer/FilterButton';
+import NoAccess from '../../components/NoAccess';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
 
@@ -349,7 +237,7 @@ export default {
     FilterButton,
     NoAccess
   },
-  EvaluationAndAdmissionPermissions,
+  EvaluationPermissions,
   data() {
     return {
       sortBy: 'submittedDate',
@@ -1066,15 +954,15 @@ export default {
     //     subject.pivot.isTaken = value ? 1 : 0;
     //   });
     // },
-    showBulletedNotification(errors) {
-      const h = this.$createElement;
-      const errorList = [];
-      Object.keys(errors).forEach((key) => {
-        errorList.push(h('li', errors[key][0]));
-      });
-      const vNodesMsg = h('ul', errorList);
-      showNotification(this, 'danger', vNodesMsg);
-    },
+    // showBulletedNotification(errors) {
+    //   const h = this.$createElement;
+    //   const errorList = [];
+    //   Object.keys(errors).forEach((key) => {
+    //     errorList.push(h('li', errors[key][0]));
+    //   });
+    //   const vNodesMsg = h('ul', errorList);
+    //   showNotification(this, 'danger', vNodesMsg);
+    // },
     // getCurrentFiles() {
     //   const { index: studentIdx } = this.lastActiveEvaluation;
     //   const { files } = this.tables?.students?.items[studentIdx];
@@ -1162,7 +1050,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-@import '../../assets/scss/shared.scss';
+@import '../../../assets/scss/shared.scss';
 
 .preview__modal-description {
   z-index: 5000;

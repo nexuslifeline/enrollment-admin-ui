@@ -3,6 +3,8 @@
     @onBack="$router.push(previousRoute)"
     @onApproveRequest="onApproveRequest"
     @onRejectionRequest="onRejectionRequest"
+    :showApprove="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
+    :showReject="isAccessible($options.EvaluationPermissions.DISAPPROVAL.id)"
     backTitle="Evaluation"
     :showOptions="showOptions">
      <template v-slot:detail>
@@ -34,7 +36,9 @@
         <b-tabs content-class="mt-3">
           <b-tab title="Request">
             <div class="tab__content">
-              <button v-if="showOptions" @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
+              <button 
+                v-if="isAccessible($options.EvaluationPermissions.ACCEPT_CREDITS.id) && showOptions"
+                @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
                 <BIconPlus scale="1.2" class="mr-1" v-if="!isCreatingTranscript"/>
                 <v-icon name="spinner" spin v-if="isCreatingTranscript"></v-icon>
                 Accept Transfer Credit
@@ -42,6 +46,7 @@
               <AcademicView
                 v-if="data && data.academicRecord"
                 :data="data.academicRecord"
+                :isEditable="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
               />
               <SchoolView
                 v-if="!!Object.keys(data).length"
@@ -97,12 +102,14 @@
 import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
 import RejectEvaluation from '../../components/RejectionModals/Evaluation';
 import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
+import Access from '../../../mixins/utils/Access';
 import { showNotification } from '../../../helpers/forms';
 import Transcript from '../../components/Transcript/Transcript'
-import { EvaluationStatuses } from "../../../helpers/enum";
+import { EvaluationStatuses, EvaluationPermissions } from "../../../helpers/enum";
 export default {
   EvaluationStatuses,
-  mixins: [EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
+  EvaluationPermissions,
+  mixins: [Access, EvaluationApi, TranscriptRecordApi, AcademicRecordApi],
   props: {
     previousRoute: {
       type: [Object]

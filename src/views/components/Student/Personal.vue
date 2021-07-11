@@ -212,7 +212,7 @@ export default {
       this.isCompleted = !!firstName && !!lastName && !!civilStatusId && !!birthDate;
       this.$emit('onCompletionChange', this.isCompleted);
     },
-    autoSave: debounce(function() { this.onSave() }, 2000),
+    autoSave: debounce(function() { this.onSave() }, 4000),
     onSave() {
       this.isProcessing = true
       const { profile, profile: { fields: { studentNo }} } = this.forms

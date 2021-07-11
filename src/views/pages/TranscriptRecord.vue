@@ -1230,7 +1230,7 @@
               >
                 <!-- v-if="
                     isAccessible(
-                      $options.EvaluationAndAdmissionPermissions.DISAPPROVAL
+                      $options.EvaluationPermissions.DISAPPROVAL
                         .id
                     )
                   " -->
@@ -1242,7 +1242,7 @@
                 >
                 <!-- v-if="
                     isAccessible(
-                      $options.EvaluationAndAdmissionPermissions.APPROVAL.id
+                      $options.EvaluationPermissions.APPROVAL.id
                     )
                   " -->
                 <b-button

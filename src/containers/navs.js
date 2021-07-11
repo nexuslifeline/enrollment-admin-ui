@@ -12,8 +12,8 @@ import {
   SectionAndSchedulePermissions,
   SubjectPermissions,
   CoursePermissions,
-  EvaluationAndAdmissionPermissions,
-  StudentSubjectPermissions,
+  EvaluationPermissions,
+  EnlistmentPermissions,
   StudentFeePermissions,
   StudentPaymentPermissions, Semesters,
   BankAccountPermissions,
@@ -61,8 +61,8 @@ export default [
     label: 'Enrollment',
     to: '/enrollment',
     permissionIds: [
-      ...EvaluationAndAdmissionPermissions.getIds(),
-      ...StudentSubjectPermissions.getIds(),
+      ...EvaluationPermissions.getIds(),
+      ...EnlistmentPermissions.getIds(),
       ...StudentFeePermissions.getIds(),
       ...StudentPaymentPermissions.getIds(),
       ...ManualEnrollmentPermissions.getIds()
@@ -71,12 +71,12 @@ export default [
       {
         label: 'Evaluation',
         to: '/enrollment/evaluation',
-        permissionIds: EvaluationAndAdmissionPermissions.getIds(),
+        permissionIds: EvaluationPermissions.getIds(),
       },
       {
         label: 'Enlistment',
         to: '/enrollment/student-subject-enlisment',
-        permissionIds: StudentSubjectPermissions.getIds()
+        permissionIds: EnlistmentPermissions.getIds()
       },
       {
         label: 'Assessment',

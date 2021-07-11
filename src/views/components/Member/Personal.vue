@@ -106,6 +106,20 @@
         </b-form-textarea>
       </b-form-group>
     </InputContainer>
+    <InputGroup>
+      <InputContainer>
+        <b-form-group>
+          <label class="required">Address</label>
+          <b-form-textarea
+            v-model="forms.profile.fields.completeAddress"
+            :state="forms.profile.states.completeAddress">
+          </b-form-textarea>
+          <b-form-invalid-feedback>
+              {{ forms.profile.errors.completeAddress }}
+            </b-form-invalid-feedback>
+        </b-form-group>
+      </InputContainer>
+    </InputGroup>
     <!-- <InputContainer>
       <InputInline class="mt-3 mb-3">
         <Toggle />
@@ -157,6 +171,7 @@ const profileFields = {
   civilStatusId: null,
   biography: null,
   departmentId: null,
+  completeAddress: null,
   photo: {}
 }
 
@@ -221,17 +236,19 @@ export default {
         jobTitle,
         birthDate,
         departmentId,
-        civilStatusId
+        civilStatusId,
+        completeAddress
       } = this.forms.profile.fields;
       this.isCompleted = !!firstName &&
         !!lastName &&
         !!jobTitle &&
         !!birthDate &&
         !!departmentId &&
-        !!civilStatusId;
+        !!civilStatusId &&
+        !!completeAddress;
       this.$emit('onCompletionChange', this.isCompleted);
     },
-    autoSave: debounce(function() { this.onSave() }, 2000),
+    autoSave: debounce(function() { this.onSave() }, 4000),
     onSave() {
       this.isProcessing = true
       const { profile, profile: { fields: { studentNo }} } = this.forms

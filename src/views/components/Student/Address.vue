@@ -367,7 +367,7 @@ export default {
         !!permanentCountryId;
       this.$emit('onCompletionChange', this.isCompleted);
     },
-    autoSave: debounce(function() { this.onSave() }, 2000),
+    autoSave: debounce(function() { this.onSave() }, 4000),
     onSave() {
       this.isProcessing = true
       const { address } = this.forms
