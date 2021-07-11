@@ -298,7 +298,7 @@ const academicRecordFields = {
           const errors = error.response.data.errors;
           console.log(error)
           this.isProcessing = false;
-          validate(academicRecord, errors);
+          validate(academicRecord, errors, this);
         });
         // Promise.all([
         //   this.updateAcademicRecord(academicRecordData, academicRecordId),
@@ -309,8 +309,8 @@ const academicRecordFields = {
         // }).catch((error) => {
         //   const errors = error.response.data.errors;
         //   this.isProcessing = false;
-        //   validate(academicRecord, errors);
-        //   validate(transcriptRecord, errors);
+        //   validate(academicRecord, errors, this);
+        //   validate(transcriptRecord, errors, this);
         // });
       },
       onSchoolYearChanged(schoolYear) {

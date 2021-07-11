@@ -770,7 +770,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             subject.isProcessing = false;
-            validate(subject, errors);
+            validate(subject, errors, this);
           });
       } else {
         const { fields } = this.forms.subject;
@@ -784,7 +784,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             subject.isProcessing = false;
-            validate(subject, errors);
+            validate(subject, errors, this);
           });
       }
     },

@@ -242,7 +242,7 @@ export default {
         .catch((error) => {
           const errors = error.response.data.errors;
           this.isProcessing = false;
-          validate(semester.fields, errors);
+          validate(semester.fields, errors, this);
         });
     },
     setAsActiveSemester(item) {

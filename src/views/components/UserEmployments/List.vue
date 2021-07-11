@@ -96,7 +96,7 @@ export default {
         showNotification(this, 'success', 'Employment has been updated.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(employment, errors);
+        validate(employment, errors, this);
         this.isConfirmBusy = false
       });
     },
@@ -112,7 +112,7 @@ export default {
         showNotification(this, 'success', 'Employment has been added.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(employment, errors);
+        validate(employment, errors, this);
         this.isConfirmBusy = false
       });
     },

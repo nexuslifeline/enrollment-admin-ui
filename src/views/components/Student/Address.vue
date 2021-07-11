@@ -399,7 +399,7 @@ export default {
         showNotification(this, 'success', 'Address has been saved.')
       }).catch(error => {
         const errors = error.response.data.errors
-        validate(address, errors)
+        validate(address, errors, this)
         this.isProcessing = false
       })
     }

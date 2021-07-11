@@ -127,7 +127,7 @@ export default {
         showNotification(this, 'success', 'Username has been updated.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(user, errors);
+        validate(user, errors, this);
         this.isConfirmBusy = false
       });
     }

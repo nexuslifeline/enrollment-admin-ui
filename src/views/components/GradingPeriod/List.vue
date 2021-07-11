@@ -116,7 +116,7 @@ export default {
         showNotification(this, 'success', 'Term has been added.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(period, errors);
+        validate(period, errors, this);
         this.isConfirmBusy = false
       });
     },
@@ -134,7 +134,7 @@ export default {
         showNotification(this, 'success', 'Term has been updated.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(period, errors);
+        validate(period, errors, this);
         this.isConfirmBusy = false
       });
     },

@@ -385,7 +385,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             userGroup.isProcessing = false;
-            validate(userGroup, errors);
+            validate(userGroup, errors, this);
           });
       } else {
         this.updateUserGroup(fields, fields.id)
@@ -402,7 +402,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             userGroup.isProcessing = false;
-            validate(userGroup, errors);
+            validate(userGroup, errors, this);
           });
       }
     },

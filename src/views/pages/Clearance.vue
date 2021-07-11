@@ -858,7 +858,7 @@ export default {
         const errors = error.response.data.errors;
         batchClearance.isProcessing = false;
         showNotification(this, 'danger', 'Please select section before proceeding.')
-        // validate(batchClearance, errors);
+        // validate(batchClearance, errors, this);
       });
     },
     setUpdateClearance(id) {
@@ -895,7 +895,7 @@ export default {
         console.log(errors)
         // batchClearance.isProcessing = false;
         // showNotification(this, 'danger', 'Please select section before proceeding.')
-        // validate(batchClearance, errors);
+        // validate(batchClearance, errors, this);
       });
     },
     onDeleteClearance() {

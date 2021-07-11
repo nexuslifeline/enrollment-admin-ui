@@ -614,8 +614,8 @@ export default {
           })
           .catch((error) => {
             const errors = error.response.data.errors;
-            validate(user, errors);
-            validate(personnel, errors);
+            validate(user, errors, this);
+            validate(personnel, errors, this);
             this.isProcessing = false
           });
       } else if (this.entryMode == 'Edit') {
@@ -628,7 +628,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             this.isProcessing = false
-            validate(personnel, errors);
+            validate(personnel, errors, this);
           });
       }
     },

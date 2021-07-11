@@ -214,7 +214,7 @@ export default {
         showNotification(this, 'success', 'Education has been saved.')
       }).catch(error => {
         const errors = error.response.data.errors
-        validate(education, errors)
+        validate(education, errors, this)
         console.log(errors)
         this.isProcessing = false
       })

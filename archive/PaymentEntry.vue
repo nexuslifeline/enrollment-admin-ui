@@ -805,7 +805,7 @@ export default {
         .catch((error) => {
           const errors = error.response.data.errors;
           this.isProcessing = false;
-          validate(payment, errors);
+          validate(payment, errors, this);
         });
     },
     getStudentInfo(student) {

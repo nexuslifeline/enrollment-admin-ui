@@ -385,7 +385,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             peraPadalaAccount.isProcessing = false;
-            validate(peraPadalaAccount, errors);
+            validate(peraPadalaAccount, errors, this);
           });
       } else {
         const { fields } = this.forms.peraPadalaAccount;
@@ -403,7 +403,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             peraPadalaAccount.isProcessing = false;
-            validate(peraPadalaAccount, errors);
+            validate(peraPadalaAccount, errors, this);
           });
       }
     },

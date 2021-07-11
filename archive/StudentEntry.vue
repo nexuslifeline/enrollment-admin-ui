@@ -1055,14 +1055,14 @@ export default {
             this.$router.push({ path: '/master-files/student' })
         }).catch(error => {
           const errors = error.response.data.errors
-          validate(student, errors)
-          validate(address, errors)
-          validate(family, errors)
-          validate(education, errors)
+          validate(student, errors, this)
+          validate(address, errors, this)
+          validate(family, errors, this)
+          validate(education, errors, this)
           this.showBulletedNotification(errors)
           this.isProcessing = false;
-          // validate(user, errors)
-          // validate(personnel, errors)
+          // validate(user, errors, this)
+          // validate(personnel, errors, this)
         })
 
       } else if (this.entryMode == "Edit") {
@@ -1074,10 +1074,10 @@ export default {
             this.$router.push({ path: '/master-files/student' })
         }).catch(error => {
           const errors = error.response.data.errors
-          validate(student, errors)
-          validate(address, errors)
-          validate(family, errors)
-          validate(education, errors)
+          validate(student, errors, this)
+          validate(address, errors, this)
+          validate(family, errors, this)
+          validate(education, errors, this)
           this.isProcessing = false;
           this.showBulletedNotification(errors)
         })

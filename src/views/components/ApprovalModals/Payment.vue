@@ -235,7 +235,7 @@ export default {
           this.$emit('onApproved')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(payment, errors)
+        validate(payment, errors, this)
         payment.isProcessing = false
       });
     },
@@ -350,7 +350,7 @@ export default {
         })
         .catch((error) => {
           const { errors } = error.response.data;
-          validate(paymentReceiptFile, errors);
+          validate(paymentReceiptFile, errors, this);
           paymentReceiptFile.isUpdating = false;
           selectedFile.isBusy = false;
         });

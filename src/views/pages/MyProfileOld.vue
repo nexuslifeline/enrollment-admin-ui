@@ -351,7 +351,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             this.isProcessing = false;
-            validate(personnel, errors);
+            validate(personnel, errors, this);
           });
       } else {
         const data = { user: user.fields, id: fields.id };
@@ -365,7 +365,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             this.isProcessing = false;
-            validate(user, errors);
+            validate(user, errors, this);
           });
       }
     },

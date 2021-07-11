@@ -213,7 +213,7 @@ export default {
         showNotification(this, 'success', 'Family has been saved.')
       }).catch(error => {
         const errors = error.response.data.errors
-        validate(family, errors)
+        validate(family, errors, this)
         console.log(errors)
         this.isProcessing = false
       })

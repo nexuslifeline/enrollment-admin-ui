@@ -100,7 +100,7 @@ export default {
           this.$emit('onApproved')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(application, errors)
+        validate(application, errors, this)
         application.isProcessing = false
       });
     }

@@ -416,8 +416,8 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             user.isProcessing = false;
-            validate(user, errors);
-            validate(personnel, errors);
+            validate(user, errors, this);
+            validate(personnel, errors, this);
           });
       } else if (this.entryMode == 'Edit Personnel') {
         this.updatePersonnel(personnel.fields, id)
@@ -430,7 +430,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             user.isProcessing = false;
-            validate(personnel, errors);
+            validate(personnel, errors, this);
           });
       } else if (this.entryMode == 'Edit User') {
         const data = { user: { username, userGroupId }, id: personnel.fields.id };
@@ -444,7 +444,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             user.isProcessing = false;
-            validate(user, errors);
+            validate(user, errors, this);
           });
       } else if (this.entryMode == 'Change Password') {
         const data = { user: { password, passwordConfirmation }, id: personnel.fields.id };
@@ -458,7 +458,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             user.isProcessing = false;
-            validate(user, errors);
+            validate(user, errors, this);
           });
       }
     },

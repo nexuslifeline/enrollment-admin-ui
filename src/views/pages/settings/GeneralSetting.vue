@@ -119,7 +119,7 @@ export default {
         .catch((error) => {
           const errors = error.response.data.errors;
           console.log(errors);
-          validate(generalSetting, errors);
+          validate(generalSetting, errors, this);
           this.isProcessing = false;
         });
     },

@@ -381,7 +381,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             eWalletAccount.isProcessing = false;
-            validate(eWalletAccount, errors);
+            validate(eWalletAccount, errors, this);
           });
       } else {
         const { fields } = this.forms.eWalletAccount;
@@ -399,7 +399,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             eWalletAccount.isProcessing = false;
-            validate(eWalletAccount, errors);
+            validate(eWalletAccount, errors, this);
           });
       }
     },

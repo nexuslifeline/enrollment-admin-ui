@@ -99,7 +99,7 @@ export default {
         }).catch((error) => {
           auth.isProcessing = false;
           const { errors } = error.response.data;
-          validate(auth, errors);
+          validate(auth, errors, this);
         })
     },
   }

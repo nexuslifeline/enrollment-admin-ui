@@ -2147,9 +2147,9 @@ export default {
             console.log(error);
             // academicRecord.isProcessing = false
             const errors = error.response.data.errors;
-            validate(studentForm, errors);
-            validate(userForm, errors);
-            validate(academicRecordForm, errors);
+            validate(studentForm, errors, this);
+            validate(userForm, errors, this);
+            validate(academicRecordForm, errors, this);
             this.isProcessing = false;
           });
       } else if (academicRecord.manualStepId === ManualSteps.SUBJECT_ENLISTMENT.id) {
@@ -2211,9 +2211,9 @@ export default {
           .catch((error) => {
             // academicRecord.isProcessing = false
             const errors = error.response.data.errors;
-            validate(studentForm, errors);
-            validate(userForm, errors);
-            validate(academicRecordForm, errors);
+            validate(studentForm, errors, this);
+            validate(userForm, errors, this);
+            validate(academicRecordForm, errors, this);
             this.isProcessing = false;
           });
       } else if (
@@ -2261,8 +2261,8 @@ export default {
           .catch((error) => {
             // academicRecord.isProcessing = false
             const errors = error.response.data.errors;
-            validate(studentForm, errors);
-            validate(academicRecordForm, errors);
+            validate(studentForm, errors, this);
+            validate(academicRecordForm, errors, this);
             this.isProcessing = false;
           });
       }

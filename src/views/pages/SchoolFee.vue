@@ -379,7 +379,7 @@ export default {
           .catch(error => {
             const errors = error.response.data.errors
             schoolFee.isProcessing = false
-            validate(schoolFee, errors)
+            validate(schoolFee, errors, this)
           })
       }
       else {
@@ -394,7 +394,7 @@ export default {
           .catch(error => {
             const errors = error.response.data.errors
             schoolFee.isProcessing = false
-            validate(schoolFee, errors)
+            validate(schoolFee, errors, this)
           })
       }
     },

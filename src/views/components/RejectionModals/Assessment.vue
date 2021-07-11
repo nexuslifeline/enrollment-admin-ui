@@ -80,7 +80,7 @@ export default {
         this.$emit('onRejected')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(studentFee, errors)
+        validate(studentFee, errors, this)
         studentFee.isProcessing = false
       });
     }

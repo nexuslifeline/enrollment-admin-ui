@@ -1907,7 +1907,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             curriculum.isProcessing = false;
-            validate(curriculum, errors);
+            validate(curriculum, errors, this);
             this.showBulletedNotification(errors);
           });
       } else {
@@ -1926,7 +1926,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             curriculum.isProcessing = false;
-            validate(curriculum, errors);
+            validate(curriculum, errors, this);
             this.showBulletedNotification(errors);
           });
       }
@@ -1983,7 +1983,7 @@ export default {
               .catch((error) => {
                 const errors = error.response.data.errors;
                 // curriculum.isProcessing = false
-                // validate(curriculum, errors)
+                // validate(curriculum, errors, this)
               });
           }
         }

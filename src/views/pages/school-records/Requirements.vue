@@ -398,7 +398,7 @@ export default {
         })
         .catch((error) => {
           const { errors } = error.response.data;
-          validate(studentFile, errors);
+          validate(studentFile, errors, this);
           this.isFileUpdating = true;
           this.selectedStudentFile.isBusy = false;
         });

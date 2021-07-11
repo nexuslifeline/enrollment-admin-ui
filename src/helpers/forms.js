@@ -4,8 +4,8 @@ export const validate = (form, errors, parentIntance) => {
       form.states[key] = false;
       form.errors[key] = errors[key].length && errors[key][0];
     });
-    if (parentIntance && errors?.nonFieldError) {
-      showNotification(parentIntance, 'danger', errors?.nonFieldError, 'Something went wrong!');
+    if (parentIntance) {
+      showNotification(parentIntance, 'danger', errors?.nonFieldError || 'The given data was invalid.', 'Something went wrong!');
     }
   }
 }

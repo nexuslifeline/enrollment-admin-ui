@@ -379,7 +379,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             department.isProcessing = false;
-            validate(department, errors);
+            validate(department, errors, this);
           });
       } else {
         const { fields } = this.forms.department;
@@ -397,7 +397,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             department.isProcessing = false;
-            validate(department, errors);
+            validate(department, errors, this);
           });
       }
     },

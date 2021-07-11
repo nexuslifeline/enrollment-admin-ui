@@ -385,7 +385,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             schoolFeeCategory.isProcessing = false;
-            validate(schoolFeeCategory, errors);
+            validate(schoolFeeCategory, errors, this);
           });
       } else {
         const { fields } = this.forms.schoolFeeCategory;
@@ -403,7 +403,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             schoolFeeCategory.isProcessing = false;
-            validate(schoolFeeCategory, errors);
+            validate(schoolFeeCategory, errors, this);
           });
       }
     },

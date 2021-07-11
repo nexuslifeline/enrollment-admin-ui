@@ -96,7 +96,7 @@ export default {
         showNotification(this, 'success', 'Education has been updated.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(education, errors);
+        validate(education, errors, this);
         this.isConfirmBusy = false
       });
     },
@@ -112,7 +112,7 @@ export default {
         showNotification(this, 'success', 'Education has been added.')
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(education, errors);
+        validate(education, errors, this);
         this.isConfirmBusy = false
       });
     },

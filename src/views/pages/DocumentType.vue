@@ -350,7 +350,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             documentType.isProcessing = false;
-            validate(documentType, errors);
+            validate(documentType, errors, this);
           });
       } else {
         const { fields } = this.forms.documentType;
@@ -368,7 +368,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             documentType.isProcessing = false;
-            validate(documentType, errors);
+            validate(documentType, errors, this);
           });
       }
     },

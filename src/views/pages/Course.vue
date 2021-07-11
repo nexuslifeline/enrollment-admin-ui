@@ -418,7 +418,7 @@ export default {
           .catch((error) => {
             course.isProcessing = false;
             const errors = error.response.data.errors;
-            validate(course, errors);
+            validate(course, errors, this);
           });
       } else {
         this.updateCourse(fields, fields.id)
@@ -431,7 +431,7 @@ export default {
           .catch((error) => {
             course.isProcessing = false;
             const errors = error.response.data.errors;
-            validate(course, errors);
+            validate(course, errors, this);
           });
       }
     },

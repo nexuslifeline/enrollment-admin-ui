@@ -150,7 +150,7 @@ const profileFields = {
   mobileNo: null,
   birthDate: null,
   civilStatusId: null,
-  email: null,
+  // email: null,
   isManual: 1,
   photo: {}
 }
@@ -233,7 +233,7 @@ export default {
         showNotification(this, 'success', 'Profile has been saved.')
       }).catch(error => {
         const errors = error.response.data.errors
-        validate(profile, errors)
+        validate(profile, errors, this)
         this.isProcessing = false
       })
     },

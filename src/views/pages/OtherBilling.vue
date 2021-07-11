@@ -1150,7 +1150,7 @@ export default {
         .catch((error) => {
           const errors = error.response.data.errors;
           batchBilling.isProcessing = false;
-          validate(batchBilling, errors);
+          validate(batchBilling, errors, this);
         });
     },
     onBillingEntry() {
@@ -1190,7 +1190,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             billing.isProcessing = false;
-            validate(billing, errors);
+            validate(billing, errors, this);
           });
       } else {
         this.updateBilling(data, fields.id)
@@ -1207,7 +1207,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             billing.isProcessing = false;
-            validate(billing, errors);
+            validate(billing, errors, this);
           });
       }
     },

@@ -1080,7 +1080,7 @@ export default {
         .catch((error) => {
           const errors = error.response.data.errors;
           this.isProcessing = false;
-          validate(this.forms.payment, errors);
+          validate(this.forms.payment, errors, this);
         });
     },
     setDisapproval(row) {
@@ -1249,7 +1249,7 @@ export default {
         })
         .catch((error) => {
           const { errors } = error.response.data;
-          validate(paymentReceiptFile, errors);
+          validate(paymentReceiptFile, errors, this);
           paymentReceiptFile.isUpdating = false;
           selectedFile.isBusy = false;
         });

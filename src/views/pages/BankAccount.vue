@@ -388,7 +388,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             bankAccount.isProcessing = false;
-            validate(bankAccount, errors);
+            validate(bankAccount, errors, this);
           });
       } else {
         const { fields } = this.forms.bankAccount;
@@ -406,7 +406,7 @@ export default {
           .catch((error) => {
             const errors = error.response.data.errors;
             bankAccount.isProcessing = false;
-            validate(bankAccount, errors);
+            validate(bankAccount, errors, this);
           });
       }
     },

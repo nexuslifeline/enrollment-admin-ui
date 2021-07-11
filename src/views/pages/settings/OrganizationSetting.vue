@@ -170,7 +170,7 @@ export default {
       }).catch(error => {
         const errors = error.response.data.errors
         console.log(errors)
-        validate(organizationSetting, errors)
+        validate(organizationSetting, errors, this)
         this.isProcessing = false
       })
     },

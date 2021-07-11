@@ -185,7 +185,7 @@ export default {
 
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(personnel, errors);
+        validate(personnel, errors, this);
         this.isConfirmBusy = false
       });
     }

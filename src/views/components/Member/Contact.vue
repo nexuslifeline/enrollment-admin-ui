@@ -203,7 +203,7 @@ export default {
         showNotification(this, 'success', 'Contact has been saved.')
       }).catch(error => {
         const errors = error.response.data.errors
-        validate(personnel, errors)
+        validate(personnel, errors, this)
         console.log(errors)
         this.isProcessing = false
       })

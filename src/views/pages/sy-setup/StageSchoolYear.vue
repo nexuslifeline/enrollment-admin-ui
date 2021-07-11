@@ -139,7 +139,7 @@ export default {
         this.isProcessing = true
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(schoolYear, errors)
+        validate(schoolYear, errors, this)
         showNotification(this, 'danger', 'Error!')
         this.isProcessing = false
       });
@@ -155,7 +155,7 @@ export default {
         this.isSaving = false
       }).catch((error) => {
         const errors = error.response.data.errors;
-        validate(schoolYear, errors);
+        validate(schoolYear, errors, this);
         this.isSaving = false
       });
     }

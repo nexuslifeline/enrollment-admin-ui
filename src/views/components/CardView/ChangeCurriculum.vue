@@ -101,7 +101,7 @@ export default {
         this.isConfirmBusy = false;
         const errors = error.response.data.errors;
         console.log(errors)
-        validate(transcriptRecord, errors)
+        validate(transcriptRecord, errors, this)
       });
     },
     onShown() {
