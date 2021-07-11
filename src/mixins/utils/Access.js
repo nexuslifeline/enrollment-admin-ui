@@ -8,8 +8,6 @@ export default {
         return true;
       }
 
-      console.log('actionPermissionId', actionPermissionId)
-
       const { user } = this.$store.state;
       if (this.checkIfSuperUser()) {
         return true

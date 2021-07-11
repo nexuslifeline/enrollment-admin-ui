@@ -6,19 +6,19 @@
           class="group"
           v-for="group in permissionGroups"
           :key="group.id">
-          <div class="group__header">{{group.name}}</div>
+          <div class="group__header">{{ group.name }}</div>
           <div
             class="permission"
             v-for="permission in group.permissions"
             :key="permission.id">
             <div class="permission-left">
-              <div class="permission__name">{{permission.name}}</div>
-              <div class="permission__description">{{permission.description}}</div>
+              <div class="permission__name">{{ permission.name }}</div>
+              <div class="permission__description">{{ permission.description }}</div>
             </div>
             <div class="permission-right">
               <Toggle
-                :value="checkIfAllowed(permission.id)"
-                @input="toggledPermission($event, permission.id)" />
+                v-model="permission.isEnabled"
+              />
             </div>
           </div>
         </div>
@@ -71,40 +71,35 @@ export default {
   methods: {
     onSavePermission() {
       this.isProcessing = true
-      this.storePermissionsOfUserGroup(this.userGroupId, { permissions: this.allowedPermissions })
-      .then(({ data }) => {
-        this.allowedPermissions = data.map(permission => { return permission.id })
+      const permissions = this.permissionGroups?.map(
+        (v) => v?.permissions?.filter(p => p?.isEnabled) || []
+      )?.flat()?.map((v) => v?.id);
+
+      this.storePermissionsOfUserGroup(this.userGroupId, { permissions })
+      .then(() => {
         showNotification(this, 'success', 'User group permissions successfully saved.')
         this.isProcessing = false
       })
     },
     loadPermissionGroups() {
-      const params = { paginate: false }
-      this.isLoading = true
-      this.getPermissionGroupList(params)
-      .then(({ data }) => {
-        this.permissionGroups = data
+      const params = { paginate: false };
+      Promise.all([
+        this.getPermissionGroupList(params),
         this.getPermissionsOfUserGroup(this.userGroupId, params)
-        .then(({ data }) => {
-          this.allowedPermissions = data.map(permission => { return permission.id })
-          this.isLoading = false
-        })
-      })
+      ]).then(([{ data: groups }, { data }]) => {
+        const allowed = data.map((v) => v.id);
+        this.permissionGroups = groups.map((v) => {
+          return {
+            ...v,
+            permissions: v?.permissions?.map(
+              (p) => ({...p, isEnabled: allowed?.includes(p?.id) })
+            )
+          }
+        });
+      }).catch((error) => {
+        console.error(error);
+      });
     },
-    toggledPermission(isChecked, permissionId) {
-      if (isChecked) {
-        this.allowedPermissions.push(permissionId)
-      } else {
-        const index = this.allowedPermissions.indexOf(permissionId)
-        this.allowedPermissions.splice(index, 1);
-      }
-    },
-    checkIfAllowed(permissionId) {
-      if (this.allowedPermissions.includes(permissionId)) {
-        return true
-      }
-      return false
-    }
   }
 }
 </script>
