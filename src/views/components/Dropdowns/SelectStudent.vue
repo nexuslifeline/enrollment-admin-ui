@@ -1,6 +1,6 @@
 <template>
   <SelectPaginated
-    class="select-paginated"
+    class="select-student"
     :value="value"
     @input="(v) => $emit('input', v)"
     :reduce="reduce"
@@ -122,7 +122,7 @@ export default {
 <style lang="scss" scoped>
   @import '../../../assets/scss/shared.scss';
 
-  .select-paginated {
+  .select-student {
     width: 100%;
   }
 
@@ -162,7 +162,8 @@ export default {
     font-size: 15px;
   }
 </style>
-<style>
+<style lang="scss">
+.select-student {
   .vs__selected-options {
     position: relative;
   }
@@ -172,6 +173,6 @@ export default {
     top: 0;
     width: 100%;
   }
-
+}
 </style>
 

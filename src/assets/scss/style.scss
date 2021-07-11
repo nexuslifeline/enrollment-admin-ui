@@ -721,12 +721,13 @@ legend.required:before {
   background-color: transparent!important;
 }
 
-.v-select .vs__dropdown-toggle .vs__selected-options .vs__selected {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-}
+// temporary disabled due to problem that occurs in User Group -> School Categories
+// .v-select .vs__dropdown-toggle .vs__selected-options .vs__selected {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   width: 100%;
+// }
 
 .vs__dropdown-menu {
   overflow-x: hidden;

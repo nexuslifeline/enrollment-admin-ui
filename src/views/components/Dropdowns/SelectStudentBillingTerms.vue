@@ -1,6 +1,6 @@
 <template>
   <v-select
-    class="select-paginated"
+    class="select-student-terms"
     :options="options.terms.items"
     :reduce="reduce"
     :value="value"
@@ -145,7 +145,7 @@ export default {
 <style lang="scss" scoped>
   @import '../../../assets/scss/shared.scss';
 
-  .select-paginated {
+  .select-student-terms {
     width: 100%;
   }
 
@@ -167,14 +167,16 @@ export default {
 
 </style>
 
-<style>
-  .vs__selected-options {
-    position: relative;
-  }
-  .vs__selected {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 100%;
+<style lang="scss">
+  .select-student-terms {
+    .vs__selected-options {
+      position: relative;
+    }
+    .vs__selected {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 100%;
+    }
   }
 </style>
