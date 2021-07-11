@@ -640,7 +640,7 @@
         :isShown.sync="showPostPayment"
         @onCancel="showPostPayment = false">
         <template #modal-body>
-          Are you sure you want to post payment for this student?
+          Do you want to Post a Payment for this Student?
         </template>
       </PostPaymentConfirmation>
     </template>
