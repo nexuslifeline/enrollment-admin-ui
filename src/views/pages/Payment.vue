@@ -58,7 +58,7 @@
           split-variant="outline-primary"
           class="soa__drop-down"
           split>
-          <b-dropdown-item @click="$router.push('/finance/post-payment')">
+          <b-dropdown-item @click="$router.push({ name: 'Payment Add' })">
             Add Payment Manually
           </b-dropdown-item>
         </b-dropdown>
@@ -283,11 +283,11 @@
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
               :showOptions="
-                isAccessible($options.StudentPaymentPermissions.APPROVAL.id) &&
+                isAccessible($options.StudentPaymentPermissions.getIds() || []) &&
                   data.item.paymentStatusId === paymentStatuses.PENDING.id
               "
               :showActionBar="
-                isAccessible($options.StudentPaymentPermissions.APPROVAL.id) &&
+                isAccessible($options.StudentPaymentPermissions.getIds() || []) &&
                   data.item.paymentStatusId === paymentStatuses.PENDING.id
               "
               :options="[

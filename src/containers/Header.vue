@@ -77,7 +77,7 @@
               <li
                 :key="idx"
                 class="header__sub-menu-item"
-                :class="{ active: $route.path === subNav.to }">
+                :class="{ active: $route.path === subNav.to || $route.path === `${subNav.to}/` }">
                 <a :href="`#${subNav.to}`" class="header__sub-menu-link">
                   {{ subNav.label }}
                   <div
