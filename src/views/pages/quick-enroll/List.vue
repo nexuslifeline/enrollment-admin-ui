@@ -3,8 +3,7 @@
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"
-    :createButtonVisible="isAccessible($options.ManualEnrollmentPermissions.ADD.id) &&
-      checkIfHasSchoolCategoryAccess()"
+    :createButtonVisible="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
     @create="onAddNew">
     <template v-slot:filters>
       <b-form-input

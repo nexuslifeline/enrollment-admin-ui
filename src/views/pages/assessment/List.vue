@@ -117,6 +117,8 @@
               :isBusy="data.item.isLoading"
               backTitle="Go back to list"
               @onBack="data.toggleDetails()"
+              :showOptions="showOptions"
+              :showActionBar="showOptions"
               :options="[
                 {
                   label: 'Approve',
