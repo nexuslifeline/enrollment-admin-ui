@@ -9,7 +9,8 @@
     :searchable="searchable"
     :selectable="selectable"
     :clearable="clearable"
-    :disabled="disabled">
+    :disabled="disabled"
+    :appendToBody="appendToBody">
     <template v-slot:selected-option="data">
       {{ formatOption(data) }}
     </template>

@@ -10,7 +10,8 @@
     :selectable="selectable"
     :clearable="clearable"
     :disabled="disabled"
-    :loading="options.curriculums.isBusy">
+    :loading="options.curriculums.isBusy"
+    :appendToBody="appendToBody">
     <!-- <template v-slot:selected-option="data">
       {{ formatOption(data) }}
     </template> -->

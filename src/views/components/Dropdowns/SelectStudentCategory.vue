@@ -10,6 +10,7 @@
     :selectable="selectable"
     :clearable="clearable"
     :disabled="disabled"
+    :appendToBody="appendToBody"
   />
 </template>
 <script>

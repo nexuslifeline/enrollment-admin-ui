@@ -10,7 +10,8 @@
     :searchable="searchable"
     :clearable="clearable"
     :loading="options.terms.isBusy"
-    :disabled="disabled">
+    :disabled="disabled"
+    :appendToBody="appendToBody">
     <template slot="option" slot-scope="data">
       <div class="select-option">
         <span class="select-option-name">

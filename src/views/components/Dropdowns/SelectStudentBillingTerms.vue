@@ -11,7 +11,8 @@
     :selectable="(v) => !v.pivot.isBilled"
     :clearable="clearable"
     :loading="options.terms.isBusy"
-    :disabled="disabled">
+    :disabled="disabled"
+    :appendToBody="appendToBody">
     <!-- <template slot="selected-option" slot-scope="data">
       <div class="select-option">
         <span class="select-option-name">

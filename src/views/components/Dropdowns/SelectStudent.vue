@@ -4,7 +4,8 @@
     :value="value"
     @input="(v) => $emit('input', v)"
     :reduce="reduce"
-    :fetchData="getStudentList">
+    :fetchData="getStudentList"
+    :appendToBody="appendToBody">
     <template slot="selected-option" slot-scope="data">
       <div class="select-option">
         <div class="select-option__avatar">
