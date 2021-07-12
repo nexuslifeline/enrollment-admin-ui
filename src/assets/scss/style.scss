@@ -707,7 +707,7 @@ legend.required:before {
   padding: 20px 25px;
 
   &.overflow-visible {
-    overflow: visible;
+    overflow: auto;
   }
 }
 
@@ -731,4 +731,5 @@ legend.required:before {
 
 .vs__dropdown-menu {
   overflow-x: hidden;
+  z-index: 9999;
 }

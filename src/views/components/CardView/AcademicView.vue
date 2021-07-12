@@ -46,17 +46,17 @@
       :courseId="courseId"
     />
     <ChangeAcademicRecord
-      @onCancel="isShowChangeLevel = false"
+      @onCancel="isShowChangeLevelCourse = false"
       :data.sync="data"
-      :isShown.sync="isShowChangeLevel"
-      v-if="isShowChangeLevel"
+      :isShown.sync="isShowChangeLevelCourse"
+      v-if="isShowChangeLevelCourse"
     />
-    <ChangeCourse
+    <!-- <ChangeCourse
       @onCancel="isShowChangeCourse = false"
       :data.sync="data"
       :isShown.sync="isShowChangeCourse"
       v-if="isShowChangeCourse"
-    />
+    /> -->
   </div>
 </template>
 <script>
@@ -90,9 +90,8 @@ export default {
     return {
       isCreatingTranscript: false,
       isShowChangeCurriculum: false,
-      isShowChangeLevel: false,
+      isShowChangeLevelCourse: false,
       isShowChangeStudentCurriculum: false,
-      isShowChangeCourse: false,
       SchoolCategories,
       options: {
         curriculums: {
@@ -130,31 +129,11 @@ export default {
       this.isShowChangeStudentCurriculum = true;
     },
     onEditCourse() {
-      this.isShowChangeCourse = true
+      this.isShowChangeLevelCourse = true
     },
     onEditLevel() {
-      this.isShowChangeLevel = true;
+      this.isShowChangeLevelCourse = true;
     }
-    // onAcceptTransferCredit() {
-    //   const { curriculumId } = this.data
-    //   if(!curriculumId) {
-    //     showNotification(this,'danger', 'Curriculum is required before accepting credit.')
-    //     return
-    //   }
-    //   //call active firstcreate transcript
-    //   this.isCreatingTranscript = true
-    //   this.activeFirstOrCreateTranscriptRecord(this.data).then(({ data }) => {
-    //     console.log(data)
-    //     this.data.transcriptRecord = data
-    //     this.data.transcriptRecordId = data.id
-    //     this.isCreatingTranscript = false
-    //     console.log(this.data)
-    //   }).catch((error) => {
-    //     const errors = error.response.data.errors;
-    //     console.log(errors)
-    //     this.isCreatingTranscript = false
-    //   });
-    // }
   },
 };
 </script>

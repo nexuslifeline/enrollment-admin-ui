@@ -2,7 +2,7 @@
   <b-modal
     :visible="isShown"
     size="md"
-    title="Change Level"
+    title="Change Academic Record"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     @hidden="$emit('update:isShown', false)"
@@ -10,20 +10,37 @@
     :centered="true">
     <div class="modal-field-container overflow-visible">
       <b-alert v-model="showSelectCurriculum" variant="danger">
-        Note: Changing Level of original request is required to re-select curriculum.
+        Note: Changing SchoolCategory, Level, Course, Semester of the original request is required to re-select curriculum.
       </b-alert>
+      <b-form-group
+        :state="forms.academicRecord.states.schoolCategoryId"
+        :invalid-feedback="forms.academicRecord.errors.schoolCategoryId">
+        <label class="required">School Category</label>
+          <SelectCategory
+            :value="forms.academicRecord.fields.schoolCategory"
+            @input="onSchoolCategoryChanged"
+            label="name"
+            placeholder="School Category"
+            class="mt-2"
+            :clearable="false"
+            :class=" { 'is-invalid' : !!forms.academicRecord.errors.schoolCategoryId  }"
+            appendToBody
+          />
+      </b-form-group>
       <b-form-group
         :state="forms.academicRecord.states.levelId"
         :invalid-feedback="forms.academicRecord.errors.levelId">
         <label class="required">Level</label>
           <SelectLevel
             :value="forms.academicRecord.fields.level"
+            :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
             @input="onLevelChanged"
             label="name"
             placeholder="Level"
             class="mt-2"
             :clearable="false"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.levelId  }"
+            appendToBody
           />
       </b-form-group>
       <b-form-group
@@ -33,12 +50,31 @@
           <SelectCourse
             :value="forms.academicRecord.fields.course"
             :levelId="forms.academicRecord.fields.levelId"
+            :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
             @input="onCourseChanged"
             label="name"
             placeholder="Course"
             class="mt-2"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.courseId  }"
+            appendToBody
+          />
+      </b-form-group>
+      <b-form-group
+        :state="forms.academicRecord.states.semesterId"
+        :invalid-feedback="forms.academicRecord.errors.semesterId">
+        <label class="required">Semester</label>
+          <SelectSemester
+            :value="forms.academicRecord.fields.semester"
+            :levelId="forms.academicRecord.fields.levelId"
+            :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
+            @input="onSemesterChanged"
+            label="name"
+            placeholder="Semester"
+            class="mt-2"
+            :clearable="true"
+            :class=" { 'is-invalid' : !!forms.academicRecord.errors.semesterId  }"
+            appendToBody
           />
       </b-form-group>
       <b-form-group
@@ -50,7 +86,7 @@
           <SelectCurriculum
             :value="forms.academicRecord.fields.transcriptRecord.curriculum"
             @input="onCurriculumChanged"
-            :schoolCategoryId="data.schoolCategoryId"
+            :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
             :levelId="forms.academicRecord.fields.levelId"
             :courseId="forms.academicRecord.fields.courseId"
             label="name"
@@ -58,6 +94,7 @@
             class="mt-2"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.transcriptRecord  }"
+            appendToBody
           />
       </b-form-group>
     </div>
@@ -76,6 +113,8 @@ import FooterAction from '../ModalFooter/ActionBar';
 import SelectCurriculum from '../../components/Dropdowns/SelectCurriculum'
 import SelectLevel from '../../components/Dropdowns/SelectLevel'
 import SelectCourse from '../../components/Dropdowns/SelectCourse'
+import SelectCategory from '../../components/Dropdowns/SelectCategory'
+import SelectSemester from '../../components/Dropdowns/SelectSemester'
 import { validate, reset } from '../../../helpers/forms';
 import { TranscriptRecordStatus } from '../../../helpers/enum';
 import { AcademicRecordApi, TranscriptRecordApi } from '../../../mixins/api';
@@ -86,10 +125,14 @@ const transcriptRecordFields = {
 }
 
 const academicRecordFields = {
+  schoolCategory: null,
+  schoolCategoryId: null,
   level: null,
   levelId: null,
   course: null,
   courseId: null,
+  semester: null,
+  semesterId: null,
   transcriptRecord: {
     curriculum: null,
     curriculumId: null
@@ -99,7 +142,9 @@ const academicRecordFields = {
 const academicErrorRecordFields = {
   levelId: null,
   courseId: null,
-  transcriptRecord: null
+  transcriptRecord: null,
+  semesterId: null,
+  schoolCategoryId: null
 }
 
 export default {
@@ -116,7 +161,9 @@ export default {
     FooterAction,
     SelectCurriculum,
     SelectLevel,
-    SelectCourse
+    SelectCourse,
+    SelectCategory,
+    SelectSemester
   },
   data() {
     return {
@@ -138,22 +185,28 @@ export default {
     courseId() {
       return this.data?.courseId;
     },
+    semesterId() {
+      return this.data?.semesterId
+    },
+    schoolCategoryId() {
+      return this.data?.schoolCategoryId
+    },
     showSelectCurriculum() {
-      if(!this.originalLevelId) {
-        //prevent flicker of showing the alert
-        return false
+      const { schoolCategoryId, levelId, courseId, semesterId } = this.forms.academicRecord.fields
+      if(this.schoolCategoryId !== schoolCategoryId || this.levelId !== levelId || this.courseId !== courseId || this.semesterId !== semesterId) {
+        return true
       }
-      return this.originalLevelId !== this.levelId
+
+      return  false
     }
   },
   created() {
     this.originalLevelId = this.data.levelId
-
     copyValue(this.data, this.forms.academicRecord.fields)
   },
   methods: {
     onSaveLevel() {
-      const { id: academicRecordId, schoolCategoryId, transcriptRecord: { curriculumId } } = this.data
+      const { id: academicRecordId, transcriptRecord: { curriculumId } } = this.data
       const { academicRecord, academicRecord: { fields } } = this.forms
       this.isConfirmBusy = true
       reset(academicRecord)
@@ -161,7 +214,8 @@ export default {
       const payLoad = {
         levelId: fields.levelId,
         courseId: fields.courseId,
-        schoolCategoryId,
+        schoolCategoryId: fields.schoolCategoryId,
+        semesterId: fields.semesterId,
         transcriptRecord: { curriculumId: fields.transcriptRecord.curriculumId }
       }
 
@@ -180,15 +234,40 @@ export default {
       });
 
     },
+    onSchoolCategoryChanged(schoolCategory) {
+      const { fields } = this.forms.academicRecord
+      fields.schoolCategory = schoolCategory
+      fields.schoolCategoryId = schoolCategory?.id
+
+      fields.level = null
+      fields.levelId = null
+      fields.course = null
+      fields.courseId = null
+      fields.semester = null
+      fields.semesterId = null
+    },
     onLevelChanged(level) {
       const { fields } = this.forms.academicRecord
       fields.level = level
       fields.levelId = level?.id
+
+      fields.course = null
+      fields.courseId = null
+      fields.semester = null
+      fields.semesterId = null
     },
     onCourseChanged(course) {
       const { fields } = this.forms.academicRecord
       fields.course = course
       fields.courseId = course?.id
+
+      fields.semester = null
+      fields.semesterId = null
+    },
+    onSemesterChanged(semester) {
+      const { fields } = this.forms.academicRecord
+      fields.semester = semester
+      fields.semesterId = semester?.id
     },
     onCurriculumChanged(curriculum) {
       const { fields: { transcriptRecord } } = this.forms.academicRecord
