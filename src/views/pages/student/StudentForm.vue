@@ -14,11 +14,12 @@
       <Subjects :studentId="$route.params.studentId" />
       <OnboardingSettings :data="data" />
       <AcademicRecord
-        v-if="!!Object.keys(data.latestAcademicRecord).length"
+        v-if="data.latestAcademicRecord"
         :data="data.latestAcademicRecord"
         :allowChangeStatus="true"
         title="Latest Academic Record"
       />
+      <!-- v-if="!!Object.keys(data.latestAcademicRecord).length" -->
     </template>
   </CenterContainer>
 </template>

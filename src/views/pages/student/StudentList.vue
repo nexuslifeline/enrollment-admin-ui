@@ -44,37 +44,6 @@
     </template>
     <template v-slot:content>
       <div class="content">
-        <!-- add button and search -->
-        <!-- <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button
-                  v-if="
-                    isAccessible($options.StudentPermissions.ADD.id) &&
-                      showAddButton
-                  "
-                  variant="primary"
-                  :to="`/master-files/student/add`"
-                >
-                  <v-icon name="plus-circle" /> ADD NEW STUDENT
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.student.criteria"
-                  type="text"
-                  placeholder="Search"
-                  debounce="500"
-                  @update="loadStudents()"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
         <b-row>
           <b-col md="12">
             <b-table
@@ -175,14 +144,8 @@
                     Change Password
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible($options.StudentPermissions.DELETE.id) &&
-                        showRowActionButton
-                    "
-                    @click="
-                      (forms.user.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
+                    v-if="isAccessible($options.StudentPermissions.DELETE.id) && showRowActionButton"
+                    @click="onSetDelete(row.item.id)"
                     :disabled="showModalConfirmation"
                   >
                     Delete
@@ -219,108 +182,7 @@
         </b-row>
         <!-- end table -->
       </div>
-      
       <!-- <b-modal
-        @shown="$refs.username.focus()"
-        v-model="showModalUpdateUser"
-        :noCloseOnEsc="true"
-        :noCloseOnBackdrop="true"
-      >
-        <div slot="modal-title">
-          User Account - Edit Username
-        </div>
-
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Username</label>
-              <b-form-input
-                ref="username"
-                v-model="forms.user.fields.username"
-                :state="forms.user.states.userUsername"
-                debounce="500"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.user.errors.userUsername }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <div slot="modal-footer" class="w-100">
-          <b-button
-            variant="outline-danger"
-            class="float-left btn-close"
-            @click="showModalUpdateUser = false"
-          >
-            Close
-          </b-button>
-          <b-button
-            :disabled="isUserSaving"
-            variant="outline-primary"
-            class="float-right btn-save"
-            @click="onStudentEntry()"
-          >
-            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-            Save
-          </b-button>
-        </div>
-      </b-modal>
-
-      <b-modal
-        @shown="$refs.password.focus()"
-        v-model="showModalChangePassword"
-        :noCloseOnEsc="true"
-        :noCloseOnBackdrop="true"
-      >
-        <div slot="modal-title">
-          User Account - Change Password
-        </div>
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label class="required">Password</label>
-              <b-form-input
-                type="password"
-                v-model="forms.user.fields.password"
-                :state="forms.user.states.userPassword"
-                debounce="500"
-                ref="password"
-              />
-              <b-form-invalid-feedback>
-                {{ forms.user.errors.userPassword }}
-              </b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group>
-              <label class="required">Confirm Password</label>
-              <b-form-input
-                type="password"
-                v-model="forms.user.fields.passwordConfirmation"
-                debounce="500"
-              />
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <div slot="modal-footer" class="w-100">
-          <b-button
-            variant="outline-danger"
-            class="float-left btn-close"
-            @click="showModalUpdateUser = false"
-          >
-            Close
-          </b-button>
-          <b-button
-            :disabled="isUserSaving"
-            variant="outline-primary"
-            class="float-right btn-save"
-            @click="onStudentEntry()"
-          >
-            <v-icon v-if="isUserSaving" name="sync" spin class="mr-2" />
-            Save
-          </b-button>
-        </div>
-      </b-modal> -->
-
-      <b-modal
         v-model="showModalConfirmation"
         :noCloseOnEsc="true"
         :noCloseOnBackdrop="true"
@@ -347,8 +209,8 @@
             No
           </b-button>
         </div>
-      </b-modal>
-
+      </b-modal> -->
+      <StudentDeleteModal v-if="showModalConfirmation" :show.sync="showModalConfirmation" :studentId="selectedStudentId" @onStudentDeleted="loadStudents()"/>
       <b-modal
         v-model="showModalPreview"
         :noCloseOnEsc="true"
@@ -457,6 +319,7 @@ import {
 } from '../../components/ColumnDetails';
 import { getFilePath } from '../../../helpers/utils';
 import PageContent from "../../components/PageContainer/PageContent";
+import StudentDeleteModal from './StudentDelete'
 
 export default {
   name: 'StudentList',
@@ -472,7 +335,8 @@ export default {
     EducationColumn,
     ContactColumn,
     AvatarMaker,
-    PageContent
+    PageContent,
+    StudentDeleteModal
   },
   props: {
     showAddButton: {
@@ -498,18 +362,13 @@ export default {
       selectedStudentId: null,
       showModalPreview: false,
       showModalFileViewer: false,
-      // showStudentEntry: false,
-      //showModalUpdateUser: false,
-      //showModalChangePassword: false,
       showModalConfirmation: false,
-      // isProfilePhotoBusy: false,
       isProcessing: false,
       isUserSaving: false,
       studentPhotoUrl: null,
       Countries: Countries,
       CivilStatuses: CivilStatuses,
       selectedPhoto: null,
-      // entryMode: '',
       activeTabIndex: 0,
       isLoading: false,
       file: {
@@ -519,33 +378,6 @@ export default {
         notes: null,
         isLoading: false,
       },
-      // forms: {
-      //   student: {
-      //     fields: { ...studentFields },
-      //     states: { ...studentFields },
-      //     errors: { ...studentFields },
-      //   },
-      //   address: {
-      //     fields: { ...addressFields },
-      //     states: { ...addressErrorFields },
-      //     errors: { ...addressErrorFields },
-      //   },
-      //   family: {
-      //     fields: { ...familyFields },
-      //     states: { ...familyErrorFields },
-      //     errors: { ...familyErrorFields },
-      //   },
-      //   education: {
-      //     fields: { ...educationFields },
-      //     states: { ...educationFields },
-      //     errors: { ...educationFields },
-      //   },
-      //   user: {
-      //     fields: { ...userFields },
-      //     states: { ...userErrorFields },
-      //     errors: { ...userErrorFields },
-      //   },
-      // },
       tables: {
         students: {
           isBusy: false,
@@ -705,18 +537,12 @@ export default {
       })
     },
     onStudentDelete() {
-      const {
-        student,
-        user: {
-          fields: { id },
-        },
-      } = this.forms;
       const { students } = this.tables;
       this.isUserSaving = true;
-      this.deleteStudent(id).then(({ data }) => {
+      this.deleteStudent(this.selectedStudentId).then(({ data }) => {
         this.deleteRow(students, this.paginations.student, id);
         this.isUserSaving = false;
-        showNotification(this, 'success', 'User deleted successfully.');
+        showNotification(this, 'success', 'Student deleted successfully.');
         this.showModalConfirmation = false;
       });
     },
@@ -805,6 +631,10 @@ export default {
     onChangeUsername(row) {
       this.selectedUser = row.item?.user || {};
       this.$router.push({ name: 'List Change Student Username', params: { studentId: row.item.id } })
+    },
+    onSetDelete(studentId) {
+      this.selectedStudentId = studentId;
+      this.showModalConfirmation = true;
     }
   },
   computed: {
