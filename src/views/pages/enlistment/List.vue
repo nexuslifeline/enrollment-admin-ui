@@ -153,61 +153,37 @@
 
                   <ActiveViewItems>
                     <ActiveViewItem label="Level: ">
-                      <!-- <p>
-                        {{ getName(data.item, 'level') }}
-                      </p> -->
                       {{ data.item.level && data.item.level.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem label="Course: ">
-                      <!-- <p>
-                        {{ getName(data.item, 'course') }}
-                      </p> -->
                       {{ data.item.course && data.item.course.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem
                       v-if="!!data.item.course"
-                      label="Semester: "
-                    >
-                      <!-- <p>
-                        {{ getName(data.item, 'semester') }}
-                      </p> -->
+                      label="Semester: ">
                       {{ data.item.semester && data.item.semester.name || '' }}
                     </ActiveViewItem>
                     <ActiveViewItem label="School Year: ">
-                      <!-- <p>
-                        {{ getName(data.item, 'schoolYear') }}
-                      </p> -->
                       {{ data.item.schoolYear && data.item.schoolYear.name || '' }}
                     </ActiveViewItem>
-                    <ActiveViewItem label="Section: ">
-                      <p>
-                        <template v-if="!changeSection">
-                          {{
-                            !data.item.sectionId
-                              ? 'No Section'
-                              : data.item.section.name
-                          }}
-                          <!---- get section value here -->
-                          <span class="ml-2"
-                            >[<a href="#" @click.prevent="changeSection = true"
-                              >Change</a
-                            >]</span
-                          >
-                        </template>
+                    <ActiveViewItem label="Section: " isEditable @onEdit="changeSection = true">
+                      <template v-if="!changeSection">
+                        {{ data.item && data.item.section && data.item.section.name || 'No Section'  }}
+                      </template>
+                      <!-- <button v-if="showOptions" class="btn-action" @click="changeSection = true">
+                        <BIconPencil />
+                      </button> -->
+
                         <b-form-select
-                          v-else
+                          v-if="changeSection"
                           class="section-select"
                           v-model="data.item.sectionId"
                           @change="prePopulateStudentSubjects(data)"
-                          :disabled="
-                            data.item.academicRecordStatusId !==
-                              AcademicRecordStatuses.DRAFT.id
-                          "
-                        >
+                          :disabled="!showOptions">
                           <template v-slot:first>
-                            <b-form-select-option :value="null" disabled
-                              >-- Section --</b-form-select-option
-                            >
+                            <b-form-select-option :value="null" disabled>
+                              -- Section --
+                            </b-form-select-option>
                           </template>
                           <b-form-select-option
                             v-for="section in filterSection(data)"
@@ -216,8 +192,7 @@
                           >
                             {{ section.name }}
                           </b-form-select-option>
-                        </b-form-select>
-                      </p>
+                        </b-form-select> 
                     </ActiveViewItem>
                   </ActiveViewItems>
                 </div>
@@ -260,33 +235,6 @@
                       </b-button>
                     </template>
                     <template v-slot:cell(section)="row">
-                      <!-- <div class="cell-section-container">
-                         <div class="cell-section">{{
-                            row.item.section ? row.item.section.name : ''
-                          }}</div>
-                          <b-dropdown
-                            right
-                            variant="link"
-                            toggle-class="text-decoration-none"
-                            no-caret
-                            class="cell-section-action"
-                            boundary="window"
-                          >
-                            <template v-slot:button-content>
-                              <v-icon name="ellipsis-v" />
-                            </template>
-                            <b-dropdown-item
-                              v-if="data.item.section && showOptions"
-                              @click.prevent="onShowModalSection(row.item, data)"
-                            >
-                              {{ row.item.section ? 'Change' : 'Select' }}
-                            </b-dropdown-item>
-                            <b-dropdown-item
-                              @click.prevent="onSectionSubjectClear(row)">
-                              Clear
-                            </b-dropdown-item>
-                          </b-dropdown>
-                      </div> -->
                       <SectionColumn :isReadOnly="!showOptions" :data="row.item.section" @onSelectSection="onShowModalSection(row.item, data)" @onClearSection="onSectionSubjectClear(row)"/>
                     </template>
                     <template v-slot:table-busy>
@@ -1528,6 +1476,7 @@ export default {
       });
     },
     loadDetails(row) {
+      this.changeSection = false
       if (!row.detailsShowing) {
         const { id: academicRecordId, admissionId } = row.item;
 
