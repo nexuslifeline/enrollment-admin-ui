@@ -7,7 +7,7 @@
         </p>
       </ActiveViewItem>
       <ActiveViewItem
-        v-if="data.course"
+        v-if="isCourseVisible"
         label="Course"
         @onEdit="onEditCourse"
         :isEditable="isEditable">
@@ -25,7 +25,7 @@
           {{ transcriptRecord.studentCurriculum && transcriptRecord.studentCurriculum.name || 'No Curriculum' }}
         </p>
       </ActiveViewItem> -->
-      <ActiveViewItem v-if="data.semester" label="Semester">
+      <ActiveViewItem v-if="isCourseVisible" label="Semester">
         <p>
           {{ data.semester && data.semester.name || 'No Semester' }}
         </p>
@@ -45,15 +45,17 @@
       :isShown.sync="isShowChangeStudentCurriculum"
       :courseId="courseId"
     />
-    <ChangeLevel
+    <ChangeAcademicRecord
       @onCancel="isShowChangeLevel = false"
       :data.sync="data"
       :isShown.sync="isShowChangeLevel"
+      v-if="isShowChangeLevel"
     />
     <ChangeCourse
       @onCancel="isShowChangeCourse = false"
       :data.sync="data"
       :isShown.sync="isShowChangeCourse"
+      v-if="isShowChangeCourse"
     />
   </div>
 </template>
@@ -63,6 +65,8 @@ import ChangeCurriculum from './ChangeCurriculum';
 import ChangeStudentCurriculum from './ChangeStudentCurriculum';
 import ChangeLevel from './ChangeLevel';
 import ChangeCourse from './ChangeCourse';
+import ChangeAcademicRecord from './ChangeAcademicRecord';
+import { SchoolCategories } from '../../../helpers/enum'
 
 export default {
   props: {
@@ -74,6 +78,13 @@ export default {
       default: true
     }
   },
+  components: {
+    ChangeCurriculum,
+    ChangeStudentCurriculum,
+    ChangeLevel,
+    ChangeCourse,
+    ChangeAcademicRecord
+  },
   mixins: [ CurriculumApi, AcademicRecordApi ],
   data() {
     return {
@@ -82,6 +93,7 @@ export default {
       isShowChangeLevel: false,
       isShowChangeStudentCurriculum: false,
       isShowChangeCourse: false,
+      SchoolCategories,
       options: {
         curriculums: {
           items: []
@@ -92,18 +104,22 @@ export default {
       }
     }
   },
-  components: {
-    ChangeCurriculum,
-    ChangeStudentCurriculum,
-    ChangeLevel,
-    ChangeCourse
-  },
   computed: {
     transcriptRecord() {
       return this.data?.transcriptRecord || {};
     },
     courseId() {
       return this.data?.courseId
+    },
+    schoolCategoryId() {
+      return this.data?.schoolCategoryId
+    },
+    isCourseVisible() {
+      return [
+        this.SchoolCategories.SENIOR_HIGH_SCHOOL.id,
+        this.SchoolCategories.COLLEGE.id,
+        this.SchoolCategories.GRADUATE_SCHOOL.id
+      ].includes(this.schoolCategoryId);
     }
   },
   methods: {

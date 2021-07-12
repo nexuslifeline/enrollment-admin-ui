@@ -7,16 +7,15 @@
     :noCloseOnBackdrop="true"
     @hidden="$emit('update:isShown', false)"
     bodyClass="modal-body__container"
-    :centered="true"
-    @shown="onShown()">
+    :centered="true">
     <div class="modal-field-container overflow-visible">
       <b-form-group
         :state="forms.transcriptRecord.states.curriculumId"
         :invalid-feedback="forms.transcriptRecord.errors.curriculumId">
         <label class="required"> Curriculum</label>
           <SelectCurriculum
-            v-model="forms.transcriptRecord.fields.curriculumId"
-            :reduce="option => option.id"
+            :value="forms.transcriptRecord.fields.curriculum"
+            @input="onCurriculumChanged"
             label="name"
             placeholder="Curriculum"
             class="mt-2"
@@ -44,7 +43,8 @@ import { TranscriptRecordStatus } from '../../../helpers/enum';
 import { TranscriptRecordApi } from '../../../mixins/api';
 
 const transcriptRecordFields = {
-  curriculumId: null
+  curriculumId: null,
+  curriculum: null
 }
 
 export default {
@@ -55,12 +55,6 @@ export default {
     data: {
       type: [Object]
     },
-    // transcriptRecordId: {
-    //   type: [Number, String]
-    // },
-    // curriculum: {
-    //   type: [Object]
-    // },
     courseId: {
       type: [Number, String]
     }
@@ -82,6 +76,10 @@ export default {
       }
     }
   },
+  created() {
+    this.forms.transcriptRecord.fields.curriculum = this.data.curriculum
+    this.forms.transcriptRecord.fields.curriculumId = this.data.curriculumId
+  },
   computed: {
     levelId() {
       return this.data?.levelId;
@@ -90,10 +88,10 @@ export default {
   methods: {
     onSaveCurriculum() {
       const { id: transcripRecordId } = this.data
-      const { transcriptRecord } = this.forms
-       this.isConfirmBusy = true;
+      this.isConfirmBusy = true;
+      const { transcriptRecord, transcriptRecord: { fields: { curriculumId } } } = this.forms
       reset(transcriptRecord)
-      this.patchTranscriptRecord(transcripRecordId, transcriptRecord.fields).then(({ data }) => {
+      this.patchTranscriptRecord(transcripRecordId, { curriculumId }).then(({ data }) => {
         this.$emit('update:isShown', false)
         this.$emit('update:data', { ...data })
         this.isConfirmBusy = false;
@@ -104,9 +102,10 @@ export default {
         validate(transcriptRecord, errors, this)
       });
     },
-    onShown() {
+    onCurriculumChanged(curriculum) {
       const { fields } = this.forms.transcriptRecord
-      fields.curriculumId = this.data?.curriculumId
+      fields.curriculum = curriculum
+      fields.curriculumId = curriculum?.id
     }
   },
 };

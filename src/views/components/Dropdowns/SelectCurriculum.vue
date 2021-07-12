@@ -108,7 +108,7 @@ export default {
     'courseId': function() {
       this.loadCurriculums()
     },
-    'schoolCateoryId': function() {
+    'schoolCategoryId': function() {
       this.loadCurriculums()
     }
   }

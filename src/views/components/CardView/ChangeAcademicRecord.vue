@@ -17,9 +17,8 @@
         :invalid-feedback="forms.academicRecord.errors.levelId">
         <label class="required">Level</label>
           <SelectLevel
-            :value="data.level"
+            :value="forms.academicRecord.fields.level"
             @input="onLevelChanged"
-            :schoolCategoryId="data.schoolCategoryId"
             label="name"
             placeholder="Level"
             class="mt-2"
@@ -28,22 +27,37 @@
           />
       </b-form-group>
       <b-form-group
-        :state="forms.transcriptRecord.states.curriculumId"
-        :invalid-feedback="forms.transcriptRecord.errors.curriculumId"
+        :state="forms.academicRecord.states.courseId"
+        :invalid-feedback="forms.academicRecord.errors.courseId">
+        <label class="required">Course</label>
+          <SelectCourse
+            :value="forms.academicRecord.fields.course"
+            :levelId="forms.academicRecord.fields.levelId"
+            @input="onCourseChanged"
+            label="name"
+            placeholder="Course"
+            class="mt-2"
+            :clearable="true"
+            :class=" { 'is-invalid' : !!forms.academicRecord.errors.courseId  }"
+          />
+      </b-form-group>
+      <b-form-group
+        :state="forms.academicRecord.states.transcriptRecord"
+        :invalid-feedback="forms.academicRecord.errors.transcriptRecord"
         v-if="showSelectCurriculum">
         <label class="required"> Curriculum</label>
           <!-- remove courseid to prevent filtered curr -->
           <SelectCurriculum
-            :value="data.transcriptRecord.curriculum"
+            :value="forms.academicRecord.fields.transcriptRecord.curriculum"
             @input="onCurriculumChanged"
             :schoolCategoryId="data.schoolCategoryId"
-            :levelId="data.levelId"
-            :courseId="data.courseId"
+            :levelId="forms.academicRecord.fields.levelId"
+            :courseId="forms.academicRecord.fields.courseId"
             label="name"
             placeholder="Curriculum"
             class="mt-2"
             :clearable="true"
-            :class=" { 'is-invalid' : !!forms.transcriptRecord.errors.curriculumId  }"
+            :class=" { 'is-invalid' : !!forms.academicRecord.errors.transcriptRecord  }"
           />
       </b-form-group>
     </div>
@@ -61,16 +75,31 @@
 import FooterAction from '../ModalFooter/ActionBar';
 import SelectCurriculum from '../../components/Dropdowns/SelectCurriculum'
 import SelectLevel from '../../components/Dropdowns/SelectLevel'
+import SelectCourse from '../../components/Dropdowns/SelectCourse'
 import { validate, reset } from '../../../helpers/forms';
 import { TranscriptRecordStatus } from '../../../helpers/enum';
 import { AcademicRecordApi, TranscriptRecordApi } from '../../../mixins/api';
+import { copyValue } from '../../../helpers/extractor';
 
 const transcriptRecordFields = {
   curriculumId: null
 }
 
 const academicRecordFields = {
-  levelId: null
+  level: null,
+  levelId: null,
+  course: null,
+  courseId: null,
+  transcriptRecord: {
+    curriculum: null,
+    curriculumId: null
+  }
+}
+
+const academicErrorRecordFields = {
+  levelId: null,
+  courseId: null,
+  transcriptRecord: null
 }
 
 export default {
@@ -86,19 +115,17 @@ export default {
   components: {
     FooterAction,
     SelectCurriculum,
-    SelectLevel
+    SelectLevel,
+    SelectCourse
   },
   data() {
     return {
       isConfirmBusy: false,
       forms: {
         academicRecord: {
-          states: { ...academicRecordFields },
-          errors: { ...academicRecordFields }
-        },
-        transcriptRecord: {
-          states: { ...transcriptRecordFields },
-          errors: { ...transcriptRecordFields }
+          fields: { ...academicRecordFields },
+          states: { ...academicErrorRecordFields },
+          errors: { ...academicErrorRecordFields }
         },
       },
       originalLevelId: null
@@ -121,45 +148,52 @@ export default {
   },
   created() {
     this.originalLevelId = this.data.levelId
+
+    copyValue(this.data, this.forms.academicRecord.fields)
   },
   methods: {
     onSaveLevel() {
-      const { id: academicRecordId, levelId,  transcriptRecord: { curriculumId } } = this.data
-      const { academicRecord, transcriptRecord } = this.forms
+      const { id: academicRecordId, schoolCategoryId, transcriptRecord: { curriculumId } } = this.data
+      const { academicRecord, academicRecord: { fields } } = this.forms
       this.isConfirmBusy = true
       reset(academicRecord)
-      reset(transcriptRecord)
 
-      const data = {
-        levelId,
-        transcriptRecord: { curriculumId }
+      const payLoad = {
+        levelId: fields.levelId,
+        courseId: fields.courseId,
+        schoolCategoryId,
+        transcriptRecord: { curriculumId: fields.transcriptRecord.curriculumId }
       }
 
       //patch academic record
-      this.updateAcademicRecord(data, academicRecordId).then(({ data: academicRecordData }) => {
+      this.updateAcademicRecord(payLoad, academicRecordId).then(({ data }) => {
+          console.log(data)
         //patch transcript
         this.$emit('update:isShown', false)
-        this.$emit('update:data', { ...academicRecordData })
+        this.$emit('update:data', { ...data })
         this.isConfirmBusy = false;
-        // this.patchTranscriptRecord(transcriptRecordId, transcriptRecord.fields).then(({ data: transcriptRecordData }) => {
-        //   academicRecordData.transcriptRecord = { ...transcriptRecordData }
-          
-        // })
       }).catch((error) => {
         this.isConfirmBusy = false;
         const errors = error.response.data.errors;
         console.log(errors)
-        validate(academicRecord, errors, this)
+        validate(academicRecord, errors)
       });
 
     },
     onLevelChanged(level) {
-      this.data.level = level
-      this.data.levelId = level?.id
+      const { fields } = this.forms.academicRecord
+      fields.level = level
+      fields.levelId = level?.id
+    },
+    onCourseChanged(course) {
+      const { fields } = this.forms.academicRecord
+      fields.course = course
+      fields.courseId = course?.id
     },
     onCurriculumChanged(curriculum) {
-      this.data.transcriptRecord.curriculum = curriculum
-      this.data.transcriptRecord.curriculumId = curriculum?.id
+      const { fields: { transcriptRecord } } = this.forms.academicRecord
+      transcriptRecord.curriculum = curriculum
+      transcriptRecord.curriculumId = curriculum?.id
     }
   },
 };

@@ -18,8 +18,10 @@
         :invalid-feedback="forms.academicRecord.errors.courseId">
         <label class="required">Course</label>
           <SelectCourse
-            v-model="forms.academicRecord.fields.courseId"
-            :reduce="option => option.id"
+            :value="data.course"
+            :levelId="data.levelId"
+            :schoolCategoryId="data.schoolCategoryId"
+            @input="onCourseChanged"
             label="name"
             placeholder="Course"
             class="mt-2"
@@ -34,8 +36,11 @@
         <label class="required"> Curriculum</label>
           <!-- remove courseid to prevent filtered curr -->
           <SelectCurriculum
-            v-model="forms.transcriptRecord.fields.curriculumId"
-            :reduce="option => option.id"
+            :value="data.transcriptRecord.curriculum"
+            @input="onCurriculumChanged"
+            :schoolCategoryId="data.schoolCategoryId"
+            :levelId="data.levelId"
+            :courseId="data.courseId"
             label="name"
             placeholder="Curriculum"
             class="mt-2"
@@ -156,6 +161,14 @@ export default {
       const { academicRecord, transcriptRecord } = this.forms
       academicRecord.fields.courseId = this.data?.courseId
       transcriptRecord.fields.curriculumId = this.data?.transcriptRecord?.curriculumId
+    },
+    onCourseChanged(course) {
+      this.data.course = course
+      this.data.courseId = course?.id
+    },
+    onCurriculumChanged(curriculum) {
+      this.data.transcriptRecord.curriculum = curriculum
+      this.data.transcriptRecord.curriculumId = curriculum?.id
     }
   },
 };
