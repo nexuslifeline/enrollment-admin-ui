@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      {{ data.level ? $options.getPropValue(data.level) : 'No Level' }}
+      {{ data && data.level ? $options.getPropValue(data.level) : 'No Level' }}
     </div>
     <div>
       <span v-if="!!(data && data.course)">{{ $options.getPropValue(data.course) }}</span>
