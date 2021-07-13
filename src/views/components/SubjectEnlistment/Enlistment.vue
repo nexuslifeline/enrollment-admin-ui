@@ -16,7 +16,7 @@
           :isReadOnly="isReadOnly"/>
       </div>
       <div v-else class="empty-container">
-        No subject(s) found.
+      No subject(s) found.
       </div>
       <template v-slot:footer>
         <CardFooterRow>

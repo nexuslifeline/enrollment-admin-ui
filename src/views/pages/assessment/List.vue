@@ -164,19 +164,6 @@
                       {{ data.item.student.email }}
                     </p>
                   </div>
-                  <!-- <p class="active-view__header-date">
-                    <BIconAlarm />
-                    {{
-                      $options.format(
-                        new Date(
-                          data.item.application
-                            ? data.item.application.appliedDate
-                            : data.item.admission.appliedDate
-                        ),
-                        'MMMM dd, yyyy'
-                      )
-                    }}
-                  </p> -->
                 </div>
               </template>
 
@@ -488,124 +475,9 @@
         </b-row>
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
-      <!-- MODAL FEES -->
-      <b-modal
-        v-model="showModalFees"
-        :noCloseOnEsc="true"
-        :noCloseOnBackdrop="true"
-        size="xl"
-      >
-        <div slot="modal-title">
-          <!-- modal title -->
-          School Fees
-        </div>
-        <!-- modal title -->
-        <b-row>
-          <!-- modal body -->
-          <b-col md="12">
-            <b-row class="mb-2">
-              <b-col offset-md="8" md="4">
-                <b-form-input
-                  v-model="filters.fee.criteria"
-                  type="text"
-                  placeholder="Search"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-            <b-table
-              small
-              hover
-              outlined
-              show-empty
-              :items.sync="tables.fees.items"
-              :fields="tables.fees.fields"
-              :filter="filters.fee.criteria"
-              :busy="tables.fees.isBusy2"
-              :current-page="paginations.fee.page"
-              :per-page="paginations.fee.perPage"
-              @filtered="onFiltered($event, paginations.fee)"
-            >
-              <template v-slot:cell(action)="row">
-                <b-button @click="addFee(row)" size="sm" variant="success">
-                  <v-icon name="plus" />
-                </b-button>
-              </template>
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.fee.from }} to {{ paginations.fee.to }} of
-                {{ paginations.fee.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  v-model="paginations.fee.page"
-                  :total-rows="paginations.fee.totalRows"
-                  :per-page="paginations.fee.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate()"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- modal body -->
-        <div slot="modal-footer" class="w-100">
-          <!-- modal footer buttons -->
-          <b-button
-            class="float-right"
-            variant="outline-danger"
-            @click="showModalFees = false"
-          >
-            Close
-          </b-button>
-        </div>
-        <!-- modal footer buttons -->
-      </b-modal>
-      <!-- Modal Approval -->
-      <!-- <b-modal
-        v-model="showModalApproval"
-        centered
-        header-bg-variant="success"
-        header-text-variant="light"
-        :noCloseOnEsc="true"
-        :noCloseOnBackdrop="true"
-      >
-        <div slot="modal-title">
-          Finalize Approval
-        </div>
-        <b-row>
 
-          <b-col md="12">
-            <label>Notes</label>
-            <b-textarea v-model="approvalNotes" rows="7" />
-          </b-col>
-        </b-row>
+      <FeesModal v-if="showModalFees" :isShown.sync="showModalFees" @onAddFee="addFee($event)" :studentFees="selectedAcademicRecord && selectedAcademicRecord.fees || []"/>
 
-        <div slot="modal-footer" class="w-100">
-
-          <b-button class="float-left" @click="showModalApproval = false">
-            Cancel
-          </b-button>
-          <b-button
-            @click="approveFees()"
-            class="float-right"
-            variant="outline-primary"
-          >
-            <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-            Confirm
-          </b-button>
-        </div>
-
-      </b-modal> -->
-      <!-- Modal Approval -->
       <FileViewer
         :show="fileViewer.show"
         :file="file"
@@ -678,7 +550,6 @@ import Tables from '../../../helpers/tables';
 import Access from '../../../mixins/utils/Access';
 import Card from '../../components/Card';
 import { StudentColumn, EducationColumn, AddressColumn, AssessmentStatusColumn } from '../../components/ColumnDetails';
-
 import ActiveRowViewer from '../../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../../components/ActiveRowViewer/ActiveViewHeader';
 import ActiveViewItems from '../../components/ActiveRowViewer/ActiveViewItems';
@@ -696,6 +567,8 @@ import AssessmentRejection from '../../components/RejectionModals/Assessment'
 import Toggle from '../../components/Form/Toggle'
 import FeesTable from '../../components/Assessment/FeesTable'
 import PostPaymentConfirmation from '../../components/ConfirmationModal'
+
+import FeesModal from '../../components/Assessment/FeesModal'
 
 export default {
   name: 'StudentFee',
@@ -734,7 +607,8 @@ export default {
     AssessmentRejection,
     Toggle,
     FeesTable,
-    PostPaymentConfirmation
+    PostPaymentConfirmation,
+    FeesModal
   },
   StudentFeePermissions,
   SettingPermissions,
@@ -963,7 +837,6 @@ export default {
           schoolCategoryItem: null,
           courseItem: null,
           courseId: null,
-          // applicationStatusId: ApplicationStatuses.SUBMITTED.id,
           assessmentStatus: AssessmentStatuses.PENDING
         },
         fee: {
@@ -1277,6 +1150,7 @@ export default {
     },
     addFee(row) {
       const { item } = row;
+
       // check if rate sheet exist in the table
       const result = this.studentFees.find((fee) => fee.id === item.id);
       // let result2
@@ -1288,13 +1162,14 @@ export default {
         showNotification(this, 'danger', item.name + ' is already added.');
         return;
       }
+
       this.studentFees.push({
         id: row.item.id,
         name: row.item.name,
         isIntegrated: row.item.isIntegrated,
-        schoolFeeCategory: { name: row.item.schoolFeeCategory.name },
+        schoolFeeCategory: row.item.schoolFeeCategory,
         description: row.item.description,
-        pivot: { schoolFeeId: row.item.id, amount: 0.0, notes: '' },
+        pivot: { schoolFeeId: row.item.id, amount: 0.0, notes: '', isInitialFee: 0 },
       });
     },
     removeFee(fees, row) {
