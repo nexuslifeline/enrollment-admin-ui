@@ -11,41 +11,23 @@
     @hidden="$emit('update:isShown', false)">
     <div class="selection__container">
       <template v-if="isShownStudent">
-        <b-form-group>
-          <label class="required">Student</label>
+        <b-form-group
+          label="Student"
+          labelClass="required"
+          :state="forms.academicRecord.states.studentId"
+          :invalid-feedback="forms.academicRecord.errors.studentId">
           <SelectStudent v-model="selectedStudent" />
-          <!-- <SelectPaginated
-            class="select-paginated mt-2 "
-            @input="getStudentInfo($event)"
-            :fetchData="getStudentList"
-            placeholder="Select Student"
-          >
-            <template slot="option" slot-scope="data">
-              <div class="select-option">
-                <div class="select-option__avatar">
-                  <b-avatar variant="info" :src="getPhoto(data)"></b-avatar>
-                </div>
-                <div class="select-option__info">
-                  <span>{{
-                    data.studentNo ? data.studentNo : 'Awaiting Confirmation'
-                  }}</span>
-                  <span>{{ data.name }}</span>
-                  <span>{{ data.email }}</span>
-                </div>
-              </div>
-            </template>
-            <template slot="loader">
-              <b-spinner label="Loading..." class="loader"></b-spinner>
-            </template>
-        </SelectPaginated> -->
         </b-form-group>
       </template>
       <template v-if="isShownAcademic">
         <template >
           <InputGroup>
             <InputContainer>
-              <b-form-group>
-              <label class="required">School Year</label>
+              <b-form-group
+                label="School Year"
+                labelClass="required"
+                :state="forms.academicRecord.states.schoolYearId"
+                :invalid-feedback="forms.academicRecord.errors.schoolYearId">
               <SelectSchoolYear
                 :value="schoolYearId"
                 :reduce="option => option.id"
@@ -56,8 +38,11 @@
             </b-form-group>
             </InputContainer>
             <InputContainer>
-              <b-form-group>
-                <label class="required">School Category</label>
+              <b-form-group
+                label="School Category"
+                labelClass="required"
+                :state="forms.academicRecord.states.schoolCategoryId"
+                :invalid-feedback="forms.academicRecord.errors.schoolCategoryId">
                 <SelectCategory
                   :value="schoolCategoryId"
                   :reduce="option => option.id"
@@ -97,6 +82,13 @@ import TileMenu from '../../components/TileSelector/List';
 import SelectSchoolYear from '../../components/Dropdowns/SelectSchoolYear'
 import SelectCategory from '../../components/Dropdowns/SelectCategory'
 import SelectPaginated  from '../../components/SelectPaginated.vue'
+import { reset, showNotification, validate } from '../../../helpers/forms';
+
+const academicRecordErrorFields = {
+  schoolYearId: null,
+  studentId: null,
+  schoolCategoryId: null
+}
 
 export default {
   props: {
@@ -129,13 +121,27 @@ export default {
         { label: 'Select Existing Student' },
         { label: 'Register New Student' }
       ],
-      academicRecordId: 1 // added hardcoded id for testing only
+      forms: {
+        academicRecord: {
+          states: { ...academicRecordErrorFields },
+          errors: { ...academicRecordErrorFields }
+        }
+      }
+      // academicRecordId: 1 // added hardcoded id for testing only
     }
   },
   methods: {
     onProceed() {
+      const { academicRecord } = this.forms
+      reset(academicRecord)
       if (this.selectedIndex === 0) {
         //existing student
+
+        if(!this.selectedStudent) {
+          showNotification(this, 'danger', 'Student is required.')
+          return
+        }
+
         this.isConfirmBusy = true
         const studentId = this.selectedStudent?.id
         this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
@@ -149,13 +155,14 @@ export default {
         }).catch((error) => {
           const errors = error.response.data.errors;
           this.isConfirmBusy = false
+          validate(academicRecord, errors, this)
           console.log(errors)
         });
       }  else if (this.selectedIndex === 1) {
         this.isConfirmBusy = true
-        // this.resetState();
         this.addStudent({}).then(({ data }) => {
           const studentId = data.id
+          this.selectedStudent = data
           this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
             const academicRecordId = data.id
             this.isConfirmBusy = false
@@ -164,12 +171,14 @@ export default {
               params: { academicRecordId, studentId }
             });
             this.$emit('update:isShown', false);
-          })
-        }).catch((error) => {
-          const errors = error.response.data.errors;
-          this.isConfirmBusy = false
-          console.log(errors)
-        });
+          }).catch((error) => {
+            const errors = error.response.data.errors;
+            this.isConfirmBusy = false
+            validate(academicRecord, errors, this)
+            this.selectedIndex = 0
+            this.isShownStudent = true
+          });
+        })
       }
     },
     resetState() {

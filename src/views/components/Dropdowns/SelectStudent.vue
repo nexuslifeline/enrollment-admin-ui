@@ -10,7 +10,7 @@
       <div class="select-option">
         <div class="select-option__avatar">
           <AvatarMaker
-            :text="`${data.firstName.charAt(0)}${data.lastName.charAt(0)}`"
+            :text="avatarText(data)"
             :avatarId="data.id"
             :size="20"
             :src="getPhoto(data)"
@@ -31,7 +31,7 @@
       <div class="select-option">
         <div class="select-option__avatar">
           <AvatarMaker
-            :text="`${data.firstName.charAt(0)}${data.lastName.charAt(0)}`"
+            :text="avatarText(data)"
             :avatarId="data.id"
             :size="40"
             :src="getPhoto(data)"
@@ -116,8 +116,15 @@ export default {
         data?.latestAcademicRecord?.semester?.name,
         data?.latestAcademicRecord?.schoolYear?.name,
       ].filter(v => !!v).join(' - ');
+    },
+    avatarText(data) {
+      const { firstName, lastName, name } = data
+      if(name.trim()) {
+        return `${firstName.charAt(0)}${lastName.charAt(0)}`
+      }
+      return 'NS'
     }
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
