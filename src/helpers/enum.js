@@ -138,7 +138,7 @@ export const EvaluationStatuses = new Enum({
     id: 1,
     name: 'Pending',
     academicRecordStatuses: [
-      AcademicRecordStatuses.DRAFT.id,
+      // AcademicRecordStatuses.DRAFT.id,
       AcademicRecordStatuses.EVALUATION_PENDING.id,
       // AcademicRecordStatuses.EVALUATION_REJECTED.id
     ]
