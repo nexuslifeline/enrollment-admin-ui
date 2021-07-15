@@ -41,8 +41,11 @@
           <span class="select-option__education">
             {{ getEducation(data) }}
           </span>
-          <span class="select-option__name">{{ data.name.trim() || 'No Name' }}
-            <b-badge v-if="!!data.studentNo" variant="success" class="ml-2">{{ data.studentNo }}</b-badge>
+          <span class="select-option__name">
+            {{ data.name.trim() || emptyNameText || 'No Name' }}
+            <b-badge v-if="!!data.studentNo" variant="success" class="ml-2">
+              {{ data.studentNo }}
+            </b-badge>
           </span>
           <span class="select-option__email">
             {{ data.email || 'No Email' }}
@@ -62,6 +65,9 @@ import { StudentApi } from '../../../mixins/api';
 export default {
   mixins: [StudentApi],
   props: {
+    emptyNameText: {
+      type: [String]
+    },
     options: {
       type: [Array]
     },

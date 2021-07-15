@@ -1,22 +1,53 @@
 <template>
   <b-modal
     :visible="isShown"
-    :size="isShownStudent || isShownAcademic ? 'lg' : 'md'"
+    :size="isShownExistingStudent || isShownAcademic ? 'lg' : 'md'"
     title="Select Student"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     bodyClass="modal-body__container"
     :centered="true"
-    @show="isShownStudent = false"
+    @show="isShownExistingStudent = false"
     @hidden="$emit('update:isShown', false)">
     <div class="selection__container">
-      <template v-if="isShownStudent">
+      <template v-if="isShownExistingStudent">
+        <!-- <template 
+          v-if="selectedStudent && selectedStudent.latestAcademicRecord.academicRecordStatusId === $options.AcademicRecordStatuses.ENROLLED.id">
+
+        </template> -->
+        <template v-if="selectedStudent && selectedStudent.hasOpenAcademicRecord">
+          <template v-if="selectedStudent.latestAcademicRecord.isManual">
+            <b-alert
+              show
+              variant="warning">
+              <h5>Existing Record Found!</h5>
+              The Student has an existing manually entered Academic Record.
+              Click 
+              <b-link
+              @click.prevent="$emit('update:isShown', false)"
+              :to="{
+                name: 'Academic Record Applications Detail', params: { academicRecordId: selectedStudent.latestAcademicRecord.id }
+              }">here</b-link> 
+              to review and continue.
+            </b-alert>
+          </template>
+          <template v-else>
+            <b-alert
+              show
+              variant="warning">
+              <h5>Existing Record Found!</h5>
+              The Student has an existing Open Academic Record.
+              You may ask your System Administrator to see the status of this record.
+            </b-alert>
+          </template>
+        </template>
+
         <b-form-group
           label="Student"
           labelClass="required"
           :state="forms.academicRecord.states.studentId"
           :invalid-feedback="forms.academicRecord.errors.studentId">
-          <SelectStudent v-model="selectedStudent" />
+          <SelectStudent v-model="selectedStudent" emptyNameText="New Student" />
         </b-form-group>
       </template>
       <template v-if="isShownAcademic">
@@ -65,17 +96,31 @@
       </template>
     </div>
     <template v-slot:modal-footer>
-      <FooterAction
-        @onConfirm="onProceed"
-        @onCancel="resetState"
-        :isConfirmBusy="isConfirmBusy"
-        confirmText="Proceed"
-      />
+      <template v-if="isShownExistingStudent">
+        <FooterAction
+          @onConfirm="onProceed"
+          @onCancel="resetState"
+          :isConfirmBusy="isConfirmBusy"
+          :isDisabledConfirm="!selectedStudent || selectedStudent.hasOpenAcademicRecord"
+          confirmText="Proceed"
+          :showConfirm="isShownAcademic"
+        />
+      </template>
+      <template v-else>
+        <FooterAction
+          @onConfirm="onProceed"
+          @onCancel="resetState"
+          :isConfirmBusy="isConfirmBusy"
+          confirmText="Proceed"
+          :showConfirm="isShownAcademic"
+        />
+      </template>
   </template>
   </b-modal>
 </template>
 <script>
 import { copyValue } from '../../../helpers/extractor';
+import { AcademicRecordStatuses } from '../../../helpers/enum';
 import { AcademicRecordApi, StudentApi } from '../../../mixins/api';
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import TileMenu from '../../components/TileSelector/List';
@@ -91,6 +136,7 @@ const academicRecordErrorFields = {
 }
 
 export default {
+  AcademicRecordStatuses,
   props: {
     previousRoute: {
       type: Object
@@ -111,7 +157,7 @@ export default {
     return {
       selectedIndex: null,
       busyIndexes: [],
-      isShownStudent: false,
+      isShownExistingStudent: false,
       isShownAcademic: false,
       isConfirmBusy: false,
       schoolYearId: null,
@@ -176,7 +222,7 @@ export default {
             this.isConfirmBusy = false
             validate(academicRecord, errors, this)
             this.selectedIndex = 0
-            this.isShownStudent = true
+            this.isShownExistingStudent = true
           });
         })
       }
@@ -185,7 +231,7 @@ export default {
       this.selectedIndex = null;
       this.busyIndexes = [];
       this.$emit('update:isShown', false);
-      this.isShownStudent = false;
+      this.isShownExistingStudent = false;
       this.isShownAcademic = false;
       this.isConfirmBusy = false;
     },
@@ -194,7 +240,7 @@ export default {
       this.selectedIndex = item.index;
       setTimeout(() => {
         if (item.index === 0) {
-          this.isShownStudent = true;
+          this.isShownExistingStudent = true;
         }
         this.isShownAcademic = true;
         this.busyIndexes = [];
