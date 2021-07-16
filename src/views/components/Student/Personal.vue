@@ -143,7 +143,7 @@ import debounce from 'lodash/debounce';
 
 const profileFields = {
   id: null,
-  studentNo: null,
+  // studentNo: null,
   firstName: null,
   middleName: null,
   lastName: null,
@@ -215,11 +215,11 @@ export default {
     autoSave: debounce(function() { this.onSave() }, 4000),
     onSave() {
       this.isProcessing = true
-      const { profile, profile: { fields: { studentNo }} } = this.forms
+      const { profile } = this.forms
 
-      profile.fields.studentNo = profile.fields.studentNo === ""
-        ? null
-        : profile.fields.studentNo
+      // profile.fields.studentNo = profile.fields.studentNo === ""
+      //   ? null
+      //   : profile.fields.studentNo
 
       const { photo, ...restProps } = profile.fields; // excempt photo property
       const payLoad = {
