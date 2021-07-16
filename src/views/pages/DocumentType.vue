@@ -58,6 +58,7 @@
               :per-page="paginations.documentType.perPage"
               :filter="filters.documentType.criteria"
               @filtered="onFiltered($event, paginations.documentType)"
+              responsive
             >
               <!-- :filter="filters.documentType.criteria> -->
               <template v-slot:table-busy>
@@ -87,6 +88,7 @@
                   variant="link"
                   toggle-class="text-decoration-none"
                   no-caret
+                  boundary="window"
                 >
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />

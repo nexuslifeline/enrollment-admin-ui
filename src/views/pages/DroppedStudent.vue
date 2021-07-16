@@ -62,6 +62,7 @@
               :per-page="paginations.droppedStudent.perPage"
               :filter="filters.droppedStudent.criteria"
               @filtered="onFiltered($event, paginations.droppedStudent)"
+              responsive
             >
               <!-- :filter="filters.droppedStudent.criteria> -->
               <template v-slot:table-busy>

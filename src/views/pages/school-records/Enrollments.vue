@@ -13,7 +13,8 @@
           hover outlined small show-empty
           :fields="tables.academicRecords.fields"
           :items="tables.academicRecords.items"
-          :busy="tables.academicRecords.isBusy">
+          :busy="tables.academicRecords.isBusy"
+          responsive>
           <template v-slot:cell(name)="row">
             <b-media>
               <template v-slot:aside>
@@ -49,7 +50,7 @@
             </b-badge>
           </template>
           <template v-slot:cell(action)="row">
-            <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret>
+            <b-dropdown right variant="link" toggle-class="text-decoration-none" no-caret boundary="window">
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>

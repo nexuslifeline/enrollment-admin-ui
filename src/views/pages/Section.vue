@@ -183,6 +183,7 @@
               :fields="tables.sections.fields"
               :busy="tables.sections.isBusy"
               :items="tables.sections.items"
+              responsive
             >
               <!-- :current-page="paginations.section.page"
               :per-page="paginations.section.perPage"
@@ -200,6 +201,7 @@
                   variant="link"
                   toggle-class="text-decoration-none"
                   no-caret
+                  boundary="window"
                 >
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />

@@ -103,6 +103,7 @@
           :fields="tables.payments.fields"
           :items="tables.payments.items"
           :busy="tables.payments.isBusy"
+          responsive
         >
           <template v-slot:table-busy>
             <div class="text-center my-2">
@@ -126,6 +127,7 @@
               variant="link"
               toggle-class="text-decoration-none"
               no-caret
+              boundary="window"
             >
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />

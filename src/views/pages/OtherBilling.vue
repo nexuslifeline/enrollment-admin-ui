@@ -62,7 +62,8 @@
           variant="outline-primary"
           split-variant="outline-primary"
           class="other__drop-down"
-          split>
+          split
+          boundary="window">
           <b-dropdown-item
             @click="$router.push({ name: 'Individual Other Billing' })">
             Individual Billing
@@ -133,6 +134,7 @@
           :fields="tables.billings.fields"
           :items="tables.billings.items"
           :busy="tables.billings.isBusy"
+          responsive
         >
           <template v-slot:table-busy>
             <div class="text-center my-2">

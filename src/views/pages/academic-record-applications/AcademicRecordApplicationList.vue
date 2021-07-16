@@ -152,6 +152,7 @@
           :fields="tables.academicRecords.fields"
           :items="tables.academicRecords.items"
           :busy="tables.academicRecords.isBusy"
+          responsive
         >
           <template v-slot:table-busy>
             <div class="text-center my-2">
@@ -192,6 +193,7 @@
               toggle-class="text-decoration-none"
               no-caret
               v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
+              boundary="window"
             >
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />

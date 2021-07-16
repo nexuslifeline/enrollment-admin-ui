@@ -61,6 +61,7 @@
               :per-page="paginations.peraPadalaAccount.perPage"
               :filter="filters.peraPadalaAccount.criteria"
               @filtered="onFiltered($event, paginations.peraPadalaAccount)"
+              responsive
             >
               <!-- :filter="filters.peraPadalaAccount.criteria> -->
               <template v-slot:table-busy>
@@ -78,6 +79,7 @@
                   variant="link"
                   toggle-class="text-decoration-none"
                   no-caret
+                  boundary="window"
                 >
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />

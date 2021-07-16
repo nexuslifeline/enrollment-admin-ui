@@ -52,7 +52,8 @@
               :current-page="paginations.schoolFee.page"
               :per-page="paginations.schoolFee.perPage"
               :filter="filters.schoolFee.criteria"
-              @filtered="onFiltered($event, paginations.schoolFee)">
+              @filtered="onFiltered($event, paginations.schoolFee)"
+              responsive>
               <!-- :filter="filters.schoolFee.criteria> -->
               <template v-slot:table-busy>
                 <div class="text-center my-2">
@@ -80,7 +81,8 @@
                   ]) || row.item.id !== fees.TUITION_FEE.id"
                   right variant="link"
                   toggle-class="text-decoration-none"
-                  no-caret>
+                  no-caret
+                  boundary="window">
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
                   </template>

@@ -26,7 +26,8 @@
               :items.sync="tables.schoolCategories.items"
               :current-page="paginations.schoolCategory.page"
               :per-page="paginations.schoolCategory.perPage"
-              :filter="filters.schoolCategory.criteria">
+              :filter="filters.schoolCategory.criteria"
+              responsive>
               <!-- :filter="filters.schoolCategory.criteria> -->
               <template v-slot:table-busy>
                 <div class="text-center my-2">

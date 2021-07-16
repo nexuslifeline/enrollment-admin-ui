@@ -54,6 +54,7 @@
           :fields="tables.students.fields"
           :items="tables.students.items"
           :busy="tables.students.isBusy"
+          responsive
         >
           <template v-slot:table-busy>
             <div class="text-center my-2">
@@ -88,6 +89,7 @@
               variant="link"
               toggle-class="text-decoration-none"
               no-caret
+              boundary="window"
             >
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
@@ -612,6 +614,7 @@
             :items.sync="tables.subjects.items"
             :fields="tables.subjects.fields2"
             :busy="tables.subjects.isBusy2"
+            responsive
           >
             <template v-slot:cell(action)="row">
               <b-button @click="addSubject(row)" size="sm" variant="success">
