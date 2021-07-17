@@ -2,23 +2,31 @@
   <CenterContainer>
     <template v-if="!!Object.keys(data).length">
       <BackLink />
-      <Personal :data="data" />
-      <Account
-        :data="data.user || {}"
-        :currentRoute="{ name: 'Student Edit', params: { ...$route.params } }"
-        :addAccountRoute="{ name: 'Create Student Account', params: { ...$route.params } }"
-      />
-      <Family :data="data.family || {}" />
-      <Address :data="data.address || {}" />
-      <Education :data="data.education || {}"/>
-      <Subjects :studentId="$route.params.studentId" />
-      <OnboardingSettings :data="data" />
-      <AcademicRecord
-        v-if="data.latestAcademicRecord"
-        :data="data.latestAcademicRecord"
-        :allowChangeStatus="true"
-        title="Latest Academic Record"
-      />
+      <b-tabs content-class="mt-4">
+        <b-tab title="Profile Information" active>
+          <Personal :data="data" />
+          <Family :data="data.family || {}" />
+          <Address :data="data.address || {}" />
+          <Education :data="data.education || {}"/>
+        </b-tab>
+        <b-tab title="Academic Record">
+          <AcademicRecord
+            v-if="data.latestAcademicRecord"
+            :data="data.latestAcademicRecord"
+            :allowChangeStatus="true"
+            title="Latest Academic Record"
+          />
+          <Subjects :studentId="$route.params.studentId" />
+        </b-tab>
+        <b-tab title="Settings">
+          <Account
+            :data="data.user || {}"
+            :currentRoute="{ name: 'Student Edit', params: { ...$route.params } }"
+            :addAccountRoute="{ name: 'Create Student Account', params: { ...$route.params } }"
+          />
+          <OnboardingSettings :data="data" />
+        </b-tab>
+      </b-tabs>
       <!-- v-if="!!Object.keys(data.latestAcademicRecord).length" -->
     </template>
   </CenterContainer>

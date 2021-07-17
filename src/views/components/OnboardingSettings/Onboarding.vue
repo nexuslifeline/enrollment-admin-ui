@@ -5,7 +5,7 @@
     :hasFooter="true">
     <CardNote>
       If student is mark as <b>Onboarding</b>, 
-      the student will need to fill up the details in onboarding stages to be able to access the main dashboard. 
+      the student will not be able to access the Dashboard and will be require to complete the Onboarding process.
     </CardNote>
     <InputGroup>
       <InputContainer>

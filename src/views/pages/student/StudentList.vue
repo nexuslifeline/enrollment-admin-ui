@@ -124,7 +124,7 @@
                     "
                     :to="`/master-files/student/${row.item.id}`"
                   >
-                    Edit Student Profile
+                    Edit Profile & Settings
                   </b-dropdown-item>
                   <b-dropdown-item
                     v-if="isAccessible(
@@ -144,19 +144,19 @@
                   >
                     Change Password
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.StudentPermissions.DELETE.id) && showRowActionButton"
-                    @click="onSetDelete(row.item.id)"
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
                   <!-- TODO: SET USER ACCESS OF PREVIEW LEDGER BUTTON -->
                   <b-dropdown-item
                     v-if="showPreviewLedgerButton"
                     @click="onShowLedgerModal(row.item.id)"
                   >
                     Preview Ledger
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    v-if="isAccessible($options.StudentPermissions.DELETE.id) && showRowActionButton"
+                    @click="onSetDelete(row.item.id)"
+                    :disabled="showModalConfirmation"
+                  >
+                    Delete
                   </b-dropdown-item>
                 </b-dropdown>
               </template>
@@ -216,7 +216,7 @@
         v-model="showModalPreview"
         :noCloseOnEsc="true"
         :noCloseOnBackdrop="true"
-        size="sm"
+        size="md"
       >
         <div slot="modal-title">
           Preview Student Ledger
