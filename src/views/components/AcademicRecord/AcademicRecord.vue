@@ -76,8 +76,8 @@
         </b-form-group>
       </InputContainer>
     </InputGroup>
-    <InputGroup>
-      <InputContainer>
+    <InputGroup v-if="data.schoolCategoryId">
+      <InputContainer v-if="$options.SchoolCategories.getEnum(data.schoolCategoryId).hasCourse">
         <b-form-group
           label="Course"
           labelClass="required"
@@ -92,7 +92,7 @@
           />
         </b-form-group>
       </InputContainer>
-      <InputContainer>
+      <InputContainer v-if="$options.SchoolCategories.getEnum(data.schoolCategoryId).hasSemester">
         <b-form-group
           label="Semester"
           labelClass="required"
@@ -108,7 +108,7 @@
         </b-form-group>
       </InputContainer>
     </InputGroup>
-     <InputGroup>
+     <InputGroup v-if="data.schoolCategoryId && data.levelId">
        <InputContainer>
         <b-form-group
           label="Curriculum"
@@ -190,6 +190,7 @@ import SelectCurriculum from '../Dropdowns/SelectCurriculum'
 import SelectStudentType from '../Dropdowns/SelectStudentType'
 import SelectSection from '../Dropdowns/SelectSection'
 import { reset, showNotification, validate } from '../../../helpers/forms'
+import { SchoolCategories } from '../../../helpers/enum'
 import { AcademicRecordApi, TranscriptRecordApi } from '../../../mixins/api'
 import debounce from 'lodash/debounce';
 
@@ -206,6 +207,7 @@ const academicRecordFields = {
 }
 
   export default {
+    SchoolCategories,
     props: {
       data: {
         type: [Object]

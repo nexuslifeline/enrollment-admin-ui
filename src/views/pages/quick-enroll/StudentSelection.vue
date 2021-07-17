@@ -60,10 +60,9 @@
                 :state="forms.academicRecord.states.schoolYearId"
                 :invalid-feedback="forms.academicRecord.errors.schoolYearId">
               <SelectSchoolYear
-                :value="schoolYearId"
+                v-model="schoolYearId"
                 :reduce="option => option.id"
                 label="name"
-                @input="schoolYearId = $event"
                 :clearable="false"
               />
             </b-form-group>
@@ -75,11 +74,58 @@
                 :state="forms.academicRecord.states.schoolCategoryId"
                 :invalid-feedback="forms.academicRecord.errors.schoolCategoryId">
                 <SelectCategory
-                  :value="schoolCategoryId"
+                  v-model="schoolCategoryId"
                   :reduce="option => option.id"
                   label="name"
-                  @input="schoolCategoryId = $event"
                   :clearable="false"
+                />
+              </b-form-group>
+            </InputContainer>
+          </InputGroup>
+          <InputGroup v-if="!!schoolCategoryId">
+            <InputContainer>
+              <b-form-group
+                label="Level"
+                labelClass="required"
+                :state="forms.academicRecord.states.levelId"
+                :invalid-feedback="forms.academicRecord.errors.levelId">
+                <SelectLevel
+                  v-model="levelId"
+                  label="name"
+                  :schoolCategoryId="schoolCategoryId"
+                  :reduce="option => option.id"
+                  :clearable="false"
+                />
+              </b-form-group>
+            </InputContainer>
+            <InputContainer v-if="$options.SchoolCategories.getEnum(schoolCategoryId).hasSemester">
+              <b-form-group
+                label="Semester"
+                labelClass="required"
+                :state="forms.academicRecord.states.semesterId"
+                :invalid-feedback="forms.academicRecord.errors.semesterId">
+                <SelectSemester
+                  v-model="semesterId"
+                  label="description"
+                  :schoolCategoryId="schoolCategoryId"
+                  :reduce="option => option.id"
+                  :clearable="false"
+                />
+              </b-form-group>
+            </InputContainer>
+          </InputGroup>
+          <InputGroup v-if="schoolCategoryId && levelId && $options.SchoolCategories.getEnum(schoolCategoryId).hasCourse">
+            <InputContainer>
+              <b-form-group
+                label="Course"
+                labelClass="required"
+                :state="forms.academicRecord.states.courseId"
+                :invalid-feedback="forms.academicRecord.errors.courseId">
+                <SelectLevelCourses
+                  v-model="courseId"
+                  label="description"
+                  :levelId="levelId"
+                  :reduce="option => option.id"
                 />
               </b-form-group>
             </InputContainer>
@@ -120,7 +166,7 @@
 </template>
 <script>
 import { copyValue } from '../../../helpers/extractor';
-import { AcademicRecordStatuses } from '../../../helpers/enum';
+import { AcademicRecordStatuses, SchoolCategories } from '../../../helpers/enum';
 import { AcademicRecordApi, StudentApi } from '../../../mixins/api';
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import TileMenu from '../../components/TileSelector/List';
@@ -132,11 +178,15 @@ import { reset, showNotification, validate } from '../../../helpers/forms';
 const academicRecordErrorFields = {
   schoolYearId: null,
   studentId: null,
-  schoolCategoryId: null
+  schoolCategoryId: null,
+  levelId: null,
+  semesterId: null,
+  courseId: null
 }
 
 export default {
   AcademicRecordStatuses,
+  SchoolCategories,
   props: {
     previousRoute: {
       type: Object
@@ -162,6 +212,9 @@ export default {
       isConfirmBusy: false,
       schoolYearId: null,
       schoolCategoryId: null,
+      levelId: null,
+      semesterId: null,
+      courseId: null,
       selectedStudent: null,
       menus: [
         { label: 'Select Existing Student' },
@@ -174,6 +227,17 @@ export default {
         }
       }
       // academicRecordId: 1 // added hardcoded id for testing only
+    }
+  },
+  watch: {
+    schoolCategoryId: function() {
+      this.levelId = null;
+      this.semesterId = null;
+      this.courseId = null;
+    },
+    levelId: function() {
+      this.semesterId = null;
+      this.courseId = null;
     }
   },
   methods: {
@@ -190,7 +254,15 @@ export default {
 
         this.isConfirmBusy = true
         const studentId = this.selectedStudent?.id
-        this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
+        const payload = {
+          schoolYearId: this.schoolYearId,
+          schoolCategoryId: this.schoolCategoryId,
+          levelId: this.levelId,
+          semesterId: this.semesterId,
+          courseId: this.courseId
+        };
+
+        this.quickEnroll(studentId, payload).then(({ data }) => {
           const academicRecordId = data.id
           this.isConfirmBusy = false
           this.$router.push({

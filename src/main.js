@@ -25,6 +25,7 @@ import ActiveViewHeader from './views/components/ActiveRowViewer/ActiveViewHeade
 import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
 import PageContent from './views/components/PageContainer/PageContent';
+import SelectLevelCourses from './views/components/Dropdowns/SelectCourseLevel';
 import SelectCategory from './views/components/Dropdowns/SelectCategory';
 import SelectStudentBillingTerms from './views/components/Dropdowns/SelectStudentBillingTerms';
 import SelectCategoryBillingTerms from './views/components/Dropdowns/SelectCategoryBillingTerms';
@@ -250,6 +251,7 @@ Vue.component('ShowMore', ShowMore);
 Vue.component('FooterAction', FooterAction);
 Vue.component('StageIndicator', StageIndicator);
 Vue.component('SelectPaginated', SelectPaginated);
+Vue.component('SelectLevelCourses', SelectLevelCourses);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
