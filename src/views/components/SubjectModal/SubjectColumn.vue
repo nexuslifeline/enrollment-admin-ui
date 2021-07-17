@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div class="subject-code">{{ data.code || '' }}</div>
-    <div class="subject-description">{{ data.description ||'' }}</div>
+    <span class="subject-code">
+      {{ [data.code || '', data.description || data.name].filter(v => !!v).join(' - ') }}
+    </span>
   </div>
 </template>
 
