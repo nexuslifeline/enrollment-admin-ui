@@ -51,6 +51,7 @@ import { AcademicRecordApi } from '../../../mixins/api';
 import SubjectsTable from './SubjectsTable';
 import SubjectListModal from '../SubjectModal/SubjectList'
 import SectionsOfSubject from './SectionsOfSubject'
+import debounce from 'lodash/debounce';
 
 export default {
   components: {
@@ -83,10 +84,22 @@ export default {
   created() {
     const params = { paginate: false}
     this.getAcademicRecordSubjects(this.academicRecordId, params).then(({ data }) => {
-      this.subjects = data
-    })
+      this.subjects = data;
+      this.registerObservers();
+    }).catch((error) => {
+      console.error(error);
+    });
   },
   methods: {
+    registerObservers() {
+      this.$watch('subjects', this.autoSave, { deep: true, immediate: false });
+      this.$watch('subjects', this.checkCompletion, { deep: true, immediate: true });
+    },
+    checkCompletion() {
+      this.isCompleted = this.subjects?.length > 0;
+      this.$emit('onCompletionChange', this.isCompleted);
+    },
+    autoSave: debounce(function() { this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const data = {

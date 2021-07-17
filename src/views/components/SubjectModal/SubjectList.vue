@@ -1,13 +1,11 @@
 <template>
   <b-modal
+    title="Subjects"
     v-model="show"
     @hidden="$emit('update:show', false)"
     no-close-on-backdrop
     no-close-on-esc
     size="xl">
-    <template v-slot:modal-header>
-      <h5>Subject List</h5>
-    </template>
     <div class="search-bar">
         <div class="search-details">
 
@@ -113,7 +111,7 @@
       </b-col>
     </b-row>
     <template v-slot:modal-footer>
-      <b-button @click="$emit('update:show', false)"> Close</b-button>
+      <b-button @click="$emit('update:show', false)" variant="dark"> Close</b-button>
     </template>
   </b-modal>
 </template>

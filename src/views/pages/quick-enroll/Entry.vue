@@ -49,6 +49,7 @@
               :isReadOnly="isReadOnly"
             />
             <Enlistment
+              @onCompletionChange="onEnlistmentCompletionChange"
               :academicRecordId="data.id"
               :data="data"
               :isReadOnly="isReadOnly"
@@ -81,6 +82,7 @@
             v-if="!isReadOnly && manualStepId === $options.QuickEnrollSteps.SUBJECT_ENLISTMENT.id"
             variant="primary"
             class="approval-view__next"
+            :disabled="!isEnlistmentCompleted"
             @click="onSubmitAssessmentRequest">
             <v-icon name="spinner" spin v-if="isBusy" />
             Submit
@@ -119,6 +121,7 @@ export default {
       selectedIndex: 0,
       isPersonalCompleted: false,
       isAccountCompleted: false,
+      isEnlistmentCompleted: false,
       data: {},
       isBusy: false,
       stages: [
@@ -163,6 +166,9 @@ export default {
   methods: {
     onSelectStage(idx) {
       this.selectedIndex = idx;
+    },
+    onEnlistmentCompletionChange(isCompleted) {
+       this.isEnlistmentCompleted = isCompleted;
     },
     onPersonalCompletion(isCompleted) {
       this.isPersonalCompleted = isCompleted;
