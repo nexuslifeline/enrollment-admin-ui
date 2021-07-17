@@ -2,52 +2,63 @@
   <b-modal
     v-model="show"
     @hidden="$emit('update:show', false)"
+    no-close-on-backdrop
+    no-close-on-esc
     size="xl">
     <template v-slot:modal-header>
-      Subject List
+      <h5>Subject List</h5>
     </template>
-    <b-row class="mb-3">
-      <b-col md=3 offset-md="9">
+    <div class="search-bar">
+        <div class="search-details">
+
+        </div>
+       <div class="search-container">
         <b-form-input
-          class="float-right"
-          placeholder="Search Here..."
+          placeholder="Search Here"
           debounce="500"
-          @update="loadSubjects()"
           v-model="filters.subject.criteria">
         </b-form-input>
-      </b-col>
-    </b-row>
-    <b-row class="mb-2">
-      <b-col>
-        <SelectLevel
-          placeholder="Level"
-          label="name"
-          :value="filters.subject.level"
-          @input="onLevelChanged" />
-      </b-col>
-      <b-col>
-        <SelectCourseLevel
-          placeholder="Course"
-          label="name"
-          :value="filters.subject.course"
-          :levelId="filters.subject.level && filters.subject.level.id || null"
-          @input="onCourseChanged" />
-      </b-col>
-      <b-col>
-        <SelectSemester
-          placeholder="Semester"
-          label="name"
-          :value="filters.subject.semester"
-          :levelId="filters.subject.level && filters.subject.level.id || null"
-          @input="onSemesterChanged" />
-      </b-col>
-      <b-col>
-        <SelectSection
-          placeholder="Section"
-          label="name"
-          :value="filters.subject.section"
-          @input="onSectionChanged" />
-      </b-col>
+       </div>
+    </div>
+    <b-row class="pb-2 pl-3 pr-3">
+      <InputGroup>
+        <InputContainer>
+          <SelectLevel
+            placeholder="Level"
+            label="name"
+            v-model="filters.subject.level"
+          />
+        </InputContainer>
+        <template v-if="levelId">
+          <InputContainer v-if="$options.SchoolCategories.getEnum(schoolCategoryId).hasCourse">
+            <SelectCourseLevel
+              placeholder="Course"
+              label="name"
+              v-model="filters.subject.course"
+              :levelId="levelId"
+            />
+          </InputContainer>
+          <InputContainer v-if="$options.SchoolCategories.getEnum(schoolCategoryId).hasSemester">
+            <SelectSemester
+              placeholder="Semester"
+              label="name"
+              v-model="filters.subject.semester"
+              :levelId="levelId"
+            />
+          </InputContainer>
+        </template>
+        <InputContainer>
+          <SelectSection
+            placeholder="Section"
+            label="name"
+            v-model="filters.subject.section"
+            :levelId="levelId"
+            :schoolCategoryId="schoolCategoryId"
+            :courseId="courseId"
+            :schoolYearId="schoolYearId"
+          />
+        </InputContainer>
+      </InputGroup>
     </b-row>
     <b-row>
       <b-col md=12>
@@ -59,13 +70,19 @@
           :items.sync="tables.subjects.items"
           :fields="tables.subjects.fields"
           :busy="tables.subjects.isBusy"
+          class="c-table"
         >
           <template v-slot:cell(name)="row">
             <SubjectColumn :data="row.item"/>
           </template>
           <template v-slot:cell(action)="row">
-            <b-button @click="$emit('onAddSubject', { subject: row.item, section: filters.subject.section })" size="sm" variant="success">
-              <v-icon name="plus" />
+            <b-button
+              @click="$emit('onAddSubject', { subject: row.item, section: filters.subject.section })"
+              :disabled="addedItems && addedItems.length > 0 && addedItems.includes(row.item.id)"
+              size="sm"
+              variant="primary">
+              <span v-if="addedItems && addedItems.length > 0 && addedItems.includes(row.item.id)">Added</span>
+              <v-icon v-else name="plus" />
             </b-button>
           </template>
           <template v-slot:table-busy>
@@ -83,6 +100,7 @@
             </b-col>
             <b-col md="6">
               <b-pagination
+                class="c-pagination"
                 v-model="paginations.subject.page"
                 :total-rows="paginations.subject.totalRows"
                 :per-page="paginations.subject.perPage"
@@ -108,8 +126,10 @@ import SelectCourseLevel from '../Dropdowns/SelectCourseLevel'
 import SelectSemester from '../Dropdowns/SelectSemester'
 import SelectSection from '../Dropdowns/SelectSection'
 import SelectCurriculum from '../Dropdowns/SelectCurriculum'
+import { SchoolCategories } from '../../../helpers/enum';
 
 export default {
+  SchoolCategories,
   props: {
     show: {
       type: [Boolean],
@@ -130,6 +150,9 @@ export default {
     section: {
       type: [Object],
       default: null
+    },
+    addedItems: {
+      type: [Array]
     }
   },
   components: { SubjectColumn, SelectLevel, SelectCourseLevel, SelectSemester, SelectCurriculum, SelectSection },
@@ -143,7 +166,7 @@ export default {
           fields: [
             {
               key: 'name',
-              label: 'Subject Code',
+              label: 'Subject',
               tdClass: 'align-middle',
               thStyle: { width: '65%' },
             },
@@ -173,7 +196,7 @@ export default {
               label: '',
               tdClass: 'align-middle text-center',
               thClass: 'align middle text-center',
-              thStyle: { width: '30px' },
+              thStyle: { width: '40px' },
             }
           ]
         }
@@ -184,7 +207,7 @@ export default {
           to: 0,
           totalRows: 0,
           page: 1,
-          perPage: 8,
+          perPage: 6,
         },
       },
       filters: {
@@ -199,12 +222,40 @@ export default {
     }
   },
   created() {
-    // const { subject } = this.filters
-    // subject.levelId = this.levelId
-    // subject.courseId = this.courseId
-    // subject.semesterId = this.semesterId
-    // subject.sectionId = this.sectionId
     this.loadSubjects()
+  },
+  watch: {
+    'filters.subject.level': function() {
+      const { subject } = this.filters;
+      subject.course = null
+      subject.section = null
+    },
+    'filters.subject': {
+      handler() {
+        this.loadSubjects();
+      },
+      deep: true
+    }
+  },
+  computed: {
+    courseId() {
+      return this.filters?.subject?.course?.id;
+    },
+    levelId() {
+      return this.filters?.subject?.level?.id;
+    },
+    schoolCategoryId() {
+      return this.filters?.subject?.level?.schoolCategoryId;
+    },
+    sectionId() {
+      return this.filters?.subject?.section?.id;
+    },
+    semesterId() {
+      return this.filters?.subject?.semester?.id;
+    },
+    schoolYearId() {
+      return this.$store.state?.schoolYear?.id;
+    }
   },
   methods: {
     loadSubjects() {
@@ -232,36 +283,49 @@ export default {
         subjects.isBusy = false;
       });
     },
-    onLevelChanged(level){
-      const { subject } = this.filters
-      subject.level = level?.id
-      subject.course = null
-      subject.section = null
-      this.loadSubjects()
-    },
-    onCourseChanged(course){
-      const { subject } = this.filters
-      subject.course = course
-      subject.courseId = course?.id
-      this.loadSubjects()
-    },
-    onSemesterChanged(semester){
-      const { subject } = this.filters
-      subject.semester = semester
-      subject.semesterId = semester?.id
-      this.loadSubjects()
-    },
-    onSectionChanged(section){
-      const { subject } = this.filters
+    // onLevelChanged(level){
+    //   const { subject } = this.filters
+    //   // subject.level = level?.id
+    //   subject.course = null
+    //   subject.section = null
+    //   this.loadSubjects()
+    // },
+    // onCourseChanged(course){
+    //   const { subject } = this.filters
+    //   subject.course = course
+    //   subject.courseId = course?.id
+    //   this.loadSubjects()
+    // },
+    // onSemesterChanged(semester){
+    //   const { subject } = this.filters
+    //   subject.semester = semester
+    //   subject.semesterId = semester?.id
+    //   this.loadSubjects()
+    // },
+    // onSectionChanged(section){
+    //   const { subject } = this.filters
 
-      subject.section = section
-      subject.sectionId = section?.id
-      this.loadSubjects()
-    }
+    //   subject.section = section
+    //   subject.sectionId = section?.id
+    //   this.loadSubjects()
+    // }
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+  .search-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+  }
 
+  .search-container {
+    flex: 1;
+  }
+
+  .search-details {
+    flex: 1;
+  }
 </style>

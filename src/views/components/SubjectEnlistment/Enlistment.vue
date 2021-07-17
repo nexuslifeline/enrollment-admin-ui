@@ -33,7 +33,9 @@
       :level="data.level"
       :course="data.course"
       :semester="data.semester"
-      :section="data.section"/>
+      :section="data.section"
+      :addedItems="subjects.map(v => v.id)"
+    />
     <SectionsOfSubject
       :show.sync="showSectionModal"
       v-if="showSectionModal"
