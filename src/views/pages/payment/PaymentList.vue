@@ -114,6 +114,7 @@
             :fields="tables.payments.fields"
             :busy="tables.payments.isBusy"
             :items="tables.payments.items"
+            responsive
           >
             <!-- :filter="filters.schoolFee.criteria> -->
             <template v-slot:table-busy>
@@ -173,6 +174,7 @@
                 variant="link"
                 toggle-class="text-decoration-none"
                 no-caret
+                boundary="window"
               >
                 <template v-slot:button-content>
                   <v-icon name="ellipsis-v" />

@@ -48,6 +48,7 @@
               :per-page="paginations.user.perPage"
               :filter="filters.user.criteria"
               @filtered="onFiltered($event, paginations.user)"
+              responsive
             >
               <template v-slot:cell(account)="data">
                 <MemberColumn
@@ -76,6 +77,7 @@
                   variant="link"
                   toggle-class="text-decoration-none"
                   no-caret
+                  boundary="window"
                 >
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />

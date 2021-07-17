@@ -49,7 +49,8 @@
           variant="outline-primary"
           split-variant="outline-primary"
           class="soa__drop-down"
-          split>
+          split
+          boundary="window">
           <b-dropdown-item
             @click="$router.push({ name: 'Individual SOA'})">
             Individual SOA

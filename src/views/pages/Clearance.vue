@@ -79,7 +79,8 @@
           variant="outline-primary"
           split-variant="outline-primary"
           class="clearance_drop-down"
-          v-if="isAccessible($options.EClearancePermissions.ADD.id)">
+          v-if="isAccessible($options.EClearancePermissions.ADD.id)"
+          boundary="window">
           <!-- <b-dropdown-item
             @click="showBatchEntry=false">
             Create Clearance

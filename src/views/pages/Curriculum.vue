@@ -167,7 +167,7 @@
                 hover
                 outlined
                 show-empty
-                :responsive="tables.curriculums.items.length > 3"
+                responsive
                 :fields="tables.curriculums.fields"
                 :busy="tables.curriculums.isBusy"
                 :items.sync="tables.curriculums.items"
@@ -202,6 +202,7 @@
                     variant="link"
                     toggle-class="text-decoration-none"
                     no-caret
+                    boundary="window"
                   >
                     <template v-slot:button-content>
                       <v-icon name="ellipsis-v" />

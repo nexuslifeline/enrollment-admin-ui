@@ -60,6 +60,7 @@
               :per-page="paginations.bankAccount.perPage"
               :filter="filters.bankAccount.criteria"
               @filtered="onFiltered($event, paginations.bankAccount)"
+              responsive
             >
               <!-- :filter="filters.bankAccount.criteria> -->
               <template v-slot:table-busy>
@@ -77,6 +78,7 @@
                   variant="link"
                   toggle-class="text-decoration-none"
                   no-caret
+                  boundary="window"
                 >
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />

@@ -35,7 +35,6 @@
         </template>
         <template v-slot:cell(gradingPeriods)="{ item }">
           <div class="cell-grading-period" v-if="item.grades">
-            
             <vue-autonumeric
               :disabled="item.studentGradeStatusId === $options.StudentGradeStatuses.SUBMITTED.id"
               v-for="gradingPeriod in gradingPeriods"

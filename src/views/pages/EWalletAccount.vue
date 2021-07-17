@@ -53,6 +53,7 @@
               :per-page="paginations.eWalletAccount.perPage"
               :filter="filters.eWalletAccount.criteria"
               @filtered="onFiltered($event, paginations.eWalletAccount)"
+              responsive
             >
               <!-- :filter="filters.eWalletAccount.criteria> -->
               <template v-slot:table-busy>
@@ -70,6 +71,7 @@
                   variant="link"
                   toggle-class="text-decoration-none"
                   no-caret
+                  boundary="window"
                 >
                   <template v-slot:button-content>
                     <v-icon name="ellipsis-v" />
