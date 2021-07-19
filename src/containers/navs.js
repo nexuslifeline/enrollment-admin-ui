@@ -314,7 +314,7 @@ export default [
         permissionIds: StudentLedgerReportPermissions.getIds()
       },
       {
-        label: 'Class Masterlist',
+        label: 'Student Masterlist',
         description: 'This report provides a list of all students currently enrolled in class.',
         to: '/report/enrolled-list',
         permissionIds: ClassMasterlistReportPermissions.getIds()
