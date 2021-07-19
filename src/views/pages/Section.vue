@@ -13,17 +13,6 @@
         type="text"
         placeholder="Search"
       />
-      <!--<v-select
-        :options="options.schoolCategories.values"
-        :value="filters.section.schoolCategoryItem"
-        @input="onCategoryFilterChange"
-        label="name"
-        placeholder="School Category"
-        class="mt-2"
-        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
-        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
-        :clearable="checkIfAllowedAll()"
-      />-->
       <SelectCategory
         :value="filters.section.schoolCategoryItem"
         @input="onCategoryFilterChange"
@@ -31,15 +20,35 @@
         placeholder="School Category"
         class="mt-2"
       />
-      <v-select
-        :options="options.levels.fixItems"
+      <SelectLevel
         :value="filters.section.levelItem"
+        :schoolCategoryId="filters.section.schoolCategoryId"
         @input="onLevelFilterChange"
         label="name"
         placeholder="Level"
+        class="mt-2" />
+      <SelectCourse
+        v-if="isCourseVisible"
+        :value="filters.section.courseItem"
+        @input="onCourseFilterChange"
+        :levelId="filters.section.levelId"
+        :schoolCategoryId="filters.section.schoolCategoryId"
+        label="name"
+        placeholder="Course"
         class="mt-2"
       />
-      <v-select
+
+      <SelectSemester
+        v-if="isCourseVisible"
+        :value="filters.section.semesterItem"
+        :levelId="filters.section.levelId"
+        :schoolCategoryId="filters.section.schoolCategoryId"
+        @input="onSemesterFilterChange"
+        label="name"
+        placeholder="Semester"
+        class="mt-2"
+      />
+      <!-- <v-select
         v-if="isCourseVisible"
         :options="options.courses.fixItems"
         :value="filters.section.courseItem"
@@ -47,8 +56,8 @@
         label="name"
         placeholder="Course"
         class="mt-2"
-      />
-      <v-select
+      /> -->
+      <!-- <v-select
         v-if="isCourseVisible"
         :options="options.semesters.values"
         :value="filters.section.semesterItem"
@@ -56,122 +65,10 @@
         label="name"
         placeholder="Semester"
         class="mt-2"
-      />
+      /> -->
     </template>
     <template  v-slot:content>
       <div v-show="!showEntry && checkIfHasSchoolCategoryAccess()">
-        <!-- <SchoolCategoryTabs
-          :showAll="true"
-          @loadSchoolCategoryId="
-            (filters.section.schoolCategoryId = $event), loadSections()
-          "
-          @clickAll="(filters.section.schoolCategoryId = null), loadSections()"
-          @click="(filters.section.schoolCategoryId = $event), loadSections()"
-        />
-        <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="2">
-                <b-button
-                  v-if="
-                    isAccessible($options.SectionAndSchedulePermissions.ADD.id)
-                  "
-                  variant="primary"
-                  @click="setCreate()"
-                >
-                  <v-icon name="plus-circle" /> ADD SECTION
-                </b-button>
-              </b-col>
-              <b-col md="3">
-                <b-form-select
-                  @input="loadSections()"
-                  v-model="filters.section.courseId"
-                  class="float-right"
-                >
-                  <template v-slot:first>
-                    <b-form-select-option :value="null" disabled
-                      >-- Course --</b-form-select-option
-                    >
-                  </template>
-                  <b-form-select-option :value="null"
-                    >None</b-form-select-option
-                  >
-                  <b-form-select-option
-                    v-for="course in options.courses.fixItems"
-                    :key="course.id"
-                    :value="course.id"
-                  >
-                    {{ course.description }}
-                    {{ course.major ? `(${course.major})` : '' }}
-                  </b-form-select-option>
-                </b-form-select>
-              </b-col>
-              <b-col md="5">
-                <b-row>
-                  <b-col md="4">
-                    <b-form-select
-                      @input="loadSections()"
-                      v-model="filters.section.semesterId"
-                      class="float-right"
-                    >
-                      <template v-slot:first>
-                        <b-form-select-option :value="null" disabled
-                          >-- Semester --</b-form-select-option
-                        >
-                      </template>
-                      <b-form-select-option :value="null"
-                        >None</b-form-select-option
-                      >
-                      <b-form-select-option
-                        v-for="semester in options.semesters.values"
-                        :key="semester.id"
-                        :value="semester.id"
-                      >
-                        {{ semester.name }}
-                      </b-form-select-option>
-                    </b-form-select>
-                  </b-col>
-                  <b-col md="4">
-                    <b-form-select
-                      @input="loadSections()"
-                      v-model="filters.section.levelId"
-                      class="float-right"
-                    >
-                      <template v-slot:first>
-                        <b-form-select-option :value="null" disabled
-                          >-- Level --</b-form-select-option
-                        >
-                      </template>
-                      <b-form-select-option :value="null"
-                        >None</b-form-select-option
-                      >
-                      <b-form-select-option
-                        v-for="level in options.levels.fixItems"
-                        :key="level.id"
-                        :value="level.id"
-                      >
-                        {{ level.name }}
-                      </b-form-select-option>
-                    </b-form-select>
-                  </b-col>
-                  <b-col md="4">
-                  </b-col>
-                </b-row>
-              </b-col>
-              <b-col md="2">
-                <b-form-input
-                  v-model="filters.section.criteria"
-                  debounce="500"
-                  @update="loadSections()"
-                  type="text"
-                  placeholder="Search"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
         <b-row>
           <b-col md="12">
             <b-table
@@ -185,10 +82,6 @@
               :items="tables.sections.items"
               responsive
             >
-              <!-- :current-page="paginations.section.page"
-              :per-page="paginations.section.perPage"
-              :filter="filters.section.criteria"
-              @filtered="onFiltered($event, paginations.section)" -->
               <template v-slot:table-busy>
                 <div class="text-center my-2">
                   <v-icon name="spinner" spin class="mr-2" />
@@ -210,39 +103,21 @@
                     {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.SectionAndSchedulePermissions.EDIT.id
-                      )
-                    "
+                    v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
                     @click="setUpdate(row, 0)"
-                    :disabled="showEntry"
-                  >
+                    :disabled="showEntry">
                     Edit
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.SectionAndSchedulePermissions.EDIT.id
-                      )
-                    "
+                    v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
                     @click="setUpdate(row, 1)"
-                    :disabled="showEntry"
-                  >
+                    :disabled="showEntry">
                     Setup Schedule
                   </b-dropdown-item>
                   <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.SectionAndSchedulePermissions.DELETE.id
-                      )
-                    "
-                    @click="
-                      (forms.section.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
+                    v-if="isAccessible($options.SectionAndSchedulePermissions.DELETE.id)"
+                    @click="(forms.section.fields.id = row.item.id),(showModalConfirmation = true)"
+                    :disabled="showModalConfirmation">
                     Delete
                   </b-dropdown-item>
                 </b-dropdown>
@@ -274,14 +149,7 @@
                   <span
                     class="link"
                     @click="setUpdate(row, 0)"
-                    :disabled="
-                      showEntry ||
-                        isAccessible(
-                          $options.SectionAndSchedulePermissions.EDIT.id
-                        )
-                    "
-                    >{{ row.item.name }}</span
-                  >
+                    :disabled="showEntry ||isAccessible($options.SectionAndSchedulePermissions.EDIT.id)">{{ row.item.name }}</span>
                 </div>
               </template>
             </b-table>
@@ -372,9 +240,16 @@
                           </b-form-group> -->
                         </b-col>
                         <b-col md="6">
-                          <b-form-group>
-                            <label class="required">School Category</label>
-                            <b-form-select
+                          <b-form-group
+                            :state="forms.section.states.schoolCategoryId"
+                            :invalid-feedback="forms.section.errors.schoolCategoryId"
+                            label="School Category"
+                            labelClass="required">
+                            <SelectCategory
+                              :value="forms.section.fields.schoolCategory"
+                              @input="onFormCategoryChanged"
+                              label="name"/>
+                            <!-- <b-form-select
                               v-model="forms.section.fields.schoolCategoryId"
                               :state="forms.section.states.schoolCategoryId"
                               @change="loadLevelsOfSchoolCategoryList()"
@@ -392,143 +267,48 @@
                               >
                                 {{ schoolCategory.name }}
                               </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.section.errors.schoolCategoryId }}
-                            </b-form-invalid-feedback>
+                            </b-form-select> -->
                           </b-form-group>
-                          <b-form-group>
-                            <label class="required">
-                              Level
-                              <v-icon
-                                v-if="options.levels.isLoading"
-                                name="spinner"
-                                spin
-                              />
-                            </label>
-                            <b-form-select
-                              v-model="forms.section.fields.levelId"
-                              :state="forms.section.states.levelId"
-                              @change="
-                                loadCoursesOfLevelList(),
-                                  loadSubjectsOfCurriculum()
-                              "
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- Level --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="level in options.levels.items"
-                                :key="level.id"
-                                :value="level.id"
-                              >
-                                {{ level.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.section.errors.levelId }}
-                            </b-form-invalid-feedback>
+                          <b-form-group
+                            :state="forms.section.states.levelId"
+                            :invalid-feedback="forms.section.errors.levelId"
+                            label="Level"
+                            labelClass="required">
+                            <SelectLevel
+                              :schoolCategoryId="forms.section.fields.schoolCategoryId"
+                              :value="forms.section.fields.level"
+                              @input="onFormLevelChanged"
+                              label="name"/>
                           </b-form-group>
-                          <b-form-group>
-                            <label>
-                              Course
-                              <v-icon
-                                v-if="options.courses.isLoading"
-                                name="spinner"
-                                spin
-                              />
-                            </label>
-                            <b-form-select
-                              v-model="forms.section.fields.courseId"
-                              :state="forms.section.states.courseId"
-                              :disabled="
-                                forms.section.fields.schoolCategoryId === null ||
-                                  forms.section.fields.schoolCategoryId ===
-                                    options.schoolCategories.PRE_SCHOOL.id ||
-                                  forms.section.fields.schoolCategoryId ===
-                                    options.schoolCategories.PRIMARY_SCHOOL.id ||
-                                  forms.section.fields.schoolCategoryId ===
-                                    options.schoolCategories.JUNIOR_HIGH_SCHOOL.id
-                              "
-                              @change="loadSubjectsOfCurriculum()"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- Course --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="course in options.courses.items"
-                                :key="course.id"
-                                :value="course.id"
-                              >
-                                {{ course.description }}
-                                {{ course.major ? `(${course.major})` : '' }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.section.errors.courseId }}
-                            </b-form-invalid-feedback>
+                          <b-form-group
+                            label="Course"
+                            labelClass="required"
+                            :state="forms.section.states.courseId"
+                            :invalid-feedback="forms.section.errors.courseId">
+                            <SelectCourse
+                              :value="forms.section.fields.course"
+                              @input="onFormCourseChanged"
+                              :levelId="forms.section.fields.levelId"
+                              :schoolCategoryId="forms.section.fields.schoolCategoryId"
+                              label="name"/>
                           </b-form-group>
-                          <b-form-group>
-                            <label>Semester</label>
-                            <b-form-select
-                              v-model="forms.section.fields.semesterId"
-                              :state="forms.section.states.semesterId"
-                              :disabled="
-                                forms.section.fields.schoolCategoryId === null ||
-                                  forms.section.fields.schoolCategoryId ===
-                                    options.schoolCategories.PRE_SCHOOL.id ||
-                                  forms.section.fields.schoolCategoryId ===
-                                    options.schoolCategories.PRIMARY_SCHOOL.id ||
-                                  forms.section.fields.schoolCategoryId ===
-                                    options.schoolCategories.JUNIOR_HIGH_SCHOOL.id
-                              "
-                              @change="loadSubjectsOfCurriculum()"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- Semester --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="semester in options.semesters.values"
-                                :key="semester.id"
-                                :value="semester.id"
-                              >
-                                {{ semester.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.section.errors.semesterId }}
-                            </b-form-invalid-feedback>
+                          <b-form-group
+                            :state="forms.section.states.semesterId"
+                            :invalid-feedback="forms.section.errors.semesterId"
+                            label="Semester"
+                            labelClass="required">
+                            <SelectSemester
+                              :value="forms.section.fields.semester"
+                              :levelId="forms.section.fields.levelId"
+                              :schoolCategoryId="forms.section.fields.schoolCategoryId"
+                              @input="onFormSemesterChanged"
+                              label="name"
+                            />
                           </b-form-group>
                         </b-col>
                       </b-row>
                     </b-tab>
                     <b-tab title="Schedule">
-                      <!-- <b-row>
-                        <b-col md=8>
-                        </b-col>
-                        <b-col md=4>
-                          <b-button
-                            variant="outline-primary"
-                            class="float-right"
-                            @click="setAddSchedule(null)">
-                            <v-icon name="plus-circle" /> ADD SCHEDULE
-                          </b-button>
-                        </b-col>
-                      </b-row> -->
-                      <!-- <Schedule
-                        class="mt-2"
-                        :isEntry="true"
-                        :isShown="showEntry"
-                        :details="scheduleDetails"
-                        :subjects="options.subjects.items"
-                        :scheduleItems="forms.section.fields.schedules"
-                        :scheduleStates="forms.section.states.schedules"/> -->
                       <h5 class="pt-2 text-center">
                         {{ forms.section.fields.name }}<br />
                         <span
@@ -796,9 +576,13 @@ const sectionFields = {
   description: null,
   schoolYearId: null,
   schoolCategoryId: null,
+  schoolCategory: null,
   levelId: null,
+  level: null,
   courseId: null,
+  course: null,
   semesterId: null,
+  semester: null,
   schedules: null,
 };
 const scheduleFields = {
@@ -844,6 +628,9 @@ import Card from '../components/Card';
 import { differenceInMinutes, addMinutes } from 'date-fns';
 import PageContent from '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
+import SelectLevel from '../components/Dropdowns/SelectLevel'
+import SelectCourse from '../components/Dropdowns/SelectCourse'
+import SelectSemester from '../components/Dropdowns/SelectSemester'
 
 export default {
   name: 'ClassSection',
@@ -863,7 +650,10 @@ export default {
     SchoolCategoryTabs,
     Card,
     PageContent,
-    NoAccess
+    NoAccess,
+    SelectLevel,
+    SelectCourse,
+    SelectSemester
   },
   SectionAndSchedulePermissions,
   Days,
@@ -903,12 +693,6 @@ export default {
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
             },
-            // {
-            //   key: "description",
-            //   label: "DESCRIPTION",
-            //   tdClass: "align-middle",
-            //   thStyle: { width: "auto" },
-            // },
             {
               key: 'schoolCategory.name',
               label: 'Category',
@@ -1077,12 +861,7 @@ export default {
       });
     },
     onSectionEntry() {
-      const {
-        section,
-        section: {
-          fields: { schedules, ...fields },
-        },
-      } = this.forms;
+      const {section,section: {fields: { schedules, ...fields },},} = this.forms;
       const { sections } = this.tables;
 
       const newSchedules = schedules.map((s) => {
@@ -1100,8 +879,10 @@ export default {
       // console.log(newSchedules)
       // return
 
+      const { schoolCategory, level, course, semester, ...sectionFields } = section.fields
+
       const data = {
-        ...fields,
+        ...sectionFields,
         schedules: newSchedules,
       };
 
@@ -1228,11 +1009,15 @@ export default {
         fields.description = data.description;
         fields.schoolYearId = data.schoolYearId;
         fields.schoolCategoryId = data.schoolCategoryId;
-        await this.loadLevelsOfSchoolCategoryList();
+        fields.schoolCategory = data.schoolCategory;
+        // await this.loadLevelsOfSchoolCategoryList();
         fields.levelId = data.levelId;
-        await this.loadCoursesOfLevelList();
+        fields.level = data.level;
+        // await this.loadCoursesOfLevelList();
         fields.courseId = data.courseId;
+        fields.course = data.course;
         fields.semesterId = data.semesterId;
+        fields.semester = data.semester;
         await this.loadSubjectsOfCurriculum();
         fields.schedules = data.schedules.map((s) => {
           const { subjects, instructors } = this.options;
@@ -1266,10 +1051,14 @@ export default {
       reset(section);
       clearFields(section.fields);
       section.fields.schoolCategoryId = null
-      section.fields.schoolYearId = this.selectedSchoolYear?.id;;
+      section.fields.schoolCategory = null
+      section.fields.schoolYearId = this.selectedSchoolYear?.id;
       section.fields.levelId = null;
+      section.fields.level = null;
       section.fields.courseId = null;
+      section.fields.course = null;
       section.fields.semesterId = null;
+      section.fields.semester = null;
       section.fields.schedules = [];
       this.entryMode = 'Add';
       section.isLoading = false;
@@ -1599,12 +1388,53 @@ export default {
       section.courseItem = item;
       this.loadSections();
     },
-     onSemesterFilterChange(item) {
+    onSemesterFilterChange(item) {
       const { section } = this.filters;
       section.semesterId = item?.id || 0;
       section.semesterItem = item;
       this.loadSections();
     },
+    onFormCategoryChanged(item) {
+      const { fields } = this.forms.section
+      fields.schoolCategory = item
+      fields.schoolCategoryId = item?.id
+
+      fields.level = null
+      fields.levelId = null
+
+      fields.course = null
+      fields.courseId = null
+
+      fields.semester = null
+      fields.semesterId = null
+    },
+    onFormLevelChanged(item) {
+      const { fields } = this.forms.section
+
+      fields.level = item
+      fields.levelId = item?.id
+
+      fields.course = null
+      fields.courseId = null
+
+      fields.semester = null
+      fields.semesterId = null
+    },
+    onFormCourseChanged(item) {
+      const { fields } = this.forms.section
+
+      fields.course = item
+      fields.courseId = item?.id
+
+      fields.semester = null
+      fields.semesterId = null
+    },
+    onFormSemesterChanged(item) {
+      const { fields } = this.forms.section
+
+      fields.semester = item
+      fields.semesterId = item?.id
+    }
   },
   computed: {
     isCourseVisible() {
