@@ -20,7 +20,6 @@
             :value="forms.academicRecord.fields.schoolCategory"
             @input="onSchoolCategoryChanged"
             label="name"
-            placeholder="School Category"
             :clearable="false"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.schoolCategoryId  }"
             appendToBody
@@ -35,7 +34,6 @@
             :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
             @input="onLevelChanged"
             label="name"
-            placeholder="Level"
             :clearable="false"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.levelId  }"
             appendToBody
@@ -52,7 +50,6 @@
             :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
             @input="onCourseChanged"
             label="name"
-            placeholder="Course"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.courseId  }"
             appendToBody
@@ -69,7 +66,6 @@
             :schoolCategoryId="forms.academicRecord.fields.schoolCategoryId"
             @input="onSemesterChanged"
             label="name"
-            placeholder="Semester"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.semesterId  }"
             appendToBody
@@ -88,7 +84,6 @@
             :levelId="forms.academicRecord.fields.levelId"
             :courseId="forms.academicRecord.fields.courseId"
             label="name"
-            placeholder="Curriculum"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.transcriptRecord  }"
             appendToBody
@@ -208,7 +203,7 @@ export default {
   },
   methods: {
     onSaveLevel() {
-      const { id: academicRecordId, transcriptRecord: { curriculumId } } = this.data
+      const { id: academicRecordId } = this.data
       const { academicRecord, academicRecord: { fields } } = this.forms
       this.isConfirmBusy = true
       reset(academicRecord)
@@ -221,12 +216,10 @@ export default {
         transcriptRecord: { curriculumId: fields.transcriptRecord.curriculumId }
       }
 
-      //patch academic record
       this.updateAcademicRecord(payLoad, academicRecordId).then(({ data }) => {
-          console.log(data)
-        //patch transcript
+        const item = { ...this.data, ...data, transcriptRecord: { ...this.data?.transcriptRecord } };
+        this.$emit('update:data', item);
         this.$emit('update:isShown', false)
-        this.$emit('update:data', { ...data })
         this.isConfirmBusy = false;
       }).catch((error) => {
         this.isConfirmBusy = false;

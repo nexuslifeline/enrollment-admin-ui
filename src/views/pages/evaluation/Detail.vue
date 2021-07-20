@@ -93,7 +93,7 @@
         <h4 class="content-title">Evaluation Request</h4>
         <AcademicView
           v-if="data"
-          :data="data.academicRecord"
+          :data.sync="data.academicRecord"
           :isEditable="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
         />
         <button
@@ -106,7 +106,7 @@
         <h4 class="content-title">Last School Attended</h4>
         <SchoolView
           v-if="!!Object.keys(data).length"
-          :data="data"
+          :data.sync="data"
         />
         <StudentAttachments
           v-if="!!Object.keys(data).length && !!Object.keys(data.academicRecord).length"

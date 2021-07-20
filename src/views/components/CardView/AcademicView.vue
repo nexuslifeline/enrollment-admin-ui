@@ -14,7 +14,7 @@
       <InlineItem label="Level" @onEdit="onEditLevel" :isEditable="isEditable">
         {{ data && data.level && data.level.name || 'No Level' }}
       </InlineItem>
-      <InlineItem v-if="isCourseVisible" label="Semester">
+      <InlineItem v-if="isCourseVisible" @onEdit="onEditLevel" label="Semester" :isEditable="isEditable">
         {{ data && data.semester && data.semester.name || 'No Semester' }}
       </InlineItem>
     </div>
@@ -25,16 +25,17 @@
       :isShown.sync="isShowChangeCurriculum"
       :courseId="courseId"
     />
-    <ChangeStudentCurriculum
+    <!-- <ChangeStudentCurriculum
       v-if="isShowChangeStudentCurriculum"
       @onCancel="isShowChangeStudentCurriculum = false"
       :data.sync="data.transcriptRecord"
       :isShown.sync="isShowChangeStudentCurriculum"
       :courseId="courseId"
-    />
+    /> -->
     <ChangeAcademicRecord
       @onCancel="isShowChangeLevelCourse = false"
-      :data.sync="data"
+      :data="data"
+      @update:data="v => $emit('update:data', v)"
       :isShown.sync="isShowChangeLevelCourse"
       v-if="isShowChangeLevelCourse"
     />
