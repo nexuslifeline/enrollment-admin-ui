@@ -7,7 +7,7 @@
       <div class="student-name">
         <AvatarMaker
           :avatarId="userId"
-          :size="30"
+          :size="33"
           :text="studentAvatarText"
           :src="studentPhoto"
           :borderSize="3"
@@ -63,7 +63,7 @@ export default {
       return this.data && `${this.data?.firstName?.charAt(0)}${this.data?.lastName?.charAt(0)}` || '';
     },
     userId() {
-      return this.data?.user?.id || 0;
+      return this.data?.id || this.data?.user?.id || 0;
     },
   }
 };

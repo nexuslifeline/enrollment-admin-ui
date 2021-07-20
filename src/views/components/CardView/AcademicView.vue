@@ -2,7 +2,7 @@
   <div>
     <div>
       <InlineItem label="Curriculum" @onEdit="onEditCurriculum" :isEditable="isEditable">
-        {{ transcriptRecord.curriculum && transcriptRecord.curriculum.name || 'No record found in Database' }}
+        {{ transcriptRecord.curriculum && transcriptRecord.curriculum.name || 'No Previous Academic Record found' }}
       </InlineItem>
       <InlineItem
         v-if="isCourseVisible"
