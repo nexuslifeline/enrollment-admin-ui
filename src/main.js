@@ -132,8 +132,10 @@ import {
   BIconArrowLeft,
   BIconImage,
   BIconTrash,
-  BIconX
+  BIconX,
+  BIconThreeDots
 } from 'bootstrap-vue';
+Vue.component('BIconThreeDots', BIconThreeDots);
 Vue.component('BIconX', BIconX);
 Vue.component('BIconTrash', BIconTrash);
 Vue.component('BIconImage', BIconImage);

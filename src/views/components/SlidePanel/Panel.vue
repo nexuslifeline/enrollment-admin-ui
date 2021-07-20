@@ -11,12 +11,15 @@
         </div>
       </div>
       <div class="slide-panel-content__container">
-        <div class="slide-panel-content__main">
-          <slot name="content"></slot>
-        </div>
-        <div class="slide-panel-content__bottom">
-          <slot name="bottom"></slot>
-        </div>
+        <BSpinner v-if="isBusy" class="m-auto" />
+        <template v-else>
+          <div class="slide-panel-content__main">
+            <slot name="content"></slot>
+          </div>
+          <div class="slide-panel-content__bottom">
+            <slot name="bottom"></slot>
+          </div>
+        </template>
       </div>
     </div>
   </transition>
@@ -25,7 +28,10 @@
 <script>
   export default {
     props: {
-
+      isBusy: {
+        type: [Boolean],
+        default: false
+      }
     }
   }
 </script>
@@ -58,7 +64,7 @@
 
 
   .slide-fade-leave-active {
-    transition: all 1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
   }
 
   .slide-fade-enter, .slide-fade-leave-to {
@@ -109,6 +115,11 @@
     border-left: 1px solid $light-gray-10;
     margin: 0;
     background: none;
+    outline: 0;
+
+    &:hover {
+      color: $blue;
+    }
   }
 
 </style>

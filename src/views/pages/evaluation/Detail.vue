@@ -1,5 +1,5 @@
 <template>
-  <Panel @onClose="$router.push({ name: 'Evaluation' })" showNotes>
+  <Panel @onClose="$router.push({ name: 'Evaluation' })" :isBusy="isLoading" showNotes>
     <template v-slot:header>
       <b-badge
         v-if="$options.EvaluationStatuses.APPROVED.academicRecordStatuses.includes(academicRecordStatusId)"
@@ -8,7 +8,7 @@
         Approved
       </b-badge>
       <b-badge
-        v-if="$options.EvaluationStatuses.REJECTED.academicRecordStatuses.includes(academicRecordStatusId)"
+        v-else-if="$options.EvaluationStatuses.REJECTED.academicRecordStatuses.includes(academicRecordStatusId)"
         variant="danger"
         class="ml-2">
         Rejected
@@ -28,7 +28,7 @@
         no-caret
         boundary="window">
         <template v-slot:button-content>
-          <v-icon name="ellipsis-h" />
+          <BIconThreeDots />
         </template>
         <b-dropdown-item
           @click="onAcceptTransferCredit"
@@ -92,14 +92,26 @@
       <div class="group__content">
         <h4 class="content-title">Evaluation Request</h4>
         <AcademicView
-          v-if="data && data.academicRecord"
+          v-if="data"
           :data="data.academicRecord"
           :isEditable="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
         />
+        <button
+          v-if="isAccessible($options.EvaluationPermissions.ACCEPT_CREDITS.id) && showOptions"
+          @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
+          <BIconPlus scale="1.2" class="mr-1" v-if="!isCreatingTranscript"/>
+          <v-icon name="spinner" spin v-if="isCreatingTranscript"></v-icon>
+          Accept Transfer Credit
+        </button>
         <h4 class="content-title">Last School Attended</h4>
         <SchoolView
           v-if="!!Object.keys(data).length"
           :data="data"
+        />
+        <StudentAttachments
+          v-if="!!Object.keys(data).length && !!Object.keys(data.academicRecord).length"
+          :studentId="data.academicRecord.student.id"
+          :owner="data.student"
         />
       </div>
 
@@ -128,10 +140,16 @@
       </template>
     </template>
     <template v-slot:bottom>
-      <b-button v-if="isAccessible($options.EvaluationPermissions.APPROVAL.id)" @click="onApproveRequest" variant="primary">
+      <b-button
+        v-if="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
+        @click="onApproveRequest" variant="primary"
+        :disabled="$options.EvaluationStatuses.APPROVED.academicRecordStatuses.includes(academicRecordStatusId)">
         Approve
       </b-button>
-      <b-button v-if="isAccessible($options.EvaluationPermissions.DISAPPROVAL.id)" @click="onRejectionRequest" variant="dark" class="ml-2">
+      <b-button
+        v-if="isAccessible($options.EvaluationPermissions.DISAPPROVAL.id)"
+        :disabled="$options.EvaluationStatuses.APPROVED.academicRecordStatuses.includes(academicRecordStatusId)"
+        @click="onRejectionRequest" variant="dark" class="ml-2">
         Reject
       </b-button>
     </template>
@@ -166,6 +184,7 @@ export default {
   data() {
     return {
       data: {},
+      isLoading: false,
       isApprovalShown: false,
       isRejectionShown: false,
       isCreatingTranscript: false,
@@ -206,12 +225,18 @@ export default {
     }
   },
   created() {
-    this.getEvaluation(this.evaluationId).then(({ data }) => {
-      this.data = data;
-      console.log('this', this.data)
-    });
+    this.loadEvaluation();
   },
   methods: {
+    loadEvaluation() {
+      this.isLoading = true;
+      this.getEvaluation(this.evaluationId).then(({ data }) => {
+        this.data = data;
+        this.isLoading = false;
+      }).catch((error) => {
+        this.isLoading = false;
+      });
+    },
     onApproveRequest() {
       const { curriculumId } = this.transcriptRecord
       if(!curriculumId) {
@@ -254,11 +279,9 @@ export default {
     border: 0;
     outline: none;
     background: none;
+    margin: 10px 0  25px 0;
     color: $blue;
     padding: 0;
-    position: absolute;
-    right: 20px;
-    top: 5px;
 
     &:hover {
       color: $dark-blue;
@@ -273,5 +296,17 @@ export default {
 
   .group__content {
     padding: 15px 25px;
+  }
+
+  .action__accept-credit {
+    border: 0;
+    outline: none;
+    background: none;
+    color: $blue;
+    padding: 0;
+
+    &:hover {
+      color: $dark-blue;
+    }
   }
 </style>

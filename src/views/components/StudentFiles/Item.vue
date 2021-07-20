@@ -59,6 +59,7 @@ export default {
     padding: 10px 15px;
     border: .5px solid $blue;
     padding-right: 0;
+    min-width: 250px;
 
     @include for-size(tablet-landscape-down) {
       flex-basis: 50%;

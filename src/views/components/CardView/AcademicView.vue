@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-5">
+  <div>
     <div>
       <InlineItem label="Curriculum" @onEdit="onEditCurriculum" :isEditable="isEditable">
         {{ transcriptRecord.curriculum && transcriptRecord.curriculum.name || 'No Curriculum' }}
@@ -9,13 +9,13 @@
         label="Course"
         @onEdit="onEditCourse"
         :isEditable="isEditable">
-        {{ data.course && data.course.name || 'No Course' }}
+        {{ data && data.course && data.course.name || 'No Course' }}
       </InlineItem>
       <InlineItem label="Level" @onEdit="onEditLevel" :isEditable="isEditable">
-        {{ data.level && data.level.name || 'No Level' }}
+        {{ data && data.level && data.level.name || 'No Level' }}
       </InlineItem>
       <InlineItem v-if="isCourseVisible" label="Semester">
-        {{ data.semester && data.semester.name || 'No Semester' }}
+        {{ data && data.semester && data.semester.name || 'No Semester' }}
       </InlineItem>
     </div>
     <ChangeCurriculum

@@ -9,8 +9,8 @@
     bodyClass="modal-body__container"
     :centered="true">
     <div class="modal-field-container overflow-visible">
-      <b-alert v-model="showSelectCurriculum" variant="danger">
-        Note: Changing SchoolCategory, Level, Course, Semester of the original request is required to re-select curriculum.
+      <b-alert v-model="showSelectCurriculum" variant="warning">
+        Please ensure that the <b>Curriculum</b> is align to the SchoolCategory, Level, Course and Semester.
       </b-alert>
       <b-form-group
         :state="forms.academicRecord.states.schoolCategoryId"
@@ -21,7 +21,6 @@
             @input="onSchoolCategoryChanged"
             label="name"
             placeholder="School Category"
-            class="mt-2"
             :clearable="false"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.schoolCategoryId  }"
             appendToBody
@@ -37,13 +36,13 @@
             @input="onLevelChanged"
             label="name"
             placeholder="Level"
-            class="mt-2"
             :clearable="false"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.levelId  }"
             appendToBody
           />
       </b-form-group>
       <b-form-group
+        v-if="$options.SchoolCategories.getEnum(selectedSchoolCategoryId).hasCourse"
         :state="forms.academicRecord.states.courseId"
         :invalid-feedback="forms.academicRecord.errors.courseId">
         <label class="required">Course</label>
@@ -54,13 +53,13 @@
             @input="onCourseChanged"
             label="name"
             placeholder="Course"
-            class="mt-2"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.courseId  }"
             appendToBody
           />
       </b-form-group>
       <b-form-group
+        v-if="$options.SchoolCategories.getEnum(selectedSchoolCategoryId).hasSemester"
         :state="forms.academicRecord.states.semesterId"
         :invalid-feedback="forms.academicRecord.errors.semesterId">
         <label class="required">Semester</label>
@@ -71,7 +70,6 @@
             @input="onSemesterChanged"
             label="name"
             placeholder="Semester"
-            class="mt-2"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.semesterId  }"
             appendToBody
@@ -81,7 +79,7 @@
         :state="forms.academicRecord.states.transcriptRecord"
         :invalid-feedback="forms.academicRecord.errors.transcriptRecord"
         v-if="showSelectCurriculum">
-        <label class="required"> Curriculum</label>
+        <label class="required">Curriculum</label>
           <!-- remove courseid to prevent filtered curr -->
           <SelectCurriculum
             :value="forms.academicRecord.fields.transcriptRecord.curriculum"
@@ -91,7 +89,6 @@
             :courseId="forms.academicRecord.fields.courseId"
             label="name"
             placeholder="Curriculum"
-            class="mt-2"
             :clearable="true"
             :class=" { 'is-invalid' : !!forms.academicRecord.errors.transcriptRecord  }"
             appendToBody
@@ -119,6 +116,7 @@ import { validate, reset } from '../../../helpers/forms';
 import { TranscriptRecordStatus } from '../../../helpers/enum';
 import { AcademicRecordApi, TranscriptRecordApi } from '../../../mixins/api';
 import { copyValue } from '../../../helpers/extractor';
+import { SchoolCategories } from '../../../helpers/enum';
 
 const transcriptRecordFields = {
   curriculumId: null
@@ -148,6 +146,7 @@ const academicErrorRecordFields = {
 }
 
 export default {
+  SchoolCategories,
   props: {
     isShown: {
       type: [Boolean]
@@ -190,6 +189,9 @@ export default {
     },
     schoolCategoryId() {
       return this.data?.schoolCategoryId
+    },
+    selectedSchoolCategoryId() {
+      return this.forms?.academicRecord?.fields?.schoolCategory?.id;
     },
     showSelectCurriculum() {
       const { schoolCategoryId, levelId, courseId, semesterId } = this.forms.academicRecord.fields
