@@ -4,6 +4,9 @@
     :showFooter="false"
     @onBack="$router.push(previousRoute)"
     backTitle="Enrollment List">
+    <template v-slot:status>
+      <ManualStageColumn :data="data"/>
+    </template>
     <template v-slot:content>
       <div class="quick-enroll__body">
         <div class="quick-enroll__side-panel">
@@ -100,6 +103,7 @@ import AcademicRecord from '../../components/AcademicRecord/AcademicRecord';
 import Enlistment from '../../components/SubjectEnlistment/Enlistment';
 import { AcademicRecordApi } from '../../../mixins/api';
 import { QuickEnrollSteps, AcademicRecordStatuses } from '../../../helpers/enum'
+import ManualStageColumn from '../../components/ColumnDetails/ManualStageColumn'
 
 export default {
   QuickEnrollSteps,
@@ -113,7 +117,8 @@ export default {
     Personal,
     Account,
     AcademicRecord,
-    Enlistment
+    Enlistment,
+    ManualStageColumn
   },
   data() {
     return {

@@ -8,11 +8,13 @@
         </button>
       </div>
       <slot name="header"></slot>
+      <div v-if="!!$slots.status" class="approval-view__header-right-actions">
+        <slot name="status"></slot>
+      </div>
       <div v-if="showOptions" class="approval-view__header-right-actions">
         <button v-if="showApprove" @click="$emit('onApproveRequest')" variant="dark" class="btn-action">
           Approve Request
         </button>
-
         <button v-if="showReject" @click="$emit('onRejectionRequest')" variant="dark" class="btn-action ml-2">
           Reject Request
         </button>

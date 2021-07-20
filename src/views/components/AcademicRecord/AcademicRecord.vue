@@ -316,11 +316,11 @@ const academicRecordFields = {
         // });
       },
       onSchoolYearChanged(schoolYear) {
-        this.data.schoolYearId = schoolYear?.id
+        this.data.schoolYearId = schoolYear?.id || null
         this.data.schoolYear = schoolYear
       },
       onSchoolCategoryChanged(schoolCategory) {
-        this.data.schoolCategoryId = schoolCategory?.id
+        this.data.schoolCategoryId = schoolCategory?.id || null
         this.data.schoolCategory = schoolCategory
 
         //reset data fields
@@ -340,7 +340,7 @@ const academicRecordFields = {
         this.data.transcriptRecord.curriculumId = null
       },
       onLevelChanged(level) {
-        this.data.levelId = level?.id
+        this.data.levelId = level?.id || null
         this.data.level = level
 
         //reset data fields
@@ -357,7 +357,7 @@ const academicRecordFields = {
         this.data.transcriptRecord.curriculumId = null
       },
       onCourseChanged(course) {
-        this.data.courseId = course?.id
+        this.data.courseId = course?.id || null
         this.data.course = course
 
         //reset data fields
@@ -371,18 +371,18 @@ const academicRecordFields = {
         this.data.transcriptRecord.curriculumId = null
       },
       onSemesterChanged(semester) {
-        this.data.semesterId = semester?.id
+        this.data.semesterId = semester?.id || null
         this.data.semester = semester
 
         this.data.sectionId = null
         this.data.section = null
       },
       onSectionChanged(section) {
-        this.data.sectionId = section?.id
+        this.data.sectionId = section?.id || null
         this.data.section = section
       },
       onCurriculumChanged(curriculum) {
-        this.data.transcriptRecord.curriculumId = curriculum?.id
+        this.data.transcriptRecord.curriculumId = curriculum?.id || null
         this.data.transcriptRecord.curriculum = curriculum
       }
     },

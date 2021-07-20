@@ -201,8 +201,7 @@
         label="name"
         placeholder="School Year"
         class="mt-2"
-        :clearable="false"
-      />
+        :clearable="false"/>
       <!--<v-select
         :options="SchoolCategories.values"
         :value="filters.academicRecord.schoolCategoryItem"
@@ -220,16 +219,14 @@
         label="name"
         placeholder="School Category"
         :clearable="false"
-        class="mt-2"
-      />
+        class="mt-2"/>
       <SelectLevel
         :value="filters.academicRecord.levelItem"
         @input="onLevelFilterChange"
         label="name"
         placeholder="Level"
         class="mt-2"
-        :schoolCategoryId="filters.academicRecord.schoolCategoryId"
-      />
+        :schoolCategoryId="filters.academicRecord.schoolCategoryId"/>
       <SelectCourse
         v-if="isCourseVisible"
         :value="filters.academicRecord.courseItem"
@@ -238,8 +235,7 @@
         placeholder="Course"
         class="mt-2"
         :schoolCategoryId="filters.academicRecord.schoolCategoryId"
-        :levelId="filters.academicRecord.levelId"
-      />
+        :levelId="filters.academicRecord.levelId"/>
       <SelectSemester
           v-if="isCourseVisible"
           :value="filters.academicRecord.semesterItem"
@@ -250,15 +246,26 @@
           :clearable="true"
           :searchable="false"
           :schoolCategoryId="filters.academicRecord.schoolCategoryId"
+          :levelId="filters.academicRecord.levelId"/>
+      <SelectSection
+          :value="filters.academicRecord.sectionItem"
+          @input="onSectionFilterChange"
+          label="name"
+          placeholder="Section"
+          class="mt-2"
+          :clearable="true"
+          :searchable="false"
+          :schoolCategoryId="filters.academicRecord.schoolCategoryId"
           :levelId="filters.academicRecord.levelId"
-        />
+          :courseId="filters.academicRecord.courseId"
+          :semesterId="filters.academicRecord.semesterId"/>
       <b-button
         class="mt-4"
         variant="outline-primary"
         size="sm"
         block
-        @click="onPreviewEnrolledList"
-        ><v-icon name="print" /> Preview</b-button>
+        @click="onPreviewEnrolledList">
+        <v-icon name="print" /> Preview</b-button>
     </template>
     <template v-slot:content>
       <ReportViewer v-if="isFileReady" :file="file" />
@@ -279,6 +286,7 @@ import SelectSchoolYear from '../../components/Dropdowns/SelectSchoolYear'
 import SelectLevel from '../../components/Dropdowns/SelectLevel'
 import SelectCourse from '../../components/Dropdowns/SelectCourse'
 import SelectSemester from '../../components/Dropdowns/SelectSemester'
+import SelectSection from '../../components/Dropdowns/SelectSection'
 
 import {
   AcademicRecordStatuses,
@@ -306,7 +314,8 @@ export default {
     SelectSchoolYear,
     SelectLevel,
     SelectCourse,
-    SelectSemester
+    SelectSemester,
+    SelectSection
   },
   mixins: [SchoolYearApi, LevelApi, CourseApi, AcademicRecordApi, ReportApi, Access],
   data() {
@@ -356,6 +365,8 @@ export default {
           courseItem: null,
           semesterId: null,
           semesterItem: null,
+          sectionId: null,
+          sectionItem: null,
         },
       },
       options: {
@@ -466,6 +477,7 @@ export default {
         levelId,
         courseId,
         semesterId,
+        sectionId
       } = this.filters.academicRecord;
       const params = {
         paginate: false,
@@ -475,6 +487,7 @@ export default {
         levelId,
         courseId,
         semesterId,
+        sectionId
       };
       this.file.type = null;
       this.file.src = null;
@@ -506,29 +519,51 @@ export default {
       const { academicRecord } = this.filters;
       academicRecord.schoolCategoryId = item?.id || 0;
       academicRecord.schoolCategoryItem = item;
+
       academicRecord.levelId = null,
       academicRecord.levelItem = null,
       academicRecord.courseId = null
       academicRecord.courseItem = null
       academicRecord.semesterId = null
       academicRecord.semesterItem = null
-      this.loadLevels()
+      academicRecord.sectionId = null
+      academicRecord.sectionItem = null
     },
     onLevelFilterChange(item) {
       const { academicRecord } = this.filters;
       academicRecord.levelId = item?.id || 0;
       academicRecord.levelItem = item;
+
+      academicRecord.courseId = null
+      academicRecord.courseItem = null
+      academicRecord.semesterId = null
+      academicRecord.semesterItem = null
+      academicRecord.sectionId = null
+      academicRecord.sectionItem = null
     },
     onCourseFilterChange(item) {
       const { academicRecord } = this.filters;
       academicRecord.courseId = item?.id || 0;
       academicRecord.courseItem = item;
+
+      academicRecord.semesterId = null
+      academicRecord.semesterItem = null
+      academicRecord.sectionId = null
+      academicRecord.sectionItem = null
     },
     onSemesterFilterChange(item) {
       const { academicRecord } = this.filters;
       academicRecord.semesterId = item?.id || 0;
       academicRecord.semesterItem = item;
+
+      academicRecord.sectionId = null
+      academicRecord.sectionItem = null
     },
+    onSectionFilterChange(item) {
+      const { academicRecord } = this.filters;
+      academicRecord.sectionId = item?.id || 0;
+      academicRecord.sectionItem = item;
+    }
   },
   computed: {
     isCourseVisible() {
