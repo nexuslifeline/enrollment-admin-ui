@@ -1,36 +1,23 @@
 <template>
-  <div>
-     <ActiveViewItems>
-      <ActiveViewItem label="Curriculum" @onEdit="onEditCurriculum" :isEditable="isEditable">
-        <p>
-          {{ transcriptRecord.curriculum && transcriptRecord.curriculum.name || 'No Curriculum' }}
-        </p>
-      </ActiveViewItem>
-      <ActiveViewItem
+  <div class="mb-5">
+    <div>
+      <InlineItem label="Curriculum" @onEdit="onEditCurriculum" :isEditable="isEditable">
+        {{ transcriptRecord.curriculum && transcriptRecord.curriculum.name || 'No Curriculum' }}
+      </InlineItem>
+      <InlineItem
         v-if="isCourseVisible"
         label="Course"
         @onEdit="onEditCourse"
         :isEditable="isEditable">
-        <p>
-          {{ data.course && data.course.name || 'No Course' }}
-        </p>
-      </ActiveViewItem>
-      <ActiveViewItem label="Level" @onEdit="onEditLevel" :isEditable="isEditable">
-        <p>
-          {{ data.level && data.level.name || 'No Level' }}
-        </p>
-      </ActiveViewItem>
-       <!-- <ActiveViewItem label="Student Curriculum" @onEdit="onEditStudentCurriculum" isEditable>
-        <p>
-          {{ transcriptRecord.studentCurriculum && transcriptRecord.studentCurriculum.name || 'No Curriculum' }}
-        </p>
-      </ActiveViewItem> -->
-      <ActiveViewItem v-if="isCourseVisible" label="Semester">
-        <p>
-          {{ data.semester && data.semester.name || 'No Semester' }}
-        </p>
-      </ActiveViewItem>
-    </ActiveViewItems>
+        {{ data.course && data.course.name || 'No Course' }}
+      </InlineItem>
+      <InlineItem label="Level" @onEdit="onEditLevel" :isEditable="isEditable">
+        {{ data.level && data.level.name || 'No Level' }}
+      </InlineItem>
+      <InlineItem v-if="isCourseVisible" label="Semester">
+        {{ data.semester && data.semester.name || 'No Semester' }}
+      </InlineItem>
+    </div>
     <ChangeCurriculum
       v-if="isShowChangeCurriculum"
       @onCancel="isShowChangeCurriculum = false"

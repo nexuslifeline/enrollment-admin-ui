@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="onLinkClick" v-if="isLinkShown" class="btn-link" type="button">
+    <button @click="onLinkClick" v-if="isLinkShown" class="btn-link" :class="{ noMargin: noMargin }" type="button">
       <BIconArrowLeft v-if="isShown" scale="1.2" class="mr-1"/>
       <BIconPlus v-else scale="1.2" class="mr-1" />
       {{ isShown ? hideLinkText : linkText }}
@@ -26,6 +26,10 @@ export default {
     hideOnContentShow: {
       type: [Boolean],
       default: true
+    },
+    noMargin: {
+      type: [Boolean],
+      default: false
     }
   },
   data() {
@@ -55,6 +59,11 @@ export default {
     color: $blue;
     padding: 0;
     margin: 10px 0 15px 0;
+
+    &.noMargin {
+      margin: 0;
+      padding: 7px 0;
+    }
   }
 
 </style>

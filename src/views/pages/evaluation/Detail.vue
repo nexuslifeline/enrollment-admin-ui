@@ -1,104 +1,145 @@
 <template>
-  <ApprovalView
-    @onBack="$router.push(previousRoute)"
-    @onApproveRequest="onApproveRequest"
-    @onRejectionRequest="onRejectionRequest"
-    :showApprove="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
-    :showReject="isAccessible($options.EvaluationPermissions.DISAPPROVAL.id)"
-    backTitle="Evaluation"
-    :showOptions="showOptions">
-     <template v-slot:detail>
-       <div class="mt-2">
-         <b-tabs content-class="mt-3">
-          <b-tab title="Personal">
-            <AvatarMaker
-              :avatarId="userId"
-              :size="110"
-              :text="studentAvatarText"
-              :src="studentPhoto"
-              :borderSize="3"
-              class="m-auto"
-            />
-            <StudentView
-              v-if="data && student"
-              :data="student"
-              :studentCategory="data.academicRecord.studentCategory"
-            />
-          </b-tab>
-          <b-tab title="Education">
-
-          </b-tab>
-        </b-tabs>
-       </div>
+  <Panel @onClose="$router.push({ name: 'Evaluation' })" showNotes>
+    <template v-slot:header>
+      <b-badge
+        v-if="$options.EvaluationStatuses.APPROVED.academicRecordStatuses.includes(academicRecordStatusId)"
+        variant="success"
+        class="ml-2">
+        Approved
+      </b-badge>
+      <b-badge
+        v-if="$options.EvaluationStatuses.REJECTED.academicRecordStatuses.includes(academicRecordStatusId)"
+        variant="danger"
+        class="ml-2">
+        Rejected
+      </b-badge>
+      <b-badge
+        v-else
+        variant="warning"
+        class="ml-2">
+        Pending
+      </b-badge>
     </template>
-     <template v-slot:content>
-       <div class="approval__content">
-        <b-tabs content-class="mt-3">
-          <b-tab title="Request">
-            <div class="tab__content">
-              <button 
-                v-if="isAccessible($options.EvaluationPermissions.ACCEPT_CREDITS.id) && showOptions"
-                @click="onAcceptTransferCredit" class="action__accept-credit" type="button">
-                <BIconPlus scale="1.2" class="mr-1" v-if="!isCreatingTranscript"/>
-                <v-icon name="spinner" spin v-if="isCreatingTranscript"></v-icon>
-                Accept Transfer Credit
-              </button>
-              <AcademicView
-                v-if="data && data.academicRecord"
-                :data="data.academicRecord"
-                :isEditable="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
+    <template v-slot:actions>
+      <b-dropdown
+        right
+        variant="link"
+        toggle-class="text-decoration-none"
+        no-caret
+        boundary="window">
+        <template v-slot:button-content>
+          <v-icon name="ellipsis-h" />
+        </template>
+        <b-dropdown-item
+          @click="onAcceptTransferCredit"
+          v-if="isAccessible($options.EvaluationPermissions.ACCEPT_CREDITS.id) && showOptions">
+          Accept Transfer Credit
+        </b-dropdown-item>
+        <b-dropdown-item @click="onApproveRequest" >
+          Approve Request
+        </b-dropdown-item>
+        <b-dropdown-item @click="onRejectionRequest">
+          Reject Request
+        </b-dropdown-item>
+      </b-dropdown>
+    </template>
+    <template v-slot:content>
+      <SlidePanelNotes>
+        Please review the details provided by the Student.
+        If something is wrong you can override the details 
+        <b-link :to="{ name: 'Student Edit', params: { studentId: student && student.id } }">here</b-link> 
+        or you can just <b>Reject</b> this request to notify the Student.
+      </SlidePanelNotes>
+
+      <div class="group__content">
+        <template v-if="student">
+          <h4 class="content-title">Student Profile</h4>
+          <StudentView
+            v-if="student"
+            :data="student"
+            :studentCategory="data.academicRecord.studentCategory"
+          />
+        </template>
+        <template v-if="student && student.education">
+          <LinkVisibilityToggler
+            linkText="View Educational Background"
+            hideLinkText="Hide Educational Background"
+            :hideOnContentShow="false"
+            noMargin>
+            <h4 class="content-title mt-3">Educational Background</h4>
+              <EducationView
+                :data="student.education"
               />
-              <SchoolView
-                v-if="!!Object.keys(data).length"
-                :data="data"
+          </LinkVisibilityToggler>
+        </template>
+        <template v-if="student && student.family">
+          <LinkVisibilityToggler
+            linkText="View Family Background"
+            hideLinkText="Hide Family Background"
+            :hideOnContentShow="false"
+            noMargin>
+            <h4 class="content-title mt-3">Family Background</h4>
+              <FamilyView
+                :data="student.family"
               />
-              <div class="p-3">
-                <StudentAttachments
-                  v-if="!!Object.keys(data).length"
-                  :studentId="data.academicRecord.student.id"
-                  :owner="data.student"
-                />
-              </div>
-            </div>
-          </b-tab>
-          <b-tab title="Account History">
-            <div class="tab__content">
+          </LinkVisibilityToggler>
+        </template>
+      </div>
+      <SlidePanelNotes>
+        If the student does not have curriculum this means that the student does not have previous Academic record in our Database so you need to set it manually.
+        Make sure that <b>Curriculum</b>, <b>Level</b> and <b>Course</b> are correct.
+      </SlidePanelNotes>
+      <div class="group__content">
+        <h4 class="content-title">Evaluation Request</h4>
+        <AcademicView
+          v-if="data && data.academicRecord"
+          :data="data.academicRecord"
+          :isEditable="isAccessible($options.EvaluationPermissions.APPROVAL.id)"
+        />
+        <h4 class="content-title">Last School Attended</h4>
+        <SchoolView
+          v-if="!!Object.keys(data).length"
+          :data="data"
+        />
+      </div>
 
-            </div>
-          </b-tab>
-          <b-tab title="Academic Record">
-            <div class="tab__content">
+      <template>
+        <ApproveEvaluation
+          :isShown.sync="isApprovalShown"
+          :evaluationId="evaluationId"
+          @onApproved="onEvaluationUpdated"
+          @onCancel="isApprovalShown = false"
+        />
+        <RejectEvaluation
+          :isShown.sync="isRejectionShown"
+          :evaluationId="evaluationId"
+          @onRejected="onEvaluationUpdated"
+          @onCancel="isRejectionShown = false"
+        />
 
-            </div>
-          </b-tab>
-        </b-tabs>
-       </div>
-      <ApproveEvaluation
-        :isShown.sync="isApprovalShown"
-        :evaluationId="evaluationId"
-        @onApproved="onEvaluationUpdated"
-        @onCancel="isApprovalShown = false"
-      />
-      <RejectEvaluation
-        :isShown.sync="isRejectionShown"
-        :evaluationId="evaluationId"
-        @onRejected="onEvaluationUpdated"
-        @onCancel="isRejectionShown = false"
-      />
-
-      <b-modal
-        size="xl"
-        v-if="showCreditGrades"
-        v-model="showCreditGrades"
-        hide-footer
-        title="Accept Transfer Credit">
-        <Transcript :transcriptId="data.academicRecord.transcriptRecordId"/>
-      </b-modal>
-     </template>
-  </ApprovalView>
+        <b-modal
+          size="xl"
+          v-if="showCreditGrades"
+          v-model="showCreditGrades"
+          hide-footer
+          title="Accept Transfer Credit">
+          <Transcript :transcriptId="data.academicRecord.transcriptRecordId"/>
+        </b-modal>
+      </template>
+    </template>
+    <template v-slot:bottom>
+      <b-button v-if="isAccessible($options.EvaluationPermissions.APPROVAL.id)" @click="onApproveRequest" variant="primary">
+        Approve
+      </b-button>
+      <b-button v-if="isAccessible($options.EvaluationPermissions.DISAPPROVAL.id)" @click="onRejectionRequest" variant="dark" class="ml-2">
+        Reject
+      </b-button>
+    </template>
+  </Panel>
 </template>
 
 <script>
+import Panel from '../../components/SlidePanel/Panel';
 import ApproveEvaluation from '../../components/ApprovalModals/Evaluation';
 import RejectEvaluation from '../../components/RejectionModals/Evaluation';
 import { AcademicRecordApi, EvaluationApi, TranscriptRecordApi } from '../../../mixins/api';
@@ -106,6 +147,7 @@ import Access from '../../../mixins/utils/Access';
 import { showNotification } from '../../../helpers/forms';
 import Transcript from '../../components/Transcript/Transcript'
 import { EvaluationStatuses, EvaluationPermissions } from "../../../helpers/enum";
+
 export default {
   EvaluationStatuses,
   EvaluationPermissions,
@@ -118,7 +160,8 @@ export default {
   components: {
     ApproveEvaluation,
     RejectEvaluation,
-    Transcript
+    Transcript,
+    Panel
   },
   data() {
     return {
@@ -135,6 +178,9 @@ export default {
     },
     academicRecord() {
       return this.data?.academicRecord
+    },
+    academicRecordStatusId() {
+      return this.data?.academicRecord?.academicRecordStatusId;
     },
     studentPhoto() {
       const path = this.student?.photo?.hashName || '';
@@ -162,6 +208,7 @@ export default {
   created() {
     this.getEvaluation(this.evaluationId).then(({ data }) => {
       this.data = data;
+      console.log('this', this.data)
     });
   },
   methods: {
@@ -222,5 +269,9 @@ export default {
     margin-left: -1px;
     width: 100%;
     position: relative;
+  }
+
+  .group__content {
+    padding: 15px 25px;
   }
 </style>

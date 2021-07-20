@@ -13,18 +13,22 @@ import FooterAction from './views/components/ModalFooter/ActionBar';
 import ShowMore from './views/components/CoDepartment/ShowMore';
 import FileViewer from './views/components/FileViewer';
 import ApprovalItem from './views/components/ApprovalContainer/Item';
+import InlineItem from './views/components/ApprovalContainer/InlineItem';
 import ApprovalView from './views/components/ApprovalContainer/PageLayout';
 import AcademicView from './views/components/CardView/AcademicView';
 import StudentAttachments from './views/components/StudentFiles/List';
 import SchoolView from './views/components/CardView/SchoolView';
 import EducationView from './views/components/CardView/EducationView';
 import StudentView from './views/components/CardView/StudentView';
+import FamilyView from './views/components/CardView/FamilyView';
 import ActiveRowViewer from './views/components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewLinks from './views/components/ActiveRowViewer/ActiveViewLinks';
 import ActiveViewHeader from './views/components/ActiveRowViewer/ActiveViewHeader';
 import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
 import PageContent from './views/components/PageContainer/PageContent';
+import SlidePanel from './views/components/SlidePanel/Panel';
+import SlidePanelNotes from './views/components/SlidePanel/PanelNotes';
 import SelectLevelCourses from './views/components/Dropdowns/SelectCourseLevel';
 import SelectCategory from './views/components/Dropdowns/SelectCategory';
 import SelectStudentBillingTerms from './views/components/Dropdowns/SelectStudentBillingTerms';
@@ -127,8 +131,10 @@ import {
   BIconPencil,
   BIconArrowLeft,
   BIconImage,
-  BIconTrash
+  BIconTrash,
+  BIconX
 } from 'bootstrap-vue';
+Vue.component('BIconX', BIconX);
 Vue.component('BIconTrash', BIconTrash);
 Vue.component('BIconImage', BIconImage);
 Vue.component('BIconArrowLeft', BIconArrowLeft);
@@ -161,7 +167,8 @@ Vue.component('BIconCaretDownFill', BIconCaretDownFill);
 Vue.component('BIconCaretUpFill', BIconCaretUpFill);
 Vue.component('BProgress', BProgress)
 Vue.component('BIconPlus', BIconPlus);
-
+Vue.component('SlidePanel', SlidePanel);
+Vue.component('SlidePanelNotes', SlidePanelNotes);
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'
@@ -240,12 +247,14 @@ Vue.component('ActiveViewHeader', ActiveViewHeader);
 Vue.component('ActiveViewItems', ActiveViewItems);
 Vue.component('ActiveViewItem', ActiveViewItem);
 Vue.component('StudentView', StudentView);
+Vue.component('FamilyView', FamilyView);
 Vue.component('SchoolView', SchoolView);
 Vue.component('StudentAttachments', StudentAttachments);
 Vue.component('EducationView', EducationView);
 Vue.component('AcademicView', AcademicView);
 Vue.component('ApprovalView', ApprovalView);
 Vue.component('ApprovalItem', ApprovalItem);
+Vue.component('InlineItem', InlineItem);
 Vue.component('FileViewer', FileViewer);
 Vue.component('ShowMore', ShowMore);
 Vue.component('FooterAction', FooterAction);

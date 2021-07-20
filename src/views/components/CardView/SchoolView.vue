@@ -1,22 +1,14 @@
 <template>
   <div>
-    <ActiveViewItems>
-      <ActiveViewItem label="Last School Attended">
-        <p>
-          {{ data.lastSchoolAttended }}
-        </p>
-      </ActiveViewItem>
-      <ActiveViewItem label="Last School Level">
-        <p>
-          {{ data.lastSchoolLevel && data.lastSchoolLevel.name || 'N/A' }}
-        </p>
-      </ActiveViewItem>
-      <ActiveViewItem label="Attended Period">
-        <p>
-          {{ data.lastSchoolYearFrom }} - {{ data.lastSchoolYearTo }}
-        </p>
-      </ActiveViewItem>
-    </ActiveViewItems>
+    <InlineItem label="Last School">
+      {{ data.lastSchoolAttended }}
+    </InlineItem>
+    <InlineItem label="Level">
+      {{ data.lastSchoolLevel && data.lastSchoolLevel.name || 'N/A' }}
+    </InlineItem>
+    <InlineItem label="Period">
+      {{ data.lastSchoolYearFrom }} - {{ data.lastSchoolYearTo }}
+    </InlineItem>
   </div>
 </template>
 <script>
