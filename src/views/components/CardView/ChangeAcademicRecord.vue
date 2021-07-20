@@ -9,7 +9,7 @@
     bodyClass="modal-body__container"
     :centered="true">
     <div class="modal-field-container overflow-visible">
-      <b-alert v-model="showSelectCurriculum" variant="warning">
+      <b-alert v-model="isShownCurriculum" variant="warning">
         Please ensure that the <b>Curriculum</b> is align to the SchoolCategory, Level, Course and Semester.
       </b-alert>
       <b-form-group
@@ -74,7 +74,7 @@
       <b-form-group
         :state="forms.academicRecord.states.transcriptRecord"
         :invalid-feedback="forms.academicRecord.errors.transcriptRecord"
-        v-if="showSelectCurriculum">
+        v-if="isShownCurriculum">
         <label class="required">Curriculum</label>
           <!-- remove courseid to prevent filtered curr -->
           <SelectCurriculum
@@ -188,7 +188,7 @@ export default {
     selectedSchoolCategoryId() {
       return this.forms?.academicRecord?.fields?.schoolCategory?.id;
     },
-    showSelectCurriculum() {
+    isShownCurriculum() {
       const { schoolCategoryId, levelId, courseId, semesterId } = this.forms.academicRecord.fields
       if(this.schoolCategoryId !== schoolCategoryId || this.levelId !== levelId || this.courseId !== courseId || this.semesterId !== semesterId) {
         return true
@@ -213,7 +213,10 @@ export default {
         courseId: fields.courseId,
         schoolCategoryId: fields.schoolCategoryId,
         semesterId: fields.semesterId,
-        transcriptRecord: { curriculumId: fields.transcriptRecord.curriculumId }
+        // only include curriculum in the payload if the field is visible
+        ...(this.isShownCurriculum && {
+          transcriptRecord: { curriculumId: fields.transcriptRecord.curriculumId }
+        })
       }
 
       this.updateAcademicRecord(payLoad, academicRecordId).then(({ data }) => {
