@@ -13,7 +13,7 @@
         {{ data.collegeDegreeYearTo || '' }}
       </span>
       <span v-else>
-        No provided Details
+        No provided details
       </span>
     </InlineItem>
     <InlineItem label="High School">

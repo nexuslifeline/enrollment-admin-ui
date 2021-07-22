@@ -45,10 +45,10 @@
     </template>
     <template v-slot:content>
       <SlidePanelNotes>
-        Please review the details provided by the Student.
+        Please review the details provided by the student.
         If something is wrong you can override the details 
         <b-link :to="{ name: 'Student Edit', params: { studentId: student && student.id } }">here</b-link> 
-        or you can just <b>Reject</b> this request to notify the Student.
+        or you can just <b>Reject</b> this request to notify the student.
       </SlidePanelNotes>
 
       <div class="group__content">
