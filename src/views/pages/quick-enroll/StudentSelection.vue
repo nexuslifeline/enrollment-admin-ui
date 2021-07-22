@@ -51,6 +51,36 @@
         </b-form-group>
       </template>
       <template v-if="isShownAcademic">
+        <template v-if="!isShownExistingStudent">
+          <InputGroup>
+            <InputContainer>
+              <b-form-group
+                label="First Name"
+                labelClass="required"
+                :state="forms.student.states.firstName"
+                :invalid-feedback="forms.student.errors.firstName">
+                <b-form-input
+                  v-model="firstName"
+                  type="text"
+                >
+                </b-form-input>
+              </b-form-group>
+            </InputContainer>
+            <InputContainer>
+              <b-form-group
+                label="Last Name"
+                labelClass="required"
+                :state="forms.student.states.lastName"
+                :invalid-feedback="forms.student.errors.lastName">
+                <b-form-input
+                  v-model="lastName"
+                  type="text"
+                >
+                </b-form-input>
+              </b-form-group>
+            </InputContainer>
+          </InputGroup>
+        </template>
         <template >
           <InputGroup>
             <InputContainer>
@@ -131,7 +161,7 @@
             </InputContainer>
           </InputGroup>
         </template>
-       </template>
+      </template>
       <template v-else>
         <TileMenu
           @onSelect="onSelectMenu"
@@ -184,6 +214,11 @@ const academicRecordErrorFields = {
   courseId: null
 }
 
+const studentErrorFields = {
+  firstName: null,
+  lastName: null
+}
+
 export default {
   AcademicRecordStatuses,
   SchoolCategories,
@@ -215,6 +250,8 @@ export default {
       levelId: null,
       semesterId: null,
       courseId: null,
+      firstName: null,
+      lastName: null,
       selectedStudent: null,
       menus: [
         { label: 'Select Existing Student' },
@@ -224,6 +261,10 @@ export default {
         academicRecord: {
           states: { ...academicRecordErrorFields },
           errors: { ...academicRecordErrorFields }
+        },
+        student: {
+          states: { ...studentErrorFields },
+          errors: { ...studentErrorFields }
         }
       }
       // academicRecordId: 1 // added hardcoded id for testing only
@@ -242,7 +283,7 @@ export default {
   },
   methods: {
     onProceed() {
-      const { academicRecord } = this.forms
+      const { academicRecord, student } = this.forms
       reset(academicRecord)
       if (this.selectedIndex === 0) {
         //existing student
@@ -278,7 +319,8 @@ export default {
         });
       }  else if (this.selectedIndex === 1) {
         this.isConfirmBusy = true
-        this.addStudent({}).then(({ data }) => {
+        reset(student)
+        this.addStudent({ firstName: this.firstName || null, lastName: this.lastName || null }).then(({ data }) => {
           const studentId = data.id
           this.selectedStudent = data
           this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
@@ -296,7 +338,11 @@ export default {
             this.selectedIndex = 0
             this.isShownExistingStudent = true
           });
-        })
+        }).catch((error) => {
+          const errors = error.response.data.errors;
+          this.isConfirmBusy = false
+          validate(student, errors, this)
+        });
       }
     },
     resetState() {

@@ -2,7 +2,7 @@
   <b-media>
     <template v-slot:aside>
       <AvatarMaker
-        :avatarId="data.student.id"
+        :avatarId="userId"
         :size="33"
         :text="avatarText"
         :src="$options.getFilePath(photoHashName)"
@@ -21,7 +21,7 @@
           {{ `Manual` }}
         </span>
         <span
-          v-if="data.student.studentNo"
+          v-if="data && data.student && data.student.studentNo"
           v-b-tooltip.hover
           :title="`Student Number: ${data.student.studentNo}`"
           class="label__student-no">
@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="text-muted">
-      {{ (data.student.user && data.student.user.username) || 'No Account' }}
+      {{ userName }}
     </div>
   </b-media>
 </template>
@@ -60,16 +60,22 @@ export default {
   },
   computed: {
     avatarText() {
-      const { firstName, lastName } = this.data.student;
+      const { firstName = '', lastName = '' } = this.data?.student || {};
       return `${firstName.charAt(0)}${lastName.charAt(0)}`;
     },
     photoHashName() {
-      const { photo } = this.data.student;
+      const { photo = {} } = this.data?.student || {};
       return photo?.hashName || '';
     },
     studentName() {
       return this.data?.student?.name?.trim() || 'No Name';
-    }
+    },
+    userName() {
+      return this.data?.student?.user?.username || 'No Account';
+    },
+    userId() {
+      return this.data?.student?.id || this.data?.student?.user?.id || 0;
+    },
   },
 };
 </script>
