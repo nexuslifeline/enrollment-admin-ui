@@ -1,13 +1,13 @@
 <template>
   <div>
     <InlineItem label="Last School">
-      {{ data.lastSchoolAttended }}
+      {{ lastSchoolLevel }}
     </InlineItem>
     <InlineItem label="Level">
-      {{ data.lastSchoolLevel && data.lastSchoolLevel.name || 'N/A' }}
+      {{ lastSchoolLevel }}
     </InlineItem>
     <InlineItem label="Period">
-      {{ data.lastSchoolYearFrom }} - {{ data.lastSchoolYearTo }}
+      {{ lastSchoolPeriod }}
     </InlineItem>
   </div>
 </template>
@@ -18,6 +18,22 @@ export default {
     data: {
       type: [Object]
     }
+  },
+  computed: {
+    lastSchoolLevel() {
+      return this.data?.lastSchoolAttended || 'No provided details';
+    },
+    lastSchoolLevel() {
+      return this.data?.lastSchoolLevel?.name || 'No provided details';
+    },
+    lastSchoolPeriod() {
+      return this.data?.lastSchoolYearFrom && this.data?.lastSchoolYearTo
+        ? `${this.data.lastSchoolYearFrom} - ${this.data.lastSchoolYearTo}`
+        : '';
+    }
+  },
+  created() {
+    console.log('created', this.data)
   }
 };
 </script>

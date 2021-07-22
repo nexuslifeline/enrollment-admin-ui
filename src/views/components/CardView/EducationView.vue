@@ -29,7 +29,7 @@
         {{ data.highSchoolCourseYearTo || '' }}
       </span>
       <span v-else>
-        No provided Details
+        No provided details
       </span>
     </InlineItem>
   </div>
