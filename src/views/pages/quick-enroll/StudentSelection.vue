@@ -22,12 +22,12 @@
               variant="warning">
               <h5>Existing Record Found!</h5>
               The Student has an existing manually entered Academic Record.
-              Click 
+              Click
               <b-link
               @click.prevent="$emit('update:isShown', false)"
               :to="{
                 name: 'Academic Record Applications Detail', params: { academicRecordId: selectedStudent.latestAcademicRecord.id }
-              }">here</b-link> 
+              }">here</b-link>
               to review and continue.
             </b-alert>
           </template>
@@ -90,10 +90,10 @@
                 :state="forms.academicRecord.states.schoolYearId"
                 :invalid-feedback="forms.academicRecord.errors.schoolYearId">
               <SelectSchoolYear
-                v-model="schoolYearId"
-                :reduce="option => option.id"
+                :value="schoolYear"
                 label="name"
                 :clearable="false"
+                @input="onSchoolYearChanged"
               />
             </b-form-group>
             </InputContainer>
@@ -197,7 +197,7 @@
 <script>
 import { copyValue } from '../../../helpers/extractor';
 import { AcademicRecordStatuses, SchoolCategories } from '../../../helpers/enum';
-import { AcademicRecordApi, StudentApi } from '../../../mixins/api';
+import { AcademicRecordApi, SchoolYearApi, StudentApi } from '../../../mixins/api';
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import TileMenu from '../../components/TileSelector/List';
 import SelectSchoolYear from '../../components/Dropdowns/SelectSchoolYear'
@@ -237,7 +237,7 @@ export default {
     SelectCategory,
     SelectPaginated
   },
-  mixins: [ StudentApi, AcademicRecordApi],
+  mixins: [ StudentApi, AcademicRecordApi, SchoolYearApi],
   data() {
     return {
       selectedIndex: null,
@@ -246,6 +246,7 @@ export default {
       isShownAcademic: false,
       isConfirmBusy: false,
       schoolYearId: null,
+      schoolYear: null,
       schoolCategoryId: null,
       levelId: null,
       semesterId: null,
@@ -266,7 +267,8 @@ export default {
           states: { ...studentErrorFields },
           errors: { ...studentErrorFields }
         }
-      }
+      },
+      schoolYears: []
       // academicRecordId: 1 // added hardcoded id for testing only
     }
   },
@@ -280,6 +282,9 @@ export default {
       this.semesterId = null;
       this.courseId = null;
     }
+  },
+  created() {
+    this.loadSchoolYears()
   },
   methods: {
     onProceed() {
@@ -371,7 +376,18 @@ export default {
     getStudentInfo(student) {
       this.selectedStudent = student;
     },
-  }
+    loadSchoolYears() {
+      const params = { paginate: false}
+      this.getSchoolYearList(params).then(({ data }) => {
+        this.schoolYear = data.find(sy => sy.isActive === 1)
+        this.schoolYearId =  this.schoolYear?.id
+      })
+    },
+    onSchoolYearChange(schoolYear) {
+      this.schoolYear = schoolYear
+      this.schoolYearId =  schoolYear?.id || null
+    }
+  },
 };
 </script>
 <style lang="scss" scoped>
