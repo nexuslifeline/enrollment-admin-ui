@@ -10,6 +10,12 @@
           <Education :data="data.education || {}"/>
         </b-tab>
         <b-tab title="Academic Record">
+          <Evaluation
+            title="Latest Evaluation"
+            v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
+            :data="data.latestAcademicRecord.evaluation"
+          />
+
           <AcademicRecord
             v-if="data.latestAcademicRecord"
             :data="data.latestAcademicRecord"
@@ -34,6 +40,7 @@
 
 <script>
 import AcademicRecord from '../../components/AcademicRecord/AcademicRecord';
+import Evaluation from '../../components/Evaluation/Evaluation'
 import OnboardingSettings from '../../components/OnboardingSettings/Onboarding';
 import Personal from '../../components/Student/Personal';
 import Account from '../../components/Student/Account';
@@ -52,7 +59,8 @@ export default {
     Family,
     Subjects,
     OnboardingSettings,
-    AcademicRecord
+    AcademicRecord,
+    Evaluation
   },
   mixins: [ StudentApi ],
   data() {
