@@ -383,7 +383,7 @@ export default {
         this.schoolYearId =  this.schoolYear?.id
       })
     },
-    onSchoolYearChange(schoolYear) {
+    onSchoolYearChanged(schoolYear) {
       this.schoolYear = schoolYear
       this.schoolYearId =  schoolYear?.id || null
     }
