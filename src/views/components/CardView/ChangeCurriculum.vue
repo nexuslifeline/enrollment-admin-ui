@@ -22,6 +22,7 @@
             :clearable="true"
             :courseId="courseId"
             :class=" { 'is-invalid' : !!forms.transcriptRecord.errors.curriculumId  }"
+            appendToBody
           />
       </b-form-group>
     </div>
