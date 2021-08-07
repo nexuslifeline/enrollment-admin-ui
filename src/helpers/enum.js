@@ -776,6 +776,10 @@ export const StudentGradePermissions = new Enum({
   EDIT: { id: 341, name: 'Edit' },
 });
 
+export const DroppedStudentPermissions = new Enum({
+  ADD: { id: 391, name: 'ADD' },
+});
+
 export const CollectionReportPermissions = new Enum({
   COLLECTION: { id: 351, name: 'Collection' },
 });

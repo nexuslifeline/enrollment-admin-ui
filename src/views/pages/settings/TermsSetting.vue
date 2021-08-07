@@ -1,6 +1,6 @@
 <template>
   <PageContent 
-    title="Terms Setting"
+    title="Billing Terms Setting"
     @refresh="loadTerms()"
     :createButtonVisible="false">
     <template v-slot:filters>
@@ -36,8 +36,8 @@
         </div>
         <div v-else>
           <div class="title-container">
-            <h4>TERMS SETTING - {{ $store.state.schoolYear.name }}</h4>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias ipsum ab qui vitae laborum dolorum, accusantium autem quisquam. Aliquid vitae explicabo rerum, esse molestiae rem cumque doloremque dolores! Perferendis, pariatur.</p>
+            <h4>BILLING TERMS SETTINGS - {{ $store.state.schoolYear.name }}</h4>
+            <p>In this Settings, you can define the length of time given to students to pay off their amount due in a specific school year. It could be divided by Grading Period(ie. Prelim, Midterm, Finals).</p>
           </div>
           <div class="tabs-container">
             <!-- <SchoolCategoryTabs

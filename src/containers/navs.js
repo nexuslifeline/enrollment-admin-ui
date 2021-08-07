@@ -31,7 +31,8 @@ import {
   StudentGradePermissions,
   SettingPermissions,
   EClearancePermissions,
-  EClearanceClearingPermissions
+  EClearanceClearingPermissions,
+  DroppedStudentPermissions
 } from '../helpers/enum';
 
 export default [
@@ -176,7 +177,8 @@ export default [
     to: '/instructor',
     permissionIds: [
       ...StudentGradePermissions.getIds(),
-      ...EClearancePermissions.getIds()
+      ...EClearancePermissions.getIds(),
+      ...DroppedStudentPermissions.getIds()
     ],
     children: [
       {
@@ -190,9 +192,9 @@ export default [
         permissionIds: StudentGradePermissions.getIds()
       },
       {
-        label: 'Dropped Students',
+        label: 'Manage Dropped Students',
         to: '/instructor/dropped-student',
-        // permissionIds: StudentGradePermissions.getIds()
+        permissionIds: DroppedStudentPermissions.getIds()
       },
 
     ]
@@ -233,9 +235,14 @@ export default [
     ],
     children: [
       {
-        label: 'Clearance Signatories',
-        to: '/maintenance/clearance-signatories',
-        permissionIds: EClearancePermissions.getIds()
+        label: 'Group & Permissions',
+        to: '/maintenance/user-group',
+        permissionIds: UserGroupPermissions.getIds()
+      },
+      {
+        label: 'School Year',
+        to: '/maintenance/school-year',
+        permissionIds: SchoolYearPermissions.getIds()
       },
       {
         label: 'Department',
@@ -247,18 +254,13 @@ export default [
         to: '/maintenance/semester'
       },
       {
-        label: 'School Year',
-        to: '/maintenance/school-year',
-        permissionIds: SchoolYearPermissions.getIds()
+        label: 'Clearance Signatories',
+        to: '/maintenance/clearance-signatories',
+        permissionIds: EClearancePermissions.getIds()
       },
       {
         label: 'Category',
         to: '/maintenance/school-category'
-      },
-      {
-        label: 'Group & Permissions',
-        to: '/maintenance/user-group',
-        permissionIds: UserGroupPermissions.getIds()
       },
       {
         label: 'Fee Category',

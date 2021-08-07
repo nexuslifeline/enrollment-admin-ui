@@ -22,10 +22,7 @@
       <div class="title-container">
         <h4>REQUIREMENTS SETTINGS</h4>
         <p>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias ipsum
-          ab qui vitae laborum dolorum, accusantium autem quisquam. Aliquid
-          vitae explicabo rerum, esse molestiae rem cumque doloremque dolores!
-          Perferendis, pariatur.
+          In this settings, you can define all the requirements or documents that the student must accomplish for the entire course, program or class.
         </p>
       </div>
       <div class="tabs-container">

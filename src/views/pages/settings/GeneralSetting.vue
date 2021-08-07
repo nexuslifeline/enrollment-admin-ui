@@ -4,10 +4,7 @@
       <div class="header-container">
         <h4>GENERAL SETTINGS</h4>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. In,
-          voluptate? Modi quibusdam ea eius saepe rem, delectus cumque provident
-          ex a perspiciatis magni aliquid minus nihil. Vitae laborum autem
-          sequi!
+         In General Settings, the basic configuration for the application can be set.
         </p>
       </div>
       <div class="content-container">

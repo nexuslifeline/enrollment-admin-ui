@@ -37,7 +37,7 @@
         <div v-else>
           <div class="title-container">
             <h4>GRADING PERIOD SETTING - {{ $store.state.schoolYear.name }}</h4>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias ipsum ab qui vitae laborum dolorum, accusantium autem quisquam. Aliquid vitae explicabo rerum, esse molestiae rem cumque doloremque dolores! Perferendis, pariatur.</p>
+            <p>In this Settings, you can define the segments or period of time for the entire course, program or class. Typically for college these are Prelim, Midterm and Finals.</p>
           </div>
           <div class="tabs-container">
             <!-- <SchoolCategoryTabs

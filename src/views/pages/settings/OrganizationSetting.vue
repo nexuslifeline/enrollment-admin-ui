@@ -3,7 +3,9 @@
     <b-overlay :show="isLoading" rounded="sm">
       <div class="header-container">
         <h4>ORGANIZATION SETTINGS</h4>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. In, voluptate? Modi quibusdam ea eius saepe rem, delectus cumque provident ex a perspiciatis magni aliquid minus nihil. Vitae laborum autem sequi!</p>
+        <p>
+          In Organization Settings, you can set the name of the organization, address, contact numbers and upload the organization's logo.
+        </p>
       </div>
       <div class="content-container">
         <div class="logo-container">
