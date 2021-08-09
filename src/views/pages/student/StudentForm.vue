@@ -2,7 +2,7 @@
   <CenterContainer>
     <template v-if="!!Object.keys(data).length">
       <BackLink />
-      <b-tabs content-class="mt-4">
+      <b-tabs content-class="mt-4" lazy>
         <b-tab title="Profile Information" active>
           <Personal :data="data" />
           <Family :data="data.family || {}" />
@@ -10,19 +10,21 @@
           <Education :data="data.education || {}"/>
         </b-tab>
         <b-tab title="Academic Record">
-          <Evaluation
-            title="Latest Evaluation"
-            v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
-            :data="data.latestAcademicRecord.evaluation"
-          />
-
           <AcademicRecord
             v-if="data.latestAcademicRecord"
             :data="data.latestAcademicRecord"
             :allowChangeStatus="true"
             title="Latest Academic Record"
           />
+          <Evaluation
+            title="Latest Evaluation"
+            v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
+            :data="data.latestAcademicRecord.evaluation"
+          />
           <Subjects :studentId="$route.params.studentId" />
+        </b-tab>
+        <b-tab title="Requirements">
+          <StudentRequirements />
         </b-tab>
         <b-tab title="Settings">
           <Account
@@ -39,6 +41,7 @@
 </template>
 
 <script>
+import StudentRequirements from '../../components/StudentRequirements/List';
 import AcademicRecord from '../../components/AcademicRecord/AcademicRecord';
 import Evaluation from '../../components/Evaluation/Evaluation'
 import OnboardingSettings from '../../components/OnboardingSettings/Onboarding';
@@ -60,7 +63,8 @@ export default {
     Subjects,
     OnboardingSettings,
     AcademicRecord,
-    Evaluation
+    Evaluation,
+    StudentRequirements
   },
   mixins: [ StudentApi ],
   data() {

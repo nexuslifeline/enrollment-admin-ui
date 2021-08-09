@@ -1,7 +1,7 @@
 <template>
   <div class="term__list-item">
     <div class="item__content">
-      <vText size="s" weight="bold">
+      <vText :fontSize="18" weight="bold">
         {{ (data.documentType &&  data.documentType.name) || 'No Name' }}
       </vText>
       <vText v-if="data.documentType && data.documentType.description" size="s" color="light">
