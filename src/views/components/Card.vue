@@ -4,6 +4,7 @@
       <vText :size="titleSize" flex="1" weight="bold">
         {{ title }}
       </vText>
+      <slot name="header-action"></slot>
       <b-button v-if="showAction" @click="$emit('onAddNew')" type="button" variant="primary">
         {{ actionLabel }}
       </b-button>
@@ -22,7 +23,6 @@
           Refresh
         </b-dropdown-item>
       </b-dropdown>
-      <slot name="header-action"></slot>
       <span v-if="isCompleted" class="c-card__completion-status">Completed!</span>
     </div>
     <div class="c-card__body" :class="{ noPadding: noPaddingBody }">

@@ -7,7 +7,7 @@
         variant="dark"
         size="sm"
         @click="$emit('onDelete')"
-        :disabled="isConfirmBusy || isDeleteBusy || isDisbledDelete">
+        :disabled="isConfirmBusy || isDeleteBusy || isDisabledDelete">
         <v-icon name="spinner" spin v-if="isDeleteBusy" />
         {{ deleteText }}
       </b-button>
