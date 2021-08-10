@@ -24,7 +24,7 @@
           <Subjects :studentId="$route.params.studentId" />
         </b-tab>
         <b-tab title="Requirements">
-          <StudentRequirements />
+          <StudentRequirements :studentId="data.id"/>
         </b-tab>
         <b-tab title="Settings">
           <Account

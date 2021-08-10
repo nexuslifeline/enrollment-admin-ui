@@ -9,17 +9,22 @@
     @hidden="$emit('update:isShown', false)"
     :centered="true">
     <div class="modal-field-container overflow-visible">
-     <b-form-group>
-        <label class="required">Name</label>
-        <!-- Change to SelectDocumentType -->
-        <SelectCategory v-model="data.documentType" />
+      <b-form-group
+        label="Document Type"
+        labelClass="required"
+        :state="states.documentTypeId"
+        :invalid-feedback="errors.documentTypeId">
+        <SelectDocumentType v-model="data.documentType" label="name" />
       </b-form-group>
       <b-form-group>
         <label>Description</label>
         <b-form-textarea v-model="data.description" />
       </b-form-group>
-      <b-form-group>
-        <label>School Category</label>
+      <b-form-group
+        label="School Category"
+        labelClass="required"
+        :state="states.schoolCategoryId"
+        :invalid-feedback="errors.schoolCategoryId">
         <SelectCategory v-model="data.schoolCategory" />
       </b-form-group>
     </div>
@@ -39,12 +44,14 @@
 <script>
 import FooterAction from '../../components/ModalFooter/ActionBar';
 import { SchoolCategories, Semesters } from '../../../helpers/enum.js'
+import SelectDocumentType from "../../components/Dropdowns/SelectDocumentType";
 
 export default {
   SchoolCategories,
   Semesters,
   components: {
-    FooterAction
+    FooterAction,
+    SelectDocumentType
   },
   props: {
     isShown: {
@@ -66,6 +73,12 @@ export default {
       type: [Boolean],
       default: false
     },
+    states: {
+      type: [Object]
+    },
+    errors: {
+      type: [Object]
+    }
   },
   computed: {
     isEditing() {

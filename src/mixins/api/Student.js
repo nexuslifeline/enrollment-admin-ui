@@ -52,6 +52,12 @@ export default {
     },
     addStudentUser(data, studentId){
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/${studentId}/user`, data);
-    }
+    },
+    getStudentRequirements(studentId, schoolCategoryId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/school-categories/${schoolCategoryId}/requirements`, { params: params });
+    },
+    updateStudentRequirement(studentId, schoolCategoryId, requirementId, data){
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/students/${studentId}/school-categories/${schoolCategoryId}/requirements/${requirementId}`, data)
+    },
   }
 }

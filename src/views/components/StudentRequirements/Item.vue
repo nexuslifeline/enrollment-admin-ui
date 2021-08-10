@@ -15,7 +15,7 @@
       <InputGroup>
         <InputInline>
           <Toggle :value="data.isSubmitted" @input="checked => $emit('onChange', { data, checked })" />
-          <span class="ml-2">Dropped</span>
+          <span class="ml-2">Submitted</span>
         </InputInline>
       </InputGroup>
     </div>
