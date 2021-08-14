@@ -638,7 +638,7 @@ export const StudentPermissions = new Enum({
   EDIT: { id: 142, name: 'Edit' },
   UPDATE_STUDENT_ACCOUNT: { id: 143, name: 'Update Student Account' },
   DELETE: { id: 144, name: 'Delete' },
-  UPDATE_ACADEMIC_RECORDS: { id: 145, name: 'Update Academic Records' },
+  EDIT_ACADEMIC_RECORDS: { id: 145, name: 'Update Academic Records' },
   EDIT_REQUIREMENTS: { id: 146, name: 'Edit Requirements' },
   EDIT_ONBOARDING: { id: 147, name: 'Edit Onboarding' },
   EDIT_EVALUATION: { id: 148, name: 'Edit Evaluation' },

@@ -9,30 +9,42 @@
           <Address :data="data.address || {}" />
           <Education :data="data.education || {}"/>
         </b-tab>
-        <b-tab title="Student Record">
-          <AcademicRecord
-            v-if="data.latestAcademicRecord"
-            :data="data.latestAcademicRecord"
-            :allowChangeStatus="true"
-            title="Latest Academic Record"
-          />
-          <Evaluation
-            title="Latest Evaluation"
-            v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
-            :data="data.latestAcademicRecord.evaluation"
-          />
+        <b-tab v-if="isStudentRecordTabVisible" title="Student Record">
+          <template v-if="isAccessible($options.StudentPermissions.EDIT_ACADEMIC_RECORDS.id)">
+            <AcademicRecord
+              v-if="data.latestAcademicRecord"
+              :data="data.latestAcademicRecord"
+              :allowChangeStatus="true"
+              title="Latest Academic Record"
+            />
+          </template>
+          <template v-if="isAccessible($options.StudentPermissions.EDIT_EVALUATION.id)">
+            <Evaluation
+              title="Latest Evaluation"
+              v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
+              :data="data.latestAcademicRecord.evaluation"
+            />
+          </template>
         </b-tab>
-        <b-tab title="Account">
-          <Account
-            :data="data.user || {}"
-            :currentRoute="{ name: 'Student Edit', params: { ...$route.params } }"
-            :addAccountRoute="{ name: 'Create Student Account', params: { ...$route.params } }"
-          />
+        <b-tab title="Account" v-if="isAccountTabVisible">
+          <template v-if="isAccessible($options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id)">
+            <Account
+              :data="data.user || {}"
+              :currentRoute="{ name: 'Student Edit', params: { ...$route.params } }"
+              :addAccountRoute="{ name: 'Create Student Account', params: { ...$route.params } }"
+            />
+          </template>
         </b-tab>
-        <b-tab title="Settings">
-          <Subjects :studentId="$route.params.studentId" />
-          <StudentRequirements :studentId="data.id"/>
-          <OnboardingSettings :data="data" />
+        <b-tab v-if="isSettingsTabVisible" title="Settings">
+          <template v-if="isAccessible($options.StudentPermissions.MANAGE_DROPPED_SUBJECTS.id)">
+            <Subjects :studentId="$route.params.studentId" />
+          </template>
+          <template v-if="isAccessible($options.StudentPermissions.EDIT_REQUIREMENTS.id)">
+            <StudentRequirements :studentId="data.id"/>
+          </template>
+          <template v-if="isAccessible($options.StudentPermissions.EDIT_ONBOARDING.id)">
+            <OnboardingSettings :data="data" />
+          </template>
         </b-tab>
       </b-tabs>
       <!-- v-if="!!Object.keys(data.latestAcademicRecord).length" -->
@@ -52,8 +64,11 @@ import Education from '../../components/Student/Education';
 import Family from '../../components/Student/Family';
 import Subjects from '../../components/StudentSubjects/List'; // added here for the meantime while testing the component
 import { StudentApi } from '../../../mixins/api';
+import { StudentPermissions } from '../../../helpers/enum';
+import  Access  from '../../../mixins/utils/Access'
 
 export default {
+  StudentPermissions,
   components: {
     Personal,
     Account,
@@ -66,10 +81,28 @@ export default {
     Evaluation,
     StudentRequirements
   },
-  mixins: [ StudentApi ],
+  mixins: [Access, StudentApi],
   data() {
     return {
       data: {}
+    }
+  },
+  computed: {
+    isAccountTabVisible() {
+      return this.isAccessible(this.$options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id);
+    },
+    isStudentRecordTabVisible() {
+      return this.isAccessible([
+        this.$options.StudentPermissions.EDIT_ACADEMIC_RECORDS.id,
+        this.$options.StudentPermissions.EDIT_EVALUATION.id
+      ]);
+    },
+    isSettingsTabVisible() {
+      return this.isAccessible([
+        this.$options.StudentPermissions.MANAGE_DROPPED_SUBJECTS.id,
+        this.$options.StudentPermissions.EDIT_REQUIREMENTS.id,
+        this.$options.StudentPermissions.EDIT_ONBOARDING.id
+      ]);
     }
   },
   methods: {

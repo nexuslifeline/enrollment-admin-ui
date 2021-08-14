@@ -94,14 +94,9 @@
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id,
-                      $options.StudentPermissions.EDIT.id,
-                      $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id,
-                      $options.StudentPermissions.DELETE.id,
-                    ])
-                  "
+                  v-if="isAccessible($options.StudentPermissions.values.filter(
+                    (v => ![$options.StudentPermissions.ADD.id, $options.StudentPermissions.DELETE.id].includes(v.id))
+                  ))"
                   right
                   variant="link"
                   toggle-class="text-decoration-none"

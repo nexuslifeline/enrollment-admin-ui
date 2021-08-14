@@ -125,7 +125,7 @@
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>
-              <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+              <!-- v-if="isAccessible($options.StudentPermissions.EDIT_ACADEMIC_RECORDS.id)" -->
               <b-dropdown-item :to="{ name: 'Evaluation Detail', params: { evaluationId: row.item.id }}">
                 {{
                   evaluationStatuses.APPROVED.academicRecordStatuses.includes(row.item.academicRecord.academic_record_status_id)

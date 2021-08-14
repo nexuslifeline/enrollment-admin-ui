@@ -237,7 +237,7 @@
               <template v-slot:button-content>
                 <v-icon name="ellipsis-v" />
               </template>
-              <!-- v-if="isAccessible($options.StudentPermissions.UPDATE_ACADEMIC_RECORDS.id)" -->
+              <!-- v-if="isAccessible($options.StudentPermissions.EDIT_ACADEMIC_RECORDS.id)" -->
               <b-dropdown-item
                 v-if="
                   row.item.transcriptRecordStatusId ===

@@ -177,7 +177,7 @@ export default [
     to: '/instructor',
     permissionIds: [
       ...StudentGradePermissions.getIds(),
-      ...EClearancePermissions.getIds(),
+      ...EClearanceClearingPermissions.getIds(),
       ...DroppedStudentPermissions.getIds()
     ],
     children: [
