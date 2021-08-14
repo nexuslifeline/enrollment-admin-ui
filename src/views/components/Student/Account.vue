@@ -1,6 +1,6 @@
 <template>
   <Card
-    :title="hasAccount ? 'Account Settings' : 'Create User Account'"
+    :title="hasAccount ? 'Manage Student Account' : 'Create User Account'"
     actionLabel="Create Account"
     @onAddNew="onAddNew"
     titleSize="m"

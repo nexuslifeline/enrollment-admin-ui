@@ -3,13 +3,13 @@
     <template v-if="!!Object.keys(data).length">
       <BackLink />
       <b-tabs content-class="mt-4" lazy>
-        <b-tab title="Profile Information" active>
+        <b-tab title="Profile Info" active>
           <Personal :data="data" />
           <Family :data="data.family || {}" />
           <Address :data="data.address || {}" />
           <Education :data="data.education || {}"/>
         </b-tab>
-        <b-tab title="Academic Record">
+        <b-tab title="Student Record">
           <AcademicRecord
             v-if="data.latestAcademicRecord"
             :data="data.latestAcademicRecord"
@@ -21,17 +21,17 @@
             v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
             :data="data.latestAcademicRecord.evaluation"
           />
-          <Subjects :studentId="$route.params.studentId" />
         </b-tab>
-        <b-tab title="Requirements">
-          <StudentRequirements :studentId="data.id"/>
-        </b-tab>
-        <b-tab title="Settings">
+        <b-tab title="Account">
           <Account
             :data="data.user || {}"
             :currentRoute="{ name: 'Student Edit', params: { ...$route.params } }"
             :addAccountRoute="{ name: 'Create Student Account', params: { ...$route.params } }"
           />
+        </b-tab>
+        <b-tab title="Settings">
+          <Subjects :studentId="$route.params.studentId" />
+          <StudentRequirements :studentId="data.id"/>
           <OnboardingSettings :data="data" />
         </b-tab>
       </b-tabs>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card
-      title="Student Subjects"
+      title="Manage Dropped Subjects"
       titleSize="m">
       <template v-slot:header-action>
         <div class="header__action-dropdown">

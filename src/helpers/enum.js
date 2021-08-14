@@ -639,6 +639,10 @@ export const StudentPermissions = new Enum({
   UPDATE_STUDENT_ACCOUNT: { id: 143, name: 'Update Student Account' },
   DELETE: { id: 144, name: 'Delete' },
   UPDATE_ACADEMIC_RECORDS: { id: 145, name: 'Update Academic Records' },
+  EDIT_REQUIREMENTS: { id: 146, name: 'Edit Requirements' },
+  EDIT_ONBOARDING: { id: 147, name: 'Edit Onboarding' },
+  EDIT_EVALUATION: { id: 148, name: 'Edit Evaluation' },
+  MANAGE_DROPPED_SUBJECTS: { id: 149, name: 'Manage Dropped Subjects' },
 });
 
 export const PersonnelPermissions = new Enum({
