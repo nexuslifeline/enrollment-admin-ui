@@ -247,6 +247,16 @@ label {
   }
 }
 
+.badge-danger {
+  background-color: $light-red;
+  border: 1px solid $red;
+  color: $red;
+
+  &:before {
+    background-color: $red;
+  }
+}
+
 .badge-secondary {
   color: $bluish-gray;
   background-color: #ced2d8;
