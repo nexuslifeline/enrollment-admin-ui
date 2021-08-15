@@ -3,15 +3,6 @@
     :title="title"
     titleSize="m"
     :hasFooter="true">
-    <!-- <CardNote v-if="showNotes">
-      <template v-if="!!notes">
-        {{ notes }}
-      </template>
-      <template v-else>
-        It is recommended to complete the <b>Academic Record</b> section first before
-        adding Subject to be able to find the right subjects for the Student.
-      </template>
-    </CardNote> -->
     <InputGroup>
       <InputContainer>
         <b-form-group
@@ -126,6 +117,10 @@ const evaluationFields = {
         type: Boolean,
         default: false
       },
+      isAutoSave: {
+        type: Boolean,
+        default: true
+      },
     },
     mixins: [ EvaluationApi ],
     components: {
@@ -143,7 +138,9 @@ const evaluationFields = {
       }
     },
     created() {
-      this.$watch('data', this.autoSave, { deep: true, immediate: false });
+      if (this.isAutoSave) {
+        this.$watch('data', this.autoSave, { deep: true, immediate: false });
+      }
     },
     methods: {
       autoSave: debounce(function() { this.onSave() }, 4000),
@@ -167,7 +164,7 @@ const evaluationFields = {
         }
         reset(evaluation)
         this.isProcessing = true
-        this.updateEvaluation(evaluationData, evaluationId).then(({ data }) => {
+        this.updateEvaluation(evaluationData, evaluationId).then(() => {
           showNotification(this, 'success', 'Evaluation Record Saved!.')
           this.isProcessing = false
         }).catch((error) => {

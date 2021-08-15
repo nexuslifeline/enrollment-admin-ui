@@ -3,15 +3,17 @@
     :title="title"
     titleSize="m"
     :hasFooter="true">
-    <CardNote v-if="showNotes">
-      <template v-if="!!notes">
-        {{ notes }}
-      </template>
-      <template v-else>
-        It is recommended to complete the <b>Academic Record</b> section first before
-        adding Subject to be able to find the right subjects for the Student.
-      </template>
-    </CardNote>
+    <template v-if="!isReadOnly">
+      <CardNote v-if="showNotes">
+        <template v-if="!!notes">
+          {{ notes }}
+        </template>
+        <template v-else>
+          It is recommended to complete the <b>Academic Record</b> section first before
+          adding Subject to be able to find the right subjects for the Student.
+        </template>
+      </CardNote>
+    </template>
     <InputGroup>
       <InputContainer>
         <b-form-group
@@ -72,6 +74,7 @@
             label="name"
             @input="data.studentCategoryId = $event"
             :disabled="isReadOnly"
+            :clearable="false"
           />
         </b-form-group>
       </InputContainer>
@@ -104,6 +107,7 @@
             @input="onSemesterChanged"
             :schoolCategoryId="data.schoolCategoryId"
             :disabled="isReadOnly"
+            :clearable="false"
           />
         </b-form-group>
       </InputContainer>
@@ -139,6 +143,7 @@
             label="name"
             @input="data.studentTypeId = $event"
             :disabled="isReadOnly"
+            :clearable="false"
           />
         </b-form-group>
       </InputContainer>
@@ -166,6 +171,7 @@
           :reduce="option => option.id"
           label="name"
           :disabled="isReadOnly"
+          :clearable="false"
         />
       </InputContainer>
       <InputContainer />
@@ -230,6 +236,10 @@ const academicRecordFields = {
       isReadOnly: {
         type: Boolean,
         default: false
+      },
+      isAutoSave: {
+        type: Boolean,
+        default: true
       }
     },
     mixins: [AcademicRecordApi, TranscriptRecordApi],
@@ -255,7 +265,9 @@ const academicRecordFields = {
       }
     },
     created() {
-      this.$watch('data', this.autoSave, { deep: true, immediate: false });
+      if (this.isAutoSave) {
+        this.$watch('data', this.autoSave, { deep: true, immediate: false });
+      }
     },
     methods: {
       autoSave: debounce(function() { this.onSave() }, 4000),

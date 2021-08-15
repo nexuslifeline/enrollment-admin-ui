@@ -16,6 +16,7 @@
               :data="data.latestAcademicRecord"
               :allowChangeStatus="true"
               title="Latest Academic Record"
+              :isAutoSave="false"
             />
           </template>
           <template v-if="isAccessible($options.StudentPermissions.EDIT_EVALUATION.id)">
@@ -23,6 +24,7 @@
               title="Latest Evaluation"
               v-if="data.latestAcademicRecord && data.latestAcademicRecord.evaluation"
               :data="data.latestAcademicRecord.evaluation"
+              :isAutoSave="false"
             />
           </template>
         </b-tab>
