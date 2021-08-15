@@ -307,6 +307,10 @@ export default {
   props: {
     data: {
       type: [Object]
+    },
+    isAutoSave: {
+      type: [Boolean],
+      default: true
     }
   },
   mixins: [ StudentApi ],
@@ -327,7 +331,9 @@ export default {
   },
   created() {
     copyValue(this.data, this.forms.address.fields);
-    this.registerObservers();
+    if (this.isAutoSave) {
+      this.registerObservers();
+    }
   },
   methods: {
     registerObservers() {
@@ -340,14 +346,14 @@ export default {
         currentBarangay,
         currentCityTown,
         currentProvince,
-        currentDistrict,
+        // currentDistrict,
         currentPostalCode,
         currentCountryId,
         permanentHouseNoStreet,
         permanentBarangay,
         permanentCityTown,
         permanentProvince,
-        permanentDistrict,
+        // permanentDistrict,
         permanentPostalCode,
         permanentCountryId
       } = this.forms.address.fields;
@@ -355,19 +361,19 @@ export default {
         !!currentBarangay &&
         !!currentCityTown &&
         !!currentProvince &&
-        !!currentDistrict &&
+        // !!currentDistrict &&
         !!currentPostalCode &&
         !!currentCountryId &&
         !!permanentHouseNoStreet &&
         !!permanentBarangay &&
         !!permanentCityTown &&
         !!permanentProvince &&
-        !!permanentDistrict &&
+        // !!permanentDistrict &&
         !!permanentPostalCode &&
         !!permanentCountryId;
       this.$emit('onCompletionChange', this.isCompleted);
     },
-    autoSave: debounce(function() { this.onSave() }, 4000),
+    autoSave: debounce(function() { if(this.isCompleted) this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { address } = this.forms
@@ -394,7 +400,7 @@ export default {
         }
       }
 
-      this.updateStudent(data, this.studentId).then(({ data }) => {
+      this.updateStudent(data, this.studentId).then(() => {
         this.isProcessing = false
         showNotification(this, 'success', 'Address has been saved.')
       }).catch(error => {

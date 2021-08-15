@@ -230,7 +230,7 @@ const academicRecordFields = {
       isReadOnly: {
         type: Boolean,
         default: false
-      },
+      }
     },
     mixins: [AcademicRecordApi, TranscriptRecordApi],
     components: {
@@ -269,12 +269,11 @@ const academicRecordFields = {
           semesterId,
           studentTypeId,
           sectionId,
-          transcriptRecordId,
           academicRecordStatusId,
           studentCategoryId,
           transcriptRecord: { curriculumId }
         } = this.data
-        const { academicRecord, transcriptRecord } = this.forms
+        const { academicRecord } = this.forms
         const academicRecordData = {
           schoolCategoryId,
           schoolYearId,
@@ -289,7 +288,7 @@ const academicRecordFields = {
         }
         reset(academicRecord)
         this.isProcessing = true
-        this.updateAcademicRecord(academicRecordData, academicRecordId).then(({ data }) => {
+        this.updateAcademicRecord(academicRecordData, academicRecordId).then(() => {
           //need to call transript record own update for the observer to run in backend
           showNotification(this, 'success', 'Academic Record Saved!.')
           this.isProcessing = false
@@ -298,7 +297,6 @@ const academicRecordFields = {
           //   })
         }).catch((error) => {
           const errors = error.response.data.errors;
-          console.log(error)
           this.isProcessing = false;
           validate(academicRecord, errors, this);
         });

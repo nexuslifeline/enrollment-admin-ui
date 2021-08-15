@@ -161,6 +161,10 @@ export default {
   props: {
     data: {
       type: [Object]
+    },
+    isAutoSave: {
+      type: [Boolean],
+      default: true
     }
   },
   mixins: [StudentApi],
@@ -179,7 +183,9 @@ export default {
   },
   created() {
     copyValue(this.data, this.forms.family.fields);
-    this.registerObservers();
+    if (this.isAutoSave) {
+      this.registerObservers();
+    }
   },
   methods: {
     registerObservers() {
@@ -196,7 +202,7 @@ export default {
       this.isCompleted = !!fatherName && !!motherName && !!parentGuardianName && !!parentGuardianContactNo;
       this.$emit('onCompletionChange', this.isCompleted);
     },
-    autoSave: debounce(function() { this.onSave() }, 4000),
+    autoSave: debounce(function() { if(this.isCompleted) this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { family } = this.forms

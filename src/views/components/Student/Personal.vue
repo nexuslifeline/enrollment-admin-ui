@@ -164,6 +164,10 @@ export default {
     isReadOnly: {
       type: [Boolean],
       default: false
+    },
+    isAutoSave: {
+      type: [Boolean],
+      default: true
     }
   },
   components: {
@@ -200,7 +204,9 @@ export default {
   created() {
     const { profile } = this.forms
     copyValue(this.data, profile.fields);
-    this.registerObservers();
+    if (this.isAutoSave) {
+      this.registerObservers();
+    }
   },
   methods: {
     registerObservers() {
@@ -212,7 +218,7 @@ export default {
       this.isCompleted = !!firstName && !!lastName && !!civilStatusId && !!birthDate;
       this.$emit('onCompletionChange', this.isCompleted);
     },
-    autoSave: debounce(function() { this.onSave() }, 4000),
+    autoSave: debounce(function() { if(this.isCompleted) this.onSave() }, 2000),
     onSave() {
       this.isProcessing = true
       const { profile } = this.forms

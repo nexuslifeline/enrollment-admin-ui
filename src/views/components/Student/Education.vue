@@ -178,6 +178,10 @@ export default {
   props: {
     data: {
       type: [Object]
+    },
+    isAutoSave: {
+      type: [Boolean],
+      default: true
     }
   },
   mixins: [ StudentApi ],
