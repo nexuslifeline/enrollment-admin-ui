@@ -19,6 +19,7 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        isPersist
       />
       <SelectLevel
         :value="filters.section.levelItem"

@@ -37,6 +37,7 @@
         label="name"
         placeholder="School Category"
         class="mt-2"
+        isPersist
       />
       <v-select
         :options="options.levels.items"

@@ -1,6 +1,6 @@
 <template>
     <PageContent
-      title="Rate Sheeet Management"
+      title="Rate Sheet Management"
       @toggleFilter="isFilterVisible = !isFilterVisible"
       @refresh="loadFeesOfLevel"
       :filterVisible="isFilterVisible"
@@ -24,6 +24,7 @@
           label="name"
           placeholder="School Category"
           class="mt-2"
+          isPersist
         />
         <v-select
           :options="options.levels.fixItems"

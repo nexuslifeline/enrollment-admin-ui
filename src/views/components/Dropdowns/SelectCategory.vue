@@ -54,6 +54,10 @@ export default {
       type: [Boolean],
       default: false
     },
+    isPersist: {
+      type: [Boolean],
+      default: false
+    },
   },
   data() {
     return {
@@ -62,9 +66,26 @@ export default {
       ) || []
     }
   },
+  created() {
+    if (this.isPersist) {
+      this.$watch('value', this.storeLocal, { deep: true, immediate: false });
+      this.showDefaultSchoolCategory();
+    }
+  },
   methods: {
     onInput(item) {
       this.$emit('input', item);
+    },
+    storeLocal() {
+      localStorage.setItem('schoolCategory', this.value ? JSON.stringify(this.value) : '');
+    },
+    getStoreCategory() {
+      const category = localStorage.getItem('schoolCategory');
+      return category ? JSON.parse(category) : null;
+    },
+    showDefaultSchoolCategory() {
+      const category = this.getStoreCategory();
+      if (category) this.onInput(category)
     }
   }
 };

@@ -213,13 +213,15 @@
         :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
         :clearable="false"
       />-->
-       <SelectCategory
+      <SelectCategory
         :value="filters.academicRecord.schoolCategoryItem"
         @input="onCategoryFilterChange"
         label="name"
         placeholder="School Category"
         :clearable="false"
-        class="mt-2"/>
+        class="mt-2"
+        isPersist
+      />
       <SelectLevel
         :value="filters.academicRecord.levelItem"
         @input="onLevelFilterChange"
