@@ -643,6 +643,7 @@ export const StudentPermissions = new Enum({
   EDIT_ONBOARDING: { id: 147, name: 'Edit Onboarding' },
   EDIT_EVALUATION: { id: 148, name: 'Edit Evaluation' },
   MANAGE_DROPPED_SUBJECTS: { id: 149, name: 'Manage Dropped Subjects' },
+  MANAGE_INITIAL_BILLING: { id: 1001, name: 'Manage Initial Billing' },
 });
 
 export const PersonnelPermissions = new Enum({

@@ -28,6 +28,14 @@
             />
           </template>
         </b-tab>
+        <b-tab title="Billing" v-if="isBillingTabVisible">
+          <template v-if="isAccessible($options.StudentPermissions.MANAGE_INITIAL_BILLING.id)">
+            <InitialBilling
+              v-if="data.latestAcademicRecord"
+              :academicRecordId="data.latestAcademicRecord.id"
+            />
+          </template>
+        </b-tab>
         <b-tab title="Account" v-if="isAccountTabVisible">
           <template v-if="isAccessible($options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id)">
             <Account
@@ -55,6 +63,7 @@
 </template>
 
 <script>
+import InitialBilling from '../../components/InitialBilling/InitialBilling';
 import StudentRequirements from '../../components/StudentRequirements/List';
 import AcademicRecord from '../../components/AcademicRecord/AcademicRecord';
 import Evaluation from '../../components/Evaluation/Evaluation'
@@ -81,7 +90,8 @@ export default {
     OnboardingSettings,
     AcademicRecord,
     Evaluation,
-    StudentRequirements
+    StudentRequirements,
+    InitialBilling
   },
   mixins: [Access, StudentApi],
   data() {
@@ -92,6 +102,9 @@ export default {
   computed: {
     isAccountTabVisible() {
       return this.isAccessible(this.$options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id);
+    },
+    isBillingTabVisible() {
+      return this.isAccessible(this.$options.StudentPermissions.MANAGE_INITIAL_BILLING.id);
     },
     isStudentRecordTabVisible() {
       return this.isAccessible([
