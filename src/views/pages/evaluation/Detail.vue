@@ -86,8 +86,8 @@
         </template>
       </div>
       <SlidePanelNotes>
-        If the <b>Evaluation Request</b> has a blank <b>Curriculum</b> this means that the student has no existing record yet in the Database so you need to set it manually.
-        Make sure that <b>Curriculum</b>, <b>Level</b> and <b>Course</b> are correct.
+        If <b>Curriculum</b> is blank in <b>Evaluation Request</b> the student has no record yet in the Database so you need to set it manually
+        <span class="text-muted">(this will be automatically populated in the next enrollment)</span>.
       </SlidePanelNotes>
       <div class="group__content">
         <h4 class="content-title">Evaluation Request</h4>
