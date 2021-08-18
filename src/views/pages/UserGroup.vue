@@ -48,9 +48,9 @@
               </template>
               <template v-slot:cell(code)="{ item, value }">
                 <b-link
-                  @click="setUpdate(item)"
+                  :to="`/maintenance/user-group/${item.id}/`"
                   :disabled="
-                    !isAccessible($options.UserGroupPermissions.EDIT.id)
+                    !isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)
                   "
                   >{{ value }}
                 </b-link>
