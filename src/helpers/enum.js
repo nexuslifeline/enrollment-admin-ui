@@ -605,7 +605,34 @@ export const CivilStatuses = new Enum({
 export const ManualSteps = new Enum({
   PROFILE_AND_ACCOUNT: { id: 1, name: 'Student Registration' },
   SUBJECT_ENLISTMENT: { id: 2, name: 'Subject Enlistment' },
-  ASSESSMENT: { id: 3, name: 'Assessment' }
+  // ASSESSMENT: { id: 3, name: 'Assessment' }
+});
+
+export const ManualStageFilter = new Enum({
+  PROFILE_AND_ACCOUNT: {
+    id: 1,
+    name: 'Profile & Account',
+    academicRecordStatusId: [AcademicRecordStatuses.DRAFT.id],
+    manualStepId: ManualSteps.PROFILE_AND_ACCOUNT.id
+  },
+  SUBJECT_ENLISTMENT: {
+    id: 2,
+    name: 'Subject Enlistment',
+    academicRecordStatusId: [AcademicRecordStatuses.DRAFT.id, AcademicRecordStatuses.ENLISTMENT_PENDING.id],
+    manualStepId: ManualSteps.SUBJECT_ENLISTMENT.id
+  },
+  ASSESSMENT_PENDING: {
+    id: 3,
+    name: 'Assessment Pending',
+    academicRecordStatusId: [AcademicRecordStatuses.ENLISTMENT_APPROVED.id],
+    manualStepId: ManualSteps.SUBJECT_ENLISTMENT.id
+  },
+  ASSESSMENT_APPROVED: {
+    id: 4,
+    name: 'Assessment Approved',
+    academicRecordStatusId: [AcademicRecordStatuses.ASSESSMENT_APPROVED.id],
+    manualStepId: ManualSteps.SUBJECT_ENLISTMENT.id
+  }
 });
 
 export const QuickEnrollSteps = new Enum({

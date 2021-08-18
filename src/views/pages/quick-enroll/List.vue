@@ -31,7 +31,7 @@
         class="mt-2"
       />
       <v-select
-        :options="$options.ManualSteps.values"
+        :options="$options.ManualStageFilter.values"
         :value="filters.academicRecord.manualStepItem"
         @input="onStatusFilterChange"
         label="name"
@@ -154,6 +154,7 @@ import {
   ManualSteps,
   SchoolCategories,
   ManualEnrollmentPermissions,
+  ManualStageFilter
 } from '../../../helpers/enum';
 import Card from '../../components/Card';
 import { AcademicRecordApi, CourseApi } from '../../../mixins/api';
@@ -168,8 +169,6 @@ import { AcademicRecordStatuses } from '../../../helpers/enum';
 
 export default {
   components: {
-    SchoolCategoryTabs,
-    Card,
     PageContent,
     NoAccess,
     StudentColumn,
@@ -180,6 +179,7 @@ export default {
   },
   mixins: [AcademicRecordApi, CourseApi, Access],
   ManualSteps,
+  ManualStageFilter,
   SchoolCategories,
   ManualEnrollmentPermissions,
   data() {
@@ -275,22 +275,24 @@ export default {
         schoolCategoryId,
         courseId,
         criteria,
+        manualStepItem
       } = this.filters.academicRecord;
       const isManual = 1;
-      const orderBy = 'created_at';
-      const sort = 'DESC';
-      let params = {
+      // const orderBy = 'created_at';
+      // const sort = 'DESC';
+      const params = {
         paginate: true,
-        perPage,manualStepId, //disabled temprarily
-        notManualStepId: this.$options.ManualSteps.ASSESSMENT.id,
+        perPage,
+        manualStepId, //disabled temprarily
+        // notManualStepId: this.$options.ManualSteps.ASSESSMENT.id,
         page,
         schoolCategoryId,
         courseId,
-        orderBy,
-        sort,
-        
+        // orderBy,
+        // sort,
         isManual,
         criteria,
+        academicRecordStatusId: manualStepItem?.academicRecordStatusId
       };
       this.getAcademicRecordList(params).then((response) => {
         const res = response.data;
@@ -343,7 +345,7 @@ export default {
     },
     onStatusFilterChange(item) {
       const { academicRecord } = this.filters;
-      academicRecord.manualStepId = item?.id || 0;
+      academicRecord.manualStepId = item?.manualStepId || 0;
       academicRecord.manualStepItem = item;
       this.loadAcademicRecord();
     },

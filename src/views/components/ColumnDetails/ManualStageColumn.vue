@@ -7,7 +7,7 @@
     </template>
     <template v-else-if="data.academicRecordStatusId === AcademicRecordStatuses.ENLISTMENT_APPROVED.id">
       <b-badge variant="warning">
-        Assessment Review
+        Assessment Pending
       </b-badge>
     </template>
     <template v-else-if="data.academicRecordStatusId === AcademicRecordStatuses.ENROLLED.id">
