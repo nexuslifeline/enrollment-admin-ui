@@ -42,13 +42,16 @@ export default {
   props: {
     studentId: {
       type: [String, Number],
+    },
+    data: {
+      type: [Object]
     }
   },
   data() {
     return {
       filters: {
-        schoolCategory: SchoolCategories.PRE_SCHOOL,
-        schoolCategoryId: SchoolCategories.PRE_SCHOOL.id
+        schoolCategory: this.data && this.data.latestAcademicRecord && this.data.latestAcademicRecord.schoolCategory || SchoolCategories.PRE_SCHOOL,
+        schoolCategoryId: this.data && this.data.latestAcademicRecord && this.data.latestAcademicRecord.schoolCategoryId || SchoolCategories.PRE_SCHOOL.id
       },
       items: [
         // {

@@ -39,10 +39,10 @@
         </b-tab>
         <b-tab v-if="isSettingsTabVisible" title="Settings">
           <template v-if="isAccessible($options.StudentPermissions.MANAGE_DROPPED_SUBJECTS.id)">
-            <Subjects :studentId="$route.params.studentId" />
+            <Subjects :studentId="$route.params.studentId" :data="data" />
           </template>
           <template v-if="isAccessible($options.StudentPermissions.EDIT_REQUIREMENTS.id)">
-            <StudentRequirements :studentId="data.id"/>
+            <StudentRequirements :studentId="data.id" :data="data"/>
           </template>
           <template v-if="isAccessible($options.StudentPermissions.EDIT_ONBOARDING.id)">
             <OnboardingSettings :data="data" />

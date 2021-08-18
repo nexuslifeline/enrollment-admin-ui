@@ -39,6 +39,9 @@ export default {
   props: {
     studentId: {
       type: [String, Number],
+    },
+    data: {
+      type: [Object]
     }
   },
   data() {
@@ -53,7 +56,7 @@ export default {
           items: []
         }
       },
-      selectedAcademicRecord: null
+      selectedAcademicRecord: this.data && this.data.latestAcademicRecord || null
     }
   },
   created() {
