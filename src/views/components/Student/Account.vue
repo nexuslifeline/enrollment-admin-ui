@@ -24,6 +24,7 @@
     </div>
     <router-view
       @onAccountCreated="onAccountCreated"
+      @onUserUpdated="onUserUpdated"
       :user="user"
       :previousRoute="currentRoute"
     />
@@ -94,6 +95,9 @@ export default {
     },
     onAccountCreated(user) {
       this.user = user;
+    },
+    onUserUpdated(user) {
+      this.user = user
     }
   },
 };

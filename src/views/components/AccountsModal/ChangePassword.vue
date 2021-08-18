@@ -117,6 +117,7 @@ export default {
         this.isShown = false
         this.isConfirmBusy = false
         showNotification(this, 'success', 'Password has been updated.')
+        this.$emit('onUserUpdated', data)
       }).catch((error) => {
         const errors = error.response.data.errors;
         validate(user, errors, this);
