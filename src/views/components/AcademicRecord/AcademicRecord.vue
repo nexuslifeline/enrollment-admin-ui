@@ -162,7 +162,7 @@
         />
       </InputContainer>
     </InputGroup>
-    <InputGroup v-if="allowChangeStatus">
+    <!-- <InputGroup v-if="allowChangeStatus">
       <InputContainer>
         <label>Status</label>
         <SelectAcademicStatus
@@ -175,7 +175,7 @@
         />
       </InputContainer>
       <InputContainer />
-    </InputGroup>
+    </InputGroup> -->
     <template v-slot:footer>
       <CardFooterRow>
         <b-button v-if="!isReadOnly" variant="primary" @click="onSave" :disabled="isProcessing">
@@ -281,7 +281,7 @@ const academicRecordFields = {
           semesterId,
           studentTypeId,
           sectionId,
-          academicRecordStatusId,
+          // academicRecordStatusId,
           studentCategoryId,
           transcriptRecord: { curriculumId }
         } = this.data
@@ -295,7 +295,7 @@ const academicRecordFields = {
           studentTypeId,
           sectionId,
           studentCategoryId,
-          ...(this.allowChangeStatus && { academicRecordStatusId }), // if allow status change, add academic record status to payload
+          // ...(this.allowChangeStatus && { academicRecordStatusId }), // if allow status change, add academic record status to payload
           transcriptRecord: { curriculumId }
         }
         reset(academicRecord)

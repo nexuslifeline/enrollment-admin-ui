@@ -1,10 +1,10 @@
 <template>
   <Card
-    title="Onboarding Settings"
+    title="Academic Status & Onboarding Settings"
     titleSize="m"
     :hasFooter="true">
     <CardNote>
-      If student is mark as <b>Onboarding</b>, 
+      If student is mark as <b>Onboarding</b>,
       the student will not be able to access the Dashboard and will be require to complete the Onboarding process.
     </CardNote>
     <InputGroup>
@@ -21,6 +21,23 @@
           :clearable="false"
           label="name"
           :disabled="!isOnboarding"
+        />
+      </InputContainer>
+    </InputGroup>
+    <InputGroup>
+      <InputContainer>
+        <InputInline>
+          <span class="ml-2">Academic Record Status</span>
+        </InputInline>
+      </InputContainer>
+      <InputContainer>
+        <SelectAcademicStatus
+          :value="academicRecordStatusId"
+          @input="academicRecordStatusId = $event"
+          :reduce="option => option.id"
+          label="name"
+          :disabled="false"
+          :clearable="false"
         />
       </InputContainer>
     </InputGroup>
@@ -46,18 +63,30 @@
       return {
         isProcessing: false,
         isOnboarding: false,
-        onboardingStepId: 1
+        onboardingStepId: 1,
+        academicRecordStatusId: 1,
+        academicRecordId: null,
       }
     },
     created() {
       this.onboardingStepId = this.data?.onboardingStepId || 1;
       this.isOnboarding = this.data?.isOnboarding;
+      this.academicRecordStatusId = this.data?.latestAcademicRecord?.academicRecordStatusId || null;
+      this.academicRecordId = this.data?.latestAcademicRecord?.id
     },
     methods: {
       onSave() {
         this.isProcessing = true;
-        const { isOnboarding, onboardingStepId } = this;
-        this.patchStudent({ isOnboarding, onboardingStepId }, this.data?.id).then(() => {
+        const { isOnboarding, onboardingStepId, academicRecordStatusId, academicRecordId  } = this;
+        const payLoad = {
+          isOnboarding,
+          onboardingStepId,
+          academicRecord: {
+            id: academicRecordId,
+            academicRecordStatusId
+          }
+        }
+        this.patchStudent(payLoad, this.data?.id).then(() => {
           this.isProcessing = false;
         }).catch((error) => {
           console.warn(error);
