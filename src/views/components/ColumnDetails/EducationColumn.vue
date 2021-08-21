@@ -4,11 +4,9 @@
       {{ data && data.level ? $options.getPropValue(data.level) : 'No Level' }}
     </div>
     <div>
-      <span v-if="!!(data && data.course)">{{ $options.getPropValue(data.course) }}</span>
-      &nbsp;
-      <span v-if="!!(data && data.semester)">{{ $options.getPropValue(data.semester) }}</span>
-      &nbsp;
-      <span v-if="!!(showSchoolYear && data && data.schoolYear)">
+      <span v-if="!!(data && data.course)" class="mr-2">{{ $options.getPropValue(data.course) }}</span>
+      <span v-if="!!(data && data.semester)" class="mr-2">{{ $options.getPropValue(data.semester) }}</span>
+      <span v-if="!!(showSchoolYear && data && data.schoolYear)" class="mr-2">
         {{  $options.getPropValue(data.schoolYear) }}
       </span>
     </div>
