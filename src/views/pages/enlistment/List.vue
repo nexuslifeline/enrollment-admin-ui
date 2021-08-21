@@ -54,6 +54,9 @@
           :fields="tables.students.fields"
           :items="tables.students.items"
           :busy="tables.students.isBusy"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
           responsive
         >
           <template v-slot:table-busy>
@@ -69,11 +72,6 @@
               :callback="{ loadDetails: () => loadDetails(data) }"
             />
           </template>
-          <!-- <template v-slot:cell(contact)="data">
-            Email : {{ data.item.student.email }} <br>
-            <small>Phone : {{ data.item.student.phoneNo }}</small> <br>
-            <small>Mobile : {{ data.item.student.mobileNo }}</small> <br>
-          </template> -->
           <template v-slot:cell(address)="data">
             <AddressColumn :data="data.item" />
           </template>
@@ -503,81 +501,7 @@
       </div>
       <!-- modal footer buttons -->
     </b-modal>
-    <!-- Modal Preview -->
-    <!-- Modal Approval -->
-    <!-- <b-modal
-      v-model="showModalApproval"
-      centered
-      header-bg-variant="success"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Finalize Approval
-      </div>
-      <b-row>
-        <b-col md="12">
-          <label>Notes</label>
-          <b-textarea
-            v-model="forms.application.fields.approvalNotes"
-            rows="7"
-          />
-        </b-col>
-      </b-row>
-      <div slot="modal-footer" class="w-100">
-        <b-button class="float-left" @click="showModalApproval = false">
-          Cancel
-        </b-button>
-        <b-button
-          @click="onApproval()"
-          class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
-        </b-button>
-      </div>
-    </b-modal> -->
-    <!-- Modal Approval -->
-    <!-- Modal Reject -->
-    <!-- <b-modal
-      v-model="showModalRejection"
-      centered
-      header-bg-variant="danger"
-      header-text-variant="light"
-      :noCloseOnEsc="true"
-      :noCloseOnBackdrop="true"
-    >
-      <div slot="modal-title">
-        Confirm Rejection
-      </div>
-      <b-row>
-        <b-col md="12">
-          <label>Reason</label>
-          <b-textarea
-            v-model="forms.application.fields.disapprovalNotes"
-            rows="7"
-          />
-        </b-col>
-      </b-row>
-      <div slot="modal-footer" class="w-100">
-        <b-button class="float-left" @click="showModalRejection = false">
-          Cancel
-        </b-button>
-        <b-button
-          @click="onDisapproval()"
-          class="float-right"
-          variant="outline-primary"
-          :disabled="isProcessing"
-        >
-          <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
-          Confirm
-        </b-button>
-      </div>
-    </b-modal> -->
-    <!-- Modal Reject -->
+
     <!-- Modal Subject -->
     <b-modal
       v-model="showModalSubjects"
@@ -789,7 +713,6 @@ import {
 } from '../../../mixins/api';
 import {
   SchoolCategories,
-  ApplicationStatuses,
   AcademicRecordStatuses,
   EnlistmentStatuses,
   StudentFeeStatuses,
@@ -799,27 +722,21 @@ import {
   SettingPermissions,
   OnBoardingSteps
 } from '../../../helpers/enum';
-import { showNotification, formatNumber } from '../../../helpers/forms';
-import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
+import { showNotification } from '../../../helpers/forms';
 import Tables from '../../../helpers/tables';
 import Access from '../../../mixins/utils/Access';
-import Card from '../../components/Card';
 import AvatarMaker from '../../components/AvatarMaker';
 import ActiveRowViewer from '../../components/ActiveRowViewer/ActiveRowViewer';
-import ActiveViewHeader from '../../components/ActiveRowViewer/ActiveViewHeader';
 import ActiveViewItems from '../../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../../components/ActiveRowViewer/ActiveViewItem';
-import ActiveViewLinks from '../../components/ActiveRowViewer/ActiveViewLinks';
-import AttachmentList from '../../components/Attachment/AttachmentList';
 import { StudentColumn,AddressColumn , EducationColumn, EnlistmentStatusColumn } from '../../components/ColumnDetails';
 import PageContent from "../../components/PageContainer/PageContent";
-import FilterButton from '../../components/PageContainer/FilterButton';
 import NoAccess from "../../components/NoAccess";
 import EnlistmentApproval from "../../components/ApprovalModals/Enlistment";
 import EnlistmentRejection from "../../components/RejectionModals/Enlistment";
 import SectionColumn from '../../components/SubjectEnlistment/SectionColumn'
-import AssessmentRejectedAlert from '../../components/AlertNotifications/AssessmentRejected'
-
+import AssessmentRejectedAlert from '../../components/AlertNotifications/AssessmentRejected';
+import { camelToSnakeCase } from '../../../helpers/utils';
 
 const acdemicRecordFields = {
   academicRecordStatusId: null,
@@ -842,6 +759,7 @@ const applicationAdmissionFields = {
 
 export default {
   name: 'Student',
+  camelToSnakeCase,
   mixins: [
     StudentApi,
     CourseApi,
@@ -856,17 +774,13 @@ export default {
     TermApi
   ],
   components: {
-    SchoolCategoryTabs,
-    Card,
     AvatarMaker,
     StudentColumn,
     EducationColumn,
     ActiveRowViewer,
-    ActiveViewHeader,
     ActiveViewItems,
     ActiveViewItem,
     PageContent,
-    FilterButton,
     NoAccess,
     AddressColumn,
     EnlistmentStatusColumn,
@@ -879,6 +793,8 @@ export default {
   SettingPermissions,
   data() {
     return {
+      sortBy: 'name',
+      sortDesc: false,
       selectedAcademicRecord: null,
       isFilterVisible: true,
       showModalPreview: false,
@@ -924,25 +840,21 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: '25%' },
-              // formatter: (value, key, item) => {
-              // 	if(!item.student.middleName){
-              // 		item.student.middleName = ""
-              // 	}
-              // 	item.student.name = item.student.firstName + " " + item.student.middleName + " " + item.student.lastName
-              // }
+              sortable: true
             },
             {
             	key: "address",
             	label: "ADDRESS",
             	tdClass: "align-middle",
             	thStyle: { width: '30%' },
-
+              sortable: true
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'status',
@@ -1265,11 +1177,8 @@ export default {
     }
 
     this.loadCourseList();
-    // this.loadDepartmentList()
     this.loadSections();
     this.loadTerms()
-    // this.filters.student.academicRecordStatusId = this.AcademicRecordStatuses.DRAFT.id
-    // this.filters.student.enlistmentStatus = this.AcademicRecordStatuses.DRAFT
     this.loadAcademicRecordList()
   },
   methods: {
@@ -1312,7 +1221,7 @@ export default {
       }
     },
     onApproval() {
-      const { id: academicRecordId, applicationId, admissionId } = this.row;
+      const { id: academicRecordId } = this.row;
 
       const {
         application: { fields: application },
@@ -1353,7 +1262,7 @@ export default {
 
       this.isProcessing = true;
       this.updateAcademicRecord(data, academicRecordId)
-        .then(({ data }) => {
+        .then(() => {
           //this.row.academicRecordStatusId = AcademicRecordStatuses.FINALIZED.id;
           this.showModalApproval = false;
           showNotification(this, 'success', 'Approved Successfully.');
@@ -1362,6 +1271,7 @@ export default {
         })
         .catch((error) => {
           const errors = error.response.data.errors;
+          console.error(errors);
           // if (errors['sectionId']) {
           // 	showNotification(this, "danger", 'Section is required.')
           // 	this.showModalApproval = false
@@ -1377,12 +1287,12 @@ export default {
     },
     onDisapproval() {
       this.isProcessing = true;
-      const { id: academicRecordId, applicationId, admissionId } = this.row;
+      const { id: academicRecordId, applicationId } = this.row;
 
       const {
         application: { fields: application },
         application: { fields: admission },
-        academicRecord: { fields: academicRecord },
+        // academicRecord: { fields: academicRecord },
       } = this.forms;
 
       const data = applicationId
@@ -1403,7 +1313,8 @@ export default {
 
       this.updateAcademicRecord(data, academicRecordId)
         .then(({ data }) => {
-          this.patchStudent({ onboardingStepId: this.OnBoardingSteps.ACADEMIC_RECORD_APPLICATION.id}, data.studentId).then(({ data }) => {
+          this.patchStudent({ onboardingStepId: this.OnBoardingSteps.ACADEMIC_RECORD_APPLICATION.id}, data.studentId)
+          .then(() => {
             this.loadAcademicRecordList();
             this.isProcessing = false;
             this.showModalRejection = false;
@@ -1434,9 +1345,7 @@ export default {
         criteria,
       } = this.filters.student;
       // const notApplicationStatusId = ApplicationStatuses.DRAFT.id;
-      const orderBy = 'updated_at';
-      const sort = 'DESC';
-      let params = {
+      const params = {
         paginate: true,
         perPage,
         page,
@@ -1450,9 +1359,8 @@ export default {
         courseId,
         // notApplicationStatusId,
         schoolYearId: this.$store.state.schoolYear.id,
-        orderBy,
-        sort,
         criteria,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
       this.getAcademicRecordList(params).then((response) => {
         const res = response.data;
@@ -1481,7 +1389,7 @@ export default {
     loadDetails(row) {
       this.changeSection = false
       if (!row.detailsShowing) {
-        const { id: academicRecordId, admissionId } = row.item;
+        const { id: academicRecordId } = row.item;
 
         const params = { paginate: false };
 
@@ -1605,7 +1513,6 @@ export default {
     checkRights() {
       const userGroupId = localStorage.getItem('userGroupId');
       const userGroup = UserGroups.getEnum(Number(userGroupId));
-      let result = false;
       if (userGroup) {
         this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
         this.schoolCategoryId = userGroup.schoolCategoryId;
@@ -1740,6 +1647,25 @@ export default {
           accumulator + Number(currentValue[field]),
         0
       )
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadAcademicRecordList();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'first_name',
+        address: 'complete_address',
+        education: 'level_name',
+        contact: 'email'
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
   },
   computed: {

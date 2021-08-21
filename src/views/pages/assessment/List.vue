@@ -57,6 +57,9 @@
           :fields="tables.students.fields"
           :items="tables.students.items"
           :busy="tables.students.isBusy"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
         >
           <template v-slot:table-busy>
             <div class="text-center my-2">
@@ -546,33 +549,29 @@ import {
   EnlistmentStatuses,
 } from '../../../helpers/enum';
 import { showNotification, formatNumber } from '../../../helpers/forms';
-import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
 import Tables from '../../../helpers/tables';
 import Access from '../../../mixins/utils/Access';
-import Card from '../../components/Card';
 import { StudentColumn, EducationColumn, AddressColumn, AssessmentStatusColumn } from '../../components/ColumnDetails';
 import ActiveRowViewer from '../../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../../components/ActiveRowViewer/ActiveViewHeader';
 import ActiveViewItems from '../../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../../components/ActiveRowViewer/ActiveViewLinks';
-import AttachmentList from '../../components/Attachment/AttachmentList';
 import AvatarMaker from '../../components/AvatarMaker';
 import FileViewer from '../../components/FileViewer';
 import { format } from 'date-fns';
 import PageContent from "../../components/PageContainer/PageContent";
-import FilterButton from "../../components/PageContainer/FilterButton";
 import NoAccess from "../../components/NoAccess";
 import AssessmentApproval from '../../components/ApprovalModals/Assessment'
 import AssessmentRejection from '../../components/RejectionModals/Assessment'
-import Toggle from '../../components/Form/Toggle'
 import FeesTable from '../../components/Assessment/FeesTable'
 import PostPaymentConfirmation from '../../components/ConfirmationModal'
-
+import { camelToSnakeCase } from '../../../helpers/utils';
 import FeesModal from '../../components/Assessment/FeesModal'
 
 export default {
   name: 'StudentFee',
+  camelToSnakeCase,
   mixins: [
     StudentApi,
     CourseApi,
@@ -587,26 +586,21 @@ export default {
   ],
   format,
   components: {
-    SchoolCategoryTabs,
-    Card,
     StudentColumn,
     EducationColumn,
     ActiveRowViewer,
     ActiveViewHeader,
-    AttachmentList,
     ActiveViewItems,
     ActiveViewItem,
     ActiveViewLinks,
     AvatarMaker,
     FileViewer,
     PageContent,
-    FilterButton,
     NoAccess,
     AddressColumn,
     AssessmentStatusColumn,
     AssessmentApproval,
     AssessmentRejection,
-    Toggle,
     FeesTable,
     PostPaymentConfirmation,
     FeesModal
@@ -615,6 +609,8 @@ export default {
   SettingPermissions,
   data() {
     return {
+      sortBy: 'name',
+      sortDesc: false,
       selectedAcademicRecord: null,
       isFilterVisible: true,
       fileViewer: {
@@ -648,18 +644,21 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: '25%' },
+              sortable: true
             },
             {
               key: 'address',
               label: 'Address',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'status',
@@ -912,7 +911,6 @@ export default {
         item: {
           id: academicRecordId,
           applicationId,
-          admissionId,
           enrollmentFee,
           previousBalance,
           student,
@@ -977,7 +975,7 @@ export default {
 
       this.isProcessing = true;
       this.updateAcademicRecord(data, academicRecordId)
-        .then(({ data }) => {
+        .then(() => {
           const form = applicationId ? 'application' : 'admission';
           item[form].applicationStatusId = ApplicationStatuses.APPROVED.id;
           this.isProcessing = false;
@@ -1010,10 +1008,10 @@ export default {
         courseId,
         criteria,
       } = this.filters.student;
-      const orderBy = 'updated_at';
-      const sort = 'DESC';
+      // const orderBy = 'updated_at';
+      // const sort = 'DESC';
       // const notAcademicRecordStatusId = AcademicRecordStatuses.DRAFT.id;
-      let params = {
+      const params = {
         paginate: true,
         perPage,
         page,
@@ -1028,9 +1026,8 @@ export default {
         courseId,
         // applicationStatusId,
         schoolYearId: this.$store.state.schoolYear.id,
-        orderBy,
-        sort,
         criteria,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
       this.getAcademicRecordList(params).then((response) => {
         const res = response.data;
@@ -1056,9 +1053,6 @@ export default {
           levelId,
           courseId,
           semesterId,
-          schoolCategoryId,
-          application,
-          // admission,
         } = row.item;
 
         const params = { paginate: false };
@@ -1191,7 +1185,6 @@ export default {
     checkRights() {
       const userGroupId = localStorage.getItem('userGroupId');
       const userGroup = UserGroups.getEnum(Number(userGroupId));
-      let result = false;
       if (userGroup) {
         this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
         this.schoolCategoryId = userGroup.schoolCategoryId;
@@ -1262,10 +1255,29 @@ export default {
         else
           this.selectedAcademicRecord.enrollmentFee = 0
       }
-    }
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadAcademicRecords();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'first_name',
+        address: 'complete_address',
+        education: 'level_name',
+        contact: 'email'
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
+    },
   },
   watch: {
-    '$store.state.schoolYear': function(newVal) {
+    '$store.state.schoolYear': function() {
       this.loadTerms();
       this.loadAcademicRecords();
     },
@@ -1314,18 +1326,6 @@ export default {
         };
       },
     },
-    initialFeeSum() {
-
-      if(!this.selectedAcademicRecord)
-      return 0
-
-      const { fees } = this.selectedAcademicRecord
-      if(fees && fees.length > 0) {
-        return fees.reduce((acc, curr) => {
-          return acc += parseInt(curr.pivot.isInitialFee) === 1 ? parseFloat(curr.pivot.amount) : 0
-        }, 0)
-      }
-    },
     isCourseVisible() {
       const { schoolCategoryId } = this.filters.student;
       const { schoolCategories } = this.options;
@@ -1335,14 +1335,6 @@ export default {
         schoolCategories.GRADUATE_SCHOOL.id
       ].includes(schoolCategoryId);
     },
-    // filteredApplicationsStatuses() {
-    //   return this.applicationStatuses.values.filter(e =>
-    //     e.id === this.applicationStatuses.SUBMITTED.id ||
-    //     e.id === this.applicationStatuses.APPROVED.id ||
-    //     e.id === this.applicationStatuses.REJECTED.id ||
-    //     e.id === this.applicationStatuses.COMPLETED.id
-    //   )
-    // },
     showOptions() {
       //for pending statuses
       if(!this.selectedAcademicRecord) return false;

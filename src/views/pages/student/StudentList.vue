@@ -55,6 +55,9 @@
               :fields="tables.students.fields"
               :busy="tables.students.isBusy"
               :items="tables.students.items"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              @sort-changed="onSortChanged"
               responsive
             >
               <template v-slot:cell(name)="data">
@@ -287,12 +290,7 @@ import {
   LevelApi,
   CourseApi,
 } from '../../../mixins/api';
-import {
-  validate,
-  reset,
-  showNotification,
-  clearFields,
-} from '../../../helpers/forms';
+import { showNotification } from '../../../helpers/forms';
 import {
   Countries,
   CivilStatuses,
@@ -301,13 +299,8 @@ import {
   SchoolCategories
 } from '../../../helpers/enum';
 import Tables from '../../../helpers/tables';
-import PhotoViewer from '../../components/PhotoViewer';
 import FileViewer from '../../components/FileViewer';
-import AvatarMaker from '../../components/AvatarMaker';
-
-import { copyValue } from '../../../helpers/extractor';
 import Access from '../../../mixins/utils/Access';
-import Card from '../../components/Card';
 import {
   StudentColumn,
   EducationColumn,
@@ -315,22 +308,21 @@ import {
 } from '../../components/ColumnDetails';
 import { getFilePath } from '../../../helpers/utils';
 import PageContent from "../../components/PageContainer/PageContent";
-import StudentDeleteModal from './StudentDelete'
+import StudentDeleteModal from './StudentDelete';
+import { camelToSnakeCase } from '../../../helpers/utils';
 
 export default {
   name: 'StudentList',
+  camelToSnakeCase,
   getFilePath,
   Semesters,
   SchoolCategories,
   mixins: [StudentApi, Tables, Access, UserGroupApi, ReportApi, SchoolYearApi, LevelApi, CourseApi ],
   components: {
-    PhotoViewer,
     FileViewer,
-    Card,
     StudentColumn,
     EducationColumn,
     ContactColumn,
-    AvatarMaker,
     PageContent,
     StudentDeleteModal
   },
@@ -352,6 +344,8 @@ export default {
   StudentPermissions,
   data() {
     return {
+      sortBy: 'name',
+      sortDesc: true,
       selectedUser: {},
       isBusyCreating: false,
       isFilterVisible: true,
@@ -384,12 +378,7 @@ export default {
               tdClass: 'align-middle',
               thClass: 'align-middle',
               thStyle: { width: 'auto' },
-              // formatter: (value, key, item) => {
-              // 	if(!item.middleName) {
-              // 		item.middleName = ""
-              // 	}
-              // 	item.name = item.firstName + " " + item.middleName + " " + item.lastName
-              // }
+              sortable: true
             },
             {
               key: 'education',
@@ -397,21 +386,16 @@ export default {
               tdClass: 'align-middle',
               thClass: 'align-middle',
               thStyle: { width: '20%' },
+              sortable: true
             },
             {
               key: 'contact',
-              label: 'Contact Info',
+              label: 'Contact',
               tdClass: 'align-middle',
               thClass: 'align-middle',
               thStyle: { width: '20%' },
+              sortable: true
             },
-            // {
-            //   key: 'requirementPercentage',
-            //   label: 'Requirement %',
-            //   tdClass: 'align-middle',
-            //   thClass: 'align-middle',
-            //   thStyle: { width: '20%' },
-            // },
             {
               key: 'action',
               label: '',
@@ -494,8 +478,8 @@ export default {
   created() {
     this.loadStudents();
     this.loadSchoolYears();
-    this.loadLevels()
-    this.loadCourses()
+    this.loadLevels();
+    this.loadCourses();
   },
   methods: {
     loadStudents() {
@@ -508,8 +492,17 @@ export default {
 
       students.isBusy = true;
 
-      let params = { paginate: true, perPage, page, criteria, levelId, courseId, semesterId };
-      console.log(params)
+      const params = {
+        paginate: true,
+        perPage,
+        page,
+        criteria,
+        levelId,
+        courseId,
+        semesterId,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
+      };
+
       this.getStudentList(params).then(({ data }) => {
         students.items = data.data;
         student.from = data.meta.from;
@@ -535,8 +528,8 @@ export default {
     onStudentDelete() {
       const { students } = this.tables;
       this.isUserSaving = true;
-      this.deleteStudent(this.selectedStudentId).then(({ data }) => {
-        this.deleteRow(students, this.paginations.student, id);
+      this.deleteStudent(this.selectedStudentId).then(() => {
+        this.deleteRow(students, this.paginations.student);
         this.isUserSaving = false;
         showNotification(this, 'success', 'Student deleted successfully.');
         this.showModalConfirmation = false;
@@ -631,7 +624,26 @@ export default {
     onSetDelete(studentId) {
       this.selectedStudentId = studentId;
       this.showModalConfirmation = true;
-    }
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadStudents();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'first_name',
+        address: 'complete_address',
+        education: 'level_name',
+        contact: 'email'
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
+    },
   },
   computed: {
     getActiveSchoolYearId() {

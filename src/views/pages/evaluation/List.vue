@@ -50,6 +50,8 @@
           :fields="tables.students.fields"
           :items="tables.students.items"
           :busy="tables.students.isBusy"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
           @sort-changed="onSortChanged"
         >
           <template v-slot:head(attachments)>
@@ -106,15 +108,7 @@
           <template v-slot:cell(status)="data">
             <StatusColumn :data="data.item" />
           </template>
-          <!-- <template v-slot:cell(attachments)="data">
-            <span>{{ data.item.filesCount }} </span>
-            <v-icon name="paperclip" class="ml-2" />
-          </template> -->
           <template v-slot:cell(action)="row">
-            <!-- <button type="button" @click="loadDetails(row)" class="btn-invisible">
-              <BIconFolder2Open v-if="row.detailsShowing " />
-              <BIconFolderSymlink v-else scale="1.2" />
-            </button> -->
             <b-dropdown
               right
               variant="link"
@@ -181,16 +175,12 @@ import {
   EvaluationPermissions,
 } from '../../../helpers/enum';
 import Tables from '../../../helpers/tables';
-import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
 import Access from '../../../mixins/utils/Access';
 import { camelToSnakeCase } from '../../../helpers/utils';
 import { format } from 'date-fns';
 import { colorFactory, getColorFactoryLength } from '../../../helpers/colors';;
-import AvatarMaker from '../../components/AvatarMaker';
-import Card from '../../components/Card';
 import { StudentColumn, EducationColumn, AddressColumn, StatusColumn } from '../../components/ColumnDetails';
 import PageContent from '../../components/PageContainer/PageContent';
-import FilterButton from '../../components/PageContainer/FilterButton';
 import NoAccess from '../../components/NoAccess';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
@@ -220,22 +210,11 @@ export default {
     SchoolYearApi
   ],
   components: {
-    SchoolCategoryTabs,
-    //FileViewer,
-    // ActiveRowViewer,
-    // ActiveViewHeader,
-    // AttachmentList,
-    // ActiveViewItems,
-    // ActiveViewItem,
-    // ActiveViewLinks,
-    AvatarMaker,
-    Card,
     StudentColumn,
     EducationColumn,
     AddressColumn,
     StatusColumn,
     PageContent,
-    FilterButton,
     NoAccess
   },
   EvaluationPermissions,
@@ -284,19 +263,21 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
-              sortable: false // allow first in backend
+              sortable: true
             },
              {
               key: 'address',
               label: 'Address',
               tdClass: 'align-middle',
               thStyle: { width: '28%' },
+              sortable: true
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
+              sortable: false
             },
             {
               key: 'submittedDate',
@@ -304,7 +285,7 @@ export default {
               tdClass: 'align-middle',
               thStyle: { width: '10%' },
               sortable: true,
-              formatter: (value, key, item) => {
+              formatter: (value) => {
                 if (!value) return '';
 
                 return format(new Date(value), 'MM/dd/yyyy');
@@ -375,7 +356,7 @@ export default {
               label: 'Prerequisites',
               tdClass: 'align-middle',
               thStyle: { width: '15%' },
-              formatter: (value, key, item) => {
+              formatter: (value) => {
                 if (value.length > 0) {
                   return value
                     .map((subject) => {
@@ -646,21 +627,19 @@ export default {
         courseId,
         criteria,
       } = this.filters.student;
-      // const applicationStatusId = EvaluationStatuses.SUBMITTED.id;
-      const orderBy = this.$options.camelToSnakeCase(this.sortBy);
-      const sort = this.sortDesc ? 'DESC' : 'ASC';
-      let params = {
+
+      const params = {
         paginate: true,
         perPage,
         page,
         academicRecordStatusId: evaluationStatus?.academicRecordStatuses,
         schoolCategoryId,
         courseId,
-        orderBy,
-        sort,
         criteria,
         schoolYearId: this.$store.state.schoolYear.id,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
+
       this.getEvaluationList(params).then((response) => {
         const res = response.data;
         students.items = res.data;
@@ -1021,12 +1000,26 @@ export default {
       this.sortBy = sortBy;
       this.sortDesc = sortDesc;
       this.loadEvaluation();
-    }
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'first_name',
+        address: 'complete_address',
+        education: 'level_name',
+        contact: 'email'
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
+    },
   },
   watch: {
-    '$store.state.schoolYear': function(newVal) {
+    '$store.state.schoolYear': function() {
       this.loadEvaluation();
-    },
+    }
   },
   computed: {
     // totalUnits() {

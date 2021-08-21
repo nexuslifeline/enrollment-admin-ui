@@ -50,6 +50,9 @@
           :fields="tables.academicRecords.fields"
           :items="tables.academicRecords.items"
           :busy="tables.academicRecords.isBusy"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
           responsive
         >
           <template v-slot:table-busy>
@@ -149,25 +152,24 @@
   <!-- main container -->
 </template>
 <script>
-import SchoolCategoryTabs from '../../components/SchoolCategoryTabs';
 import {
   ManualSteps,
   SchoolCategories,
   ManualEnrollmentPermissions,
   ManualStageFilter
 } from '../../../helpers/enum';
-import Card from '../../components/Card';
 import { AcademicRecordApi, CourseApi } from '../../../mixins/api';
-import { clearFields, showNotification } from '../../../helpers/forms';
-import { copyValue } from '../../../helpers/extractor';
+import { showNotification } from '../../../helpers/forms';
 import Access from '../../../mixins/utils/Access';
 import PageContent from '../../components/PageContainer/PageContent'
 import NoAccess from '../../components/NoAccess'
 import { StudentColumn, EducationColumn, ContactColumn, ManualStageColumn } from "../../components/ColumnDetails";
 import StudentSelection from './StudentSelection';
 import { AcademicRecordStatuses } from '../../../helpers/enum';
+import { camelToSnakeCase } from '../../../helpers/utils';
 
 export default {
+  camelToSnakeCase,
   components: {
     PageContent,
     NoAccess,
@@ -184,6 +186,8 @@ export default {
   ManualEnrollmentPermissions,
   data() {
     return {
+      sortBy: 'name',
+      sortDesc: true,
       AcademicRecordStatuses,
       isStudentShown: false,
       isFilterVisible: true,
@@ -196,18 +200,21 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'contact',
               label: 'Contact',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
               thStyle: { width: '25%' },
+              sortable: true
             },
             {
               key: 'step',
@@ -278,22 +285,20 @@ export default {
         manualStepItem
       } = this.filters.academicRecord;
       const isManual = 1;
-      // const orderBy = 'created_at';
-      // const sort = 'DESC';
+
       const params = {
         paginate: true,
         perPage,
         manualStepId, //disabled temprarily
-        // notManualStepId: this.$options.ManualSteps.ASSESSMENT.id,
         page,
         schoolCategoryId,
         courseId,
-        // orderBy,
-        // sort,
         isManual,
         criteria,
-        academicRecordStatusId: manualStepItem?.academicRecordStatusId
+        academicRecordStatusId: manualStepItem?.academicRecordStatusId,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
+
       this.getAcademicRecordList(params).then((response) => {
         const res = response.data;
         academicRecords.items = res.data;
@@ -357,7 +362,26 @@ export default {
     },
     onAssessmentRequested(){
       this.loadAcademicRecord()
-    }
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadAcademicRecord();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'first_name',
+        address: 'complete_address',
+        education: 'level_name',
+        contact: 'email'
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
+    },
   },
   computed: {
     isCourseVisible() {
