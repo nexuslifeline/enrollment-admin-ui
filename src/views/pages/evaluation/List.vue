@@ -297,6 +297,7 @@ export default {
               tdClass: 'align-middle text-center font-weight-bold',
               thClass: 'text-center',
               thStyle: { width: '80px' },
+              sortable: true,
             },
             {
               key: 'status',
@@ -872,7 +873,6 @@ export default {
     checkRights() {
       const userGroupId = localStorage.getItem('userGroupId');
       const userGroup = UserGroups.getEnum(Number(userGroupId));
-      let result = false;
       if (userGroup) {
         this.filters.student.schoolCategoryId = userGroup.schoolCategoryId;
         this.schoolCategoryId = userGroup.schoolCategoryId;
@@ -1012,7 +1012,8 @@ export default {
         name: 'first_name',
         address: 'complete_address',
         education: 'level_name',
-        contact: 'email'
+        contact: 'email',
+        studentCategory: 'student_category_name'
       })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
   },
