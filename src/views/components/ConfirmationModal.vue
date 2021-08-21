@@ -2,7 +2,7 @@
   <b-modal
     :visible="isShown"
     size="md"
-    title="Post Payment"
+    :title="title"
     :noCloseOnEsc="true"
     :noCloseOnBackdrop="true"
     bodyClass="modal-body__container"
@@ -31,7 +31,10 @@ export default {
     isConfirmBusy: {
       type: [Boolean]
     },
-
+    title: {
+      type: [String],
+      default: 'Post Payment'
+    }
   },
   components: {
     FooterAction

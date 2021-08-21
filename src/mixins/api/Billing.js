@@ -29,5 +29,8 @@ export default {
     postPayment(data, id) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/${id}/post-payment`, data);
     },
+    cancelPayments(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/billings/${id}/cancel-payments`);
+    }
   }
 }

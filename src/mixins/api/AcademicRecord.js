@@ -56,5 +56,11 @@ export default {
     generateBilling(academicRecordId, data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/generate-billing`, data)
     },
+    getInitialBilling(academicRecordId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/initial-billing`)
+    },
+    updateInitialBilling(academicRecordId, billingId, data) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/initial-billing/${billingId}`, data)
+    }
   }
 }
