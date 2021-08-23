@@ -25,7 +25,7 @@
   </div>
 </template>
 <script>
-import { AcademicRecordApi } from '../../../mixins/api';
+import { AcademicRecordApi, StudentApi } from '../../../mixins/api';
 
 import Card from '../Card';
 import Item from './Item';
@@ -35,14 +35,11 @@ export default {
     Card,
     Item
   },
-  mixins: [ AcademicRecordApi ],
+  mixins: [ AcademicRecordApi, StudentApi ],
   props: {
     studentId: {
       type: [String, Number],
     },
-    data: {
-      type: [Object]
-    }
   },
   data() {
     return {
@@ -56,11 +53,16 @@ export default {
           items: []
         }
       },
-      selectedAcademicRecord: this.data && this.data.latestAcademicRecord || null
+      selectedAcademicRecord: null,
+      data: {}
     }
   },
   created() {
     // load student here using the property student id provided
+    this.getStudent(this.studentId).then(({ data }) => {
+      this.data = data
+      this.selectedAcademicRecord = data && data.latestAcademicRecord || null
+    })
   },
   methods: {
     onAcademicRecordFilterChange(item) {

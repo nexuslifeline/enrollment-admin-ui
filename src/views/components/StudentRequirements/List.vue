@@ -43,31 +43,25 @@ export default {
     studentId: {
       type: [String, Number],
     },
-    data: {
-      type: [Object]
-    }
   },
   data() {
     return {
+      data: {},
       filters: {
-        schoolCategory: this.data && this.data.latestAcademicRecord && this.data.latestAcademicRecord.schoolCategory || SchoolCategories.PRE_SCHOOL,
-        schoolCategoryId: this.data && this.data.latestAcademicRecord && this.data.latestAcademicRecord.schoolCategoryId || SchoolCategories.PRE_SCHOOL.id
+        schoolCategory: null,
+        schoolCategoryId: null
       },
-      items: [
-        // {
-        //   id: 1,
-        //   documentType: {
-        //     name: 'Form 138', description: 'Lorem ipsum dolor isetit misaned kuniparamiya delae.'
-        //   },
-        //   isSubmitted: true,
-        //   schoolCategory: { name: 'College' }
-        // },
-      ],
+      items: [],
     }
   },
   created() {
     // load student requirements here using the property student id provided
-    this.loadRequirements()
+    this.getStudent(this.studentId).then(({ data }) => {
+      this.data = data
+      this.filters.schoolCategory = data && data.latestAcademicRecord && data.latestAcademicRecord.schoolCategory || SchoolCategories.PRE_SCHOOL,
+      this.filters.schoolCategoryId = data && data.latestAcademicRecord && data.latestAcademicRecord.schoolCategoryId || SchoolCategories.PRE_SCHOOL.id
+      this.loadRequirements()
+    })
   },
   methods: {
     loadRequirements() {
