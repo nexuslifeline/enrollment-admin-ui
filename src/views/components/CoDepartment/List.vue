@@ -2,7 +2,7 @@
   <Card :title="`Users in ${department}`" titleSize="m" noPaddingBody>
     <div v-if="!!personnels.length" class="co-department__list">
       <template v-for="personnel in personnels">
-        <template v-if="personnel.user.id === $store.state.user.id">
+        <template v-if="personnel.user && personnel.user.id === $store.state.user.id">
           <Item
             :key="personnel.id"
             :data="{ ...personnel, name: `${personnel.name} (You)` }"
