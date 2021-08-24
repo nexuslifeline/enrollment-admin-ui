@@ -51,6 +51,7 @@
   </Card>
 </template>
 <script>
+import { showNotification } from '../../../helpers/forms';
   import { StudentApi } from '../../../mixins/api';
   export default {
     mixins: [StudentApi],
@@ -88,6 +89,7 @@
         }
         this.patchStudent(payLoad, this.data?.id).then(() => {
           this.isProcessing = false;
+          showNotification(this,'success', 'Academic Status & Onboarding Settings has been saved.', )
         }).catch((error) => {
           console.warn(error);
         });
