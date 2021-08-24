@@ -2,7 +2,7 @@
   <div class="header" :class="{ shrink: !isHome && !isReport, left: isReport }">
     <div class="header__menus-container">
       <ul class="header__menus">
-        <template v-for="(nav, idx) in $options.navItems.filter((v, i) => i < mainNavLimit)">
+        <template v-for="(nav, idx) in accessibleMainNavs.filter((v, i) => i < mainNavLimit)">
           <li
             v-if="isAccessible(nav.permissionIds)"
             :key="idx"
@@ -13,7 +13,7 @@
             </a>
           </li>
         </template>
-        <template v-if="$options.navItems.length > mainNavLimit">
+        <template v-if="accessibleMainNavs.length > mainNavLimit && isMoreMainVisible" >
           <li
             class="header__menu-item header__menu-item-more"
             :class="{ active: isMainNavActive }">
@@ -252,6 +252,12 @@ export default {
           .filter((v) => this.$route.path.startsWith(v))?.length
       );
     },
+    isMoreMainVisible() {
+      return !!this.moreMainNavItems.find(nav => this.isAccessible(nav.permissionIds))
+    },
+    accessibleMainNavs() {
+      return this.$options.navItems.filter(nav => this.isAccessible(nav.permissionIds))
+    }
   },
   mounted() {
     this.calculateNavLimit();
