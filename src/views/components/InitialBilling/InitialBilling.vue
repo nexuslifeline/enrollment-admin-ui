@@ -1,9 +1,11 @@
 <template>
   <Card
-    title="Manage Initial Billing"
+    title="Manage Initial Fee"
     titleSize="m"
     :hasFooter="true">
     <CardNote type="warning">
+      <b>Initial Fee</b> is the amount that should be paid to be officially enrolled.
+      If the amount is incorrect, you can override the amount here.
       Marking the initial billing as <b>Unpaid</b> will <b>cancel</b> all the payments posted to it.
     </CardNote>
     <InputGroup>
