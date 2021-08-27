@@ -13,14 +13,16 @@
             appendToBody/>
         </div>
       </template>
-      <div v-if="items.length > 0" class="subjects__list">
-        <template v-for="(item, idx) in items">
-          <Item :data="item" :key="idx" @onChange="onSubmitChange" />
-        </template>
-      </div>
-      <div v-else>
-        <vText size="s" weight="light">No record(s) found.</vText>
-      </div>
+      <b-overlay :show="isLoading" rounded="sm">
+        <div v-if="items.length > 0" class="subjects__list">
+          <template v-for="(item, idx) in items">
+            <Item :data="item" :key="idx" @onChange="onSubmitChange" />
+          </template>
+        </div>
+        <div v-else>
+          <vText size="s" weight="light">No record(s) found.</vText>
+        </div>
+       </b-overlay>
     </Card>
   </div>
 </template>
@@ -52,6 +54,7 @@ export default {
         schoolCategoryId: null
       },
       items: [],
+      isLoading: true
     }
   },
   created() {
@@ -67,8 +70,10 @@ export default {
     loadRequirements() {
       const { schoolCategoryId } = this.filters
       const params = { paginate: false }
+      this.isLoading = true
       this.getStudentRequirements(this.studentId, schoolCategoryId, params).then(({ data }) => {
         this.items = data
+        this.isLoading = false
       })
     },
     onSubmitChange(item) {
