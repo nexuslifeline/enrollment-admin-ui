@@ -1,6 +1,6 @@
 <template>
   <v-select
-    :options="options.academicRecords.items"
+    :options="filteredOptions"
     :reduce="reduce"
     :value="value"
     @input="onInput"
@@ -23,6 +23,7 @@
 </template>
 <script>
 import { AcademicRecordApi } from '../../../mixins/api';
+import { AcademicRecordStatuses } from '../../../helpers/enum'
 
 export default {
   props: {
@@ -63,10 +64,16 @@ export default {
       type: [Boolean],
       default: false
     },
+    includeDraftStatus:{
+      //show draft status academic record
+      type: [Boolean],
+      default: true
+    }
   },
   mixins: [AcademicRecordApi],
   data() {
     return {
+      AcademicRecordStatuses,
       options: {
         academicRecords: {
           items: []
@@ -89,6 +96,15 @@ export default {
       return `${data?.schoolYear?.name || 'No School Year'} - ${data?.level?.name} ${data?.semester?.name}`;
     }
   },
+  computed: {
+    filteredOptions() {
+      const { academicRecords } = this.options
+      if(!this.includeDraftStatus) {
+        return academicRecords.items.filter(v => v.academicRecordStatusId !== this.AcademicRecordStatuses.DRAFT.id)
+      }
+      return academicRecords.items
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
