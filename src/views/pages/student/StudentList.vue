@@ -386,7 +386,7 @@ export default {
               tdClass: 'align-middle',
               thClass: 'align-middle',
               thStyle: { width: '20%' },
-              sortable: true
+              // sortable: true
             },
             {
               key: 'contact',
@@ -640,7 +640,7 @@ export default {
       return ({
         name: 'first_name',
         address: 'complete_address',
-        education: 'level_name',
+        // education: 'level_name',
         contact: 'email'
       })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
