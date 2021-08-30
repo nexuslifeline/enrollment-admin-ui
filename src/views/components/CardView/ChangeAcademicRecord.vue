@@ -10,7 +10,7 @@
     :centered="true">
     <div class="modal-field-container overflow-visible">
       <b-alert v-model="isShownCurriculum" variant="warning">
-        Please ensure that the <b>Curriculum</b> is a valid curriculum of the selected SchoolCategory, Level, Course and Semester.
+        Please ensure that the <b>Curriculum</b> is a valid curriculum of the selected School Category, Level, Course and Semester.
       </b-alert>
       <b-form-group
         :state="forms.academicRecord.states.schoolCategoryId"
