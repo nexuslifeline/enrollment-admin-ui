@@ -97,6 +97,9 @@
               :fields="tables.subjects.fields"
               :busy="tables.subjects.isBusy"
               :items="tables.subjects.items"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              @sort-changed="onSortChanged"
             >
               <template v-slot:table-busy>
                 <div class="text-center my-2">
@@ -110,6 +113,9 @@
                   :disabled="!isAccessible($options.SubjectPermissions.EDIT.id)"
                   >{{ value }}
                 </b-link>
+              </template>
+              <template v-slot:cell(schoolCategory)="{ item: { schoolCategory }}">
+                {{ schoolCategory && schoolCategory.name || ''}}
               </template>
               <template v-slot:cell(action)="row">
                 <b-dropdown
@@ -571,6 +577,8 @@ export default {
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',
+      sortBy: null,
+      sortDesc: null,
       forms: {
         subject: {
           isProcessing: false,
@@ -595,37 +603,22 @@ export default {
               label: 'SUBJECT CODE',
               tdClass: 'align-middle',
               thStyle: { width: '10%' },
+              sortable: true,
             },
             {
               key: 'description',
               label: 'DESCRIPTION',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
+              sortable: true,
             },
-            // {
-            // 	key: "department.name",
-            // 	label: "DEPARTMENT",
-            // 	tdClass: "align-middle",
-            // 	thStyle: {width: "8%"}
-            // },
             {
-              key: 'schoolCategory.name',
+              key: 'schoolCategory',
               label: 'SCHOOL CATEGORY',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
+              sortable: true,
             },
-            // {
-            // 	key: "prerequisites",
-            // 	label: "PREREQUISITE",
-            // 	tdClass: "align-middle",
-            //   thStyle: {width: "10%"},
-            //   formatter: (value, key, item) => {
-            //      if (value.length > 0) {
-            //        return value.map(subject => { return subject.name; }).join(", ");
-            //      }
-            //      return ''
-            //   }
-            // },
             {
               key: 'units',
               label: 'LEC UNITS',
@@ -633,16 +626,6 @@ export default {
               thClass: 'text-center',
               thStyle: { width: '7%' },
             },
-            // {
-            // 	key: "amountPerUnit",
-            // 	label: "AMT PER LEC",
-            // 	tdClass: "align-middle text-right",
-            // 	thClass: "text-right",
-            //   thStyle: {width: "10%"},
-            //   formatter: (value) => {
-            //     return formatNumber(value)
-            //   }
-            // },
             {
               key: 'labs',
               label: 'LAB UNITS',
@@ -650,26 +633,6 @@ export default {
               thClass: 'text-center',
               thStyle: { width: '7%' },
             },
-            // {
-            // 	key: "amountPerLab",
-            // 	label: "AMT PER LAB",
-            // 	tdClass: "align-middle text-right",
-            // 	thClass: "text-right",
-            //   thStyle: {width: "10%"},
-            //   formatter: (value) => {
-            //     return formatNumber(value)
-            //   }
-            // },
-            // {
-            // 	key: "totalAmount",
-            // 	label: "TOTAL AMT",
-            // 	tdClass: "align-middle text-right",
-            // 	thClass: "text-right",
-            //   thStyle: {width: "10%"},
-            //   formatter: (value) => {
-            //     return formatNumber(value)
-            //   }
-            // },
             {
               key: 'action',
               label: '',
@@ -735,6 +698,7 @@ export default {
         page,
         criteria,
         schoolCategoryId,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
       this.getSubjectList(params).then(({ data }) => {
         subjects.items = data.data;
@@ -886,6 +850,24 @@ export default {
       subject.schoolCategoryId = item?.id || 0;
       subject.schoolCategoryItem = item;
       this.loadSubjects();
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadSubjects();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'name',
+        description: 'description',
+        schoolCategory: 'school_category_name',
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
   },
 };
