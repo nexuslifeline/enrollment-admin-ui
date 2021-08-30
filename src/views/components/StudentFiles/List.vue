@@ -79,6 +79,7 @@ export default {
     onView(item, idx) {
       this.activeNavIndex = idx;
       this.previewFile(item);
+      this.isShown = true;
     },
     onFileNavLeft() {
       this.activeNavIndex = this.activeNavIndex === 0 ? this.items.length - 1 : this.activeNavIndex - 1;
@@ -97,7 +98,6 @@ export default {
         this.file.isLoading = false;
         this.$options.preview(data, data.type, (src) => {
           this.file = { type: data.type, src, name: item.name };
-          this.isShown = true;
         });
       });
     },
