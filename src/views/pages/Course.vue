@@ -16,33 +16,6 @@
     </template>
     <template v-slot:content>
       <div>
-        <!-- add button and search -->
-        <!-- <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button
-                  v-if="isAccessible($options.CoursePermissions.ADD.id)"
-                  class="bottom-space"
-                  variant="primary"
-                  @click="setCreate()"
-                >
-                  <v-icon name="plus-circle" /> ADD NEW COURSE
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.course.criteria"
-                  type="text"
-                  placeholder="Search"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
         <b-row>
           <b-col md="12">
             <b-table
@@ -59,6 +32,9 @@
               :filter="filters.course.criteria"
               @filtered="onFiltered($event, paginations.course)"
               responsive
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              @sort-changed="onSortChanged"
             >
               <template v-slot:table-busy>
                 <div class="text-center my-2">
@@ -310,6 +286,8 @@ export default {
       showModalEntry: false,
       showModalConfirmation: false,
       entryMode: '',
+      sortBy: null,
+      sortDesc: null,
       forms: {
         course: {
           isProcessing: false,
@@ -328,18 +306,21 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
+              sortable: true
             },
             {
               key: 'description',
               label: 'DESCRIPTION',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
+              sortable: true
             },
             {
               key: 'major',
               label: 'MAJOR',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'action',
@@ -380,7 +361,7 @@ export default {
 
       courses.isBusy = true;
 
-      let params = { paginate: false };
+      let params = { paginate: false, ordering: this.getOrdering(this.sortBy, this.sortDesc) };
       this.getCourseList(params).then(({ data }) => {
         courses.items = data;
         course.totalRows = data.length;
@@ -474,6 +455,15 @@ export default {
       course.fields.degreeTypeId = null;
       this.entryMode = 'Add';
       course.isLoading = false;
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadCourses();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      return `${sortDesc ? '-' : ''}${sortBy}`;
     },
   },
 };
