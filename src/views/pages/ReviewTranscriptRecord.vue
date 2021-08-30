@@ -3,7 +3,7 @@
     title="Review Transcript Record"
     :createButtonVisible="false"
     :filterVisible="false"
-    showBottomActions>
+    :showBottomActions="false">
     <template v-slot:content>
       <b-overlay :show="isProcessing">
         <div class="transcript">
