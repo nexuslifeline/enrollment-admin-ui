@@ -40,6 +40,7 @@ import SelectAcademicRecord from './views/components/Dropdowns/SelectAcademicRec
 import SelectSemester from './views/components/Dropdowns/SelectSemester';
 import SelectLevel from './views/components/Dropdowns/SelectLevel';
 import SelectAcademicStatus from './views/components/Dropdowns/SelectAcademicStatus';
+import SelectSubjectSection from './views/components/Dropdowns/SelectSubjectSection';
 import AvatarMaker from './views/components/AvatarMaker';
 import vText from './views/components/Text';
 import Card from './views/components/Card';
@@ -232,6 +233,7 @@ Vue.component('SelectOnboardingSteps', SelectOnboardingSteps);
 Vue.component('SelectAcademicStatus', SelectAcademicStatus);
 Vue.component('SelectAcademicRecord', SelectAcademicRecord);
 Vue.component('SelectSemester', SelectSemester);
+Vue.component('SelectSubjectSection', SelectSubjectSection);
 Vue.component('CenterContainer', CenterContainer);
 Vue.component('AvatarMaker', AvatarMaker);
 Vue.component('Card', Card);

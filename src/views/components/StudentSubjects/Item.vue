@@ -17,6 +17,9 @@
     <div>
       <InputGroup>
         <InputInline>
+           <button  class="btn-action" @click="$emit('onEdit', data)">
+            <BIconPencil />
+          </button>
           <Toggle :value="data.pivot.isDropped" @input="checked => $emit('onChange', { data, checked })" />
           <span class="ml-2">Dropped</span>
         </InputInline>
@@ -100,4 +103,25 @@ export default {
     }
   }
 }
+
+.btn-action {
+    outline: none;
+    border: 0;
+    background: none;
+    margin-bottom: auto;
+    margin-right: 20px;
+    border-radius: 50%;
+    height: 23px;
+    width: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: black;
+      svg {
+        color: $white;
+      }
+    }
+  }
 </style>
