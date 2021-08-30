@@ -2,7 +2,8 @@
   <div>
     <Card
       title="Manage Requirements"
-      titleSize="m">
+      titleSize="m"
+      :isLoading="isLoading">
       <template v-slot:header-action>
         <div class="header__action-dropdown">
           <SelectCategory
@@ -13,16 +14,14 @@
             appendToBody/>
         </div>
       </template>
-      <b-overlay :show="isLoading" rounded="sm">
-        <div v-if="items.length > 0" class="subjects__list">
-          <template v-for="(item, idx) in items">
-            <Item :data="item" :key="idx" @onChange="onSubmitChange" />
-          </template>
-        </div>
-        <div v-else>
-          <vText size="s" weight="light">No record(s) found.</vText>
-        </div>
-       </b-overlay>
+      <div v-if="items.length > 0" class="subjects__list">
+        <template v-for="(item, idx) in items">
+          <Item :data="item" :key="idx" @onChange="onSubmitChange" />
+        </template>
+      </div>
+      <div v-else>
+        <vText size="s" weight="light">No record(s) found.</vText>
+      </div>
     </Card>
   </div>
 </template>

@@ -2,31 +2,31 @@
   <Card
     title="Manage Initial Fee"
     titleSize="m"
-    :hasFooter="true">
+    :hasFooter="true"
+    :isLoading="isLoading">
     <CardNote type="warning">
       <b>Initial Fee</b> is the amount that should be paid to be officially enrolled.
       If the amount is incorrect, you can override the amount here.
       Marking the initial billing as <b>Unpaid</b> will <b>cancel</b> all the payments posted to it.
     </CardNote>
-    <b-overlay :show="isLoading" rounded="sm">
-      <InputGroup>
-        <InputContainer>
-          <InputInline>
-            <Toggle @input="onMarkUnpaid" v-model="isUnpaid"/>
-            <span class="ml-2">Mark as Unpaid</span>
-          </InputInline>
-        </InputContainer>
-        <div class="initial-fee__container">
-          <label class="required label">Registration Fee</label>
-          <!-- <b-form-input v-model="forms.billing.fields.totalAmount"/> -->
-          <vue-autonumeric
-            v-model="forms.billing.fields.totalAmount"
-            class="form-control text-right"
-            :options="[{modifyValueOnWheel: false,emptyInputBehavior: 0,},]"
-          />
-        </div>
-      </InputGroup>
-    </b-overlay>
+    <InputGroup>
+      <InputContainer>
+        <InputInline>
+          <Toggle @input="onMarkUnpaid" v-model="isUnpaid"/>
+          <span class="ml-2">Mark as Unpaid</span>
+        </InputInline>
+      </InputContainer>
+      <div class="initial-fee__container">
+        <label class="required label">Registration Fee</label>
+        <!-- <b-form-input v-model="forms.billing.fields.totalAmount"/> -->
+        <vue-autonumeric
+          v-model="forms.billing.fields.totalAmount"
+          class="form-control text-right"
+          :options="[{modifyValueOnWheel: false,emptyInputBehavior: 0,},]"
+        />
+      </div>
+    </InputGroup>
+
     <template v-slot:footer>
       <CardFooterRow>
         <b-button v-if="!isReadOnly" variant="primary" @click="onUpdateAmount" :disabled="isProcessing">

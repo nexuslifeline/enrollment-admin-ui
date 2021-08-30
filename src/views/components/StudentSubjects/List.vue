@@ -1,8 +1,9 @@
 <template>
   <div>
     <Card
-      title="Manage Dropped Subjects"
-      titleSize="m">
+      title="Manage Subjects"
+      titleSize="m"
+      :isLoading="isLoading">
       <template v-slot:header-action>
         <div class="header__action-dropdown">
           <SelectAcademicRecord
@@ -14,17 +15,20 @@
             :includeDraftStatus="false"/>
         </div>
       </template>
-      <b-overlay :show="isLoading" rounded="sm">
-        <div v-if="options.subjects.items.length > 0" class="subjects__list">
-          <template v-for="(item, idx) in options.subjects.items">
-            <Item :data="item" :key="idx" @onChange="onStatusChange" />
-          </template>
-        </div>
-        <div v-else>
-          <vText size="s" weight="light">No record(s) found.</vText>
-        </div>
-      </b-overlay>
+      <div v-if="options.subjects.items.length > 0" class="subjects__list">
+        <template v-for="(item, idx) in options.subjects.items">
+          <Item :data="item" :key="idx" @onChange="onStatusChange" @onEdit="onEdit"/>
+        </template>
+      </div>
+      <div v-else>
+        <vText size="s" weight="light">No record(s) found.</vText>
+      </div>
     </Card>
+    <EditSubject v-if="showEditSubject"
+      :show.sync="showEditSubject"
+      :data="selectedSubject"
+      :academicRecord="selectedAcademicRecord"
+      @onSubjectUpdated="onSubjectUpdated" />
   </div>
 </template>
 <script>
@@ -33,11 +37,13 @@ import { AcademicRecordStatuses } from '../../../helpers/enum'
 
 import Card from '../Card';
 import Item from './Item';
+import EditSubject from './Edit'
 
 export default {
   components: {
     Card,
-    Item
+    Item,
+    EditSubject
   },
   mixins: [ AcademicRecordApi, StudentApi ],
   props: {
@@ -56,7 +62,9 @@ export default {
       },
       selectedAcademicRecord: null,
       data: {},
-      isLoading: true
+      isLoading: true,
+      selectedSubject: null,
+      showEditSubject: false
     }
   },
   created() {
@@ -107,6 +115,16 @@ export default {
       return null
 
       return latestAcademicRecord
+    },
+    onEdit(item) {
+      console.log(item)
+      this.selectedSubject = item
+      this.showEditSubject = true
+    },
+    onSubjectUpdated(subject) {
+      const { items: subjects }= this.options.subjects
+      const index = subjects.findIndex(s => s.id === subject.id)
+      subjects.splice(index, 1, subject)
     }
   }
 };

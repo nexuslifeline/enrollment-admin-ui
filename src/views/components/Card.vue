@@ -26,7 +26,12 @@
       <span v-if="isCompleted" class="c-card__completion-status">Completed!</span>
     </div>
     <div class="c-card__body" :class="{ noPadding: noPaddingBody }">
-      <slot></slot>
+      <template v-if="isLoading">
+        <CardLoader/>
+      </template>
+      <template v-else>
+        <slot></slot>
+      </template>
     </div>
     <div v-if="hasFooter" class="c-card__footer">
       <slot name="footer"></slot>
@@ -34,6 +39,7 @@
   </div>
 </template>
 <script>
+import CardLoader from './Card/CardLoader'
 export default {
   props: {
     title: {
@@ -67,7 +73,12 @@ export default {
       type: Boolean,
       default: false,
     },
+    isLoading: {
+      type: [Boolean],
+      default: false
+    }
   },
+  components: { CardLoader }
 };
 </script>
 <style lang="scss" scoped>
