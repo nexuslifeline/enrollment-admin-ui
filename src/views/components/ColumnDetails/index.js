@@ -8,3 +8,4 @@ export { default as StatusColumn } from './StatusColumn';
 export { default as EnlistmentStatusColumn } from './EnlistmentStatusColumn';
 export { default as AssessmentStatusColumn } from './AssessmentStatusColumn';
 export { default as ManualStageColumn } from './ManualStageColumn';
+export { default as SoaStatusColumn } from './SoaStatusColumn';

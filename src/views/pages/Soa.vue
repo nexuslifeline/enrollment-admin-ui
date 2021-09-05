@@ -139,26 +139,16 @@
         <template v-slot:cell(education)="data">
           <EducationColumn :data="data.item.student.latestAcademicRecord" />
         </template>
-        <template v-slot:cell(billingStatusId)="{ value }">
-          <b-badge
-            :variant="
-              value === $options.BillingStatuses.UNPAID.id
-                ? 'danger'
-                : 'success'
-            "
-          >
-            {{ $options.BillingStatuses.getEnum(value).name }}
-          </b-badge>
+        <template v-slot:cell(billingStatusId)="data">
+          <SoaStatusColumn :data="data.item" />
         </template>
-        <template v-slot:cell(action)="{ item: { id } }">
+        <template v-slot:cell(action)="{ item: { id, billingStatusId, isForwarded } }">
           <b-dropdown
-            v-if="
-              isAccessible([
-                $options.StatementOfAccountPermissions.PREVIEW.id,
-                $options.StatementOfAccountPermissions.EDIT.id,
-                $options.StatementOfAccountPermissions.DELETE.id,
-              ])
-            "
+            v-if="isAccessible([
+              $options.StatementOfAccountPermissions.PREVIEW.id,
+              $options.StatementOfAccountPermissions.EDIT.id,
+              $options.StatementOfAccountPermissions.DELETE.id,
+            ])"
             boundary="window"
             right
             variant="link"
@@ -173,19 +163,13 @@
               @click="previewBilling(id)">
               <v-icon name="file-pdf" /> Preview
             </b-dropdown-item>
-            <!-- <b-dropdown-item
-              v-if="
-                isAccessible($options.StatementOfAccountPermissions.EDIT.id)
-              "
-              @click="setUpdateSoa(id)"
-            >
-              <v-icon name="pen" /> Edit
-            </b-dropdown-item> -->
-            <b-dropdown-item
-              v-if="isAccessible($options.StatementOfAccountPermissions.DELETE.id)"
-              @click="(forms.billing.fields.id = id), (showModalConfirmation = true)">
-              <v-icon name="trash" /> Delete
-            </b-dropdown-item>
+            <template v-if="billingStatusId !== $options.BillingStatuses.PAID.id && !isForwarded">
+              <b-dropdown-item
+                v-if="isAccessible($options.StatementOfAccountPermissions.DELETE.id)"
+                @click="(forms.billing.fields.id = id), (showModalConfirmation = true)">
+                <v-icon name="trash" /> Delete
+              </b-dropdown-item>
+            </template>
           </b-dropdown>
         </template>
       </b-table>
@@ -254,8 +238,6 @@
 </template>
 <script>
 import FileViewer from '../components/FileViewer';
-import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
-import SelectPaginated from '../components/SelectPaginated';
 import {
   SchoolCategories,
   Semesters,
@@ -274,67 +256,24 @@ import {
   ReportApi,
   SchoolFeeApi,
 } from '../../mixins/api';
-import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, SoaStatusColumn } from '../components/ColumnDetails';
 import {
-  clearFields,
   formatNumber,
-  reset,
-  showNotification,
-  validate,
+  showNotification
 } from '../../helpers/forms';
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
-import Card from '../components/Card';
-import debounce from 'lodash/debounce';
 import tables from '../../helpers/tables';
-import { copyValue } from '../../helpers/extractor';
 import Access from '../../mixins/utils/Access';
 import PageContent from "../components/PageContainer/PageContent";
 import NoAccess from '../components/NoAccess';
-import SelectedOption from '../components/DropdownSlots/SelectedOption';
-import ProfileMaker from '../components/ProfileMaker.vue';
-
-// const billingFields = {
-//   id: null,
-//   student: {
-//     studentNo: null,
-//     name: null,
-//     levelName: null,
-//     courseName: null,
-//     semesterName: null,
-//   },
-//   billingItems: null,
-//   semesterId: null,
-//   studentId: null,
-//   studentFeeId: null,
-//   termId: null,
-//   previousBalance: null,
-//   amount: null,
-//   totalAmount: null,
-//   dueDate: null,
-// };
-
-// const batchBillingFields = {
-//   schoolCategoryId: null,
-//   semesterId: null,
-//   dueDate: null,
-//   levelId: null,
-//   termId: null,
-//   billingItems: null,
-// };
 
 export default {
   components: {
-    SchoolCategoryTabs,
-    VueBootstrapTypeahead,
-    Card,
     FileViewer,
     StudentColumn,
     EducationColumn,
+    SoaStatusColumn,
     PageContent,
-    NoAccess,
-    SelectPaginated,
-    SelectedOption,
-    ProfileMaker
+    NoAccess
   },
   mixins: [
     TermApi,
@@ -823,7 +762,7 @@ export default {
         },
       } = this.forms;
       billing.isProcessing = true;
-      this.deleteBilling(id).then(({ data }) => {
+      this.deleteBilling(id).then(() => {
         billing.isProcessing = false;
         this.loadBillings();
         showNotification(this, 'success', 'SOA deleted successfully.');
@@ -965,7 +904,7 @@ export default {
     // 'forms.billing.studentQuery': debounce(function() {
     //   this.loadStudents();
     // }, 500),
-    '$store.state.schoolYear': function(newVal) {
+    '$store.state.schoolYear': function() {
       this.loadBillings();
     },
   },
