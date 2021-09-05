@@ -48,6 +48,9 @@
               :per-page="paginations.user.perPage"
               :filter="filters.user.criteria"
               @filtered="onFiltered($event, paginations.user)"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              @sort-changed="onSortChanged"
               responsive
             >
               <template v-slot:cell(account)="data">
@@ -55,6 +58,12 @@
                   :data="data.item"
                   :callback="{ loadDetails: () => $router.push(`/master-files/member/${data.item.id}`) }"
                 />
+              </template>
+              <template v-slot:cell(userGroup)="data">
+                {{ data.item.user && data.item.user.userGroup && data.item.user.userGroup.name || '' }}
+              </template>
+              <template v-slot:cell(department)="data">
+                {{ data.item.department && data.item.department.name || '' }}
               </template>
               <template v-slot:table-busy>
                 <div class="text-center my-2">
@@ -264,6 +273,8 @@ export default {
       selectedPhoto: null,
       personnelPhotoUrl: null,
       entryMode: '',
+      sortBy: null,
+      sortDesc: null,
       forms: {
         personnel: {
           isLoading: false,
@@ -288,31 +299,35 @@ export default {
               key: 'account',
               label: 'Account',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '30%' },
+              sortable: true
             },
             {
               key: 'completeAddress',
               label: 'Address',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '30%' },
             },
             {
-              key: 'user.userGroup.name',
+              key: 'userGroup',
               label: 'User Group',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '20%' },
+              sortable: true
             },
             {
-              key: 'department.name',
+              key: 'department',
               label: 'Department',
               tdClass: 'align-middle',
               thStyle: { width: '18%' },
+              sortable: true
             },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle',
               thStyle: { width: '20px' },
+              sortable: true
             },
           ],
           items: [],
@@ -367,7 +382,11 @@ export default {
 
       users.isBusy = true;
 
-      const params = { paginate: false, userGroupId, departmentId };
+      const params = {
+          paginate: false,
+          userGroupId,
+          departmentId,
+          ordering: this.getOrdering(this.sortBy, this.sortDesc) };
       this.getPersonnelList(params).then(({ data }) => {
         users.items = data;
         user.totalRows = data.length;
@@ -515,6 +534,24 @@ export default {
         name: 'List Change Member Password',
         params: { personnelId: row.item.id }
       })
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadPersonnels();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        account: 'first_name',
+        department: 'department_name',
+        userGroup: 'user_group_name',
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
   },
 };
