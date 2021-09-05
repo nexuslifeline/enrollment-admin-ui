@@ -46,6 +46,7 @@ import SubjectsTable from './SubjectsTable';
 import { TranscriptRecordApi } from '../../../mixins/api';
 import { Semesters } from '../../../helpers/enum'
 import { showNotification } from '../../../helpers/forms';
+import { parse } from 'date-fns/fp';
 
 export default {
   Semesters,
@@ -96,6 +97,11 @@ export default {
   },
   methods: {
     onSave(data) {
+      if(!this.validGrades) {
+        showNotification(this, 'warning', 'There are invalid grades on credited subjects. Please enter a grade between 65 - 100.')
+        return
+      }
+
       this.isProcessing = true
       this.saveTranscriptRecordSubjects(this.transcriptId, data).then(({ data }) => {
         showNotification(this, 'success', 'Subjects has been updated.')
@@ -104,8 +110,20 @@ export default {
         console.log(error)
         this.isProcessing = false
       })
+    },
+  },
+  computed: {
+    validGrades() {
+      const subject = this.subjects.find(subject => subject.isTaken && (parseFloat(subject.grade) < 65 || parseFloat(subject.grade) > 100))
+      if(!subject){
+        return true
+      }
+
+      //fail validation of grades
+      return false
     }
   }
+
 };
 </script>
 <style lang="scss" scoped>

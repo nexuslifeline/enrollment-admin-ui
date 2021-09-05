@@ -24,10 +24,10 @@
                 {{ row.totalUnits }}
               </td>
               <td class="cell credited-cell">
-                <Toggle v-model="row.isTaken" />
+                <Toggle v-model="row.isTaken" @input="onCreditChanged($event, row)"/>
               </td>
               <td class="cell__input grade-cell">
-                <input type="number" v-model="row.grade" />
+                <input type="number" v-model="row.grade" min="65" max="100" class="grade-input" :disabled="!row.isTaken"/>
               </td>
               <td class="cell__input remarks-cell">
                 <input type="text" v-model="row.notes" />
@@ -71,6 +71,14 @@ export default {
     isProcessing: {
       type: [Boolean, String],
       default: false
+    }
+  },
+  methods: {
+    onCreditChanged(checked, subject) {
+      console.log(subject)
+      if(!checked) {
+        subject.grade = 0
+      }
     }
   },
   computed: {
@@ -148,5 +156,14 @@ export default {
 .remarks-cell {
   width: 20%;
 }
+
+.grade-cell {
+  input {
+    text-align:  right;
+    direction: rtl;
+  }
+}
+
+
 
 </style>
