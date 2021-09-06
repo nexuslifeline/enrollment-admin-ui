@@ -305,6 +305,7 @@ export const UserGroups = new Enum({
 export const BillingStatuses = new Enum({
   PAID: { id: 1, name: 'Paid' },
   UNPAID: { id: 2, name: 'Unpaid' },
+  PARTIAL: { id: 3, name: 'Partially Paid' },
 });
 
 export const BillingTypes = new Enum({

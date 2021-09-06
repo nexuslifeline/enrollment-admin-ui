@@ -7,7 +7,7 @@
   <b-badge
     v-else
     :variant="data.isForwarded ? 'primary' : 'warning'">
-    Unpaid
+    {{ data.billingStatusId === $options.BillingStatuses.UNPAID.id ? 'Unpaid': 'Partially Paid' }}
     <span v-if="data.isForwarded">&nbsp;+ Forwarded</span>
   </b-badge>
 </template>
