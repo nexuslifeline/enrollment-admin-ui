@@ -151,7 +151,7 @@ const profileFields = {
   birthDate: null,
   civilStatusId: null,
   // email: null,
-  isManual: 1,
+  // isManual: 1,
   photo: {}
 }
 
