@@ -290,6 +290,15 @@ export default {
     onProceed() {
       const { academicRecord, student } = this.forms
       reset(academicRecord)
+
+      const payload = {
+          schoolYearId: this.schoolYearId,
+          schoolCategoryId: this.schoolCategoryId,
+          levelId: this.levelId,
+          semesterId: this.semesterId,
+          courseId: this.courseId
+        };
+
       if (this.selectedIndex === 0) {
         //existing student
 
@@ -300,13 +309,6 @@ export default {
 
         this.isConfirmBusy = true
         const studentId = this.selectedStudent?.id
-        const payload = {
-          schoolYearId: this.schoolYearId,
-          schoolCategoryId: this.schoolCategoryId,
-          levelId: this.levelId,
-          semesterId: this.semesterId,
-          courseId: this.courseId
-        };
 
         this.quickEnroll(studentId, payload).then(({ data }) => {
           const academicRecordId = data.id
@@ -328,7 +330,7 @@ export default {
         this.addStudent({ firstName: this.firstName || null, lastName: this.lastName || null }).then(({ data }) => {
           const studentId = data.id
           this.selectedStudent = data
-          this.quickEnroll(studentId, { schoolYearId: this.schoolYearId, schoolCategoryId: this.schoolCategoryId }).then(({ data }) => {
+          this.quickEnroll(studentId, payload).then(({ data }) => {
             const academicRecordId = data.id
             this.isConfirmBusy = false
             this.$router.push({
