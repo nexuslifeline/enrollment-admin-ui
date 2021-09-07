@@ -175,6 +175,9 @@
                 :per-page="paginations.curriculum.perPage"
                 :filter="filters.curriculum.criteria"
                 @filtered="onFiltered($event, paginations.curriculum)"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                @sort-changed="onSortChanged"
               >
                 <template v-slot:table-busy>
                   <div class="text-center my-2">
@@ -394,6 +397,9 @@
                       </b-row>
                     </b-card>
                   </b-overlay>
+                </template>
+                <template v-slot:cell(course)="row">
+                  {{ row.item && row.item.course && row.item.course.name || 'N/A' }}
                 </template>
               </b-table>
               <b-row>
@@ -1263,6 +1269,7 @@ import Card from '../components/Card';
 import PageContent from '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
 import SchoolCategory from '../../mixins/api/SchoolCategory';
+import { camelToSnakeCase } from '../../helpers/utils';
 
 const curriculumFields = {
   id: null,
@@ -1278,6 +1285,7 @@ const curriculumFields = {
 
 export default {
   name: 'Curriculum',
+  camelToSnakeCase,
   mixins: [
     SchoolCategoryApi,
     LevelApi,
@@ -1305,6 +1313,8 @@ export default {
       showModalSchoolCategory: false,
       entryMode: 'Add',
       isLoading: false,
+      sortBy: null,
+      sortDesc: null,
       forms: {
         curriculum: {
           isProcessing: false,
@@ -1323,13 +1333,8 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: 'auto' },
+              sortable: true
             },
-            // {
-            //   key: "description",
-            // 	label: "Description",
-            // 	tdClass: "align-middle",
-            // 	thStyle: {width: "auto"}
-            // },
             {
               key: 'effectiveYear',
               label: 'Effective',
@@ -1338,9 +1343,10 @@ export default {
             },
             {
               key: 'schoolCategories',
-              label: 'School',
+              label: 'School Categories',
               tdClass: 'align-middle',
               thStyle: { width: '15%' },
+              // sortable: true,
               formatter: (value) => {
                 let text = '';
                 value.forEach(v => {
@@ -1351,43 +1357,12 @@ export default {
               }
             },
             {
-              key: 'course.name',
+              key: 'course',
               label: 'Course',
               tdClass: 'align-middle',
               thStyle: { width: '10%' },
-              formatter: (value) => {
-                if (value) {
-                  return value;
-                } else {
-                  return 'N/A';
-                }
-              },
+              sortable: true,
             },
-            // {
-            // 	key: "course.major",
-            // 	label: "Major",
-            // 	tdClass: "align-middle",
-            // 	thStyle: {width: "10%"}
-            // },
-            // {
-            //   key: 'level.name',
-            //   label: 'Level',
-            //   tdClass: 'align-middle',
-            //   thStyle: { width: '8%' },
-            //   formatter: (value) => {
-            //     if (value) {
-            //       return value;
-            //     } else {
-            //       return 'N/A';
-            //     }
-            //   },
-            // },
-            // {
-            // 	key: "notes",
-            // 	label: "Notes",
-            // 	tdClass: "align-middle",
-            // 	thStyle: {width: "15%"}
-            // },
             {
               key: 'active',
               label: 'Status',
@@ -1661,7 +1636,8 @@ export default {
       const { schoolCategoryId, levelId, courseId } = this.filters.curriculum;
       curriculums.isBusy = true;
 
-      let params = { paginate: false, schoolCategoryId, levelId, courseId };
+      let params = { paginate: false, schoolCategoryId, levelId, courseId, ordering: this.getOrdering(this.sortBy, this.sortDesc) };
+      console.log(this.getOrdering(this.sortBy, this.sortDesc))
       this.getCurriculumList(params).then(({ data }) => {
         curriculums.items = data;
         curriculum.totalRows = data.length;
@@ -1832,8 +1808,6 @@ export default {
         data.subjects.forEach((s) => {
           s.prerequisites = s.prerequisites.map((p) => p.id);
         });
-        
-        
         fields.subjects = data.subjects;
         fields.schoolCategories = data.schoolCategories.map(sc => {
           const schoolCategory = SchoolCategories.getEnum(sc.id)
@@ -1847,7 +1821,6 @@ export default {
         if (data.courseId) {
           this.loadCoursesOfSchoolCategoryList(fields.schoolCategories[0]?.id)
         }
-        
         // let getSelectedLevel = false;
         // if (this.checkSchoolCategory()) {
         //   this.loadLevelsOfCourse();
@@ -2255,7 +2228,27 @@ export default {
         const { schoolCategories } = this.forms.curriculum.fields
         return schoolCategories.length > 0 ? true : false
       }
-    }
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadCurriculums();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      //TODO: 08/30/2021
+      //school category sorting not yet working
+      return ({
+        name: 'name',
+        schoolCategory: 'school_category_name',
+        course: 'course_name'
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
+    },
   },
   computed: {
     totalUnits() {
