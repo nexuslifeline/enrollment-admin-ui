@@ -19,7 +19,7 @@
             :schoolYearId="academicRecord.schoolYearId"
             @input="onSectionChanged"
             label="name"
-            :clearable="false"
+            :clearable="true"
             :class=" { 'is-invalid' : !!forms.subject.errors.sectionId  }"
             appendToBody
           />
