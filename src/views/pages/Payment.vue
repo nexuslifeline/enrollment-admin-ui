@@ -388,7 +388,7 @@
                       >
                         {{ data.item.billing.billingNo }}
                       </b-link>
-                      <p>
+                      <p v-else>
                         {{ data.item.billing.billingNo }}
                       </p>
                     </ActiveViewItem>
@@ -409,6 +409,20 @@
                             ? data.item.billing.billingType.name
                             : ''
                         }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Billing Type : ">
+                      <p>
+                        {{
+                          data.item.billing.billingType
+                            ? data.item.billing.billingType.name
+                            : ''
+                        }}
+                      </p>
+                    </ActiveViewItem>
+                    <ActiveViewItem label="Billing Type : ">
+                      <p>
+                       {{ data.item.paymentMode && data.item.paymentMode.name || '' }}
                       </p>
                     </ActiveViewItem>
                   </ActiveViewItems>

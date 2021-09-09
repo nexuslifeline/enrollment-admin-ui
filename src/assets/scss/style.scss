@@ -716,9 +716,9 @@ legend.required:before {
   overflow: auto;
   padding: 20px 25px;
 
-  &.overflow-visible {
-    overflow: visible;
-  }
+  // &.overflow-visible {
+  //   overflow: visible;
+  // }
 }
 
 .v-select.is-invalid {
