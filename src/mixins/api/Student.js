@@ -45,7 +45,7 @@ export default {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/student-fees`, { params: params });
     },
     getBillingsOfStudent(studentId) {
-      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/billings`);
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/students/${studentId}/open-billings`);
     },
     manualRegisterStudent(data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/students/manual-registration`, data);
