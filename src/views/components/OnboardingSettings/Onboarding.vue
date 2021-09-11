@@ -7,38 +7,42 @@
       If student is mark as <b>Onboarding</b>,
       the student will not be able to access the Dashboard and will be require to complete the Onboarding process.
     </CardNote>
-    <InputGroup>
+    <InputGroup :style="{ marginBottom: '10px' }">
       <InputContainer>
         <InputInline>
           <Toggle v-model="isOnboarding" />
           <span class="ml-2">Onboarding</span>
         </InputInline>
       </InputContainer>
-      <InputContainer>
-        <SelectOnboardingSteps
-          v-model="onboardingStepId"
-          :reduce="option => option.id"
-          :clearable="false"
-          label="name"
-          :disabled="!isOnboarding"
-        />
+      <InputContainer :style="{ minWidth: '65%' }">
+        <InputInline>
+          <span class="inline-label">Onboarding Stage</span>
+          <SelectOnboardingSteps
+            v-model="onboardingStepId"
+            :reduce="option => option.id"
+            :clearable="false"
+            label="name"
+            :disabled="!isOnboarding"
+            :style="{ flex: 1 }"
+          />
+        </InputInline>
       </InputContainer>
     </InputGroup>
     <InputGroup>
-      <InputContainer>
+      <InputContainer />
+      <InputContainer :style="{ minWidth: '65%' }">
         <InputInline>
-          <span class="ml-2">Academic Record Status</span>
+          <span class="inline-label">Academic Record Status</span>
+          <SelectAcademicStatus
+            :value="academicRecordStatusId"
+            @input="academicRecordStatusId = $event"
+            :reduce="option => option.id"
+            label="name"
+            :disabled="false"
+            :clearable="false"
+            :style="{ flex: 1 }"
+          />
         </InputInline>
-      </InputContainer>
-      <InputContainer>
-        <SelectAcademicStatus
-          :value="academicRecordStatusId"
-          @input="academicRecordStatusId = $event"
-          :reduce="option => option.id"
-          label="name"
-          :disabled="false"
-          :clearable="false"
-        />
       </InputContainer>
     </InputGroup>
     <template v-slot:footer>
@@ -99,4 +103,10 @@ import { showNotification } from '../../../helpers/forms';
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/shared.scss";
+
+  .inline-label {
+    margin-right: 15px;
+    text-align: left;
+    min-width: 160px;
+  }
 </style>

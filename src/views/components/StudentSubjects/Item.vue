@@ -76,11 +76,10 @@ export default {
   flex-direction: row;
   align-items: center;
   padding: 20px 0;
-  border-bottom: 1px solid $light-gray-10;
+  border-bottom: 1px solid $light-gray-100;
 
   &:last-child {
     margin-bottom: 0;
-    border-bottom: 0;
   }
 }
 

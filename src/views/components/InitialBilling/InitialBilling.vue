@@ -13,7 +13,7 @@
       <InputContainer>
         <InputInline>
           <Toggle @input="onMarkUnpaid" v-model="isUnpaid"/>
-          <span class="ml-2">Mark as Unpaid</span>
+          <span class="ml-2">Mark as <b>Unpaid</b></span>
         </InputInline>
       </InputContainer>
       <div class="initial-fee__container">

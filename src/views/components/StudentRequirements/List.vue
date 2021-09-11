@@ -102,7 +102,7 @@ export default {
 
 .subjects__list {
   width: 100%;
-  min-height: 120px;
+  min-height: 80px;
   background-color: $white;
   margin: -20px 0;
 }

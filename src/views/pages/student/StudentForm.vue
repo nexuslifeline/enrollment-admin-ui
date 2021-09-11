@@ -104,7 +104,8 @@ export default {
       return this.isAccessible(this.$options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id);
     },
     isBillingTabVisible() {
-      return this.isAccessible(this.$options.StudentPermissions.MANAGE_INITIAL_BILLING.id);
+      return this.isAccessible(this.$options.StudentPermissions.MANAGE_INITIAL_BILLING.id) &&
+        this.data?.latestAcademicRecord?.hasInitialBilling;
     },
     isStudentRecordTabVisible() {
       return this.isAccessible([

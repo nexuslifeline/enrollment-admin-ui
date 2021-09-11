@@ -24,10 +24,14 @@
             appendToBody
           />
       </b-form-group>
-      <b-form-group
-        label="Dropped">
-        <Toggle :value="forms.subject.fields.isDropped" @input="onDroppedChanged"/>
-      </b-form-group>
+      <InputGroup class="mt-2">
+        <InputContainer>
+          <InputInline>
+            <Toggle :value="forms.subject.fields.isDropped" @input="onDroppedChanged"/>
+            <span class="ml-2">Dropped</span>
+          </InputInline>
+        </InputContainer>
+      </InputGroup>
     </div>
     <template v-slot:modal-footer>
       <FooterAction
