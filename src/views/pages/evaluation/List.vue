@@ -178,7 +178,7 @@ import Tables from '../../../helpers/tables';
 import Access from '../../../mixins/utils/Access';
 import { camelToSnakeCase } from '../../../helpers/utils';
 import { format } from 'date-fns';
-import { colorFactory, getColorFactoryLength } from '../../../helpers/colors';;
+import { colorFactory, getColorFactoryLength } from '../../../helpers/colors';
 import { StudentColumn, EducationColumn, AddressColumn, StatusColumn } from '../../components/ColumnDetails';
 import PageContent from '../../components/PageContainer/PageContent';
 import NoAccess from '../../components/NoAccess';
@@ -262,28 +262,28 @@ export default {
               key: 'name',
               label: 'Name',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '32%' },
               sortable: true
             },
              {
               key: 'address',
               label: 'Address',
               tdClass: 'align-middle',
-              thStyle: { width: '28%' },
+              thStyle: { width: 'auto' },
               sortable: true
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
-              thStyle: { width: '20%' },
+              thStyle: { width: 'auto' },
               sortable: false
             },
             {
               key: 'submittedDate',
               label: 'Submitted',
               tdClass: 'align-middle',
-              thStyle: { width: '10%' },
+              thStyle: { width: '100px' },
               sortable: true,
               formatter: (value) => {
                 if (!value) return '';
@@ -294,16 +294,14 @@ export default {
             {
               key: 'studentCategory',
               label: 'Category',
-              tdClass: 'align-middle text-center font-weight-bold',
-              thClass: 'text-center',
+              tdClass: 'align-middle font-weight-bold',
               thStyle: { width: '80px' },
               sortable: true,
             },
             {
               key: 'status',
               label: 'Status',
-              tdClass: 'align-middle text-center',
-              thClass: 'text-center',
+              tdClass: 'align-middle',
               thStyle: { width: '50px' },
             },
             {

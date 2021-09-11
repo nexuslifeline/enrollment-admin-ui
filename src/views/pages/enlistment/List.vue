@@ -839,29 +839,28 @@ export default {
               key: 'name',
               label: 'Name',
               tdClass: 'align-middle',
-              thStyle: { width: '25%' },
+              thStyle: { width: '35%' },
               sortable: true
             },
             {
             	key: "address",
             	label: "ADDRESS",
             	tdClass: "align-middle",
-            	thStyle: { width: '30%' },
+            	thStyle: { width: 'auto' },
               sortable: true
             },
             {
               key: 'education',
               label: 'Education',
               tdClass: 'align-middle',
-              thStyle: { width: '30%' },
+              thStyle: { width: 'auto' },
               sortable: true
             },
             {
               key: 'status',
               label: 'Status',
-              tdClass: 'align-middle text-center',
-              thClass: 'text-center',
-              thStyle: { width: '12%' },
+              tdClass: 'align-middle',
+              thStyle: { width: '50px' },
             },
             {
               key: 'action',

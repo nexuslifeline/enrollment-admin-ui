@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <!-- <div>
     <div>
       {{ data && data.level ? $options.getPropValue(data.level) : 'No Level' }}
     </div>
@@ -10,7 +10,13 @@
         {{  $options.getPropValue(data.schoolYear) }}
       </span>
     </div>
-  </div>
+  </div> -->
+  <BulletedContent :items="[
+      data && data.level ? $options.getPropValue(data.level) : 'No Level',
+      $options.getPropValue(data.course),
+      $options.getPropValue(data.semester)
+    ]"
+  />
 </template>
 
 <script>

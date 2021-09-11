@@ -86,7 +86,7 @@
         </template>
       </div>
       <SlidePanelNotes>
-        If <b>Curriculum</b> is blank in <b>Evaluation Request</b> the student has no record yet in the Database so you need to set it manually
+        If <b>Curriculum</b> is blank in the <b>Evaluation Request</b> the student has no record yet in the Database so you need to set it manually
         <span class="text-muted">(this will be automatically populated in the next enrollment)</span>.
       </SlidePanelNotes>
       <div class="group__content">

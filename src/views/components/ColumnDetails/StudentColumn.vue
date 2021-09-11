@@ -9,37 +9,41 @@
       />
     </template>
     <div class="student-name">
-      <b-link @click="callback.loadDetails">
-        {{ studentName }}
-      </b-link>
+      <div>
+        <b-link @click="callback.loadDetails">
+          {{ studentName }}
+        </b-link>
+      </div>
       <div class="label__badges-container">
         <span
           v-if="showIsManual && isManual"
           v-b-tooltip.hover
           :title="`Student is manually registered.`"
-          class="label__student-no">
+          class="label__secondary">
           {{ `Manual` }}
         </span>
-        <span
-          v-if="data && data.student && data.student.studentNo"
-          v-b-tooltip.hover
-          :title="`Student Number: ${data.student.studentNo}`"
-          class="label__student-no">
-          {{data.student.studentNo}}
-        </span>
+        <template v-if="data.student">
+          <span
+            v-if="isProvisional"
+            v-b-tooltip.hover
+            :title="`Student is still Onboarding. Currently in '${$options.OnBoardingSteps.getEnum(data.student.onboardingStepId).name}' Stage.`"
+            class="label__secondary">
+            {{ `Provisional` }}
+          </span>
+        </template>
       </div>
     </div>
-    <div class="text-muted">
-      {{ userName }}
-    </div>
+    <BulletedContent :items="[userName, `SN: ${data.student.studentNo || 'Awaiting'}`]" />
   </b-media>
 </template>
 
 <script>
 import AvatarMaker from '../AvatarMaker';
 import { getFilePath } from '../../../helpers/utils';
+import { OnBoardingSteps } from '../../../helpers/enum';
 export default {
   getFilePath,
+  OnBoardingSteps,
   props: {
     data: {
       type: [Object],
@@ -76,28 +80,14 @@ export default {
     userId() {
       return this.data?.student?.id || this.data?.student?.user?.id || 0;
     },
+    isProvisional() {
+      return this.data?.student?.isOnboarding;
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/scss/shared.scss';
-
-.student-name {
-  display: flex;
-  position: relative;
-}
-
-.label__student-no {
-  font-size: 10px;
-  padding: 0 6px;
-  border-radius: 5px;
-  color: $dark-gray-300;
-  font-weight: 600;
-  border: 1px solid $dark-gray-100;
-  background-color: $light-gray-100;
-  height: 15px;
-  cursor: pointer;
-}
 
 .label__badges-container {
   display: flex;
@@ -105,4 +95,22 @@ export default {
   position: absolute;
   right: 10px;
 }
+
+.student-name {
+  display: flex;
+  position: relative;
+}
+
+.label__secondary {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: $dark-gray-300;
+  font-weight: 600;
+  // border: 1px solid $dark-gray-100;
+  background-color: $light-gray-100;
+  cursor: pointer;
+  line-height: 13px;
+}
+
 </style>

@@ -4,7 +4,7 @@ const TABLET_LANDSCAPE = 900;
 const TABLET_PORTRAIT = 600;
 const PHONE = 599;
 const MEDIUM_PHONE = 380;
-const SMALL_PHONE = 320;
+// const SMALL_PHONE = 320;
 
 export const getFilePath = (filename) => {
   return `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${filename}`

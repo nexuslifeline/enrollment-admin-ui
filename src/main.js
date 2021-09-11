@@ -44,6 +44,7 @@ import SelectSubjectSection from './views/components/Dropdowns/SelectSubjectSect
 import AvatarMaker from './views/components/AvatarMaker';
 import vText from './views/components/Text';
 import Card from './views/components/Card';
+import BulletedContent from './views/components/BulletedContent/BulletedContent';
 import CardNote from './views/components/CardNote';
 import CardFooterRow from './views/components/CardFooterRow';
 import BackLink from './views/components/BackLink/Link';
@@ -172,6 +173,7 @@ Vue.component('BProgress', BProgress)
 Vue.component('BIconPlus', BIconPlus);
 Vue.component('SlidePanel', SlidePanel);
 Vue.component('SlidePanelNotes', SlidePanelNotes);
+Vue.component('BulletedContent', BulletedContent);
 
 import 'vue-awesome/icons/spinner'
 import 'vue-awesome/icons/check'
