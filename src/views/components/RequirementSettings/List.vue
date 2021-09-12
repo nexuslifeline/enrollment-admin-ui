@@ -5,7 +5,8 @@
       titleSize="m"
       actionLabel="Add Requirement"
       @onAddNew="onAddRequirement"
-      showAction>
+      showAction
+      :isLoading="isLoading">
       <template v-slot:header-action>
         <!-- v-if="items.length > 0" -->
         <div  class="header__action-dropdown">
@@ -13,7 +14,8 @@
             label="name"
             :value="filters.schoolCategory"
             placeholder="School Category"
-            @input="onSchoolCategoryChanged" />
+            @input="onSchoolCategoryChanged"
+            appendToBody />
         </div>
       </template>
       <div v-if="items.length > 0" class="Requirement__list">
@@ -63,6 +65,7 @@ export default {
       selected: {},
       isConfirmBusy: false,
       isDeleteBusy: false,
+      isLoading: true,
       forms: {
         requirement: {
           states: { ...requirementErrorFields },
@@ -85,8 +88,10 @@ export default {
     loadRequirements() {
       const { schoolCategoryId } = this.filters
       const params = { paginate: false, schoolCategoryId }
+      this.isLoading = true
       this.getRequirementList(params).then(({ data }) => {
         this.items = data
+        this.isLoading = false
       })
     },
     onAddRequirement() {

@@ -13,6 +13,7 @@
         debounce="500"
         type="text"
         placeholder="Search"
+        @update="loadPersonnels()"
       />
       <v-select
         :options="options.userGroups.items"
@@ -44,10 +45,6 @@
               :fields="tables.users.fields"
               :busy="tables.users.isBusy"
               :items="tables.users.items"
-              :current-page="paginations.user.page"
-              :per-page="paginations.user.perPage"
-              :filter="filters.user.criteria"
-              @filtered="onFiltered($event, paginations.user)"
               :sort-by.sync="sortBy"
               :sort-desc.sync="sortDesc"
               @sort-changed="onSortChanged"
@@ -144,7 +141,7 @@
                   :per-page="paginations.user.perPage"
                   size="sm"
                   align="end"
-                  @input="paginate(paginations.user)"
+                  @input="loadPersonnels()"
                 />
               </b-col>
             </b-row>
@@ -377,20 +374,25 @@ export default {
   methods: {
     loadPersonnels() {
       const { users } = this.tables;
-      const { user } = this.paginations;
-      const { userGroupId, departmentId } = this.filters.user
+      const { user, user: { perPage, page } } = this.paginations;
+      const { userGroupId, departmentId, criteria } = this.filters.user
 
       users.isBusy = true;
 
       const params = {
-          paginate: false,
+          paginate: true,
+          perPage,
+          page,
           userGroupId,
           departmentId,
+          criteria,
           ordering: this.getOrdering(this.sortBy, this.sortDesc) };
+
       this.getPersonnelList(params).then(({ data }) => {
-        users.items = data;
-        user.totalRows = data.length;
-        this.paginate(user);
+        users.items = data.data;
+        user.totalRows = data.meta.total;
+        user.from = data.meta.from;
+        user.to = data.meta.to;
         users.isBusy = false;
       });
     },
