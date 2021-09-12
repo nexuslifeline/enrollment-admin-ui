@@ -213,7 +213,7 @@ import {
   ReportApi,
   SchoolFeeApi,
 } from '../../mixins/api';
-import { StudentColumn, EducationColumn, SoaStatusColumn, BillColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, BillColumn } from '../components/ColumnDetails';
 import {
   formatNumber,
   showNotification
@@ -228,7 +228,6 @@ export default {
     FileViewer,
     StudentColumn,
     EducationColumn,
-    SoaStatusColumn,
     BillColumn,
     PageContent,
     NoAccess

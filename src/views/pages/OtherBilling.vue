@@ -126,6 +126,7 @@
           </b-col>
         </b-row> -->
         <b-table
+          class="c-table"
           details-td-class="table-secondary"
           hover
           outlined
@@ -160,6 +161,12 @@
                 </template>
               </b-table>
             </b-card>
+          </template>
+          <template v-slot:cell(billingNo)="data">
+            <BillColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => previewBilling(data.item.id) }"
+            />
           </template>
           <template v-slot:cell(name)="data">
             <StudentColumn
@@ -223,6 +230,7 @@
           </b-col>
           <b-col md="6">
             <b-pagination
+              class="c-pagination"
               v-model="paginations.billing.page"
               :total-rows="paginations.billing.totalRows"
               :per-page="paginations.billing.perPage"
@@ -788,13 +796,12 @@ import {
   showNotification,
   validate,
 } from '../../helpers/forms';
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead';
 import debounce from 'lodash/debounce';
 import tables from '../../helpers/tables';
 import Card from '../components/Card';
 import { copyValue } from '../../helpers/extractor';
 import Access from '../../mixins/utils/Access';
-import { StudentColumn, EducationColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, BillColumn } from '../components/ColumnDetails';
 import PageContent  from '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
 import SelectPaginated from '../components/SelectPaginated';
@@ -826,8 +833,7 @@ const batchBillingFields = {
 
 export default {
   components: {
-    SchoolCategoryTabs,
-    VueBootstrapTypeahead,
+    BillColumn,
     Card,
     StudentColumn,
     EducationColumn,
@@ -865,29 +871,30 @@ export default {
           isBusy: false,
           fields: [
             {
-              key: 'name',
-              label: 'STUDENT',
-              tdClass: 'align-middle',
-              thStyle: { width: '20%' },
-            },
-            {
-              key: 'education',
-              label: 'EDUCATION',
-              tdClass: 'align-middle',
-              thStyle: { width: '20%' },
-            },
-            {
-              key: 'dueDate',
-              label: 'DUE DATE',
-              tdClass: 'align-middle',
-              thStyle: { width: '130px' },
-            },
-            {
               key: 'billingNo',
               label: 'BILLING NO.',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
+              thStyle: { width: 'auto' },
             },
+            {
+              key: 'name',
+              label: 'STUDENT',
+              tdClass: 'align-middle',
+              thStyle: { width: 'auto' },
+            },
+            // {
+            //   key: 'education',
+            //   label: 'EDUCATION',
+            //   tdClass: 'align-middle',
+            //   thStyle: { width: '20%' },
+            // },
+            // {
+            //   key: 'dueDate',
+            //   label: 'DUE DATE',
+            //   tdClass: 'align-middle',
+            //   thStyle: { width: '130px' },
+            // },
+
             {
               key: 'totalAmount',
               label: 'AMOUNT',
@@ -898,13 +905,13 @@ export default {
                 return formatNumber(value);
               },
             },
-            {
-              key: 'billingStatusId',
-              label: 'STATUS',
-              tdClass: 'align-middle text-center',
-              thClass: 'text-center',
-              thStyle: { width: '10%' },
-            },
+            // {
+            //   key: 'billingStatusId',
+            //   label: 'STATUS',
+            //   tdClass: 'align-middle text-center',
+            //   thClass: 'text-center',
+            //   thStyle: { width: '10%' },
+            // },
             {
               key: 'action',
               label: '',
