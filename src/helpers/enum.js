@@ -904,14 +904,14 @@ export const Levels = new Enum({
 })
 
 export const OnBoardingSteps = new Enum({
-  PROFILE: { id: 1, name: 'Profile' },
-  ADDRESS: { id: 2, name: 'Address' },
-  FAMILY: { id: 3, name: 'Family' },
-  EDUCATION: { id: 4, name: 'Education' },
-  REQUEST_EVALUATION: { id: 5, name: 'Request Evaluation' },
-  EVALUATION_IN_REVIEW: { id: 6, name: 'Evaluation in Review' },
-  ACADEMIC_RECORD_APPLICATION: { id: 7, name: 'Academic Record Application' },
-  ACADEMIC_RECORD_IN_REVIEW: { id: 8, name: 'Academic Record in Review' },
-  PAYMENTS: { id: 9, name: 'Payments' },
-  PAYMENT_IN_REVIEW: { id: 10, name: 'Payment in Review' },
+  PROFILE: { id: 1, name: 'Profile', stage: 'Profile Info Entry' },
+  ADDRESS: { id: 2, name: 'Address', stage: 'Address Info Entry' },
+  FAMILY: { id: 3, name: 'Family', stage: 'Family Background Entry' },
+  EDUCATION: { id: 4, name: 'Education', stage: 'Educational Background Entry' },
+  REQUEST_EVALUATION: { id: 5, name: 'Request Evaluation', stage: 'Request for Evaluation' },
+  EVALUATION_IN_REVIEW: { id: 6, name: 'Evaluation in Review', stage: 'Waiting for Evaluation Approval' },
+  ACADEMIC_RECORD_APPLICATION: { id: 7, name: 'Academic Record Application', stage: 'Request for Application' },
+  ACADEMIC_RECORD_IN_REVIEW: { id: 8, name: 'Academic Record in Review', stage: 'Waiting for Enlistment & Assessment Approval' },
+  PAYMENTS: { id: 9, name: 'Payments', stage: 'Request for Payment Approval' },
+  PAYMENT_IN_REVIEW: { id: 10, name: 'Payment in Review', stage: 'Waiting for Payment Approval' },
 });

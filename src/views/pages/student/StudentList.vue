@@ -75,6 +75,9 @@
               <template v-slot:cell(contact)="data">
                <ContactColumn :data="data.item"/>
               </template>
+              <template v-slot:cell(address)="data">
+               <AddressColumn :data="data.item"/>
+              </template>
               <template v-slot:cell(education)="data">
                 <EducationColumn :data="data.item.latestAcademicRecord" />
               </template>
@@ -305,6 +308,7 @@ import {
   StudentColumn,
   EducationColumn,
   ContactColumn,
+  AddressColumn
 } from '../../components/ColumnDetails';
 import { getFilePath } from '../../../helpers/utils';
 import PageContent from "../../components/PageContainer/PageContent";
@@ -323,6 +327,7 @@ export default {
     StudentColumn,
     EducationColumn,
     ContactColumn,
+    AddressColumn,
     PageContent,
     StudentDeleteModal
   },
@@ -377,6 +382,14 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thClass: 'align-middle',
+              thStyle: { width: '35%' },
+              sortable: true
+            },
+            {
+              key: 'address',
+              label: 'Address',
+              tdClass: 'align-middle',
+              thClass: 'align-middle',
               thStyle: { width: 'auto' },
               sortable: true
             },
@@ -385,15 +398,14 @@ export default {
               label: 'Education',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: '20%' },
-              // sortable: true
+              thStyle: { width: 'auto' },
             },
             {
               key: 'contact',
               label: 'Contact',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: '20%' },
+              thStyle: { width: 'auto' },
               sortable: true
             },
             {

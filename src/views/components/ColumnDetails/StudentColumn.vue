@@ -26,7 +26,7 @@
           <span
             v-if="isProvisional"
             v-b-tooltip.hover
-            :title="`Student is still Onboarding. Currently in '${$options.OnBoardingSteps.getEnum(data.student.onboardingStepId).name}' Stage.`"
+            :title="`Student is still Onboarding. Currently in '${$options.OnBoardingSteps.getEnum(data.student.onboardingStepId).stage}' Stage.`"
             class="label__secondary">
             {{ `Provisional` }}
           </span>

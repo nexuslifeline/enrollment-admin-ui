@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      {{ $options.formatAddress((data.student && data.student.address) || null) }}
+      {{ $options.formatAddress(((data.student && data.student.address) || data.address) || null) }}
     </div>
   </div>
 </template>
@@ -14,6 +14,9 @@
       data: {
         type: [Object]
       }
+    },
+    created() {
+      console.log('created', this.data)
     }
   }
 </script>
