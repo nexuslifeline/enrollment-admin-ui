@@ -1,3 +1,5 @@
+import format from "date-fns/esm/format";
+
 const BIG_DESKTOP = 1800;
 const DESKTOP = 1200;
 const TABLET_LANDSCAPE = 900;
@@ -86,3 +88,6 @@ export const preview = (blobData, contentType, completion) => {
   // reader.onload = (e) => completion?.(e.target.result);
   // reader.readAsDataURL(file);
 }
+
+
+export const toReadableDate = (d) => format(new Date(d), 'MMM dd, yyyy');

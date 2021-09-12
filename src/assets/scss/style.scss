@@ -199,19 +199,19 @@ label {
 
 .badge {
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
-  font-size: 10px;
+  font-size: 9px;
 
   &:before {
     content: ' ';
-    height: 8px;
-    width: 8px;
+    height: 7px;
+    width: 7px;
     border-radius: 50%;
     border: 1px solid $white;
-    left: 2px;
-    margin: 0 3px 0 0;
+    left: 1px;
+    margin: 0 2px 0 0;
   }
 }
 

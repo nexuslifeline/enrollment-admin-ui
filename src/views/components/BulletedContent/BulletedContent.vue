@@ -26,13 +26,13 @@
     align-items: center;
     flex-wrap: wrap;
     // color: $gray;
-    font-size: 14px;
+    font-size: 13.7px;
 
     .bulleted-item {
       &:not(:last-child) {
         &::after {
           content: '\25CF';
-          margin: 0 4px;
+          margin: 0 5px 0 3px;
           color: $gray;
         }
       }

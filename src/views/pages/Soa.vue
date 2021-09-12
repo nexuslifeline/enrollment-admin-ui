@@ -63,55 +63,6 @@
     </template>
     <template v-slot:content>
     <div v-if="checkIfHasSchoolCategoryAccess()" >
-      <!-- <b-row class="mb-2">
-        <b-col md="8">
-          <b-form-radio-group
-            @input="loadBillings()"
-            v-model="filters.billing.billingStatusId"
-          >
-            <b-form-radio :value="null">Show All</b-form-radio>
-            <b-form-radio
-              v-for="status in $options.BillingStatuses.values"
-              :value="status.id"
-              :key="status.id"
-            >
-              {{ status.name }}
-            </b-form-radio>
-          </b-form-radio-group>
-        </b-col>
-        <b-col md="4"> </b-col>
-      </b-row>
-      <b-row class="mb-2">
-        <b-col md="8">
-          <b-dropdown
-            v-if="
-              isAccessible($options.StatementOfAccountPermissions.GENERATE.id)
-            "
-            variant="primary"
-          >
-            <template v-slot:button-content>
-              <v-icon name="plus-circle" />
-              Generate SOA
-            </template>
-            <b-dropdown-item @click="setCreateSoa()"
-              >Generate Single SOA</b-dropdown-item
-            >
-            <b-dropdown-item @click="setCreateBatchSoa()"
-              >Generate Batch SOA</b-dropdown-item
-            >
-          </b-dropdown>
-        </b-col>
-        <b-col md="4">
-          <b-form-input
-            v-model="filters.billing.criteria"
-            debounce="500"
-            @update="loadBillings()"
-            type="text"
-            placeholder="Search"
-          >
-          </b-form-input>
-        </b-col>
-      </b-row> -->
       <b-table
         class="c-table"
         details-td-class="table-secondary"
@@ -130,6 +81,12 @@
             <strong>Loading...</strong>
           </div>
         </template>
+        <template v-slot:cell(billingNo)="data">
+          <BillColumn
+            :data="data.item"
+            :callback="{ loadDetails: () => previewBilling(data.item.id) }"
+          />
+        </template>
         <template v-slot:cell(name)="data">
           <StudentColumn
             :data="data.item"
@@ -139,9 +96,9 @@
         <template v-slot:cell(education)="data">
           <EducationColumn :data="data.item.student.latestAcademicRecord" />
         </template>
-        <template v-slot:cell(billingStatusId)="data">
+        <!-- <template v-slot:cell(billingStatusId)="data">
           <SoaStatusColumn :data="data.item" />
-        </template>
+        </template> -->
         <template v-slot:cell(action)="{ item: { id, billingStatusId, isForwarded } }">
           <b-dropdown
             v-if="isAccessible([
@@ -152,7 +109,7 @@
             boundary="window"
             right
             variant="link"
-            toggle-class="text-decoration-none"
+            toggle-class="text-decoration-none m-0"
             no-caret
           >
             <template v-slot:button-content>
@@ -256,7 +213,7 @@ import {
   ReportApi,
   SchoolFeeApi,
 } from '../../mixins/api';
-import { StudentColumn, EducationColumn, SoaStatusColumn } from '../components/ColumnDetails';
+import { StudentColumn, EducationColumn, SoaStatusColumn, BillColumn } from '../components/ColumnDetails';
 import {
   formatNumber,
   showNotification
@@ -272,6 +229,7 @@ export default {
     StudentColumn,
     EducationColumn,
     SoaStatusColumn,
+    BillColumn,
     PageContent,
     NoAccess
   },
@@ -309,43 +267,32 @@ export default {
         notes: null,
         isLoading: false,
       },
-      // showBatchEntry: false,
-      // showEntry: false,
-      // showModalFees: false,
       showModalConfirmation: false,
-      // entryMode: 'Add',
       tables: {
         billings: {
           isBusy: false,
           fields: [
             {
+              key: 'billingNo',
+              label: 'Bill',
+              tdClass: 'align-middle',
+              thClass: 'align-middle',
+              thStyle: { width: 'auto' },
+            },
+            {
               key: 'name',
               label: 'Student',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: '20%' },
+              thStyle: { width: 'auto' },
             },
             // {
-            //   key: 'education',
-            //   label: 'EDUCATION',
+            //   key: 'dueDate',
+            //   label: 'Due Date',
             //   tdClass: 'align-middle',
             //   thClass: 'align-middle',
-            //   thStyle: { width: '20%' },
+            //   thStyle: { width: '130px' },
             // },
-            {
-              key: 'dueDate',
-              label: 'Due Date',
-              tdClass: 'align-middle',
-              thClass: 'align-middle',
-              thStyle: { width: '130px' },
-            },
-            {
-              key: 'billingNo',
-              label: 'BILLING NO.',
-              tdClass: 'align-middle',
-              thClass: 'align-middle',
-              thStyle: { width: '15%' },
-            },
             {
               key: 'previousBalance',
               label: 'Previous',
@@ -370,18 +317,18 @@ export default {
               thStyle: { width: 'auto' },
               formatter: (value) => formatNumber(value)
             },
-            {
-              key: 'billingStatusId',
-              label: 'Status',
-              tdClass: 'align-middle text-center',
-              thClass: 'text-center aling-middle',
-              thStyle: { width: '10%' },
-            },
+            // {
+            //   key: 'billingStatusId',
+            //   label: 'Status',
+            //   tdClass: 'align-middle text-center',
+            //   thClass: 'text-center aling-middle',
+            //   thStyle: { width: '10%' },
+            // },
             {
               key: 'action',
               label: '',
               tdClass: 'align-middle text-center',
-              thStyle: { width: '40px' },
+              thStyle: { width: '30px' },
             },
           ],
           items: [],

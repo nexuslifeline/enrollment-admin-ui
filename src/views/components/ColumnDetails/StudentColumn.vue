@@ -75,7 +75,7 @@ export default {
       return this.data?.student?.name?.trim() || 'No Name';
     },
     userName() {
-      return this.data?.student?.user?.username || 'No Account';
+      return this.data?.student?.user?.username || this.data?.student?.email || 'No Account';
     },
     userId() {
       return this.data?.student?.id || this.data?.student?.user?.id || 0;
@@ -107,7 +107,6 @@ export default {
   border-radius: 5px;
   color: $dark-gray-300;
   font-weight: 600;
-  // border: 1px solid $dark-gray-100;
   background-color: $light-gray-100;
   cursor: pointer;
   line-height: 13px;
