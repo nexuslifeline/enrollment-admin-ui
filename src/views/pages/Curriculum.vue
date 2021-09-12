@@ -12,6 +12,7 @@
         debounce="500"
         type="text"
         placeholder="Search"
+        @update="loadCurriculums()"
       />
       <!--<v-select
         :options="options.schoolCategories.values"
@@ -171,10 +172,6 @@
                 :fields="tables.curriculums.fields"
                 :busy="tables.curriculums.isBusy"
                 :items.sync="tables.curriculums.items"
-                :current-page="paginations.curriculum.page"
-                :per-page="paginations.curriculum.perPage"
-                :filter="filters.curriculum.criteria"
-                @filtered="onFiltered($event, paginations.curriculum)"
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
                 @sort-changed="onSortChanged"
@@ -416,7 +413,7 @@
                     :per-page="paginations.curriculum.perPage"
                     size="sm"
                     align="end"
-                    @input="paginate(paginations.curriculum)"
+                    @input="loadCurriculums()"
                   />
                 </b-col>
               </b-row>
@@ -1340,6 +1337,7 @@ export default {
               label: 'Effective',
               tdClass: 'align-middle',
               thStyle: { width: '10%' },
+              sortable: true
             },
             {
               key: 'schoolCategories',
@@ -1632,16 +1630,25 @@ export default {
   methods: {
     loadCurriculums() {
       const { curriculums } = this.tables;
-      const { curriculum } = this.paginations;
-      const { schoolCategoryId, levelId, courseId } = this.filters.curriculum;
+      const { curriculum, curriculum: { perPage, page } } = this.paginations;
+      const { schoolCategoryId, levelId, courseId, criteria } = this.filters.curriculum;
       curriculums.isBusy = true;
 
-      let params = { paginate: false, schoolCategoryId, levelId, courseId, ordering: this.getOrdering(this.sortBy, this.sortDesc) };
-      console.log(this.getOrdering(this.sortBy, this.sortDesc))
+      const params = {
+        paginate: true,
+        schoolCategoryId,
+        perPage,
+        page,
+        criteria,
+        levelId,
+        courseId,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc) };
+
       this.getCurriculumList(params).then(({ data }) => {
-        curriculums.items = data;
-        curriculum.totalRows = data.length;
-        this.paginate(curriculum);
+        curriculums.items = data.data;
+        curriculum.totalRows = data.meta.total;
+        curriculum.from = data.meta.from;
+        curriculum.to = data.meta.to;
         curriculums.isBusy = false;
       });
     },
@@ -2246,7 +2253,8 @@ export default {
       return ({
         name: 'name',
         schoolCategory: 'school_category_name',
-        course: 'course_name'
+        course: 'course_name',
+        effectiveYear: 'effective_year'
       })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
   },
