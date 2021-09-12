@@ -12,6 +12,7 @@
         debounce="500"
         type="text"
         placeholder="Search"
+        @update="loadCourses()"
       />
     </template>
     <template v-slot:content>
@@ -27,10 +28,6 @@
               :fields="tables.courses.fields"
               :busy="tables.courses.isBusy"
               :items="tables.courses.items"
-              :current-page="paginations.course.page"
-              :per-page="paginations.course.perPage"
-              :filter="filters.course.criteria"
-              @filtered="onFiltered($event, paginations.course)"
               responsive
               :sort-by.sync="sortBy"
               :sort-desc.sync="sortDesc"
@@ -98,7 +95,7 @@
                   v-model="paginations.course.page"
                   :total-rows="paginations.course.totalRows"
                   :per-page="paginations.course.perPage"
-                  @input="paginate(paginations.course)"
+                  @input="loadCourses()"
                   size="sm"
                   align="end"
                 />
@@ -357,15 +354,23 @@ export default {
   methods: {
     loadCourses() {
       const { courses } = this.tables;
-      const { course } = this.paginations;
+      const { course, course:{ perPage, page } } = this.paginations;
+      const { criteria } = this.filters.course
 
       courses.isBusy = true;
 
-      let params = { paginate: false, ordering: this.getOrdering(this.sortBy, this.sortDesc) };
+      let params = {
+        paginate: true,
+        perPage,
+        page,
+        criteria,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
+      };
       this.getCourseList(params).then(({ data }) => {
-        courses.items = data;
-        course.totalRows = data.length;
-        this.paginate(course);
+        courses.items = data.data;
+        course.totalRows = data.meta.total;
+        course.from = data.meta.from;
+        course.to = data.meta.to;
         courses.isBusy = false;
       });
     },
