@@ -9,6 +9,9 @@
     bodyClass="modal-body__container"
     :centered="true">
     <div class="modal-field-container overflow-visible">
+      <b-alert variant="primary" show>
+        No curriculum added with the current course. You can change the course to select a curriculum.
+      </b-alert>
       <b-form-group
         :state="forms.transcriptRecord.states.curriculumId"
         :invalid-feedback="forms.transcriptRecord.errors.curriculumId">
