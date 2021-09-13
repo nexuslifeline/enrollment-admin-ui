@@ -1,6 +1,7 @@
 <template>
   <div>
-    <b-list-group>
+    <CardLoader v-if="isLoading" height="100"/>
+    <b-list-group v-else>
       <b-list-group-item v-for="(level, idx) in levels" :key="idx">
         <div v-b-toggle="`level_${idx}`">
           <vText fontSize="16" weight="bold">
@@ -47,11 +48,13 @@ import { TranscriptRecordApi } from '../../../mixins/api';
 import { Semesters } from '../../../helpers/enum'
 import { showNotification } from '../../../helpers/forms';
 import { parse } from 'date-fns/fp';
+import CardLoader from '../Card/CardLoader'
 
 export default {
   Semesters,
   components: {
-    SubjectsTable
+    SubjectsTable,
+    CardLoader
   },
   mixins: [ TranscriptRecordApi ],
   props: {
@@ -65,10 +68,12 @@ export default {
       semesters: Semesters.values.slice(0, 2),
       subjects: [],
       courseId: 0,
-      isProcessing: false
+      isProcessing: false,
+      isLoading: true
     }
   },
   created() {
+    this.isLoading = true
     Promise.all([
       this.getTranscriptRecordLevels(this.transcriptId, { paginate: false }),
       this.getTranscriptRecord(this.transcriptId)
@@ -91,8 +96,10 @@ export default {
         ...pivot
       }));
       // console.log(this.subjects)
+      this.isLoading = false
     }).catch((error) => {
       console.log(error)
+      this.isLoading = false
     });
   },
   methods: {
