@@ -41,6 +41,9 @@
         placeholder="Semester"
         class="mt-2"
       />
+      <div class="onboarding-filter mt-2">
+        Onboarding <Toggle :value="filters.student.isOnboarding" @input="onOnboardingChanged"/>
+      </div>
     </template>
     <template v-slot:content>
       <div class="content">
@@ -382,7 +385,7 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: '35%' },
+              thStyle: { width: '30%' },
               sortable: true
             },
             {
@@ -390,7 +393,7 @@ export default {
               label: 'Address',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '25%' },
               sortable: true
             },
             {
@@ -398,14 +401,14 @@ export default {
               label: 'Education',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '25%' },
             },
             {
               key: 'contact',
               label: 'Contact',
               tdClass: 'align-middle',
               thClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '20%' },
               sortable: true
             },
             {
@@ -458,7 +461,8 @@ export default {
           courseId: null,
           courseItem: null,
           semesterId: null,
-          semesterItem: null
+          semesterItem: null,
+          isOnboarding: false
         },
         ledger: {
           schoolYearId: null,
@@ -496,7 +500,7 @@ export default {
   methods: {
     loadStudents() {
       const { students } = this.tables;
-      const { criteria, levelId, courseId, semesterId } = this.filters.student;
+      const { criteria, levelId, courseId, semesterId, isOnboarding } = this.filters.student;
       const {
         student,
         student: { perPage, page },
@@ -512,6 +516,7 @@ export default {
         levelId,
         courseId,
         semesterId,
+        isOnboarding: isOnboarding ? 1 : 0,
         ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
 
@@ -656,6 +661,10 @@ export default {
         contact: 'email'
       })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
     },
+    onOnboardingChanged(checked) {
+      this.filters.student.isOnboarding = checked
+      this.loadStudents()
+    }
   },
   computed: {
     getActiveSchoolYearId() {
@@ -696,5 +705,11 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+
+.onboarding-filter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
