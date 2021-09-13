@@ -189,8 +189,8 @@
                 <v-icon name="search" /> View Details
               </b-dropdown-item>
               <b-dropdown-item
-                v-if="isAccessible($options.OtherBillingPermissions.EDIT.id)"
-                @click="setUpdateOtherFee(row.item.id)"
+                v-if="isAccessible($options.OtherBillingPermissions.EDIT.id) && !row.item.payments.lengt > 0"
+                @click="$router.push({ name: 'Edit Other Billing', params: { billingId: row.item.id } })"
               >
                 <v-icon name="pen" /> Edit
               </b-dropdown-item>
@@ -210,16 +210,8 @@
           <template v-slot:cell(education)="data">
             <EducationColumn :data="data.item.student.latestAcademicRecord" />
           </template>
-          <template v-slot:cell(billingStatusId)="{ value }">
-            <b-badge
-              :variant="
-                value === $options.BillingStatuses.UNPAID.id
-                  ? 'danger'
-                  : 'success'
-              "
-            >
-              {{ $options.BillingStatuses.getEnum(value).name }}
-            </b-badge>
+          <template v-slot:cell(billingStatusId)="data">
+            <OtherBillingStatusColumn :data="data.item" />
           </template>
         </b-table>
         <b-row>
@@ -805,6 +797,7 @@ import { StudentColumn, EducationColumn, BillColumn } from '../components/Column
 import PageContent  from '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
 import SelectPaginated from '../components/SelectPaginated';
+import OtherBillingStatusColumn from '../components/ColumnDetails/OtherBillingStatusColumn'
 
 const billingFields = {
   id: null,
@@ -839,7 +832,8 @@ export default {
     EducationColumn,
     PageContent,
     NoAccess,
-    SelectPaginated
+    SelectPaginated,
+    OtherBillingStatusColumn
   },
   mixins: [
     TermApi,

@@ -1,7 +1,7 @@
 <template>
   <CenterContainer>
-    <BackLink :previousRoute="{ name: 'Soa' }" />
-    <Card title="Generate Billing (Other)" titleSize="m" :hasFooter="true">
+    <BackLink :previousRoute="{ name: 'Other Billing' }" />
+    <Card :title="`${entryMode === 'Add' ? 'Generate' : 'Edit' } Billing (Other)`" titleSize="m" :hasFooter="true">
       <InputGroup>
         <InputContainer>
           <b-form-group>
@@ -31,8 +31,9 @@
 
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onGenerate" :disabled="isProcessing || !hasSelectedAcademicId">
-            <v-icon name="spinner" spin v-if="isProcessing"/> Generate
+          <b-button variant="primary" @click="entryMode === 'Add' ? onGenerate() : onUpdate()" :disabled="isProcessing || !hasSelectedAcademicId">
+            <v-icon name="spinner" spin v-if="isProcessing"/>
+            {{ entryMode === 'Add' ? 'Generate' : 'Update' }}
           </b-button>
         </CardFooterRow>
       </template>
@@ -40,40 +41,56 @@
   </CenterContainer>
 </template>
 <script>
-  import { AcademicRecordApi } from '../../../mixins/api';
+  import { AcademicRecordApi, BillingApi } from '../../../mixins/api';
   import { reset, validate } from '../../../helpers/forms'
   import { BillingTypes } from '../../../helpers/enum';
   import OtherFeesTable from '../../components/Billing/OtherFeesTable';
+import { copyValue } from '../../../helpers/extractor';
   export default {
-    mixins: [AcademicRecordApi],
+    mixins: [AcademicRecordApi,BillingApi],
     components: {
       OtherFeesTable
     },
     data() {
-     return  {
-      isProcessing: false,
-      tables: {
-        otherFees: {
-          items: []
-        }
-      },
-      forms: {
-        billing: {
-          fields: {
-            student: null,
-            dueDate: null,
-          },
-          states: {
-            dueDate: null,
-            studentId: null,
-          },
-          errors: {
-            dueDate: null,
-            studentId: null,
+      return  {
+        isProcessing: false,
+        entryMode: 'Add',
+        tables: {
+          otherFees: {
+            items: []
+          }
+        },
+        forms: {
+          billing: {
+            fields: {
+              student: null,
+              dueDate: null,
+            },
+            states: {
+              dueDate: null,
+              studentId: null,
+            },
+            errors: {
+              dueDate: null,
+              studentId: null,
+            }
           }
         }
       }
-     }
+    },
+    created() {
+      if(this.billingId) {
+        //get billing
+        // alert('get billing')
+        this.entryMode = 'Edit'
+        const { billing } = this.forms
+        const { otherFees } = this.tables
+        this.getBilling(this.billingId).then(({ data }) => {
+          // console.log(data)
+          copyValue(data, billing.fields)
+          otherFees.items = data.billingItems
+        })
+      }
     },
     methods: {
       onGenerate() {
@@ -103,10 +120,40 @@
           this.isProcessing = false;
         })
       },
+      onUpdate() {
+        const { student: { latestAcademicRecord }, dueDate } = this.forms.billing.fields;
+
+        if (!latestAcademicRecord || !latestAcademicRecord?.id) {
+          console.warn('No latest academic record found on student!');
+          return;
+        }
+
+        const otherFees = this.tables?.otherFees?.items || [];
+
+        const payload = {
+          dueDate,
+          otherFees,
+          billingTypeId: BillingTypes.BILLING.id
+        };
+
+        reset(this.forms.billing);
+        this.isProcessing = true;
+        this.updateBilling(payload, this.billingId).then(({ data }) => {
+          this.isProcessing = false;
+          this.$router.push({ name: 'Other Billing' });
+        }).catch((error) => {
+          const errors = error.response.data.errors;
+          validate(this.forms.billing, errors, this);
+          this.isProcessing = false;
+        })
+      }
     },
     computed: {
       hasSelectedAcademicId() {
         return !!this.forms?.billing?.fields?.student?.latestAcademicRecord?.id;
+      },
+      billingId() {
+        return this.$route?.params?.billingId || null
       }
     }
   }
