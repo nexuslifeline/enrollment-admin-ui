@@ -1,10 +1,6 @@
 <template>
-  <PageContent
-    title="Review Transcript Record"
-    :createButtonVisible="false"
-    :filterVisible="false"
-    :showBottomActions="false">
-    <template v-slot:content>
+  <CenterContainer>
+    <div>
       <b-overlay :show="isProcessing">
         <div class="transcript">
           <div class="transcript-info__container">
@@ -526,27 +522,8 @@
         </div>
         <!-- modal footer buttons -->
       </b-modal>
-    </template>
-    <template v-slot:bottom-actions>
-      <div class="transcript__action-bar">
-        <b-button
-          :disabled="isSaving"
-          variant="outline-primary" 
-          @click="onUpdateTranscriptRecord()">
-          <v-icon v-if="isSaving" name="spinner" spin />
-          Update
-        </b-button>
-        <b-button
-          :disabled="isSaving"
-          variant="outline-primary" 
-          @click="onUpdateTranscriptRecord(true)">
-          <v-icon v-if="isSaving" name="spinner" spin />
-          Finalize
-        </b-button>
-        <b-button variant="outline-danger" :to="`/registrar/academic-transcript`">Cancel</b-button>
-      </div>
-    </template>
-  </PageContent>
+    </div>
+  </CenterContainer>
 </template>
 <script>
 import { copyValue } from '../../helpers/extractor'
