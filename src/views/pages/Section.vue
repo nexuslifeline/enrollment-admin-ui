@@ -12,6 +12,7 @@
         debounce="500"
         type="text"
         placeholder="Search"
+        @update="loadSections()"
       />
       <SelectCategory
         :value="filters.section.schoolCategoryItem"
@@ -48,24 +49,6 @@
         placeholder="Semester"
         class="mt-2"
       />
-      <!-- <v-select
-        v-if="isCourseVisible"
-        :options="options.courses.fixItems"
-        :value="filters.section.courseItem"
-        @input="onCourseFilterChange"
-        label="name"
-        placeholder="Course"
-        class="mt-2"
-      /> -->
-      <!-- <v-select
-        v-if="isCourseVisible"
-        :options="options.semesters.values"
-        :value="filters.section.semesterItem"
-        @input="onSemesterFilterChange"
-        label="name"
-        placeholder="Semester"
-        class="mt-2"
-      /> -->
     </template>
     <template  v-slot:content>
       <div v-show="!showEntry && checkIfHasSchoolCategoryAccess()">
@@ -81,6 +64,9 @@
               :busy="tables.sections.isBusy"
               :items="tables.sections.items"
               responsive
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              @sort-changed="onSortChanged"
             >
               <template v-slot:table-busy>
                 <div class="text-center my-2">
@@ -152,6 +138,18 @@
                     :disabled="showEntry ||isAccessible($options.SectionAndSchedulePermissions.EDIT.id)">{{ row.item.name }}</span>
                 </div>
               </template>
+              <template v-slot:cell(schoolCategory)="{ item }">
+                {{ item.schoolCategory && item.schoolCategory.name || '' }}
+              </template>
+              <template v-slot:cell(level)="{ item }">
+                {{ item.level && item.level.name || '' }}
+              </template>
+              <template v-slot:cell(course)="{ item }">
+                {{ item.course && item.course.description || '' }}
+              </template>
+              <template v-slot:cell(semester)="{ item }">
+                {{ item.semester && item.semester.name || '' }}
+              </template>
             </b-table>
             <b-row>
               <b-col md="6">
@@ -214,30 +212,6 @@
                               {{ forms.section.errors.description }}
                             </b-form-invalid-feedback>
                           </b-form-group>
-                          <!-- <b-form-group>
-                            <label class="required">School Year</label>
-                            <b-form-select
-                              @change="loadSectionDetails()"
-                              v-model="forms.section.fields.schoolYearId"
-                              :state="forms.section.states.schoolYearId"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- School Year --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="schoolYear in options.schoolYears.items"
-                                :key="schoolYear.id"
-                                :value="schoolYear.id"
-                              >
-                                {{ schoolYear.name }}
-                              </b-form-select-option>
-                            </b-form-select>
-                            <b-form-invalid-feedback>
-                              {{ forms.section.errors.schoolYearId }}
-                            </b-form-invalid-feedback>
-                          </b-form-group> -->
                         </b-col>
                         <b-col md="6">
                           <b-form-group
@@ -249,25 +223,6 @@
                               :value="forms.section.fields.schoolCategory"
                               @input="onFormCategoryChanged"
                               label="name"/>
-                            <!-- <b-form-select
-                              v-model="forms.section.fields.schoolCategoryId"
-                              :state="forms.section.states.schoolCategoryId"
-                              @change="loadLevelsOfSchoolCategoryList()"
-                            >
-                              <template v-slot:first>
-                                <b-form-select-option :value="null" disabled
-                                  >-- School Category --</b-form-select-option
-                                >
-                              </template>
-                              <b-form-select-option
-                                v-for="schoolCategory in options.schoolCategories
-                                  .values"
-                                :key="schoolCategory.id"
-                                :value="schoolCategory.id"
-                              >
-                                {{ schoolCategory.name }}
-                              </b-form-select-option>
-                            </b-form-select> -->
                           </b-form-group>
                           <b-form-group
                             :state="forms.section.states.levelId"
@@ -669,6 +624,8 @@ export default {
       entryMode: '',
       Semesters: Semesters,
       SchoolCategories: SchoolCategories,
+      sortBy: null,
+      sortDesc: null,
       forms: {
         section: {
           isProcessing: false,
@@ -692,29 +649,35 @@ export default {
               label: 'Name',
               tdClass: 'align-middle',
               thStyle: { width: '20%' },
+              sortable: true
             },
             {
-              key: 'schoolCategory.name',
+              key: 'schoolCategory',
               label: 'Category',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '15%' },
+              sortable: true
             },
             {
-              key: 'level.name',
+              key: 'level',
               label: 'Level',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '15%' },
+              sortable: true
             },
             {
-              key: 'course.description',
+              key: 'course',
               label: 'Course',
               tdClass: 'align-middle',
+              thStyle: { width: '35%' },
+              sortable: true
             },
             {
-              key: 'semester.name',
+              key: 'semester',
               label: 'Semester',
               tdClass: 'align-middle',
-              thStyle: { width: 'auto' },
+              thStyle: { width: '15%' },
+              sortable: true
             },
             {
               key: 'action',
@@ -792,10 +755,7 @@ export default {
   methods: {
     loadSections() {
       const { sections } = this.tables;
-      const {
-        section,
-        section: { perPage, page },
-      } = this.paginations;
+      const { section, section: { perPage, page }, } = this.paginations;
       sections.isBusy = true;
       const {
         schoolCategoryId,
@@ -804,7 +764,7 @@ export default {
         semesterId,
         criteria,
       } = this.filters.section;
-      let params = {
+      const params = {
         paginate: true,
         perPage,
         page,
@@ -814,6 +774,7 @@ export default {
         semesterId,
         schoolYearId: this.selectedSchoolYear?.id,
         criteria,
+        ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
       this.getSectionList(params).then(({ data }) => {
         sections.items = data.data;
@@ -1434,7 +1395,27 @@ export default {
 
       fields.semester = item
       fields.semesterId = item?.id
-    }
+    },
+    onSortChanged({ sortBy, sortDesc }) {
+      this.sortBy = sortBy;
+      this.sortDesc = sortDesc;
+      this.loadSections();
+    },
+    getOrdering(sortBy, sortDesc = false) {
+      if (!sortBy) return;
+      const orderBy = this.mapOrdering(sortBy);
+      if (!orderBy) return;
+      return `${sortDesc ? '-' : ''}${orderBy}`;
+    },
+    mapOrdering(sortBy) {
+      return ({
+        name: 'name',
+        schoolCategory: 'school_category_name',
+        level: 'level_name',
+        course: 'course_name',
+        semester: 'semester_name',
+      })?.[sortBy] || this.$options.camelToSnakeCase(sortBy);
+    },
   },
   computed: {
     isCourseVisible() {
