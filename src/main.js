@@ -27,6 +27,8 @@ import ActiveViewHeader from './views/components/ActiveRowViewer/ActiveViewHeade
 import ActiveViewItems from './views/components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from './views/components/ActiveRowViewer/ActiveViewItem';
 import PageContent from './views/components/PageContainer/PageContent';
+import FolderManager from './views/components/FolderManager/SubjectFolderManager';
+import GradeSheet from './views/components/GradeSheet/GradeSheet';
 import SlidePanel from './views/components/SlidePanel/Panel';
 import SlidePanelNotes from './views/components/SlidePanel/PanelNotes';
 import SelectLevelCourses from './views/components/Dropdowns/SelectCourseLevel';
@@ -135,7 +137,9 @@ import {
   BIconImage,
   BIconTrash,
   BIconX,
-  BIconThreeDots
+  BIconThreeDots,
+  BIconFolderPlus,
+  BIconFolderMinus
 } from 'bootstrap-vue';
 Vue.component('BIconThreeDots', BIconThreeDots);
 Vue.component('BIconX', BIconX);
@@ -152,6 +156,8 @@ Vue.component('BIconTelephone', BIconTelephone);
 Vue.component('BIconGeo', BIconGeo);
 Vue.component('BIconPerson', BIconPerson);
 Vue.component('BIconFolderSymlink', BIconFolderSymlink);
+Vue.component('BIconFolderPlus', BIconFolderPlus);
+Vue.component('BIconFolderMinus', BIconFolderMinus);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
 Vue.component('BIconAlarm', BIconAlarm);
 Vue.component('BIconFunnelFill', BIconFunnelFill);
@@ -247,6 +253,8 @@ Vue.component('InputInline', InputInline);
 Vue.component('Toggle', Toggle);
 Vue.component('LinkVisibilityToggler', LinkVisibilityToggler);
 Vue.component('PageContent', PageContent);
+Vue.component('FolderManager', FolderManager);
+Vue.component('GradeSheet', GradeSheet);
 Vue.component('ActiveRowViewer', ActiveRowViewer);
 Vue.component('ActiveViewLinks', ActiveViewLinks);
 Vue.component('ActiveViewHeader', ActiveViewHeader);

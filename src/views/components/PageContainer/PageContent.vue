@@ -3,7 +3,7 @@
     <div v-if="filterVisible" class="c-side-filter__container">
       <div class="c-side-filter__container-header">
         <vText size="xs" weight="bold" transform="uppercase">
-          Filter
+          {{ filterTitle || 'Filter' }}
         </vText>
       </div>
       <div class="c-side-filter__filter-body">
@@ -28,7 +28,7 @@
       <div class="content-list__actions">
         <slot name="actions"></slot>
       </div>
-      <div class="content-list__body">
+      <div class="content-list__body" :class="{ noPadding: noPaddingBody, noScroll: noScrollBody }">
         <slot name="content"></slot>
       </div>
     </div>
@@ -61,11 +61,23 @@ export default {
       type: Boolean,
       default: true
     },
+    filterTitle: {
+      type: String,
+      default: ''
+    },
     title: {
       type: String,
       default: ''
     },
     showBottomActions: {
+      type: Boolean,
+      default: false
+    },
+    noPaddingBody: {
+      type: Boolean,
+      default: false
+    },
+    noScrollBody: {
       type: Boolean,
       default: false
     }
@@ -133,6 +145,14 @@ export default {
 
 .content-list__body {
   padding: 10px 10px;
+
+  &.noPadding {
+    padding: 0;
+  }
+
+  &.noScroll {
+    overflow: hidden;
+  }
 }
 
 .content-list__actions {
