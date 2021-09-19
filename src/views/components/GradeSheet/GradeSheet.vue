@@ -31,12 +31,19 @@
               </td>
               <template v-for="period in gradingPeriods">
                 <td :key="period.id" class="cell__input-no-padding">
-                  <input type="number" class="cell__input" @input="() => onGradeInput(period.id, student.id)" />
+                  <!-- change second arg to setudent id, temporary I did passed idx for testing -->
+                  <input type="number" class="cell__input" @input="() => onGradeInput(period.id, idx, idx)" />
                 </td>
               </template>
-               <td class="cell__input-no-padding">
+              <td class="cell__input-no-padding">
                 <input type="text" class="cell__input" :style="{ textAlign: 'left' }" />
               </td>
+              <template v-if="busyRow.includes(idx)">
+                <td class="cell__loader">
+                  <b-spinner type="border" small />
+                  <span class="ml-2 text-muted">Saving...</span>
+                </td>
+              </template>
             </tr>
           </template>
         </tbody>
@@ -46,6 +53,7 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce';
 export default {
   props: {
     subjectId: {
@@ -57,6 +65,7 @@ export default {
   },
   data() {
     return {
+      busyRow: [],
       gradingPeriods: [ // this is for demo only, should change this to actual data from api response
         {
           id: 1,
@@ -74,11 +83,22 @@ export default {
     }
   },
   methods: {
-    onGradeInput(gradePeriodId, studentId) {
+    onGradeInput(gradePeriodId, studentId, rowIndex) {
+      this.debounceGradeInput(gradePeriodId, studentId, rowIndex);
+    },
+    debounceGradeInput: debounce(function (gradePeriodId, studentId, rowIndex) {
       console.log('gradePeriodId', gradePeriodId)
       console.log('studentId', studentId)
+      console.log('rowIndex', rowIndex)
       // PUT/PATCH grade here
-    }
+
+      // before the request, make the row busy
+      this.busyRow = [rowIndex];
+
+      // after the request remove busy state
+      // just to replicate the request delay, will use setTimeout here
+      setTimeout(() => this.busyRow = [], 450);
+    },  750)
   },
   watch: {
     sectionId: function(nVal, oVal) {
@@ -173,6 +193,12 @@ export default {
     :nth-child(-n + 2) { // first 2 child
       z-index: 1;
     }
+
+
+  }
+
+  tr {
+    position: relative;
   }
 
   tbody {
@@ -190,11 +216,11 @@ export default {
       }
     }
 
-    tr:focus-within {
-      td, th {
-        background-color: $light-blue;
-      }
-    }
+    // tr:focus-within {
+    //   td, th {
+    //     background-color: $light-blue;
+    //   }
+    // }
   }
 
   .cell__student-headline {
@@ -233,6 +259,19 @@ export default {
 
   .cell__input-no-padding {
     padding: 0;
+  }
+
+  .cell__loader {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: $white;
+    opacity: .85;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
 </style>
