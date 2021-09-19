@@ -32,7 +32,11 @@
               <template v-for="period in gradingPeriods">
                 <td :key="period.id" class="cell__input-no-padding">
                   <!-- change second arg to setudent id, temporary I did passed idx for testing -->
-                  <input type="number" class="cell__input" @input="() => onGradeInput(period.id, idx, idx)" />
+                  <input
+                    type="number"
+                    class="cell__input"
+                    @input="() => onGradeInput({ gradePeriodId: period.id, studentId: idx, rowIndex: idx })"
+                  />
                 </td>
               </template>
               <td class="cell__input-no-padding">
@@ -65,6 +69,7 @@ export default {
   },
   data() {
     return {
+      lastRowIndex: null,
       busyRow: [],
       gradingPeriods: [ // this is for demo only, should change this to actual data from api response
         {
@@ -83,10 +88,18 @@ export default {
     }
   },
   methods: {
-    onGradeInput(gradePeriodId, studentId, rowIndex) {
-      this.debounceGradeInput(gradePeriodId, studentId, rowIndex);
+    onGradeInput(payload) {
+      if (payload.rowIndex === this.lastRowIndex || this.lastRowIndex === null) {
+        this.debounceGradeInput(payload);
+        this.lastRowIndex = payload.rowIndex;
+        return;
+      }
+
+      this.saveGrade(payload);
+      this.lastRowIndex = payload.rowIndex;
+
     },
-    debounceGradeInput: debounce(function (gradePeriodId, studentId, rowIndex) {
+    saveGrade({ gradePeriodId, studentId, rowIndex }) {
       console.log('gradePeriodId', gradePeriodId)
       console.log('studentId', studentId)
       console.log('rowIndex', rowIndex)
@@ -98,7 +111,10 @@ export default {
       // after the request remove busy state
       // just to replicate the request delay, will use setTimeout here
       setTimeout(() => this.busyRow = [], 450);
-    },  750)
+    },
+    debounceGradeInput: debounce(function (payload) {
+      this.saveGrade(payload)
+    }, 750)
   },
   watch: {
     sectionId: function(nVal, oVal) {
