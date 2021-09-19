@@ -3,8 +3,7 @@
     :title="`Student Grade (${$store.state.schoolYear.name})`"
     filterTitle="Your Subjects"
     :createButtonVisible="false"
-    noScrollBody
-    noPaddingBody>
+    noScrollBody>
     <template v-slot:filters>
       <FolderManager :personnelId="1" @onSectionSelect="onSectionSelect" />
     </template>

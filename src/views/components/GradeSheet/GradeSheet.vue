@@ -4,10 +4,10 @@
       <table>
         <thead>
           <tr>
+            <th class="cell__center">#</th>
             <th class="cell__long">Name</th>
-            <th class="cell__long">Course</th>
             <template v-for="period in gradingPeriods">
-              <th :key="period.id" class="cell__small">{{ period.name }}</th>
+              <th :key="period.id" class="cell__extra-small cell__center">{{ period.name }}</th>
             </template>
             <th class="cell__extra-long">Remarks</th>
           </tr>
@@ -15,35 +15,27 @@
         <tbody>
           <template v-for="(student, idx) in Array.from({ length: 150 })">
             <tr :key="idx">
+              <td class="cell__sticky cell__center">{{ idx + 1 }}</td>
               <td class="cell__sticky">
                 <div class="cell__student-headline">
                   <AvatarMaker
                     :avatarId="idx"
-                    :size="36"
+                    :size="25"
                     :text="'PH'"
                     :src="''"
                   />
                   <div class="cell__name">
-                    <span>
-                      Paul Christian Rueda
-                    </span>
-                    <BulletedContent :items="['chrisrueda14@yahoo.com', 'SN: 190121-0111']" />
+                    <BulletedContent :items="['Paul Christian Rueda', 'SN: 190121-0111']" />
                   </div>
                 </div>
               </td>
-              <td>
-                <div>
-                  Bachelor of Science in Information Technology
-                </div>
-                <BulletedContent :items="['First Year College', 'First Semester']" />
-              </td>
               <template v-for="period in gradingPeriods">
-                <td :key="period.id">
+                <td :key="period.id" class="cell__input-no-padding">
                   <input type="number" class="cell__input" @input="() => onGradeInput(period.id, student.id)" />
                 </td>
               </template>
-               <td>
-                <input type="text" class="cell__input" />
+               <td class="cell__input-no-padding">
+                <input type="text" class="cell__input" :style="{ textAlign: 'left' }" />
               </td>
             </tr>
           </template>
@@ -91,7 +83,7 @@ export default {
   watch: {
     sectionId: function(nVal, oVal) {
       if (nVal !== oVal) {
-        console.log('reload student list')
+        console.log('reload student list in GET /sections/:id/subjects/:id/subjects')
       }
     },
   }
@@ -104,13 +96,13 @@ export default {
     overflow: hidden;
     width: 100%;
     height: 100%;
-    border: 0;
+    border: 1px solid $light-gray-10;
   }
 
   .table__container {
     width: 100%;
     height: 100%;
-    max-height: calc(100vh - 124px);
+    max-height: calc(100vh - 150px);
     overflow: scroll;
     position: relative;
     border: 0;
@@ -125,11 +117,15 @@ export default {
 
   td,
   th {
-    padding: 6px 10px;
+    padding: 5px 10px;
     border-bottom: 1px solid $light-gray-100;
-    min-width: 200px;
     color: $dark-gray-500;
     background-color: $white;
+    border-right: 1px solid $light-gray-10;
+
+    &.cell__center {
+      text-align: center;
+    }
   }
 
 
@@ -142,20 +138,21 @@ export default {
       color: $white;
       font-weight: normal;
     }
+
+    td, th {
+      padding: 3.5px 10px;
+      font-weight: 500;
+    }
   }
 
   thead {
     .cell__long {
       left: 0;
-      min-width: 370px;
-
-      &:first-child {
-        z-index: 1;
-      }
+      min-width: 350px;
     }
 
     .cell__extra-long {
-      min-width: 470px;
+      min-width: 490px;
     }
 
     .cell__medium {
@@ -165,7 +162,16 @@ export default {
 
     .cell__small {
       left: 0;
-      min-width: 180px;
+      min-width: 190px;
+    }
+
+    .cell__extra-small {
+      left: 0;
+      min-width: 150px;
+    }
+
+    :nth-child(-n + 2) { // first 2 child
+      z-index: 1;
     }
   }
 
@@ -175,7 +181,19 @@ export default {
       position: sticky;
       left: 0;
       background: $white;
-      border-right: 1px solid #CCC;
+      border-right: 1px solid $light-gray-10;
+    }
+
+    tr:nth-child(even) {
+      td, th {
+        background-color: $light-gray-100;
+      }
+    }
+
+    tr:focus-within {
+      td, th {
+        background-color: $light-blue;
+      }
     }
   }
 
@@ -186,15 +204,35 @@ export default {
   }
 
   .cell__name {
-    margin-left: 10px;
+    margin-left: 5px;
   }
 
   .cell__input {
-    border-radius: 5px;
-    padding: 5px;
-    border: 1px solid $light-gray-10;
-    text-align: right;
+    border: 0;
+    text-align: center;
     width: 100%;
+    outline: none;
+    min-height: 30px;
+    background-color: transparent;
+    font-weight: 500;
+    min-width: none;
+    padding: 0 12px;
+  }
+
+
+  input.cell__input::-webkit-outer-spin-button,
+  input.cell__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input.cell__input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  .cell__input-no-padding {
+    padding: 0;
   }
 
 </style>
