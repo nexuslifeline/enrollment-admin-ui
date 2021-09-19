@@ -34,7 +34,7 @@ export default {
   data() {
     return {
       expanded: [],
-      subjects: [
+      subjects: [ // this is how I expect the api response, so we shouldnt have problem changing this to actual data response
           {
             id: 1,
             name: 'Data Structure',
@@ -117,6 +117,9 @@ export default {
           }
         ]
     }
+  },
+  created() {
+    // load personnel subjects GET  /personnels/:id/subjects
   },
   methods: {
     onSubjectSelect(idx) {
