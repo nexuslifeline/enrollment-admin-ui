@@ -103,13 +103,32 @@ export default {
   mounted() {
     const infiniteScroll = this.$refs.infiniteScroll;
     infiniteScroll.addEventListener('scroll', () => {
+      this.doScrollCheck();
+    });
+
+    if (!this.isVerticalScrollVisible()) {
+      this.makeScrollable();
+    }
+  },
+  methods: {
+    isVerticalScrollVisible() {
+      const infiniteScroll = this.$refs.infiniteScroll;
+      return infiniteScroll.scrollHeight > infiniteScroll.clientHeight;
+    },
+    makeScrollable() {
+      setTimeout(() => {
+        if (this.isVerticalScrollVisible()) return;
+        if (!this.hasMore) return;
+        this.doScrollCheck();
+        this.makeScrollable();
+      }, 250);
+    },
+    doScrollCheck() {
+      const infiniteScroll = this.$refs.infiniteScroll;
       if(infiniteScroll.scrollTop + infiniteScroll.clientHeight >= infiniteScroll.scrollHeight) {
         this.loadMore();
       }
-    });
-
-  },
-  methods: {
+    },
     loadMore(reset) {
       if (!this.hasMore || this.isLoadingMore) {
         return;
@@ -127,8 +146,8 @@ export default {
           this.currentPage = this.currentPage + 1;
         }
 
-        this.students = Array.from({ length: 150 * this.currentPage }); // this is for test purpose only, remove this line if GET request is already added
-        const meta = { lastPage: 5 }; // this is for test purpose only, remove this line if GET request is already added
+        this.students = Array.from({ length: 25 * this.currentPage }); // this is for test purpose only, remove this line if GET request is already added
+        const meta = { lastPage: 10 }; // this is for test purpose only, remove this line if GET request is already added
 
         this.hasMore = this.currentPage !== meta.lastPage;
         this.isLoadingMore = false;
