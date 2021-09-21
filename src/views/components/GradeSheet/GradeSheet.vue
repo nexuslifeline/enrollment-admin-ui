@@ -117,7 +117,7 @@ export default {
 
       this.isLoadingMore = true;
 
-      console.log('reload student list in GET /sections/:id/subjects/:id/subjects')
+      console.log('reload student list in GET /sections/:id/subjects/:id/academic-records')
       setTimeout(() => { // this is just to replicate the GET http request, change this to actual http request once api is available
         if (reset) { // we need to reset if section id has changed
           // passed data here without pushing/concat to students
@@ -153,6 +153,7 @@ export default {
 
       // before the request, make the row busy
       this.busyRow = [rowIndex];
+      // PUT /sections/:id/subjects/:id/academic-records/:id/grade-periods/:id
 
       // after the request remove busy state
       // just to replicate the request delay, will use setTimeout here
