@@ -1,6 +1,6 @@
 <template>
   <div class="outer__container">
-    <div class="table__container">
+    <div class="table__container" ref="infiniteScroll">
       <table>
         <thead>
           <tr>
@@ -13,7 +13,7 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="(student, idx) in Array.from({ length: 150 })">
+          <template v-for="(student, idx) in students">
             <tr :key="idx">
               <td class="cell__sticky cell__center">{{ idx + 1 }}</td>
               <td class="cell__sticky">
@@ -50,6 +50,15 @@
               </template>
             </tr>
           </template>
+          <template v-if="isLoadingMore">
+            <tr>
+              <td>&nbsp;</td>
+              <td class="cell__loader">
+                <b-spinner type="border" small />
+                <span class="ml-2 text-muted">Loading...</span>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -71,6 +80,9 @@ export default {
     return {
       lastRowIndex: null,
       busyRow: [],
+      currentPage: 1,
+      hasMore: true,
+      isLoadingMore: false,
       gradingPeriods: [ // this is for demo only, should change this to actual data from api response
         {
           id: 1,
@@ -84,10 +96,44 @@ export default {
           id: 3,
           name: 'Finals'
         }
-      ]
+      ],
+      students: []
     }
   },
+  mounted() {
+    const infiniteScroll = this.$refs.infiniteScroll;
+    infiniteScroll.addEventListener('scroll', () => {
+      if(infiniteScroll.scrollTop + infiniteScroll.clientHeight >= infiniteScroll.scrollHeight) {
+        this.loadMore();
+      }
+    });
+
+  },
   methods: {
+    loadMore(reset) {
+      if (!this.hasMore || this.isLoadingMore) {
+        return;
+      }
+
+      this.isLoadingMore = true;
+
+      console.log('reload student list in GET /sections/:id/subjects/:id/subjects')
+      setTimeout(() => { // this is just to replicate the GET http request, change this to actual http request once api is available
+        if (reset) { // we need to reset if section id has changed
+          // passed data here without pushing/concat to students
+          this.currentPage = 1;
+        } else {
+          // concat/append data here to students
+          this.currentPage = this.currentPage + 1;
+        }
+
+        this.students = Array.from({ length: 150 * this.currentPage }); // this is for test purpose only, remove this line if GET request is already added
+        const meta = { lastPage: 5 }; // this is for test purpose only, remove this line if GET request is already added
+
+        this.hasMore = this.currentPage !== meta.lastPage;
+        this.isLoadingMore = false;
+      }, 1000);
+    },
     onGradeInput(payload) {
       if (payload.rowIndex === this.lastRowIndex || this.lastRowIndex === null) {
         this.debounceGradeInput(payload);
@@ -114,14 +160,15 @@ export default {
     },
     debounceGradeInput: debounce(function (payload) {
       this.saveGrade(payload)
-    }, 750)
+    }, 650)
   },
   watch: {
-    sectionId: function(nVal, oVal) {
-      if (nVal !== oVal) {
-        console.log('reload student list in GET /sections/:id/subjects/:id/subjects')
+    sectionId: {
+      immediate: true,
+      handler() {
+        this.loadMore(true);
       }
-    },
+    }
   }
 }
 </script>
@@ -137,7 +184,7 @@ export default {
 
   .table__container {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 150px);
     max-height: calc(100vh - 150px);
     overflow: scroll;
     position: relative;
