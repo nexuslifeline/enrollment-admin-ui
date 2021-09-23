@@ -59,5 +59,8 @@ export default {
     updateStudentRequirement(studentId, schoolCategoryId, requirementId, data){
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/students/${studentId}/school-categories/${schoolCategoryId}/requirements/${requirementId}`, data)
     },
+    getStudentsOfSubjetOfSection(params, sectionId, subjectId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/sections/${sectionId}/subjects/${subjectId}/students`, { params: params });
+    }
   }
 }

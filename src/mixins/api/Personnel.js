@@ -56,5 +56,8 @@ export default {
     getStudentsOfPersonnel(params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/me/students`, { params: params });
     },
+    getPersonnelSubjects(params, personnelId) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/personnels/${personnelId}/subjects`, { params: params });
+    }
   }
 }

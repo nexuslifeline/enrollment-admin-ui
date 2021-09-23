@@ -5,10 +5,13 @@
     :createButtonVisible="false"
     noScrollBody>
     <template v-slot:filters>
-      <FolderManager :personnelId="1" @onSectionSelect="onSectionSelect" />
+      <FolderManager :personnelId="personnelId" @onSectionSelect="onSectionSelect" />
     </template>
     <template v-slot:content>
-      <GradeSheet :sectionId="sectionId" :subjectId="subjectId" />
+      <GradeSheet
+        :sectionId="sectionId"
+        :subjectId="subjectId"
+        :section="section" />
     </template>
   </PageContent>
 </template>
@@ -16,14 +19,24 @@
 export default {
   data() {
     return {
+      section: null,
       sectionId: null,
-      subjectId: null
+      subjectId: null,
+      schoolYearId: null,
+      schoolCategoryId: null,
+      semesterId: null
     }
   },
   methods: {
-    onSectionSelect({ sectionId, subjectId }) {
+    onSectionSelect({ sectionId, subjectId, section }) {
       this.sectionId = sectionId;
       this.subjectId = subjectId;
+      this.section = section
+    }
+  },
+  computed: {
+    personnelId() {
+      return this.$store?.state?.user?.userableId || null
     }
   }
 };

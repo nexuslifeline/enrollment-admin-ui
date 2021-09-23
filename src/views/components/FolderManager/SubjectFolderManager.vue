@@ -1,31 +1,38 @@
 <template>
   <ul class="folder__list-container">
-    <template v-for="(subject, idx) in subjects">
-      <li class="folder__item" :key="idx">
-        <div class="folder__item-headline" @click.stop="() => onSubjectSelect(idx)">
-          <template v-if="expanded.includes(idx)">
-            <BIconFolderMinus scale="1.4" class="folder__item-icon" />
-          </template>
-          <template v-else>
-            <BIconFolderPlus scale="1.4" class="folder__item-icon" />
-          </template>
-          {{ subject.name }}
-        </div>
-        <ul v-if="expanded.includes(idx)" class="sub-folder__list-container">
-          <template v-for="(section, sIdx) in subject.sections">
-            <li class="sub-folder__item" :key="sIdx" @click.stop="$emit('onSectionSelect', { sectionId: section.id, subjectId: subject.id })">
-              {{ section.name }}
-              <BIconChevronRight scale=".85" class="sub-folder__item-icon" />
-            </li>
-          </template>
-        </ul>
-      </li>
+    <CardLoader v-if="isLoading"/>
+    <template v-else>
+      <template v-for="(subject, idx) in subjects">
+        <li class="folder__item" :key="idx">
+          <div class="folder__item-headline" @click.stop="() => onSubjectSelect(idx)">
+            <template v-if="expanded.includes(idx)">
+              <BIconFolderMinus scale="1.4" class="folder__item-icon" />
+            </template>
+            <template v-else>
+              <BIconFolderPlus scale="1.4" class="folder__item-icon" />
+            </template>
+            {{ subject.name }}
+          </div>
+          <ul v-if="expanded.includes(idx)" class="sub-folder__list-container">
+            <template v-for="(section, sIdx) in subject.sections">
+              <li class="sub-folder__item" :key="sIdx" @click.stop="$emit('onSectionSelect', { sectionId: section.id, subjectId: subject.id, section: section })">
+                {{ section.name }}
+                <BIconChevronRight scale=".85" class="sub-folder__item-icon" />
+              </li>
+            </template>
+          </ul>
+        </li>
+      </template>
     </template>
   </ul>
 </template>
 
 <script>
+import { PersonnelApi } from '../../../mixins/api'
+import CardLoader from '../Card/CardLoader'
 export default {
+  mixins: [PersonnelApi],
+  components: { CardLoader },
   props: {
     personnelId: {
       type: [String, Number]
@@ -34,92 +41,99 @@ export default {
   data() {
     return {
       expanded: [],
+      isLoading: true,
       subjects: [ // this is how I expect the api response, so we shouldnt have problem changing this to actual data response
-          {
-            id: 1,
-            name: 'Data Structure',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 2,
-            name: 'Software Engineering',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 3,
-            name: 'Algebra',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 4,
-            name: 'Algorithm',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 5,
-            name: 'Database & Programming',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 6,
-            name: 'DBMS using MySQL',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 7,
-            name: 'Discrete Math',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          },
-          {
-            id: 8,
-            name: 'Physics',
-            sections: [
-              { id: 1, name: 'BSIT-1A' },
-              { id: 2, name: 'BSIT-1B' },
-              { id: 3, name: 'BSIT-1C' },
-              { id: 4, name: 'BSIT-1D' },
-            ]
-          }
+          // {
+          //   id: 1,
+          //   name: 'Data Structure',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 2,
+          //   name: 'Software Engineering',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 3,
+          //   name: 'Algebra',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 4,
+          //   name: 'Algorithm',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 5,
+          //   name: 'Database & Programming',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 6,
+          //   name: 'DBMS using MySQL',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 7,
+          //   name: 'Discrete Math',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // },
+          // {
+          //   id: 8,
+          //   name: 'Physics',
+          //   sections: [
+          //     { id: 1, name: 'BSIT-1A' },
+          //     { id: 2, name: 'BSIT-1B' },
+          //     { id: 3, name: 'BSIT-1C' },
+          //     { id: 4, name: 'BSIT-1D' },
+          //   ]
+          // }
         ]
     }
   },
   created() {
     // load personnel subjects GET  /personnels/:id/subjects
+    const params = { paginate: false }
+    this.isLoading = true
+    this.getPersonnelSubjects(params, this.personnelId).then(({ data }) => {
+      this.subjects = data
+      this.isLoading = false
+    })
   },
   methods: {
     onSubjectSelect(idx) {

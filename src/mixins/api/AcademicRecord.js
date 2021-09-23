@@ -61,6 +61,13 @@ export default {
     },
     updateInitialBilling(academicRecordId, billingId, data) {
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/academic-records/${academicRecordId}/initial-billing/${billingId}`, data)
+    },
+    getAcademicRecordsOfSubjectOfSection(sectionId, subjectId, params) {
+      return this.$authHttp.get(`${apiPrefix}/${apiVersion}/sections/${sectionId}/subjects/${subjectId}/academic-records`, { params: params })
+    },
+    updateAcacdemicRecordSubjectGrade(sectionId, subjectId, academicRecordId, gradingPeriodId, data){
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/sections/${sectionId}/subjects/${subjectId}/academic-records/${academicRecordId}/grade-periods/${gradingPeriodId}`
+        , data)
     }
   }
 }
