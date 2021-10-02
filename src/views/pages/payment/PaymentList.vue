@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Post Payment"
+    description="Manually post a payment. Once posted this will automatically reflect to student's account without the need to approve it."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPayments"
     :filterVisible="isFilterVisible"
@@ -50,167 +51,112 @@
         ><v-icon name="print" /> PRINT PREVIEW</b-button>
     </template>
     <template v-slot:content>
-      <div class="search-filter-container">
-        <!-- <b-button
-          v-if="
-            showAddButton && isAccessible($options.PaymentPermissions.ADD.id)
-          "
-          variant="primary"
-          :to="`/finance/payment/add`"
+      <div>
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.payments.fields"
+          :busy="tables.payments.isBusy"
+          :items="tables.payments.items"
+          responsive
         >
-          <v-icon name="plus-circle" /> ADD NEW PAYMENT
-        </b-button> -->
-        <!-- <b-button
-          v-if="showPrintPreviewButton"
-          class="print-preview"
-          variant="outline-primary"
-          @click="previewCollection()"
-          ><v-icon name="print" /> PRINT PREVIEW</b-button
-        >
-        <div class="date-filter-cotainer">
-          <span>FROM</span>
-          <b-form-datepicker
-            :date-format-options="{
-              year: 'numeric',
-              month: 'short',
-              day: '2-digit',
-              weekday: 'short',
-            }"
-            class="date-pickers"
-            v-model="filters.payment.dateFrom"
-            @input="loadPayments"
-          />
-          <span>TO</span>
-          <b-form-datepicker
-            :date-format-options="{
-              year: 'numeric',
-              month: 'short',
-              day: '2-digit',
-              weekday: 'short',
-            }"
-            class="date-pickers"
-            v-model="filters.payment.dateTo"
-            @input="loadPayments"
-          />
-        </div>
-        <b-form-input
-          type="text"
-          placeholder="Search"
-          debounce="500"
-          class="search-input"
-          v-model="filters.payment.criteria"
-          @update="loadPayments()"
-        >
-        </b-form-input> -->
-      </div>
-      <b-row class="mt-3">
-        <b-col md="12">
-          <b-table
-            class="c-table"
-            small
-            hover
-            outlined
-            show-empty
-            :fields="tables.payments.fields"
-            :busy="tables.payments.isBusy"
-            :items="tables.payments.items"
-            responsive
-          >
-            <!-- :filter="filters.schoolFee.criteria> -->
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(student)="data">
-              <!-- <b-media>
-                <template v-slot:aside>
-                  <b-avatar
-                    rounded
-                    blank
-                    size="64"
-                    :text="
-                      data.item.student.firstName.charAt(0) +
-                        '' +
-                        data.item.student.lastName.charAt(0)
-                    "
-                    :src="avatar(data.item)"
-                  />
-                </template>
-                <span>{{ data.item.student.name }}</span
-                ><br />
-                <small
-                  >Student no.:
-                  {{
-                    data.item.student.studentNo
-                      ? data.item.student.studentNo
-                      : 'Awaiting Confirmation'
-                  }}</small
-                ><br />
-                <small
-                  >Address :
-                  {{
-                    data.item.student.address
-                      ? data.item.student.currentAddress
-                        ? data.item.student.currentAddress
-                        : data.item.student.address.currentCompleteAddress
-                      : ''
-                  }}
-                </small>
-              </b-media> -->
-              <StudentColumn
-                :data="data.item"
-                :callback="{ loadDetails: () => null }"
-              />
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="
-                  showRowActionButton &&
-                    isAccessible($options.PaymentPermissions.CANCEL.id)
-                "
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret
-                boundary="window"
-              >
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  @click="
-                    (selectedPaymentId = row.item.id),
-                      (showModalConfirmation = true)
+          <!-- :filter="filters.schoolFee.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(student)="data">
+            <!-- <b-media>
+              <template v-slot:aside>
+                <b-avatar
+                  rounded
+                  blank
+                  size="64"
+                  :text="
+                    data.item.student.firstName.charAt(0) +
+                      '' +
+                      data.item.student.lastName.charAt(0)
                   "
-                  :disabled="showModalConfirmation"
-                >
-                  Cancel Payment
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.payment.from }} to
-              {{ paginations.payment.to }} of
-              {{ paginations.payment.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.payment.page"
-                :total-rows="paginations.payment.totalRows"
-                :per-page="paginations.payment.perPage"
-                size="sm"
-                align="end"
-                @input="loadPayments()"
-              />
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
+                  :src="avatar(data.item)"
+                />
+              </template>
+              <span>{{ data.item.student.name }}</span
+              ><br />
+              <small
+                >Student no.:
+                {{
+                  data.item.student.studentNo
+                    ? data.item.student.studentNo
+                    : 'Awaiting Confirmation'
+                }}</small
+              ><br />
+              <small
+                >Address :
+                {{
+                  data.item.student.address
+                    ? data.item.student.currentAddress
+                      ? data.item.student.currentAddress
+                      : data.item.student.address.currentCompleteAddress
+                    : ''
+                }}
+              </small>
+            </b-media> -->
+            <StudentColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => null }"
+            />
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                showRowActionButton &&
+                  isAccessible($options.PaymentPermissions.CANCEL.id)
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
+            >
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <b-dropdown-item
+                @click="
+                  (selectedPaymentId = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Cancel Payment
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.payment.from }} to
+            {{ paginations.payment.to }} of
+            {{ paginations.payment.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.payment.page"
+              :total-rows="paginations.payment.totalRows"
+              :per-page="paginations.payment.perPage"
+              size="sm"
+              align="end"
+              @input="loadPayments()"
+            />
+          </div>
+        </div>
+      </div>
       <b-modal
         v-model="showModalConfirmation"
         :noCloseOnEsc="true"
@@ -251,12 +197,11 @@
 </template>
 
 <script>
-import { StudentApi, PaymentApi, ReportApi } from '../../../mixins/api';
-import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { PaymentApi, ReportApi } from '../../../mixins/api';
+import { startOfMonth, endOfMonth } from 'date-fns';
 import { showNotification, formatNumber } from '../../../helpers/forms';
 import FileViewer from '../../components/FileViewer';
 import { PaymentStatuses, PaymentPermissions } from '../../../helpers/enum';
-import Card from '../../components/Card';
 import Access from '../../../mixins/utils/Access';
 import PageContent from "../../components/PageContainer/PageContent";
 import { StudentColumn } from "../../components/ColumnDetails";
@@ -265,7 +210,6 @@ export default {
   mixins: [PaymentApi, ReportApi, Access],
   components: {
     FileViewer,
-    Card,
     PageContent,
     StudentColumn
   },
@@ -309,38 +253,34 @@ export default {
               key: 'student',
               label: 'Student',
               tdClass: 'align-middle',
-              thStyle: { width: '28%' },
+              thStyle: { width: 'auto' },
             },
             {
               key: 'referenceNo',
               label: 'Reference No',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
             },
             {
               key: 'paymentMode.name',
               label: 'Payment Mode',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
             },
             {
               key: 'billing.billingNo',
               label: 'Billing No',
               tdClass: 'align-middle',
-              thStyle: { width: '15%' },
             },
             {
               key: 'datePaid',
               label: 'Date Paid',
               tdClass: 'align-middle',
-              thStyle: { width: '10%' },
             },
             {
               key: 'amount',
               label: 'Amount',
               tdClass: 'align-middle text-right',
               thClass: 'text-right',
-              thStyle: { width: '15%' },
+              thStyle: { width: '50px' },
               formatter: (value) => {
                 return formatNumber(value);
               },
@@ -349,7 +289,7 @@ export default {
               key: 'action',
               label: '',
               tdClass: 'align-middle',
-              thStyle: { width: '40px' },
+              thStyle: { width: '30px' },
             },
           ],
           items: [],

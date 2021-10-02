@@ -419,6 +419,7 @@ legend.required:before {
 
 .c-wrapper:not(.c-wrapper-fluid) {
   height: 100vh;
+  // overflow: hidden;
 }
 
 .c-wrapper {
@@ -429,7 +430,7 @@ legend.required:before {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  background-color: #f7f7f7;
+  // background-color: #f7f7f7;
 }
 
 .c-wrapper {
@@ -461,7 +462,8 @@ legend.required:before {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  background-color: #f7f7f7;
+  // background-color: #f7f7f7;
+  background-color: $white;
 }
 
 .c-body {
@@ -475,7 +477,8 @@ legend.required:before {
   -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
-  background-color: $light-gray-50;
+  // background-color: $light-gray-50;
+  background-color: $white;
 }
 
 .c-main {
@@ -487,8 +490,9 @@ legend.required:before {
   -ms-flex-positive: 1;
   flex-grow: 1;
   min-width: 0;
-  padding-top: 2rem;
-  background-color: $light-gray-50;
+  // padding-top: 2rem;
+  // background-color: $light-gray-50;
+  background-color: $white;
 }
 
 @media (min-width: 768px){

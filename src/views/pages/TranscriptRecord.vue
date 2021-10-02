@@ -1,5 +1,7 @@
 <template>
-  <PageContent title="Transcripts"
+  <PageContent 
+    title="Academic Transcripts"
+    description="Manage draft academic transcripts and approve the grades submitted by teachers and intructors. You can also print the finalized student's TOR."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadTranscriptRecords"
     :filterVisible="isFilterVisible"

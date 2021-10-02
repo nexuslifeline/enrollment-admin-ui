@@ -173,7 +173,7 @@ export default {
         this.academicRecords = data.data
         this.hasMore = this.currentPage !== data.meta.lastPage;
         this.isLoadingMore = false;
-      }).catch((error) => {
+      }).catch(() => {
         this.isLoadingMore = false;
         showNotification(this, 'danger', 'Error in fetching data.')
       });
@@ -289,7 +289,7 @@ export default {
 
   .table__container {
     width: 100%;
-    height: calc(100vh - 150px);
+    height: calc(100vh - 165px);
     max-height: calc(100vh - 150px);
     overflow: scroll;
     position: relative;
@@ -322,8 +322,8 @@ export default {
       position: -webkit-sticky; /* for Safari */
       position: sticky;
       top: 0;
-      background: $dark-gray-500;
-      color: $white;
+      background-color: $light-gray;
+      // color: $white;
       font-weight: normal;
     }
 

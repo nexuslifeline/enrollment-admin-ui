@@ -1,5 +1,7 @@
 <template>
-  <PageContent title="Subject Management"
+  <PageContent 
+    title="Subject Management"
+    description="Manage the subject's code, title, description, category and other details."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadSubjects"
     :filterVisible="isFilterVisible"
@@ -13,17 +15,7 @@
         placeholder="Search"
         @update="loadSubjects()"
       />
-      <!--<v-select
-        :options="options.schoolCategories.values"
-        :value="filters.subject.schoolCategoryItem"
-        @input="onStatusFilterChange"
-        label="name"
-        placeholder="School Category"
-        class="mt-2"
-        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
-        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
-        :clearable="checkIfAllowedAll()"
-      />-->
+
        <SelectCategory
         :value="filters.subject.schoolCategoryItem"
         @input="onStatusFilterChange"
@@ -34,152 +26,97 @@
     </template>
     <template v-slot:content>
       <div v-if="checkIfHasSchoolCategoryAccess()">
-        <!-- add button and search -->
-        <!-- <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="6" class="bottom-space">
-                <b-button
-                  v-if="isAccessible($options.SubjectPermissions.ADD.id)"
-                  variant="primary"
-                  @click="onCreate()"
-                >
-                  <v-icon name="plus-circle" /> ADD NEW SUBJECT
-                </b-button>
-              </b-col>
-              <b-col md="3">
-                <b-form-select
-                  @input="loadSubjects()"
-                  v-model="filters.subject.schoolCategoryId"
-                  class="float-right"
-                >
-                  <template v-slot:first>
-                    <b-form-select-option :value="null" disabled
-                      >-- School Category --</b-form-select-option
-                    >
-                  </template>
-                  <b-form-select-option :value="null"
-                    >None</b-form-select-option
-                  >
-                  <b-form-select-option
-                    v-for="category in options.schoolCategories.values"
-                    :key="category.id"
-                    :value="category.id"
-                  >
-                    {{ category.name }}
-                  </b-form-select-option>
-                </b-form-select>
-              </b-col>
-              <b-col md="3">
-                <b-form-input
-                  v-model="filters.subject.criteria"
-                  type="text"
-                  placeholder="Search"
-                  @update="loadSubjects()"
-                  debounce="500"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              responsive
-              :fields="tables.subjects.fields"
-              :busy="tables.subjects.isBusy"
-              :items="tables.subjects.items"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @sort-changed="onSortChanged"
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          responsive
+          :fields="tables.subjects.fields"
+          :busy="tables.subjects.isBusy"
+          :items="tables.subjects.items"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
+        >
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="{ item, value }">
+            <b-link
+              @click="setSubjectUpdate(item)"
+              :disabled="!isAccessible($options.SubjectPermissions.EDIT.id)"
+              >{{ value }}
+            </b-link>
+          </template>
+          <template v-slot:cell(schoolCategory)="{ item: { schoolCategory }}">
+            {{ schoolCategory && schoolCategory.name || ''}}
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.SubjectPermissions.EDIT.id,
+                  $options.SubjectPermissions.EDIT_PRICE.id,
+                  $options.SubjectPermissions.DELETE.id,
+                ])
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(name)="{ item, value }">
-                <b-link
-                  @click="setSubjectUpdate(item)"
-                  :disabled="!isAccessible($options.SubjectPermissions.EDIT.id)"
-                  >{{ value }}
-                </b-link>
-              </template>
-              <template v-slot:cell(schoolCategory)="{ item: { schoolCategory }}">
-                {{ schoolCategory && schoolCategory.name || ''}}
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.SubjectPermissions.EDIT.id,
-                      $options.SubjectPermissions.EDIT_PRICE.id,
-                      $options.SubjectPermissions.DELETE.id,
-                    ])
-                  "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible([
-                        $options.SubjectPermissions.EDIT.id,
-                        $options.SubjectPermissions.EDIT_PRICE.id,
-                      ])
-                    "
-                    @click="setSubjectUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.SubjectPermissions.DELETE.id)"
-                    @click="
-                      (forms.subject.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.subject.from }} to
-                {{ paginations.subject.to }} of
-                {{ paginations.subject.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.subject.page"
-                  :total-rows="paginations.subject.totalRows"
-                  :per-page="paginations.subject.perPage"
-                  size="sm"
-                  align="end"
-                  @input="loadSubjects()"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="
+                  isAccessible([
+                    $options.SubjectPermissions.EDIT.id,
+                    $options.SubjectPermissions.EDIT_PRICE.id,
+                  ])
+                "
+                @click="setSubjectUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.SubjectPermissions.DELETE.id)"
+                @click="
+                  (forms.subject.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.subject.from }} to
+            {{ paginations.subject.to }} of
+            {{ paginations.subject.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.subject.page"
+              :total-rows="paginations.subject.totalRows"
+              :per-page="paginations.subject.perPage"
+              size="sm"
+              align="end"
+              @input="loadSubjects()"
+            />
+          </div>
+        </div>
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <!-- Modal Entry -->
@@ -273,54 +210,6 @@
                   </b-form-group>
                 </b-col>
               </b-row>
-              <!-- <b-row>
-                <b-col md=12>
-                  <b-form-group >
-                    <label class="required">Department</label>
-                    <b-form-select
-                      v-model="forms.subject.fields.departmentId"
-                      :state="forms.subject.states.departmentId">
-                      <template v-slot:first>
-                        <b-form-select-option :value="null" disabled>-- Department --</b-form-select-option>
-                      </template>
-                      <b-form-select-option
-                        v-for="department in options.departments.items"
-                        :key="department.id"
-                        :value="department.id">
-                        {{department.name}}
-                      </b-form-select-option>
-                    </b-form-select>
-                    <b-form-invalid-feedback>
-                      {{forms.subject.errors.departmentId}}
-                    </b-form-invalid-feedback>
-                  </b-form-group>
-                </b-col>
-              </b-row> -->
-              <!-- <b-row>
-                <b-col md=12>
-                  <b-form-group >
-                    <label>Prerequisites
-                      <v-icon
-                        v-if="isLoading"
-                        class="ml-2"
-                        name="spinner"
-                        spin/>
-                    </label>
-                    <Select2
-                      multiple
-                      :disabled="isLoading"
-                      v-model="forms.subject.fields.prerequisites"
-                      :allowClear="false">
-                      <option
-                        v-for="subject in options.subjects.items"
-                        :key="subject.id"
-                        :value="subject.id">
-                        {{subject.name}}
-                      </option>
-                    </Select2>
-                  </b-form-group>
-                </b-col>
-              </b-row> -->
               <b-row>
                 <b-col md="6">
                   <b-form-group label="Lecture Units">
@@ -463,7 +352,7 @@
         <div slot="modal-footer" class="w-100">
           <!-- modal footer buttons -->
           <b-button
-            variant="outline-danger"
+            variant="dark"
             class="float-left btn-close"
             @click="showModalEntry = false"
           >

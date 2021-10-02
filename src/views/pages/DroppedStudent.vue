@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Dropped Students"
+    description="If student is mark as dropped, the student will blocked on the subject's current academic year."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadDroppedStudents"
     :filterVisible="isFilterVisible"

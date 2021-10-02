@@ -66,7 +66,7 @@ export default {
   height: 100%;
   width: 100%;
   max-width: calc(#{$header-details-row-max-width} + 70px);
-  margin: 30px auto;
+  margin: 60px auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;

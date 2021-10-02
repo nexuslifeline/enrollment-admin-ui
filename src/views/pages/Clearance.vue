@@ -1,6 +1,7 @@
 <template>
   <PageContent
     :title="`Clearance (${$store.state.schoolYear.name})`"
+    description="If all relevant requirements were settled, you can clear a particular student."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"

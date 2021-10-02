@@ -1,6 +1,7 @@
 <template>
   <PageContent
     :title="`Subject Enlistment (${$store.state.schoolYear.name})`"
+    description="Manage and review the student's pre-enlistment request. If something is not allowed to be taken, you can remove the subject or add subject if necessary."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecordList"
     :filterVisible="isFilterVisible"

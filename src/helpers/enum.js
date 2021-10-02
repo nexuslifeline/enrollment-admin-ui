@@ -222,9 +222,10 @@ export const AssessmentStatuses = new Enum({
 });
 
 export const StudentGradeStatuses = new Enum({
-  PENDING: { id: 1, name: 'Pending' },
-  SUBMITTED: { id: 2, name: 'Submitted' },
-  FINALIZED: { id: 3, name: 'Finalized' },
+  DRAFT: { id: 1, name: 'Draft' },
+  PUBLISHED: { id: 2, name: 'Published' },
+  SUBMITTED: { id: 3, name: 'Submitted for Review' },
+  FINALIZED: { id: 4, name: 'Finalized' },
 });
 
 export const Semesters = new Enum({

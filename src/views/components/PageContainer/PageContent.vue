@@ -2,8 +2,8 @@
   <div class="c-page-content" :class="{ 'filter-visible': filterVisible }">
     <div v-if="filterVisible" class="c-side-filter__container">
       <div class="c-side-filter__container-header">
-        <vText size="xs" weight="bold" transform="uppercase">
-          {{ filterTitle || 'Filter' }}
+        <vText size="s" weight="bold">
+          {{ filterTitle || 'Search and Filter' }}
         </vText>
       </div>
       <div class="c-side-filter__filter-body">
@@ -11,19 +11,27 @@
       </div>
     </div>
     <div class="content-list__container">
-      <div class="c-side-filter__title">
-        <vText size="xs" weight="bold" transform="uppercase" flex="1">
-          {{ title }}
-        </vText>
-        <FilterButton class="ml-auto" :isExpanded="filterVisible" @toggle="$emit('toggleFilter')" />
-        <RefreshButton @reload="$emit('refresh')" class="ml-1" />
-        <CreateButton
-          :isBusy="isBusyCreating"
-          @create="$emit('create')"
-          class="ml-1"
-          v-if="createButtonVisible"
-        />
-        <slot name="extra-buttons"></slot>
+      <div class="c-side-filter__headline-container">
+        <div class="c-side-filter__headline">
+          <p class="c-side-filter__title">
+            {{ title }}
+          </p>
+          <p class="c-side-filter__description">
+            {{ description }}
+          </p>
+        </div>
+
+        <!-- <FilterButton class="ml-auto" :isExpanded="filterVisible" @toggle="$emit('toggleFilter')" /> -->
+        <div class="ml-auto">
+          <!-- <RefreshButton @reload="$emit('refresh')" class="ml-1" /> -->
+          <CreateButton
+            v-if="createButtonVisible"
+            :isBusy="isBusyCreating"
+            @create="$emit('create')"
+            class="ml-1"
+          />
+          <slot name="extra-buttons"></slot>
+        </div>
       </div>
       <div class="content-list__actions">
         <slot name="actions"></slot>
@@ -38,14 +46,14 @@
   </div>
 </template>
 <script>
-import RefreshButton from './RefreshButton';
-import FilterButton from './FilterButton';
+// import RefreshButton from './RefreshButton';
+// import FilterButton from './FilterButton';
 import CreateButton from './CreateButton';
 
 export default {
   components: {
-    RefreshButton,
-    FilterButton,
+    // RefreshButton,
+    // FilterButton,
     CreateButton
   },
   props: {
@@ -66,6 +74,10 @@ export default {
       default: ''
     },
     title: {
+      type: String,
+      default: ''
+    },
+    description: {
       type: String,
       default: ''
     },
@@ -134,13 +146,15 @@ export default {
   padding: 15px 10px;
 }
 
-.c-side-filter__title {
-  border-bottom: 1px solid $light-gray-10;
-  padding: 8px 10px;
+.c-side-filter__headline-container {
+  // border-bottom: 1px solid $light-gray-10;
+  padding: 25px 12px 0 12px;
   width: 100%;
-  background-color: $white;
+  // background-color: $white;
   display: flex;
-  height: 39px;
+  align-items: center;
+  height: 45px;
+  margin-bottom: 10px;
 }
 
 .content-list__body {
@@ -160,7 +174,12 @@ export default {
   flex-direction: row;
 }
 
-
+.c-side-filter__headline {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
 
 .action-bar__container {
   position: fixed;
@@ -171,6 +190,19 @@ export default {
   background-color: white;
   align-items: center;
   justify-content: flex-end;
+}
+
+.c-side-filter__title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 21px;
+  margin: 0;
+}
+
+.c-side-filter__description {
+  font-size: 13px;
+  color: $dark-gray;
+  margin: 0;
 }
 
 </style>

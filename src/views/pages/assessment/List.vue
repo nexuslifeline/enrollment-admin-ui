@@ -1,6 +1,7 @@
 <template>
   <PageContent
     :title="`Student Assessment Fee (${$store.state.schoolYear.name})`"
+    description="Manage and review the calculation of tuition fee and other fees. If something is incorrect you can update the fee amount or add/remove a fee item if necessary."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecords"
     :filterVisible="isFilterVisible"

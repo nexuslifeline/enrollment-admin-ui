@@ -237,7 +237,7 @@ export default {
               grade: grade.pivot.grade
             }
           }),
-          studentGradeStatusId: isFinalized ? StudentGradeStatuses.SUBMITTED.id : StudentGradeStatuses.PENDING.id
+          studentGradeStatusId: isFinalized ? StudentGradeStatuses.SUBMITTED.id : StudentGradeStatuses.DRAFT.id
         }
       })
       this.batchUpdateStudentGrade(data).then(({ data }) => {

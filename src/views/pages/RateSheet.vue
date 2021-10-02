@@ -1,6 +1,7 @@
 <template>
     <PageContent
       title="Rate Sheeet Management"
+      description="Manage the fees of each course and level. If the fee is needed to be paid upon enrollment, you should mark the fee as initial fee."
       @toggleFilter="isFilterVisible = !isFilterVisible"
       @refresh="loadFeesOfLevel"
       :filterVisible="isFilterVisible"

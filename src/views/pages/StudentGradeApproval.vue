@@ -168,7 +168,7 @@ import PageContent from "../components/PageContainer/PageContent";
 import { SchoolCategories, Semesters, StudentGradeStatuses } from "../../helpers/enum"
 import { StudentApi, GradingPeriodApi, StudentGradeApi, PersonnelApi } from '../../mixins/api';
 import { StudentColumn } from '../components/ColumnDetails';
-import { formatNumber, showNotification } from '../../helpers/forms';
+import { showNotification } from '../../helpers/forms';
 export default {
   name: 'StudentGrade',
   components: {

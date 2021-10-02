@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Course Management"
+    description="Manage the course name, description, category and other details."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadCourses"
     :filterVisible="isFilterVisible"
@@ -17,92 +18,88 @@
     </template>
     <template v-slot:content>
       <div>
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.courses.fields"
-              :busy="tables.courses.isBusy"
-              :items="tables.courses.items"
-              responsive
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @sort-changed="onSortChanged"
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.courses.fields"
+          :busy="tables.courses.isBusy"
+          :items="tables.courses.items"
+          responsive
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
+        >
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="{ item, value }">
+            <b-link
+              @click="setUpdate(item)"
+              :disabled="!isAccessible($options.CoursePermissions.EDIT.id)"
+              >{{ value }}
+            </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.CoursePermissions.EDIT.id,
+                  $options.CoursePermissions.DELETE.id,
+                ])
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(name)="{ item, value }">
-                <b-link
-                  @click="setUpdate(item)"
-                  :disabled="!isAccessible($options.CoursePermissions.EDIT.id)"
-                  >{{ value }}
-                </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.CoursePermissions.EDIT.id,
-                      $options.CoursePermissions.DELETE.id,
-                    ])
-                  "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.CoursePermissions.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.CoursePermissions.DELETE.id)"
-                    @click="
-                      (forms.course.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.course.from }} to
-                {{ paginations.course.to }} of
-                {{ paginations.course.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.course.page"
-                  :total-rows="paginations.course.totalRows"
-                  :per-page="paginations.course.perPage"
-                  @input="loadCourses()"
-                  size="sm"
-                  align="end"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="isAccessible($options.CoursePermissions.EDIT.id)"
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.CoursePermissions.DELETE.id)"
+                @click="
+                  (forms.course.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.course.from }} to
+            {{ paginations.course.to }} of
+            {{ paginations.course.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.course.page"
+              :total-rows="paginations.course.totalRows"
+              :per-page="paginations.course.perPage"
+              @input="loadCourses()"
+              size="sm"
+              align="end"
+            />
+          </div>
+        </div>
         <!-- end table -->
       </div>
       <!-- Modal Entry -->

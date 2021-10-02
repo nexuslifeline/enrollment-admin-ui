@@ -1,5 +1,7 @@
 <template>
-  <PageContent title="Other Billings"
+  <PageContent
+    title="Other Billings"
+    description="Review and manage other charges to student that were billed for a given period of time."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadBillings()"
     :filterVisible="isFilterVisible"
@@ -214,13 +216,13 @@
             <OtherBillingStatusColumn :data="data.item" />
           </template>
         </b-table>
-        <b-row>
-          <b-col md="6">
+        <div class="d-flex">
+          <div>
             Showing {{ paginations.billing.from }} to
             {{ paginations.billing.to }} of
             {{ paginations.billing.totalRows }} records.
-          </b-col>
-          <b-col md="6">
+          </div>
+          <div class="ml-auto">
             <b-pagination
               class="c-pagination"
               v-model="paginations.billing.page"
@@ -230,8 +232,8 @@
               align="end"
               @input="loadBillings()"
             />
-          </b-col>
-        </b-row>
+          </div>
+        </div>
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <Card v-if="showEntry" :title="`Other Billing Entry - ${entryMode}`">

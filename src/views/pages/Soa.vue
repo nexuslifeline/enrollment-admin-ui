@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Statement of Account"
+    description="Review and manage existing student's statement of account for a given period of time."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadBillings()"
     :filterVisible="isFilterVisible"
@@ -130,13 +131,13 @@
           </b-dropdown>
         </template>
       </b-table>
-      <b-row>
-        <b-col md="6">
+      <div class="d-flex">
+        <div>
           Showing {{ paginations.billing.from }} to
           {{ paginations.billing.to }} of
           {{ paginations.billing.totalRows }} records.
-        </b-col>
-        <b-col md="6">
+        </div>
+        <div class="ml-auto">
           <b-pagination
             class="c-pagination"
             v-model="paginations.billing.page"
@@ -146,8 +147,8 @@
             align="end"
             @input="loadBillings()"
           />
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </div>
     <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
 

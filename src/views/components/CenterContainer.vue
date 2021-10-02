@@ -24,7 +24,7 @@ export default {
   width: 100%;
   max-width: 950px;
   margin: 0 auto;
-  background-color: $light-gray-50;
+  // background-color: $light-gray-50;
 
   @include for-size(phone-only) {
     margin-top: 30px;

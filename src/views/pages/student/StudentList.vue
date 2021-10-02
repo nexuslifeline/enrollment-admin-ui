@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Student Management"
+    description="Manage student's profile information, account settings, family background, educational background and other various settings."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadStudents"
     :filterVisible="isFilterVisible"
@@ -46,145 +47,141 @@
       </div>
     </template>
     <template v-slot:content>
-      <div class="content">
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.students.fields"
-              :busy="tables.students.isBusy"
-              :items="tables.students.items"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @sort-changed="onSortChanged"
-              responsive
+      <div>
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.students.fields"
+          :busy="tables.students.isBusy"
+          :items="tables.students.items"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
+          responsive
+        >
+          <template v-slot:cell(name)="data">
+            <StudentColumn
+              :data="{ student: data.item }"
+              :callback="{
+                loadDetails: () => {
+                  $options.StudentPermissions.EDIT.id
+                    ? $router.push(`/master-files/student/${data.item.id}`)
+                    : null;
+                },
+              }"
+            />
+          </template>
+          <template v-slot:cell(contact)="data">
+            <ContactColumn :data="data.item"/>
+          </template>
+          <template v-slot:cell(address)="data">
+            <AddressColumn :data="data.item"/>
+          </template>
+          <template v-slot:cell(education)="data">
+            <EducationColumn :data="data.item.latestAcademicRecord" />
+          </template>
+          <template v-slot:cell(requirementPercentage)="{ item, value }">
+            <div class="text-center">
+              <b-link
+                :to="
+                  `/master-files/student/${item.id}/school-records/requirements`
+                ">
+                {{ value }}%
+                <BProgress :value="value" variant="info" animated striped />
+              </b-link>
+            </div>
+          </template>
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="isAccessible($options.StudentPermissions.values.filter(
+                (v => ![$options.StudentPermissions.ADD.id, $options.StudentPermissions.DELETE.id].includes(v.id))
+              ))"
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <template v-slot:cell(name)="data">
-                <StudentColumn
-                  :data="{ student: data.item }"
-                  :callback="{
-                    loadDetails: () => {
-                      $options.StudentPermissions.EDIT.id
-                        ? $router.push(`/master-files/student/${data.item.id}`)
-                        : null;
-                    },
-                  }"
-                />
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(contact)="data">
-               <ContactColumn :data="data.item"/>
-              </template>
-              <template v-slot:cell(address)="data">
-               <AddressColumn :data="data.item"/>
-              </template>
-              <template v-slot:cell(education)="data">
-                <EducationColumn :data="data.item.latestAcademicRecord" />
-              </template>
-              <template v-slot:cell(requirementPercentage)="{ item, value }">
-                <div class="text-center">
-                  <b-link
-                    :to="
-                      `/master-files/student/${item.id}/school-records/requirements`
-                    ">
-                    {{ value }}%
-                    <BProgress :value="value" variant="info" animated striped />
-                  </b-link>
-                </div>
-              </template>
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="isAccessible($options.StudentPermissions.values.filter(
-                    (v => ![$options.StudentPermissions.ADD.id, $options.StudentPermissions.DELETE.id].includes(v.id))
-                  ))"
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <!-- <b-dropdown-item
-                    v-if="showRowActionButton"
-                    :to="`/master-files/student/${row.item.id}/school-records`"
-                  >
-                    Update School Records
-                  </b-dropdown-item> -->
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible($options.StudentPermissions.EDIT.id) &&
-                        showRowActionButton
-                    "
-                    :to="`/master-files/student/${row.item.id}`"
-                  >
-                    Edit Profile & Settings
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible(
-                        $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
-                      ) & showRowActionButton"
-                    @click="onChangeUsername(row)"
-                    :disabled="!row.item.user"
-                  >
-                    Change Username
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible(
-                      $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
-                    ) & showRowActionButton"
-                    :to="`/master-files/student/account/${row.item.id}/change-password`"
-                    :disabled="!row.item.user"
-                  >
-                    Change Password
-                  </b-dropdown-item>
-                  <!-- TODO: SET USER ACCESS OF PREVIEW LEDGER BUTTON -->
-                  <b-dropdown-item
-                    v-if="showPreviewLedgerButton"
-                    @click="onShowLedgerModal(row.item.id)"
-                  >
-                    Preview Ledger
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.StudentPermissions.DELETE.id) && showRowActionButton"
-                    @click="onSetDelete(row.item.id)"
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.student.from }} to
-                {{ paginations.student.to }} of
-                {{ paginations.student.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.student.page"
-                  :total-rows="paginations.student.totalRows"
-                  :per-page="paginations.student.perPage"
-                  size="sm"
-                  align="end"
-                  @input="loadStudents()"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <!-- <b-dropdown-item
+                v-if="showRowActionButton"
+                :to="`/master-files/student/${row.item.id}/school-records`"
+              >
+                Update School Records
+              </b-dropdown-item> -->
+              <b-dropdown-item
+                v-if="
+                  isAccessible($options.StudentPermissions.EDIT.id) &&
+                    showRowActionButton
+                "
+                :to="`/master-files/student/${row.item.id}`"
+              >
+                Edit Profile & Settings
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible(
+                    $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
+                  ) & showRowActionButton"
+                @click="onChangeUsername(row)"
+                :disabled="!row.item.user"
+              >
+                Change Username
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible(
+                  $options.StudentPermissions.UPDATE_STUDENT_ACCOUNT.id
+                ) & showRowActionButton"
+                :to="`/master-files/student/account/${row.item.id}/change-password`"
+                :disabled="!row.item.user"
+              >
+                Change Password
+              </b-dropdown-item>
+              <!-- TODO: SET USER ACCESS OF PREVIEW LEDGER BUTTON -->
+              <b-dropdown-item
+                v-if="showPreviewLedgerButton"
+                @click="onShowLedgerModal(row.item.id)"
+              >
+                Preview Ledger
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.StudentPermissions.DELETE.id) && showRowActionButton"
+                @click="onSetDelete(row.item.id)"
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.student.from }} to
+            {{ paginations.student.to }} of
+            {{ paginations.student.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.student.page"
+              :total-rows="paginations.student.totalRows"
+              :per-page="paginations.student.perPage"
+              size="sm"
+              align="end"
+              @input="loadStudents()"
+            />
+          </div>
+        </div>
         <!-- end table -->
       </div>
       <!-- <b-modal

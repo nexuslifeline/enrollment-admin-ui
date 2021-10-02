@@ -1,6 +1,7 @@
 <template>
   <PageContent
     :title="`Section and Schedule Management (${$store.state.schoolYear.name})`"
+    description="Manage the subject's schedule to keep track on the daily activity of a section. You can also set who's teacher or intructor is handling the subject in a particular schedule."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadSections"
     :filterVisible="isFilterVisible"
@@ -52,125 +53,121 @@
     </template>
     <template  v-slot:content>
       <div v-show="!showEntry && checkIfHasSchoolCategoryAccess()">
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.sections.fields"
-              :busy="tables.sections.isBusy"
-              :items="tables.sections.items"
-              responsive
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @sort-changed="onSortChanged"
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.sections.fields"
+          :busy="tables.sections.isBusy"
+          :items="tables.sections.items"
+          responsive
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
+        >
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item @click="loadSchedules(row)">
-                    {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
-                    @click="setUpdate(row, 0)"
-                    :disabled="showEntry">
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
-                    @click="setUpdate(row, 1)"
-                    :disabled="showEntry">
-                    Setup Schedule
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.SectionAndSchedulePermissions.DELETE.id)"
-                    @click="(forms.section.fields.id = row.item.id),(showModalConfirmation = true)"
-                    :disabled="showModalConfirmation">
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-              <template v-slot:row-details="{ item }">
-                <b-overlay :show="item.isLoading" rounded="sm">
-                  <b-card>
-                    <h5 class="text-center">
-                      {{ item.name }}<br />
-                      <span
-                        >{{ item.level.name }} -
-                        {{ item.schoolYear.name }}</span
-                      ><br />
-                      <span v-if="item.course"
-                        >{{ item.course.name }} - {{ item.semester.name }}</span
-                      >
-                    </h5>
-                    <br />
-                    <ScheduleViewer
-                      v-if="item.schedules"
-                      :selectedItems="item.schedules"
-                      :showExtendedTime="false"
-                    />
-                  </b-card>
-                </b-overlay>
-              </template>
-              <template v-slot:cell(name)="row">
-                <div>
+              <b-dropdown-item @click="loadSchedules(row)">
+                {{ !row.detailsShowing ? 'View' : 'Hide' }} Schedule
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
+                @click="setUpdate(row, 0)"
+                :disabled="showEntry">
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.SectionAndSchedulePermissions.EDIT.id)"
+                @click="setUpdate(row, 1)"
+                :disabled="showEntry">
+                Setup Schedule
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.SectionAndSchedulePermissions.DELETE.id)"
+                @click="(forms.section.fields.id = row.item.id),(showModalConfirmation = true)"
+                :disabled="showModalConfirmation">
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+          <template v-slot:row-details="{ item }">
+            <b-overlay :show="item.isLoading" rounded="sm">
+              <b-card>
+                <h5 class="text-center">
+                  {{ item.name }}<br />
                   <span
-                    class="link"
-                    @click="setUpdate(row, 0)"
-                    :disabled="showEntry ||isAccessible($options.SectionAndSchedulePermissions.EDIT.id)">{{ row.item.name }}</span>
-                </div>
-              </template>
-              <template v-slot:cell(schoolCategory)="{ item }">
-                {{ item.schoolCategory && item.schoolCategory.name || '' }}
-              </template>
-              <template v-slot:cell(level)="{ item }">
-                {{ item.level && item.level.name || '' }}
-              </template>
-              <template v-slot:cell(course)="{ item }">
-                {{ item.course && item.course.description || '' }}
-              </template>
-              <template v-slot:cell(semester)="{ item }">
-                {{ item.semester && item.semester.name || '' }}
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.section.from }} to
-                {{ paginations.section.to }} of
-                {{ paginations.section.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.section.page"
-                  :total-rows="paginations.section.totalRows"
-                  :per-page="paginations.section.perPage"
-                  size="sm"
-                  align="end"
-                  @input="loadSections()"
+                    >{{ item.level.name }} -
+                    {{ item.schoolYear.name }}</span
+                  ><br />
+                  <span v-if="item.course"
+                    >{{ item.course.name }} - {{ item.semester.name }}</span
+                  >
+                </h5>
+                <br />
+                <ScheduleViewer
+                  v-if="item.schedules"
+                  :selectedItems="item.schedules"
+                  :showExtendedTime="false"
                 />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              </b-card>
+            </b-overlay>
+          </template>
+          <template v-slot:cell(name)="row">
+            <div>
+              <span
+                class="link"
+                @click="setUpdate(row, 0)"
+                :disabled="showEntry ||isAccessible($options.SectionAndSchedulePermissions.EDIT.id)">{{ row.item.name }}</span>
+            </div>
+          </template>
+          <template v-slot:cell(schoolCategory)="{ item }">
+            {{ item.schoolCategory && item.schoolCategory.name || '' }}
+          </template>
+          <template v-slot:cell(level)="{ item }">
+            {{ item.level && item.level.name || '' }}
+          </template>
+          <template v-slot:cell(course)="{ item }">
+            {{ item.course && item.course.description || '' }}
+          </template>
+          <template v-slot:cell(semester)="{ item }">
+            {{ item.semester && item.semester.name || '' }}
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.section.from }} to
+            {{ paginations.section.to }} of
+            {{ paginations.section.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.section.page"
+              :total-rows="paginations.section.totalRows"
+              :per-page="paginations.section.perPage"
+              size="sm"
+              align="end"
+              @input="loadSections()"
+            />
+          </div>
+        </div>
         <!-- end table -->
       </div>
       <div v-show="showEntry && checkIfHasSchoolCategoryAccess()">

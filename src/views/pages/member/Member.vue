@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Member Management"
+    description="Manage member's personal information, family background, educational background and other settings."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPersonnels"
     :filterVisible="isFilterVisible"
@@ -34,119 +35,115 @@
     </template>
     <template v-slot:content >
       <div>
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.users.fields"
-              :busy="tables.users.isBusy"
-              :items="tables.users.items"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @sort-changed="onSortChanged"
-              responsive
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.users.fields"
+          :busy="tables.users.isBusy"
+          :items="tables.users.items"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @sort-changed="onSortChanged"
+          responsive
+        >
+          <template v-slot:cell(account)="data">
+            <MemberColumn
+              :data="data.item"
+              :callback="{ loadDetails: () => $router.push(`/master-files/member/${data.item.id}`) }"
+            />
+          </template>
+          <template v-slot:cell(userGroup)="data">
+            {{ data.item.user && data.item.user.userGroup && data.item.user.userGroup.name || '' }}
+          </template>
+          <template v-slot:cell(department)="data">
+            {{ data.item.department && data.item.department.name || '' }}
+          </template>
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.PersonnelPermissions.EDIT.id,
+                  $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id,
+                  $options.PersonnelPermissions.DELETE.id,
+                  $options.PersonnelPermissions.CHANGE_PASSWORD.id,
+                  $options.UserGroupPermissions.SETUP_PERMISSION.id
+                ])
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <template v-slot:cell(account)="data">
-                <MemberColumn
-                  :data="data.item"
-                  :callback="{ loadDetails: () => $router.push(`/master-files/member/${data.item.id}`) }"
-                />
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(userGroup)="data">
-                {{ data.item.user && data.item.user.userGroup && data.item.user.userGroup.name || '' }}
-              </template>
-              <template v-slot:cell(department)="data">
-                {{ data.item.department && data.item.department.name || '' }}
-              </template>
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.PersonnelPermissions.EDIT.id,
-                      $options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNT.id,
-                      $options.PersonnelPermissions.DELETE.id,
-                      $options.PersonnelPermissions.CHANGE_PASSWORD.id,
-                      $options.UserGroupPermissions.SETUP_PERMISSION.id
-                    ])
-                  "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
-                    :to="`/master-files/member/${row.item.id}`"
-                    :disabled="showModalEntry"
-                  >
-                    Edit Profile
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNTid)"
-                    @click="onEditAccount(row)"
-                    :disabled="showModalConfirmation"
-                  >
-                    Edit Account
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    :disabled="showModalChangePassword"
-                    v-if="isAccessible($options.PersonnelPermissions.CHANGE_PASSWORD.id)"
-                    @click="onChangePassword(row)"
-                  >
-                    Change Password
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    @click="$router.push({ path: `/maintenance/user-group/${row.item.user.userGroupId}/permissions` })"
-                    v-if="isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)"
-                  >
-                    Update Persimission
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
-                    @click="
-                      (forms.user.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.user.from }} to
-                {{ paginations.user.to }} of
-                {{ paginations.user.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.user.page"
-                  :total-rows="paginations.user.totalRows"
-                  :per-page="paginations.user.perPage"
-                  size="sm"
-                  align="end"
-                  @input="loadPersonnels()"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="isAccessible($options.PersonnelPermissions.EDIT.id)"
+                :to="`/master-files/member/${row.item.id}`"
+                :disabled="showModalEntry"
+              >
+                Edit Profile
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.PersonnelPermissions.UPDATE_PERSONNEL_ACCOUNTid)"
+                @click="onEditAccount(row)"
+                :disabled="showModalConfirmation"
+              >
+                Edit Account
+              </b-dropdown-item>
+              <b-dropdown-item
+                :disabled="showModalChangePassword"
+                v-if="isAccessible($options.PersonnelPermissions.CHANGE_PASSWORD.id)"
+                @click="onChangePassword(row)"
+              >
+                Change Password
+              </b-dropdown-item>
+              <b-dropdown-item
+                @click="$router.push({ path: `/maintenance/user-group/${row.item.user.userGroupId}/permissions` })"
+                v-if="isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)"
+              >
+                Update Persimission
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.PersonnelPermissions.DELETE.id)"
+                @click="
+                  (forms.user.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.user.from }} to
+            {{ paginations.user.to }} of
+            {{ paginations.user.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.user.page"
+              :total-rows="paginations.user.totalRows"
+              :per-page="paginations.user.perPage"
+              size="sm"
+              align="end"
+              @input="loadPersonnels()"
+            />
+          </div>
+        </div>
         <!-- end table -->
       </div>
 
@@ -228,19 +225,13 @@ import {
   validate,
   reset,
   showNotification,
-  clearFields,
 } from '../../../helpers/forms';
-import PhotoViewer from '../../components/PhotoViewer';
 import Tables from '../../../helpers/tables';
-import Personnel from '../../../mixins/api/Personnel';
 import Access from '../../../mixins/utils/Access';
 import { PersonnelPermissions, PersonnelStatuses, UserGroupPermissions } from '../../../helpers/enum';
-import Card from '../../components/Card';
 import PageContent from "../../components/PageContainer/PageContent";
-import { copyValue } from '../../../helpers/extractor';
 import { getFilePath } from '../../../helpers/utils';
-import AvatarMaker from "../../components/AvatarMaker";
-import { MemberColumn, AddressColumn } from "../../components/ColumnDetails";
+import { MemberColumn } from "../../components/ColumnDetails";
 
 export default {
   name: 'Personnel',
@@ -249,10 +240,7 @@ export default {
   UserGroupPermissions,
   getFilePath,
   components: {
-    PhotoViewer,
-    Card,
     PageContent,
-    AvatarMaker,
     MemberColumn
   },
   PersonnelPermissions,
@@ -294,7 +282,7 @@ export default {
           fields: [
             {
               key: 'account',
-              label: 'Account',
+              label: 'Member',
               tdClass: 'align-middle',
               thStyle: { width: '30%' },
               sortable: true

@@ -1,6 +1,7 @@
 <template>
   <PageContent
     :title="`Evaluation and Admission Records (${$store.state.schoolYear.name})`"
+    description="Manage and review the student's evaluation and admission request. You can accept transfer credit if necessary. If necessary requirements are not provided, you can temporarily disapprove the record."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadEvaluation"
     :filterVisible="isFilterVisible"

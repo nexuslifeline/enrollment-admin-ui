@@ -1,6 +1,7 @@
 <template>
   <PageContent
     title="Payment Transactions"
+    description="Manage and review a payment that was submitted by the student. If something is incorrect you can disapproved the payment."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadPaymentList"
     :filterVisible="isFilterVisible"

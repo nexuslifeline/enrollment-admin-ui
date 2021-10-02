@@ -1,8 +1,11 @@
 <template>
-  <button class="create-button" @click="$emit('create')" :disabled="isBusy">
+  <b-button variant="primary" @click="$emit('create')" :disabled="isBusy">
     <BSpinner v-if="isBusy" small type="grow" />
-    <BIconPlus v-else />
-  </button>
+    <BIconPlus v-else scale="1.5" />
+    <span class="ml-2">
+      Create New
+    </span>
+  </b-button>
 </template>
 <script>
 export default {
@@ -16,20 +19,4 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/scss/shared.scss';
-
-.create-button {
-  background: none;
-  outline: 0;
-  border: 1px solid $light-gray-10;
-  border-radius: 4px;
-  padding: 4px 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-
-  &:hover {
-    background-color: $light-gray-50;
-  }
-}
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <PageContent title="Quick Enroll"
+  <PageContent
+    title="Quick Enroll"
+    description="Manually add student profile, academic record and assessment record without requiring the student to signup in the Student Application/Portal."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadAcademicRecord"
     :filterVisible="isFilterVisible"

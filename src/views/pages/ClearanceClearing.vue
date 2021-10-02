@@ -1,6 +1,7 @@
 <template>
   <PageContent
     :title="`Clearance (${$store.state.schoolYear.name})`"
+    description="If all relevant requirements were settled, you can clear a particular student."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"
@@ -70,72 +71,68 @@
       />
     </template>
     <template v-slot:content>
-      <b-row>
-        <b-col md="12">
-          <b-table
-            class="c-table"
-            small
-            hover
-            outlined
-            show-empty
-            :fields="tables.clearances.fields"
-            :busy="tables.clearances.isBusy"
-            :items="tables.clearances.items"
-            responsive
-          >
-            <template v-slot:cell(name)="{ item }">
-              <StudentColumn
-                :data="{ student: item.studentClearance.student }"
-                :callback="{
-                  loadDetails: () => null,
-                }"
-              />
-            </template>
-            <template v-slot:cell(education)="{ item }">
-              <EducationColumn :data="item.studentClearance.academicRecord" />
-            </template>
-            <template v-slot:cell(isCleared)="{ item }">
-              <!-- <b-form-checkbox
-                :value=1
-                :unchecked-value=0
-                v-model="item.isCleared" /> -->
-                <Toggle
-                  :value="item.isCleared ? true : false"
-                  @input="item.isCleared = $event" />
-            </template>
-            <template v-slot:cell(remarks)="{ item }">
-              <b-form-input
-                v-model="item.remarks" />
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="row">
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.clearance.from }} to
-              {{ paginations.clearance.to }} of
-              {{ paginations.clearance.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.clearance.page"
-                :total-rows="paginations.clearance.totalRows"
-                :per-page="paginations.clearance.perPage"
-                size="sm"
-                align="end"
-                @input="onSaveClearance()"
-              />
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
+      <div>
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.clearances.fields"
+          :busy="tables.clearances.isBusy"
+          :items="tables.clearances.items"
+          responsive
+        >
+          <template v-slot:cell(name)="{ item }">
+            <StudentColumn
+              :data="{ student: item.studentClearance.student }"
+              :callback="{
+                loadDetails: () => null,
+              }"
+            />
+          </template>
+          <template v-slot:cell(education)="{ item }">
+            <EducationColumn :data="item.studentClearance.academicRecord" />
+          </template>
+          <template v-slot:cell(isCleared)="{ item }">
+            <!-- <b-form-checkbox
+              :value=1
+              :unchecked-value=0
+              v-model="item.isCleared" /> -->
+              <Toggle
+                :value="item.isCleared ? true : false"
+                @input="item.isCleared = $event" />
+          </template>
+          <template v-slot:cell(remarks)="{ item }">
+            <b-form-input
+              v-model="item.remarks" />
+          </template>
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+        </b-table>
+        <div class="d-flex">
+          <div>
+            Showing {{ paginations.clearance.from }} to
+            {{ paginations.clearance.to }} of
+            {{ paginations.clearance.totalRows }} records.
+          </div>
+          <div class="ml-auto">
+            <b-pagination
+              class="c-pagination"
+              v-model="paginations.clearance.page"
+              :total-rows="paginations.clearance.totalRows"
+              :per-page="paginations.clearance.perPage"
+              size="sm"
+              align="end"
+              @input="onSaveClearance()"
+            />
+          </div>
+        </div>
+      </div>
     </template>
     <template v-slot:bottom-actions>
        <b-button

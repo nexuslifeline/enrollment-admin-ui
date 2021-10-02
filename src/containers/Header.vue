@@ -582,7 +582,7 @@ export default {
   //margin-left: 235px;
   z-index: 1;
   transition: all .3s;
-  background-color: $white;
+  // background-color: $white;
 
   @include for-size(tablet-portrait-down) {
     padding: 0 20px;
