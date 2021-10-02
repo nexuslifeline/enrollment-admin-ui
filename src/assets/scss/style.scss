@@ -203,13 +203,15 @@ label {
   display: inline-flex;
   align-items: center;
   font-size: 9px;
+  padding: 1.8px 3px;
+  border-radius: 4px;
 
   &:before {
     content: ' ';
-    height: 7px;
-    width: 7px;
+    height: 5px;
+    width: 5px;
     border-radius: 50%;
-    border: 1px solid $white;
+    // border: 1px solid $white;
     left: 1px;
     margin: 0 2px 0 0;
   }
@@ -259,7 +261,8 @@ label {
 
 .badge-secondary {
   color: $bluish-gray;
-  background-color: #ced2d8;
+  background-color: $light-gray-100;
+  border: 1px solid $light-gray-100;
 }
 
 

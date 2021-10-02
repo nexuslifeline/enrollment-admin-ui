@@ -1,10 +1,11 @@
 <template>
   <PageContent
-    :title="`Evaluation and Admission Records (${$store.state.schoolYear.name})`"
+    :title="`Evaluation and Admission Records`"
     description="Manage and review the student's evaluation and admission request. You can accept transfer credit if necessary. If necessary requirements are not provided, you can temporarily disapprove the record."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadEvaluation"
     :filterVisible="isFilterVisible"
+    :badges="[{ text: $store.state.schoolYear.name }]"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input

@@ -43,7 +43,16 @@
       />
     </template>
     <template v-slot:extra-buttons>
-      <div class="ml-1 drop-down__container" >
+      <SplitButton
+        v-if="isAccessible($options.StatementOfAccountPermissions.GENERATE.id)"
+        text="Generate Batch SOA"
+        @click="() => $router.push({ name: 'Batch SOA' })"
+        :actions="[
+          { text: 'Create Individual SOA', callback: () => $router.push({ name: 'Individual SOA' }) },
+          { text: 'Create Batch SOA', callback: () => $router.push({ name: 'Batch SOA' }) },
+        ]"
+      />
+      <!-- <div class="ml-1 drop-down__container" >
          <b-dropdown
           v-if="isAccessible($options.StatementOfAccountPermissions.GENERATE.id)"
           text="Generate"
@@ -60,7 +69,7 @@
             Batch SOA
           </b-dropdown-item>
         </b-dropdown>
-      </div>
+      </div> -->
     </template>
     <template v-slot:content>
     <div v-if="checkIfHasSchoolCategoryAccess()" >

@@ -1,21 +1,30 @@
 <template>
-  <div class="c-page-content" :class="{ 'filter-visible': filterVisible }">
+  <div class="c-page-content" :class="{ 'filter-visible': filterVisible, shrink: shrink }">
     <div v-if="filterVisible" class="c-side-filter__container">
       <div class="c-side-filter__container-header">
-        <vText size="s" weight="bold">
-          {{ filterTitle || 'Search and Filter' }}
-        </vText>
+        <span v-if="!shrink" class="c-side-filter__panel-title">
+          {{ filterTitle || 'Search and Filters' }}
+        </span>
+        <button class="action__toggle-panel" @click="shrink = !shrink">
+          <BIconChevronDoubleRight v-if="shrink" scale=".85" />
+          <BIconChevronDoubleLeft v-else scale=".85" />
+        </button>
       </div>
-      <div class="c-side-filter__filter-body">
+      <div v-if="!shrink" class="c-side-filter__filter-body">
         <slot name="filters"></slot>
       </div>
     </div>
     <div class="content-list__container">
       <div class="c-side-filter__headline-container">
         <div class="c-side-filter__headline">
-          <p class="c-side-filter__title">
+          <div class="c-side-filter__title">
             {{ title }}
-          </p>
+            <template v-if="badges && badges.length > 0">
+              <b-badge v-for="(badge, idx) in badges" :key="idx" :variant="badge.variant || 'secondary'" class="ml-2">
+                {{ badge.text }}
+              </b-badge>
+            </template>
+          </div>
           <p class="c-side-filter__description">
             {{ description }}
           </p>
@@ -56,6 +65,11 @@ export default {
     // FilterButton,
     CreateButton
   },
+  data() {
+    return {
+      shrink: false
+    };
+  },
   props: {
     isBusyCreating: {
       type: Boolean,
@@ -92,6 +106,9 @@ export default {
     noScrollBody: {
       type: Boolean,
       default: false
+    },
+    badges: {
+      type: Array,
     }
   },
 };
@@ -114,6 +131,9 @@ export default {
   border-bottom: 1px solid $light-gray-10;
   padding: 7px 10px;
   height: 36px;
+  display: flex;
+  flex-direction: row;
+  // box-shadow: 0 0.25rem 0.25rem $light-gray-100, inset 0 -1px 5px $light-gray-100;
 }
 
 .c-side-filter__content {
@@ -124,6 +144,25 @@ export default {
 .c-page-content {
   position: relative;
   height: calc(100vh - 85px);
+
+  &.shrink {
+    .c-side-filter__container {
+      width: 50px;
+    }
+
+    .content-list__container {
+      margin-left: 50px !important;
+    }
+
+    .action__toggle-panel {
+      background: none;
+      margin: 0 auto;
+
+      &:hover {
+        background-color: $light-gray-10;
+      }
+    }
+  }
 
   &.filter-visible {
     .content-list__container {
@@ -148,13 +187,14 @@ export default {
 
 .c-side-filter__headline-container {
   // border-bottom: 1px solid $light-gray-10;
-  padding: 25px 12px 0 12px;
+  padding: 20px 12px 0 12px;
   width: 100%;
   // background-color: $white;
   display: flex;
   align-items: center;
-  height: 45px;
-  margin-bottom: 10px;
+  // height: 45px;
+  margin-bottom: 6px;
+  // overflow: hidden;
 }
 
 .content-list__body {
@@ -193,9 +233,11 @@ export default {
 }
 
 .c-side-filter__title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 500;
-  line-height: 21px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
   margin: 0;
 }
 
@@ -203,6 +245,29 @@ export default {
   font-size: 13px;
   color: $dark-gray;
   margin: 0;
+}
+
+.action__toggle-panel {
+  border: 0;
+  outline: none;
+  background-color: $light-gray-100;
+  padding: 5px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-weight: 500;
+
+  &:hover {
+    background-color: $light-gray-10;
+  }
+}
+
+.c-side-filter__panel-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 </style>

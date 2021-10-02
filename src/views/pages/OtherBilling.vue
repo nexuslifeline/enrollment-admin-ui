@@ -57,7 +57,16 @@
           >
         </b-dropdown>
       </div> -->
-      <div class="ml-1 drop-down__container" >
+      <SplitButton
+        v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
+        text="Generate Batch Bill"
+        @click="() => $router.push({ name: 'Batch Other Billing' })"
+        :actions="[
+          { text: 'Create Individual Bill', callback: () => $router.push({ name: 'Individual Other Billing' }) },
+          { text: 'Create Batch Bill', callback: () => $router.push({ name: 'Batch Other Billing' }) },
+        ]"
+      />
+      <!-- <div class="ml-1 drop-down__container" >
          <b-dropdown
           v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
           text="Generate"
@@ -74,7 +83,7 @@
             Batch billing
           </b-dropdown-item>
         </b-dropdown>
-      </div>
+      </div> -->
     </template>
     <template v-slot:content>
       <div v-if="!showEntry && !showBatchEntry && checkIfHasSchoolCategoryAccess()">

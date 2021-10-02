@@ -388,12 +388,11 @@ export default {
 
 
 .header__sub-menu-item {
-  margin-right: 20px;
   font-size: 14px;
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 0 18px;
+  padding: 0 10px;
   //color: $white;
   background-color: $white;
 
@@ -435,6 +434,7 @@ export default {
       height: 39px;
       background-color: $white;
       border-bottom: 1px solid $light-gray-10;
+      box-shadow: 0 0.25rem 0.25rem $light-gray-100, inset 0 -1px 5px $light-gray-100;
       align-items: flex-start;
 
       .header__sub-menus-container {
@@ -451,7 +451,7 @@ export default {
       .header__sub-menu-item {
         background: none;
         color: black;
-        margin-right: 5px;
+        margin-right: 18px;
 
         &.active {
           border-bottom: 3px solid $brand-primary;
@@ -645,6 +645,7 @@ export default {
   transition: all .3s;
   justify-content: flex-end;
   align-items: center;
+  // box-shadow: 0 0.25rem 0.25rem rgb(0 0 0 / 25%), inset 0 -1px 5px rgb(0 0 0 / 25%);
 }
 
 .header__sub-menus {

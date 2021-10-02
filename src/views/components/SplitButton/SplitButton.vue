@@ -21,11 +21,11 @@
     props: {
       splitVariant: {
         type: [String],
-        default: 'outline-primary'
+        default: 'primary'
       },
       variant: {
         type: [String],
-        default: 'outline-primary'
+        default: 'primary'
       },
       text: {
         type: [String],
@@ -43,6 +43,7 @@
   .split-dropdown {
     .dropdown-toggle-split {
       padding: 5px 7px !important;
+      border-left: 1px solid $white;
     }
 
     button.btn:first-child {

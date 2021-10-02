@@ -1,10 +1,11 @@
 <template>
   <PageContent
-    :title="`Section and Schedule Management (${$store.state.schoolYear.name})`"
+    :title="`Section and Schedule Management`"
     description="Manage the subject's schedule to keep track on the daily activity of a section. You can also set who's teacher or intructor is handling the subject in a particular schedule."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadSections"
     :filterVisible="isFilterVisible"
+    :badges="[{ text: $store.state.schoolYear.name }]"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess() ">
     <template v-slot:filters>

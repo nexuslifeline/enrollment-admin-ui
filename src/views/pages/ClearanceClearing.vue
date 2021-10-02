@@ -1,11 +1,12 @@
 <template>
   <PageContent
-    :title="`Clearance (${$store.state.schoolYear.name})`"
+    :title="`Clearance`"
     description="If all relevant requirements were settled, you can clear a particular student."
     @toggleFilter="isFilterVisible = !isFilterVisible"
     @refresh="loadClearances()"
     :filterVisible="isFilterVisible"
     :createButtonVisible="false"
+    :badges="[{ text: $store.state.schoolYear.name }]"
     showBottomActions>
     <template v-slot:filters>
       <b-form-input

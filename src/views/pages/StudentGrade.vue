@@ -1,9 +1,13 @@
 <template>
   <PageContent
-    :title="`Student Grade (${$store.state.schoolYear.name})`"
+    :title="`Student Grade`"
     description="Manage student's raw grade per grading period. Manage grade visibility settings and other subject related settings."
     filterTitle="Your Subjects"
     :createButtonVisible="false"
+    :badges="[
+      { text: StudentGradeStatuses.getEnum(studentGrade.studentGradeStatusId).name, variant: 'success' },
+      { text: $store.state.schoolYear.name },
+    ]"
     noScrollBody>
     <template v-slot:extra-buttons>
       <template v-if="studentGrade.studentGradeStatusId === StudentGradeStatuses.DRAFT.id">

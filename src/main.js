@@ -139,9 +139,15 @@ import {
   BIconTrash,
   BIconX,
   BIconThreeDots,
+  BIconThreeDotsVertical,
   BIconFolderPlus,
-  BIconFolderMinus
+  BIconFolderMinus,
+  BIconChevronDoubleLeft,
+  BIconChevronDoubleRight
 } from 'bootstrap-vue';
+Vue.component('BIconThreeDotsVertical', BIconThreeDotsVertical);
+Vue.component('BIconChevronDoubleLeft', BIconChevronDoubleLeft);
+Vue.component('BIconChevronDoubleRight', BIconChevronDoubleRight);
 Vue.component('BIconThreeDots', BIconThreeDots);
 Vue.component('BIconX', BIconX);
 Vue.component('BIconTrash', BIconTrash);

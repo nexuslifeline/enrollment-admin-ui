@@ -51,7 +51,15 @@
       />
     </template>
     <template v-slot:extra-buttons>
-      <div class="ml-1 drop-down__container" v-if="isAccessible($options.PaymentPermissions.ADD.id)">
+      <SplitButton
+        v-if="isAccessible($options.PaymentPermissions.ADD.id)"
+        text="Post Payment"
+        @click="() => $router.push({ name: 'Payment Add' })"
+        :actions="[
+          { text: 'Add Payment Manually', callback: () => $router.push({ name: 'Payment Add' }) }
+        ]"
+      />
+      <!-- <div class="ml-1 drop-down__container" v-if="isAccessible($options.PaymentPermissions.ADD.id)">
          <b-dropdown
           v-if="isAccessible($options.PaymentPermissions.ADD.id)"
           text="Post Payment"
@@ -63,7 +71,7 @@
             Add Payment Manually
           </b-dropdown-item>
         </b-dropdown>
-      </div>
+      </div> -->
     </template>
     <template v-slot:content>
       <div>
