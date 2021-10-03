@@ -1,12 +1,12 @@
 <template>
   <PageContent
-    :title="`Student Grade`"
+    :title="`Grade Sheet`"
     description="Manage student's raw grade per grading period. Manage grade visibility settings and other subject related settings."
     filterTitle="Your Subjects"
     :createButtonVisible="false"
     :badges="[
-      { text: StudentGradeStatuses.getEnum(studentGrade.studentGradeStatusId).name, variant: 'success' },
       { text: $store.state.schoolYear.name },
+      { text: StudentGradeStatuses.getEnum(studentGrade.studentGradeStatusId).name, variant: 'success' },
     ]"
     noScrollBody>
     <template v-slot:extra-buttons>
@@ -42,7 +42,12 @@
       </template>
     </template>
     <template v-slot:filters>
-      <FolderManager :personnelId="personnelId" @onSectionSelect="onSectionSelect" />
+      <FolderManager
+        :personnelId="personnelId"
+        @onSectionSelect="onSectionSelect"
+        :activeSectionId="sectionId"
+        :activeSubjectId="subjectId"
+      />
     </template>
     <template v-slot:content>
       <GradeSheet
