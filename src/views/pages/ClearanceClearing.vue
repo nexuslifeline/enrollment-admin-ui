@@ -2,9 +2,14 @@
   <PageContent
     :title="`Clearance`"
     description="If all relevant requirements were settled, you can clear a particular student."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadClearances()"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.clearance.criteria"
+    :pageFrom="paginations.clearance.from"
+    :pageTo="paginations.clearance.to"
+    :pageTotal="paginations.clearance.totalRows"
+    :perPage="paginations.clearance.perPage"
+    :currentPage.sync="paginations.clearance.page"
+    @onPageChange="loadClearances"
+    @onRefresh="loadClearances"
     :createButtonVisible="false"
     :badges="[{ text: $store.state.schoolYear.name }]"
     showBottomActions>
@@ -115,7 +120,7 @@
             </div>
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.clearance.from }} to
             {{ paginations.clearance.to }} of
@@ -132,16 +137,16 @@
               @input="onSaveClearance()"
             />
           </div>
-        </div>
+        </div> -->
       </div>
     </template>
-    <template v-slot:bottom-actions>
+    <template v-slot:extra-buttons>
        <b-button
         :disabled="tables.clearances.items.length == 0"
          @click="onSaveClearance()"
         variant="primary">
         <v-icon v-if="isProcessing" name="spinner" spin />
-        Save
+        Save Changes
       </b-button>
     </template>
   </PageContent>

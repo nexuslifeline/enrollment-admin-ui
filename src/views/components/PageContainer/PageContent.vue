@@ -10,7 +10,7 @@
           <BIconChevronDoubleLeft v-else scale=".85" />
         </button>
       </div>
-      <div v-if="!shrink" class="c-side-filter__filter-body">
+      <div v-show="!shrink" class="c-side-filter__filter-body">
         <slot name="filters"></slot>
       </div>
     </div>
@@ -43,14 +43,69 @@
         </div>
       </div>
       <div class="content-list__actions">
+        <button class="list__sub-action" @click="shrink = !shrink">
+          <BIconFunnel scale=".9" />
+          <span class="list__sub-action-label">
+            Filters
+          </span>
+        </button>
+        <button class="list__sub-action" @click="$emit('onRefresh')">
+          <BIconArrowRepeat scale=".9" />
+          <span class="list__sub-action-label">
+            Refresh
+          </span>
+        </button>
+        <button class="list__sub-action" @click="onPrint">
+          <BIconPrinter scale=".9" />
+          <span class="list__sub-action-label">
+            Print
+          </span>
+        </button>
+        <button class="list__sub-action" @click="onDownload">
+          <BIconDownload scale=".9" />
+          <span class="list__sub-action-label">
+            Download
+          </span>
+        </button>
+        <div class="list__fill-bar">
+
+        </div>
         <slot name="actions"></slot>
       </div>
       <div class="content-list__body" :class="{ noPadding: noPaddingBody, noScroll: noScrollBody }">
         <slot name="content"></slot>
       </div>
-    </div>
-    <div class="action-bar__container" v-if="showBottomActions">
-      <slot name="bottom-actions"></slot>
+      <div class="action-bar__container" v-if="showBottomActions">
+        <div class="bottom-action__fill-bar">
+          <div class="pagination__details" v-if="showPagination">
+            <div>
+              <span v-if="pageTotal > 0">
+                Showing {{ pageFrom }} to
+                {{ pageTo }} of
+                {{ pageTotal }} records.
+              </span>
+              <span v-else>
+                No record(s) found.
+              </span>
+              <span v-if="!!searchKeyword" class="list__search-description">
+                Search Keyword: <b>{{ searchKeyword }}</b>
+              </span>
+            </div>
+            <div class="ml-auto" v-if="pageTotal > 0">
+              <b-pagination
+                class="c-pagination"
+                :value="currentPage"
+                :total-rows="pageTotal"
+                :per-page="perPage"
+                size="sm"
+                align="end"
+                @input="onPageChange"
+              />
+            </div>
+          </div>
+        </div>
+        <slot name="bottom-actions"></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -67,10 +122,29 @@ export default {
   },
   data() {
     return {
-      shrink: false
+      shrink: true
     };
   },
   props: {
+    pageFrom: {
+      type: Number
+    },
+    pageTo: {
+      type: Number
+    },
+    pageTotal: {
+      type: Number
+    },
+    currentPage: {
+      type: Number
+    },
+    perPage: {
+      type: Number
+    },
+    showPagination: {
+      type: Boolean,
+      default: true
+    },
     isBusyCreating: {
       type: Boolean,
       default: false
@@ -87,6 +161,10 @@ export default {
       type: String,
       default: ''
     },
+    searchKeyword: {
+      type: String,
+      default: ''
+    },
     title: {
       type: String,
       default: ''
@@ -97,7 +175,7 @@ export default {
     },
     showBottomActions: {
       type: Boolean,
-      default: false
+      default: true
     },
     noPaddingBody: {
       type: Boolean,
@@ -111,6 +189,20 @@ export default {
       type: Array,
     }
   },
+  methods: {
+    onPrint() {
+      this.$emit('onPrint');
+      alert('Feature not yet available!');
+    },
+    onDownload() {
+      this.$emit('onDownload');
+      alert('Feature not yet available!');
+    },
+    onPageChange(page) {
+      this.$emit('update:currentPage', page);
+      this.$emit('onPageChange', page);
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -136,6 +228,12 @@ export default {
   // box-shadow: 0 0.25rem 0.25rem $light-gray-100, inset 0 -1px 5px $light-gray-100;
 }
 
+.content-list__container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .c-side-filter__content {
   height: 100%;
   padding: 15px 10px;
@@ -148,6 +246,7 @@ export default {
   &.shrink {
     .c-side-filter__container {
       width: 50px;
+      background-color: $light-gray-100;
     }
 
     .content-list__container {
@@ -162,6 +261,7 @@ export default {
         background-color: $light-gray-10;
       }
     }
+
   }
 
   &.filter-visible {
@@ -174,10 +274,10 @@ export default {
       margin: 0 !important;
     }
 
-    .action-bar__container {
-      width: calc(100% - 245px);
-      margin-left: 240px;
-    }
+    // .action-bar__container {
+    //   width: calc(100% - 245px);
+    //   margin-left: 240px;
+    // }
   }
 }
 
@@ -186,18 +286,19 @@ export default {
 }
 
 .c-side-filter__headline-container {
-  // border-bottom: 1px solid $light-gray-10;
-  padding: 20px 12px 0 12px;
+  border-bottom: 1px solid $light-gray-10;
+  padding: 14px 10px 9px 10px;
   width: 100%;
-  // background-color: $white;
+  background-color: $white;
   display: flex;
   align-items: center;
   // height: 45px;
-  margin-bottom: 6px;
+  // margin-bottom: 6px;
   // overflow: hidden;
 }
 
 .content-list__body {
+  flex: 1;
   padding: 10px 10px;
 
   &.noPadding {
@@ -212,6 +313,13 @@ export default {
 .content-list__actions {
   display: flex;
   flex-direction: row;
+  height: 25px;
+  width: 100%;
+  padding: 2px 0;
+  // background-color: $light-gray-100;
+  border-bottom: 1px solid $light-gray-10;
+  background-color: $light-gray-50;
+  box-shadow: 0 0.25rem 0.25rem $light-gray-100, inset 0 -1px 5px $light-gray-100;
 }
 
 .c-side-filter__headline {
@@ -222,14 +330,20 @@ export default {
 }
 
 .action-bar__container {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
   display: flex;
-  height: 60px;
-  background-color: white;
+  height: 35px;
+  background-color: $light-gray-50;
   align-items: center;
   justify-content: flex-end;
+  border-top: 1px solid $light-gray-10;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+}
+
+.bottom-action__fill-bar {
+  flex: 1;
+  padding: 2px 12px;
 }
 
 .c-side-filter__title {
@@ -239,6 +353,7 @@ export default {
   display: flex;
   align-items: center;
   margin: 0;
+  color: $blue;
 }
 
 .c-side-filter__description {
@@ -268,6 +383,59 @@ export default {
   flex: 1;
   font-size: 14px;
   font-weight: 500;
+}
+
+.list__sub-action {
+  background: none;
+  border: 0;
+  outline: none;
+  min-width: 95px;
+  border-right: 1px solid $light-gray-10;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  @include for-size(phone-only) {
+    min-width: none;
+    flex: 1;
+
+    .list__sub-action-label {
+      display: none;
+    }
+  }
+}
+
+.list__sub-action-label {
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 5px;
+  color: $dark-gray-100;
+
+  &:hover {
+    color: $dark-gray;
+  }
+}
+
+.list__fill-bar {
+  flex: 1;
+  font-size: 12.5px;
+  padding: 2px 12px;
+  display: flex;
+  border-right: 1px solid $light-gray-10;
+}
+
+.list__search-description {
+  margin-left: 12px;
+}
+
+.pagination__details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  font-size: 13.5px;
 }
 
 </style>

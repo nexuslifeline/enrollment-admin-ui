@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div>
-      {{ curriculumName }}
-    </div>
+    {{ curriculumName }}
   </div>
 </template>
 

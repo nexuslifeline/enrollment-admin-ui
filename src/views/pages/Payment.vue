@@ -2,9 +2,14 @@
   <PageContent
     title="Payment Transactions"
     description="Manage and review a payment that was submitted by the student. If something is incorrect you can disapproved the payment."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadPaymentList"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.payment.criteria"
+    :pageFrom="paginations.payment.from"
+    :pageTo="paginations.payment.to"
+    :pageTotal="paginations.payment.totalRows"
+    :perPage="paginations.payment.perPage"
+    :currentPage.sync="paginations.payment.page"
+    @onPageChange="loadPaymentList"
+    @onRefresh="loadPaymentList"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -507,7 +512,7 @@
             </ActiveRowViewer>
           </template>
         </b-table>
-        <b-row>
+        <!-- <b-row>
           <b-col md="6">
             Showing {{ paginations.payment.from }} to
             {{ paginations.payment.to }} of
@@ -524,7 +529,7 @@
               @input="loadPaymentList()"
             />
           </b-col>
-        </b-row>
+        </b-row> -->
       </div>
       <!-- Modal Preview -->
       <FileViewer

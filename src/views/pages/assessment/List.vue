@@ -2,10 +2,15 @@
   <PageContent
     :title="`Student Assessment Fee`"
     description="Manage and review the calculation of tuition fee and other fees. If something is incorrect you can update the fee amount or add/remove a fee item if necessary."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadAcademicRecords"
-    :filterVisible="isFilterVisible"
     :badges="[{ text: $store.state.schoolYear.name }]"
+    :searchKeyword="filters.student.criteria"
+    :pageFrom="paginations.student.from"
+    :pageTo="paginations.student.to"
+    :pageTotal="paginations.student.totalRows"
+    :perPage="paginations.student.perPage"
+    :currentPage.sync="paginations.student.page"
+    @onPageChange="loadAcademicRecords"
+    @onRefresh="loadAcademicRecords"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -461,7 +466,7 @@
             </ActiveRowViewer>
           </template>
         </b-table>
-        <b-row>
+        <!-- <b-row>
           <b-col md="6">
             Showing {{ paginations.student.from }} to
             {{ paginations.student.to }} of
@@ -478,7 +483,7 @@
               @input="loadAcademicRecords()"
             />
           </b-col>
-        </b-row>
+        </b-row> -->
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
 

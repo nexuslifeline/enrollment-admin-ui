@@ -2,9 +2,14 @@
   <PageContent 
     title="Academic Transcripts"
     description="Manage draft academic transcripts and approve the grades submitted by teachers and intructors. You can also print the finalized student's TOR."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadTranscriptRecords"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.transcriptRecord.criteria"
+    :pageFrom="paginations.transcriptRecord.from"
+    :pageTo="paginations.transcriptRecord.to"
+    :pageTotal="paginations.transcriptRecord.totalRows"
+    :perPage="paginations.transcriptRecord.perPage"
+    :currentPage.sync="paginations.transcriptRecord.page"
+    @onPageChange="loadTranscriptRecords"
+    @onRefresh="loadTranscriptRecords"
     @create="setCreate()"
     :createButtonVisible="false">
     <template v-slot:extra-buttons>
@@ -1258,7 +1263,7 @@
             </ActiveRowViewer>
           </template>
         </b-table>
-        <b-row>
+        <!-- <b-row>
           <b-col md="6">
             Showing {{ paginations.transcriptRecord.from }} to
             {{ paginations.transcriptRecord.to }} of
@@ -1275,7 +1280,7 @@
               @input="loadTranscriptRecords()"
             />
           </b-col>
-        </b-row>
+        </b-row> -->
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <b-modal
@@ -1397,22 +1402,16 @@ import {
 } from '../../helpers/enum';
 import {
   showNotification,
-  formatNumber,
-  clearFields,
 } from '../../helpers/forms';
 import Tables from '../../helpers/tables';
-import SchoolCategoryTabs from '../components/SchoolCategoryTabs';
-import { copyValue } from '../../helpers/extractor';
 import { format } from 'date-fns';
 import { colorFactory, getColorFactoryLength } from '../../helpers/colors';
-import AvatarMaker from '../components/AvatarMaker';
-import Card from '../components/Card';
+import AvatarMaker from '../components/AvatarMaker';;
 import ActiveRowViewer from '../components/ActiveRowViewer/ActiveRowViewer';
 import ActiveViewHeader from '../components/ActiveRowViewer/ActiveViewHeader';
 import ActiveViewItems from '../components/ActiveRowViewer/ActiveViewItems';
 import ActiveViewItem from '../components/ActiveRowViewer/ActiveViewItem';
 import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
-import AttachmentList from '../components/Attachment/AttachmentList';
 import Access from '../../mixins/utils/Access';
 import PageContent from  '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
@@ -1440,12 +1439,9 @@ export default {
     StudentGradeApi
   ],
   components: {
-    SchoolCategoryTabs,
-    Card,
     AvatarMaker,
     ActiveRowViewer,
     ActiveViewHeader,
-    AttachmentList,
     ActiveViewItems,
     ActiveViewItem,
     ActiveViewLinks,

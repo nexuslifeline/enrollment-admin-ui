@@ -2,9 +2,14 @@
   <PageContent
     title="Quick Enroll"
     description="Manually add student profile, academic record and assessment record without requiring the student to signup in the Student Application/Portal."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadAcademicRecord"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.academicRecord.criteria"
+    :pageFrom="paginations.academicRecord.from"
+    :pageTo="paginations.academicRecord.to"
+    :pageTotal="paginations.academicRecord.totalRows"
+    :perPage="paginations.academicRecord.perPage"
+    :currentPage.sync="paginations.academicRecord.page"
+    @onPageChange="loadAcademicRecord"
+    @onRefresh="loadAcademicRecord"
     :createButtonVisible="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
     @create="onAddNew">
     <template v-slot:filters>
@@ -124,7 +129,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <b-row>
+        <!-- <b-row>
           <b-col md="6">
             Showing {{ paginations.academicRecord.from }} to
             {{ paginations.academicRecord.to }} of
@@ -141,7 +146,7 @@
               @input="loadAcademicRecord()"
             />
           </b-col>
-        </b-row>
+        </b-row> -->
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <StudentSelection

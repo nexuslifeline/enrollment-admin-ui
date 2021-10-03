@@ -2,9 +2,14 @@
   <PageContent
     title="Statement of Account"
     description="Review and manage existing student's statement of account for a given period of time."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadBillings()"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.billing.criteria"
+    :pageFrom="paginations.billing.from"
+    :pageTo="paginations.billing.to"
+    :pageTotal="paginations.billing.totalRows"
+    :perPage="paginations.billing.perPage"
+    :currentPage.sync="paginations.billing.page"
+    @onPageChange="loadBillings"
+    @onRefresh="loadBillings"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -140,7 +145,7 @@
           </b-dropdown>
         </template>
       </b-table>
-      <div class="d-flex">
+      <!-- <div class="d-flex">
         <div>
           Showing {{ paginations.billing.from }} to
           {{ paginations.billing.to }} of
@@ -157,7 +162,7 @@
             @input="loadBillings()"
           />
         </div>
-      </div>
+      </div> -->
     </div>
     <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
 

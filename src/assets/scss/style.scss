@@ -569,11 +569,13 @@ legend.required:before {
 }
 
 .c-table {
+  // box-shadow: 0 0.25rem 0.25rem $light-gray-100, inset 0 -1px 5px $light-gray-100;
+
   thead {
     th {
-      padding: 8px;
+      padding: 7px;
       text-transform: uppercase;
-      font-size: 13px;
+      font-size: 12px;
       color: $dark-gray-500;
       background-color: $light-gray-50;
     }
@@ -587,6 +589,8 @@ legend.required:before {
 }
 
 .c-pagination {
+  margin-bottom: 0 !important;
+
   .page-item {
     margin: 3px;
   }
@@ -620,11 +624,11 @@ legend.required:before {
 
 .c-table thead th {
   color: $bluish-gray !important;
-  padding: 4px 7px !important;
+  padding: 3px 7px !important;
 }
 
 .c-table tbody td {
-  padding: 6px !important;
+  padding: 5px !important;
 }
 
 .modal-footer {

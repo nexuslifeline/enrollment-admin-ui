@@ -2,10 +2,15 @@
   <PageContent
     title="Curriculum Management"
     description="Manage the level, course, effective year details and the subjects comprising a particular curriculum."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadCurriculums"
-    :filterVisible="isFilterVisible"
     @create="setCreate()"
+    :searchKeyword="filters.curriculum.criteria"
+    :pageFrom="paginations.curriculum.from"
+    :pageTo="paginations.curriculum.to"
+    :pageTotal="paginations.curriculum.totalRows"
+    :perPage="paginations.curriculum.perPage"
+    :currentPage.sync="paginations.curriculum.page"
+    @onPageChange="loadCurriculums"
+    @onRefresh="loadCurriculums"
     :createButtonVisible="isAccessible($options.CurriculumPermissions.ADD.id) && checkIfHasSchoolCategoryAccess()">
     <template v-slot:filters>
       <b-form-input
@@ -398,7 +403,7 @@
               {{ row.item && row.item.course && row.item.course.name || 'N/A' }}
             </template>
           </b-table>
-          <div class="d-flex">
+          <!-- <div class="d-flex">
             <div>
               Showing {{ paginations.curriculum.from }} to
               {{ paginations.curriculum.to }} of
@@ -415,7 +420,7 @@
                 @input="loadCurriculums()"
               />
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
       <div v-show="showEntry && checkIfHasSchoolCategoryAccess()">

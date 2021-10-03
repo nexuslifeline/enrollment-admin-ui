@@ -2,10 +2,15 @@
   <PageContent
     :title="`Subject Enlistment`"
     description="Manage and review the student's pre-enlistment request. If something is not allowed to be taken, you can remove the subject or add subject if necessary."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadAcademicRecordList"
     :badges="[{ text: $store.state.schoolYear.name }]"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.student.criteria"
+    :pageFrom="paginations.student.from"
+    :pageTo="paginations.student.to"
+    :pageTotal="paginations.student.totalRows"
+    :perPage="paginations.student.perPage"
+    :currentPage.sync="paginations.student.page"
+    @onPageChange="loadAcademicRecordList"
+    @onRefresh="loadAcademicRecordList"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -433,7 +438,7 @@
             </b-overlay>
           </template>
         </b-table>
-        <b-row>
+        <!-- <b-row>
           <b-col md="6">
             Showing {{ paginations.student.from }} to
             {{ paginations.student.to }} of
@@ -450,7 +455,7 @@
               @input="loadAcademicRecordList()"
             />
           </b-col>
-        </b-row>
+        </b-row> -->
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
     <!-- </Card> -->

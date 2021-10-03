@@ -105,7 +105,7 @@ export default {
   }
 
   &.shrink {
-    margin-top: 80px;
+    margin-top: 85px;
 
     .c-body {
       margin-left: 0;

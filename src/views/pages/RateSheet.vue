@@ -6,6 +6,8 @@
       @refresh="loadFeesOfLevel"
       :filterVisible="isFilterVisible"
       :createButtonVisible="checkIfHasSchoolCategoryAccess()"
+      :showBottomActions="false"
+      showB
       @create="showModalFees = true">
       <template v-slot:filters>
         <!--<v-select
@@ -151,6 +153,7 @@
                       :items.sync="forms.rateSheet.fields.fees"
                       :fields="tables.rateSheetFees.fields"
                       :busy="tables.rateSheetFees.isBusy"
+                      class="c-table"
                     >
                       <template v-slot:table-busy>
                         <div class="text-center my-2">

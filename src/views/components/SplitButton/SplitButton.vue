@@ -1,5 +1,6 @@
 <template>
   <b-dropdown
+    v-if="actions && actions.length > 0"
     class="split-dropdown"
     split
     :split-variant="splitVariant"
@@ -14,6 +15,9 @@
       {{ action.text }}
     </b-dropdown-item>
   </b-dropdown>
+  <b-button v-else :variant="splitVariant" @click="$emit('click')">
+    {{ text }}
+  </b-button>
 </template>
 
 <script>

@@ -2,9 +2,14 @@
   <PageContent
     title="Course Management"
     description="Manage the course name, description, category and other details."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadCourses"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.course.criteria"
+    :pageFrom="paginations.course.from"
+    :pageTo="paginations.course.to"
+    :pageTotal="paginations.course.totalRows"
+    :perPage="paginations.course.perPage"
+    :currentPage.sync="paginations.course.page"
+    @onPageChange="loadCourses"
+    @onRefresh="loadCourses"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.CoursePermissions.ADD.id)">
     <template v-slot:filters>
@@ -82,7 +87,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.course.from }} to
             {{ paginations.course.to }} of
@@ -99,7 +104,7 @@
               align="end"
             />
           </div>
-        </div>
+        </div> -->
         <!-- end table -->
       </div>
       <!-- Modal Entry -->

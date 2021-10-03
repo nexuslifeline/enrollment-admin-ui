@@ -1,6 +1,6 @@
 <template>
   <div :style="{ position: 'relative' }">
-    <div>
+    <div :style="{ lineHeight: '18px' }">
       <b-link @click="callback.loadDetails">
         {{ data.billingNo }}
       </b-link>

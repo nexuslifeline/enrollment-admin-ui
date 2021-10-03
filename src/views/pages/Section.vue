@@ -2,10 +2,15 @@
   <PageContent
     :title="`Section and Schedule Management`"
     description="Manage the subject's schedule to keep track on the daily activity of a section. You can also set who's teacher or intructor is handling the subject in a particular schedule."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadSections"
-    :filterVisible="isFilterVisible"
     :badges="[{ text: $store.state.schoolYear.name }]"
+    :searchKeyword="filters.section.criteria"
+    :pageFrom="paginations.section.from"
+    :pageTo="paginations.section.to"
+    :pageTotal="paginations.section.totalRows"
+    :perPage="paginations.section.perPage"
+    :currentPage.sync="paginations.section.page"
+    @onPageChange="loadSections"
+    @onRefresh="loadSections"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.SectionAndSchedulePermissions.ADD.id) && checkIfHasSchoolCategoryAccess() ">
     <template v-slot:filters>
@@ -151,7 +156,7 @@
             {{ item.semester && item.semester.name || '' }}
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.section.from }} to
             {{ paginations.section.to }} of
@@ -168,7 +173,7 @@
               @input="loadSections()"
             />
           </div>
-        </div>
+        </div> -->
         <!-- end table -->
       </div>
       <div v-show="showEntry && checkIfHasSchoolCategoryAccess()">

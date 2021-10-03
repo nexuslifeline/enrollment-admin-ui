@@ -8,8 +8,8 @@
         :src="$options.getFilePath(photoHashName)"
       />
     </template>
-    <div class="student-name">
-      <div>
+    <div class="student-details__container">
+      <div class="student__name">
         <b-link @click="callback.loadDetails">
           {{ studentName }}
         </b-link>
@@ -96,7 +96,7 @@ export default {
   right: 10px;
 }
 
-.student-name {
+.student-details__container {
   display: flex;
   position: relative;
 }
@@ -110,6 +110,10 @@ export default {
   background-color: $light-gray-100;
   cursor: pointer;
   line-height: 13px;
+}
+
+.student__name {
+  line-height: 17px;
 }
 
 </style>

@@ -2,9 +2,14 @@
   <PageContent
     title="Student Management"
     description="Manage student's profile information, account settings, family background, educational background and other various settings."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadStudents"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.student.criteria"
+    :pageFrom="paginations.student.from"
+    :pageTo="paginations.student.to"
+    :pageTotal="paginations.student.totalRows"
+    :perPage="paginations.student.perPage"
+    :currentPage.sync="paginations.student.page"
+    @onPageChange="loadStudents"
+    @onRefresh="loadStudents"
     @create="onAddNewStudent"
     :isBusyCreating="isBusyCreating"
     :createButtonVisible="isAccessible($options.StudentPermissions.ADD.id) && showAddButton">
@@ -42,9 +47,12 @@
         placeholder="Semester"
         class="mt-2"
       />
-      <div class="onboarding-filter mt-2">
-        Onboarding <Toggle :value="filters.student.isOnboarding" @input="onOnboardingChanged"/>
-      </div>
+      <InputContainer class="mt-3">
+        <InputInline>
+          <Toggle :value="filters.student.isOnboarding" @input="onOnboardingChanged"/>
+          <span class="ml-2">Onboarding</span>
+        </InputInline>
+      </InputContainer>
     </template>
     <template v-slot:content>
       <div>
@@ -164,7 +172,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.student.from }} to
             {{ paginations.student.to }} of
@@ -181,7 +189,7 @@
               @input="loadStudents()"
             />
           </div>
-        </div>
+        </div> -->
         <!-- end table -->
       </div>
       <!-- <b-modal

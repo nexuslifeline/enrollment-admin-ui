@@ -2,9 +2,14 @@
   <PageContent
     title="Member Management"
     description="Manage member's personal information, family background, educational background and other settings."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadPersonnels"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.user.criteria"
+    :pageFrom="paginations.user.from"
+    :pageTo="paginations.user.to"
+    :pageTotal="paginations.user.totalRows"
+    :perPage="paginations.user.perPage"
+    :currentPage.sync="paginations.user.page"
+    @onPageChange="loadPersonnels"
+    @onRefresh="loadPersonnels"
     @create="onAddNewMember"
     :isBusyCreating="isBusyCreating"
     :createButtonVisible="isAccessible($options.PersonnelPermissions.ADD.id)">
@@ -126,7 +131,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.user.from }} to
             {{ paginations.user.to }} of
@@ -143,7 +148,7 @@
               @input="loadPersonnels()"
             />
           </div>
-        </div>
+        </div> -->
         <!-- end table -->
       </div>
 

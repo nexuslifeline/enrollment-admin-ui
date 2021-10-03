@@ -1,10 +1,15 @@
 <template>
   <PageContent 
     title="Subject Management"
-    description="Manage the subject's code, title, description, category and other details."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadSubjects"
-    :filterVisible="isFilterVisible"
+    description="Manage the subject's code, title, description, units, category and other details."
+    :searchKeyword="filters.subject.criteria"
+    :pageFrom="paginations.subject.from"
+    :pageTo="paginations.subject.to"
+    :pageTotal="paginations.subject.totalRows"
+    :perPage="paginations.subject.perPage"
+    :currentPage.sync="paginations.subject.page"
+    @onPageChange="loadSubjects"
+    @onRefresh="loadSubjects"
     @create="onCreate()"
     :createButtonVisible="isAccessible($options.SubjectPermissions.ADD.id) && checkIfHasSchoolCategoryAccess()">
     <template v-slot:filters>
@@ -99,7 +104,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.subject.from }} to
             {{ paginations.subject.to }} of
@@ -116,7 +121,7 @@
               @input="loadSubjects()"
             />
           </div>
-        </div>
+        </div> -->
       </div>
       <NoAccess v-if="!checkIfHasSchoolCategoryAccess()"/>
       <!-- Modal Entry -->

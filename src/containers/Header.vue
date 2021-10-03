@@ -392,14 +392,14 @@ export default {
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 8px;
   //color: $white;
   background-color: $white;
 
   &.active,
   &:hover {
     font-weight: 600;
-    color: $dark-gray-500;
+    color: $blue !important;
     background-color: $white;
     border-bottom: 3px solid $brand-primary;
   }

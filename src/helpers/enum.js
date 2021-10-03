@@ -222,10 +222,12 @@ export const AssessmentStatuses = new Enum({
 });
 
 export const StudentGradeStatuses = new Enum({
-  DRAFT: { id: 1, name: 'Draft' },
-  PUBLISHED: { id: 2, name: 'Published' },
-  SUBMITTED: { id: 3, name: 'Submitted for Review' },
-  FINALIZED: { id: 4, name: 'Finalized' },
+  DRAFT: { id: 1, name: 'Draft', description: 'Visible only to creator. No one can see the grades.' },
+  PUBLISHED: { id: 2, name: 'Published', description: 'Visible to anyone including the students and the school staff.' },
+  SUBMITTED: { id: 3, name: 'Submitted for Review', description: 'Locked for editing and subject for approval of registrar.' },
+  REQUEST_EDIT: { id: 4, name: 'Request Edit', desription: 'Locked for editing and subject for edit request approval.' },
+  REQUEST_EDIT_APPROVED: { id: 5, name: 'Editing Approved', description: 'Publisher would able to edit the grades again.' },
+  FINALIZED: { id: 6, name: 'Finalized', description: 'Permanently locked. Everyone will not be able to change the grade.' },
 });
 
 export const Semesters = new Enum({

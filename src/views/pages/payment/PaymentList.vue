@@ -2,9 +2,14 @@
   <PageContent
     title="Post Payment"
     description="Manually post a payment. Once posted this will automatically reflect to student's account without the need to approve it."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadPayments"
-    :filterVisible="isFilterVisible"
+    :searchKeyword="filters.payment.criteria"
+    :pageFrom="paginations.payment.from"
+    :pageTo="paginations.payment.to"
+    :pageTotal="paginations.payment.totalRows"
+    :perPage="paginations.payment.perPage"
+    :currentPage.sync="paginations.payment.page"
+    @onPageChange="loadPayments"
+    @onRefresh="loadPayments"
     :createButtonVisible="showAddButton && isAccessible($options.PaymentPermissions.ADD.id)"
     @create="$router.push(`/finance/post-payment/add`)">
     <template v-slot:filters>
@@ -138,7 +143,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <div>
             Showing {{ paginations.payment.from }} to
             {{ paginations.payment.to }} of
@@ -155,7 +160,7 @@
               @input="loadPayments()"
             />
           </div>
-        </div>
+        </div> -->
       </div>
       <b-modal
         v-model="showModalConfirmation"

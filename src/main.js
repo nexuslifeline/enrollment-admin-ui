@@ -122,7 +122,10 @@ import {
   BIconCaretDownFill,
   BIconCaretUpFill,
   BProgress,
-  BIconFunnelFill,
+  BIconDownload,
+  // BIconFunnelFill,
+  BIconFunnel,
+  BIconPrinter,
   BIconChevronLeft,
   BIconChevronRight,
   BIconChevronDown,
@@ -145,6 +148,9 @@ import {
   BIconChevronDoubleLeft,
   BIconChevronDoubleRight
 } from 'bootstrap-vue';
+Vue.component('BIconDownload', BIconDownload);
+Vue.component('BIconFunnel', BIconFunnel);
+Vue.component('BIconPrinter', BIconPrinter);
 Vue.component('BIconThreeDotsVertical', BIconThreeDotsVertical);
 Vue.component('BIconChevronDoubleLeft', BIconChevronDoubleLeft);
 Vue.component('BIconChevronDoubleRight', BIconChevronDoubleRight);
@@ -167,7 +173,7 @@ Vue.component('BIconFolderPlus', BIconFolderPlus);
 Vue.component('BIconFolderMinus', BIconFolderMinus);
 Vue.component('BIconFolder2Open', BIconFolder2Open);
 Vue.component('BIconAlarm', BIconAlarm);
-Vue.component('BIconFunnelFill', BIconFunnelFill);
+// Vue.component('BIconFunnelFill', BIconFunnelFill);
 Vue.component('BIconChevronLeft', BIconChevronLeft);
 Vue.component('BIconChevronRight', BIconChevronRight);
 Vue.component('BIconArrowRepeat', BIconArrowRepeat);

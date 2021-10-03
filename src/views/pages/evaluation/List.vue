@@ -1,11 +1,16 @@
 <template>
   <PageContent
     :title="`Evaluation and Admission Records`"
-    description="Manage and review the student's evaluation and admission request. You can accept transfer credit if necessary. If necessary requirements are not provided, you can temporarily disapprove the record."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadEvaluation"
-    :filterVisible="isFilterVisible"
+    description="Manage and review the student's evaluation and admission request. You can accept transfer credit if necessary. If required requirements are not provided, you can temporarily disapprove the record."
     :badges="[{ text: $store.state.schoolYear.name }]"
+    :searchKeyword="filters.student.criteria"
+    :pageFrom="paginations.student.from"
+    :pageTo="paginations.student.to"
+    :pageTotal="paginations.student.totalRows"
+    :perPage="paginations.student.perPage"
+    :currentPage.sync="paginations.student.page"
+    @onPageChange="loadEvaluation"
+    @onRefresh="loadEvaluation"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -132,7 +137,7 @@
             </b-dropdown>
           </template>
         </b-table>
-        <b-row>
+        <!-- <b-row>
           <b-col md="6">
             Showing {{ paginations.student.from }} to
             {{ paginations.student.to }} of
@@ -149,7 +154,7 @@
               @input="loadEvaluation()"
             />
           </b-col>
-        </b-row>
+        </b-row> -->
       </div>
       <NoAccess v-else />
       <router-view
