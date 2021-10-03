@@ -10,7 +10,10 @@
     ]"
     noScrollBody>
     <template v-slot:extra-buttons>
-      <template v-if="[StudentGradeStatuses.DRAFT.id, StudentGradeStatuses.REQUEST_EDIT_APPROVED.id].includes(studentGrade.studentGradeStatusId)">
+      <template v-if="[
+        StudentGradeStatuses.DRAFT.id,
+        StudentGradeStatuses.REQUEST_EDIT_APPROVED.id
+      ].includes(studentGrade.studentGradeStatusId)">
         <SplitButton
           text="Publish Grades"
           @click="onPublishGrade"
@@ -25,14 +28,14 @@
           @click="onSubmitForReview"
           :actions="[
             { text: 'Unpublish Grades', callback: onUnpublishGrade },
-            { text: 'Request Edit', callback: onSubmitForReview },
+            { text: 'Request Edit', callback: onRequestEdit },
           ]"
         />
       </template>
       <template v-else-if="studentGrade.studentGradeStatusId === StudentGradeStatuses.SUBMITTED.id">
         <SplitButton
           text="Request Edit"
-          @click="onSubmitForReview"
+          @click="onRequestEdit"
           splitVariant="outline-primary"
           :actions="[]"
         />
@@ -86,6 +89,10 @@ export default {
       console.log('onUnpublishGrade')
       // POST /student-grades/:id/unpublish
     },
+    onRequestEdit() {
+      console.log('onRequestEdit')
+      // POST /student-grades/:id/request-edit
+    }
   },
   computed: {
     personnelId() {
