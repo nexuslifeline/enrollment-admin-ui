@@ -321,7 +321,7 @@
                   <b-button
                     class="float-right btn-save ml-2"
                     @click="showEntry = false"
-                    variant="outline-danger"
+                    variant="dark"
                   >
                     Close
                   </b-button>
@@ -329,7 +329,7 @@
                     :disabled="forms.section.isProcessing"
                     class="float-right btn-save"
                     @click="onSectionEntry()"
-                    variant="outline-primary"
+                    variant="primary"
                   >
                     <v-icon
                       v-if="forms.section.isProcessing"
@@ -359,7 +359,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="forms.section.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onSectionDelete()"
           >
@@ -372,8 +372,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No
@@ -501,15 +501,15 @@
         <div slot="modal-footer" class="w-100">
           <!-- modal footer buttons -->
           <b-button
-            variant="outline-danger"
-            class="float-left btn-close"
+            variant="dark"
+            class="float-left "
             @click="showModalSchedule = false"
           >
             Close
           </b-button>
           <b-button
             :disabled="forms.schedule.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="float-right btn-save"
             @click="addSchedule()"
           >

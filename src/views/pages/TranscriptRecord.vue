@@ -655,7 +655,7 @@
                           <b-col md="3">
                             <b-button
                               class="float-right mb-2"
-                              variant="outline-primary"
+                              variant="primary"
                               @click="onAddSubject(data.item.level.id)"
                             >
                               <v-icon name="plus-circle" /> ADD NEW SUBJECT
@@ -845,7 +845,7 @@
                                   <b-col md="3">
                                     <b-button
                                       class="float-right mb-2"
-                                      variant="outline-primary"
+                                      variant="primary"
                                       @click="
                                         onAddSubject(level.id, semester.id)
                                       "
@@ -1245,7 +1245,7 @@
                 <b-button
                   @click="setDisapproval(data)"
                   class="float-right my-2 mr-2"
-                  variant="outline-danger"
+                  variant="dark"
                   >Reject</b-button
                 >
                 <!-- v-if="
@@ -1256,7 +1256,7 @@
                 <b-button
                   @click="setApproval(data)"
                   class="float-right m-2"
-                  variant="outline-primary"
+                  variant="primary"
                   >Approve</b-button
                 >
               </div>
@@ -1361,7 +1361,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSubjects = false"
         >
           Close

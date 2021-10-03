@@ -21,7 +21,7 @@
           <div class="logo-details">
             <h5>CHANGE LOGO</h5>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta architecto ipsam reiciendis itaque sed facilis placeat! </p>
-            <b-button variant="outline-primary" @click="onUploadClick">UPLOAD</b-button>
+            <b-button variant="primary" @click="onUploadClick">UPLOAD</b-button>
           </div>
         </div>
         <div class="organization-info-container">
@@ -100,7 +100,7 @@
           </div>
         </div>
         <div class="footer">
-          <b-button variant="outline-primary"
+          <b-button variant="primary"
             @click="onUpdateSettings"
             :disabled="isProcessing">
             <v-icon

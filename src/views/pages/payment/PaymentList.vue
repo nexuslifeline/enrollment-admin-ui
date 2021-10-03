@@ -51,7 +51,7 @@
       <b-button
         v-if="showPrintPreviewButton"
         class="print-preview mt-3 w-100"
-        variant="outline-primary"
+        variant="primary"
         @click="previewCollection()"
         ><v-icon name="print" /> PRINT PREVIEW</b-button>
     </template>
@@ -174,7 +174,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onCancelPayment()"
           >
@@ -182,8 +182,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No

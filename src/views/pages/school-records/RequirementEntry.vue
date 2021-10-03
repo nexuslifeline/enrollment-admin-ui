@@ -113,7 +113,7 @@
             :to="
               `/master-files/student/${$route.params.studentId}/school-records/requirements`
             "
-            variant="outline-danger"
+            variant="dark"
             class="float-right"
           >
             Close
@@ -150,7 +150,7 @@
         <b-button
           class="float-left"
           @click="onDeleteEvaluationFile(selectedEvaluationFile, evaluationRow)"
-          variant="outline-danger"
+          variant="dark"
         >
           <v-icon v-if="isFileDeleting" name="sync" class="mr-2" spin />
           Delete
@@ -158,7 +158,7 @@
         <b-button
           @click="onUpdateEvaluationFile()"
           class="float-right"
-          variant="outline-primary"
+          variant="primary"
         >
           <v-icon v-if="isFileUpdating" name="sync" class="mr-2" spin />
           Update

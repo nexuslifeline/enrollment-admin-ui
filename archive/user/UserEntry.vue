@@ -375,10 +375,10 @@
     <div class="action-bar">
        <b-button class="float-right ml-2 mr-2"
         :to="`/master-files/member`"
-        variant="outline-danger"
+        variant="dark"
         :disabled="isProcessing" > Cancel </b-button>
       <b-button class="float-right"
-        variant="outline-primary"
+        variant="primary"
         @click="onUserEntry"
         :disabled="isProcessing">
         <v-icon

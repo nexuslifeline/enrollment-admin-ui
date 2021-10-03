@@ -8,7 +8,7 @@
           <!-- <span class="entry-header">Details here</span> -->
         </b-col>
         <b-col md=4>
-          <b-button variant="outline-primary" class="float-right"  @click="addSchedule()">
+          <b-button variant="primary" class="float-right"  @click="addSchedule()">
             <v-icon name="plus-circle" /> ADD NEW ROW
           </b-button>
         </b-col>

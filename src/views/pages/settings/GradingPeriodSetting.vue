@@ -72,7 +72,7 @@
                     </b-form-select-option>
                   </b-form-select>
                 </div> -->
-                <button class="btn btn-outline-primary add-row-button float-right" @click="onAddGradingPeriod">
+                <button class="btn btn-primary add-row-button float-right" @click="onAddGradingPeriod">
                   <v-icon name="plus-circle" /> ADD PERIOD
                 </button>
               </div>
@@ -100,12 +100,12 @@
                 <b-form-input v-model="item.description"></b-form-input>
               </template>
               <template v-slot:cell(action)="data">
-                <b-button variant="outline-danger" @click="onDeletingGradingPeriod(data)"><v-icon name="trash" /></b-button>
+                <b-button variant="dark" @click="onDeletingGradingPeriod(data)"><v-icon name="trash" /></b-button>
               </template>
             </b-table>
           </div>
           <div class="footer-container">
-            <b-button variant="outline-primary" class="float-right" @click="onSaveChanges"><v-icon
+            <b-button variant="primary" class="float-right" @click="onSaveChanges"><v-icon
               v-if="isProcessing"
               name="sync"
               spin
@@ -124,7 +124,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onDeleteGradingPeriod()">
             <v-icon
@@ -135,8 +135,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation=false">
             No
           </b-button>

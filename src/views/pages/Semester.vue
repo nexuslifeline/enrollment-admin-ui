@@ -99,7 +99,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onSetActiveSemester()"
           >
@@ -107,8 +107,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showConfirmationModal = false"
           >
             No

@@ -75,8 +75,8 @@
          <b-dropdown
           v-if="isAccessible($options.OtherBillingPermissions.GENERATE.id)"
           text="Generate"
-          variant="outline-primary"
-          split-variant="outline-primary"
+          variant="primary"
+          split-variant="primary"
           class="other__drop-down"
           split
           boundary="window">
@@ -386,7 +386,7 @@
             <b-col md="4">
               <b-button
                 @click="showModalFees = true"
-                variant="outline-primary"
+                variant="primary"
                 class="float-right"
               >
                 <v-icon name="plus-circle" /> New Item
@@ -442,7 +442,7 @@
               <b-button
                 class="float-right btn-save ml-2"
                 @click="showEntry = false"
-                variant="outline-danger"
+                variant="dark"
               >
                 Close
               </b-button>
@@ -450,7 +450,7 @@
                 :disabled="forms.billing.isProcessing"
                 class="float-right btn-save"
                 @click="onBillingEntry()"
-                variant="outline-primary"
+                variant="primary"
               >
                 <v-icon
                   v-if="forms.billing.isProcessing"
@@ -584,7 +584,7 @@
           <b-col md="4">
             <b-button
               @click="showModalFees = true"
-              variant="outline-primary"
+              variant="primary"
               class="float-right"
             >
               <v-icon name="plus-circle" /> New Item
@@ -640,7 +640,7 @@
             <b-button
               class="float-right btn-save ml-2"
               @click="showBatchEntry = false"
-              variant="outline-danger"
+              variant="dark"
             >
               Close
             </b-button>
@@ -648,7 +648,7 @@
               :disabled="forms.batchBilling.isProcessing"
               class="float-right btn-save"
               @click="onBatchCreateBilling()"
-              variant="outline-primary"
+              variant="primary"
             >
               <v-icon
                 v-if="forms.batchBilling.isProcessing"
@@ -733,7 +733,7 @@
           <!-- modal footer buttons -->
           <b-button
             class="float-right"
-            variant="outline-danger"
+            variant="dark"
             @click="showModalFees = false"
           >
             Close
@@ -753,7 +753,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="forms.billing.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onDeleteOtherBilling()"
           >
@@ -766,8 +766,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No
@@ -1434,7 +1434,7 @@ export default {
   .other__drop-down {
     height: 24px;
 
-    .btn-outline-primary {
+    .btn-primary {
       display: flex!important;
       align-items: center!important;
     }

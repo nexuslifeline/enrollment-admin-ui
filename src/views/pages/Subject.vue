@@ -358,14 +358,14 @@
           <!-- modal footer buttons -->
           <b-button
             variant="dark"
-            class="float-left btn-close"
+            class="float-left "
             @click="showModalEntry = false"
           >
             Close
           </b-button>
           <b-button
             :disabled="forms.subject.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="float-right btn-save"
             @click="onSubjectEntry()"
           >
@@ -393,7 +393,7 @@
         Are you sure you want to delete this subject?
         <div slot="modal-footer">
           <b-button
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onSubjectDelete()"
           >
@@ -406,8 +406,8 @@
             Yes
           </b-button>
           <b-button
-            class="btn-close"
-            variant="outline-danger"
+            class=""
+            variant="dark"
             @click="showModalConfirmation = false"
           >
             No

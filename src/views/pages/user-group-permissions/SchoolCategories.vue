@@ -14,16 +14,16 @@
         </b-form-group>
         <template v-if="Number(userGroupId) !== $options.UserGroups.SUPER_USER.id" v-slot:footer>
           <b-button
-            class="float-right btn-close ml-2"
+            class="float-right  ml-2"
             @click="$router.push('/maintenance/user-group')"
-            variant="outline-danger">
+            variant="dark">
             Close
           </b-button>
           <b-button
             :disabled="isProcessing"
             class="float-right btn-save"
             @click="onSaveSchoolCategories()"
-            variant="outline-primary">
+            variant="primary">
             <v-icon
               v-if="isProcessing"
               name="sync"

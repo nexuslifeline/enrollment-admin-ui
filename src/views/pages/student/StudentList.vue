@@ -204,7 +204,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="isUserSaving"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onStudentDelete()"
           >
@@ -212,8 +212,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No
@@ -261,7 +261,7 @@
         </b-row>
         <div slot="modal-footer">
           <b-button
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="previewLedger(selectedStudentId)"
           >
@@ -269,8 +269,8 @@
             Preview
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalPreview = false"
           >
             Close

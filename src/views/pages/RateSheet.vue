@@ -278,7 +278,7 @@
                   v-if="isAccessible($options.RateSheetPermissions.UPDATE.id)"
                   :disabled="forms.rateSheet.isProcessing"
                   class="float-right btn-save"
-                  variant="outline-primary"
+                  variant="primary"
                   @click="createUpdateRateSheet()"
                 >
                   <v-icon
@@ -367,7 +367,7 @@
             <!-- modal footer buttons -->
             <b-button
               class="float-right"
-              variant="outline-danger"
+              variant="dark"
               @click="showModalFees = false"
             >
               Close

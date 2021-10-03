@@ -14,7 +14,7 @@
           {{ user.userGroup && user.userGroup.name || '' }}
         </vText>
       </div>
-      <b-button @click="onChangeUsername" type="button" variant="outline-primary">
+      <b-button @click="onChangeUsername" type="button" variant="primary">
         Change
       </b-button>
     </div>

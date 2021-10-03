@@ -306,15 +306,15 @@ button.btn-primary {
   border-color: $brand-primary;
 }
 
-button.btn-outline-primary {
+button.btn-primary {
   color: $brand-primary;
   border-color: $brand-primary;
 }
 
-button.btn-outline-danger {
-  color: $brand-danger;
-  border-color: $brand-danger;
-}
+// button.btn-dark {
+//   color: $brand-danger;
+//   border-color: $brand-danger;
+// }
 
 .form-control {
   display: block;

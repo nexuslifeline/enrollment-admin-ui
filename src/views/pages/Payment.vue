@@ -68,8 +68,8 @@
          <b-dropdown
           v-if="isAccessible($options.PaymentPermissions.ADD.id)"
           text="Post Payment"
-          variant="outline-primary"
-          split-variant="outline-primary"
+          variant="primary"
+          split-variant="primary"
           class="soa__drop-down"
           split>
           <b-dropdown-item @click="$router.push({ name: 'Payment Add' })">
@@ -274,7 +274,7 @@
                           "
                           @click="setDisapproval(data)"
                           class="float-right my-2"
-                          variant="outline-danger"
+                          variant="dark"
                           >Reject</b-button
                         >
                         <b-button
@@ -285,7 +285,7 @@
                           "
                           @click="setApproval(data)"
                           class="float-right my-2 mr-2"
-                          variant="outline-primary"
+                          variant="primary"
                           >Approve</b-button
                         >
                       </b-col>
@@ -501,9 +501,9 @@
                 <div class="float-right">
                   <b-button
                     @click="setApproval(data)"
-                    class="mr-2" variant="outline-primary"
+                    class="mr-2" variant="primary"
                     v-if="isAccessible($options.StudentPaymentPermissions.APPROVAL.id)"> Approve</b-button>
-                  <b-button variant="outline-danger"
+                  <b-button variant="dark"
                     @click="setDisapproval(data)"
                     v-if="isAccessible(
                     $options.StudentPaymentPermissions.DISAPPROVAL.id)"> Reject</b-button>
@@ -641,7 +641,7 @@
           <b-button
             @click="onApproval()"
             class="float-right"
-            variant="outline-primary"
+            variant="primary"
             :disabled="isProcessing"
           >
             <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
@@ -678,7 +678,7 @@
           <b-button
             @click="onDisapproval()"
             class="float-right"
-            variant="outline-primary"
+            variant="primary"
             :disabled="isProcessing"
           >
             <v-icon v-if="isProcessing" name="sync" class="mr-2" spin />
@@ -721,7 +721,7 @@
           <b-button
             class="float-left"
             @click="onDeletePaymentReceiptFile(selectedPaymentReceiptFileIndex)"
-            variant="outline-danger"
+            variant="dark"
           >
             <v-icon
               v-if="forms.paymentReceiptFile.isDeleting"
@@ -734,7 +734,7 @@
           <b-button
             @click="onUpdatePaymentReceiptFile()"
             class="float-right"
-            variant="outline-primary"
+            variant="primary"
           >
             <v-icon
               v-if="forms.paymentReceiptFile.isUpdating"
@@ -1442,7 +1442,7 @@ export default {
   .soa__drop-down {
     height: 24px;
 
-    .btn-outline-primary {
+    .btn-primary {
       display: flex;
       align-items: center;
     }

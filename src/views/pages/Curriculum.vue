@@ -612,7 +612,7 @@
                             </b-form-group>
                             <b-button
                               @click="showModalSchoolCategory = true"
-                              variant="outline-primary">
+                              variant="primary">
                               Add School Category
                             </b-button>
                           </b-col>
@@ -729,7 +729,7 @@
                                       <b-col md="3">
                                         <b-button
                                           class="float-right mb-2"
-                                          variant="outline-primary"
+                                          variant="primary"
                                           @click="
                                             onAddSubject(level, semester.id)
                                           "
@@ -892,7 +892,7 @@
                                     <b-col md="3" offset-md="9">
                                       <b-button
                                         class="float-right mb-2"
-                                        variant="outline-primary"
+                                        variant="primary"
                                         @click="onAddSubject(level)"
                                       >
                                         <v-icon name="plus-circle" /> ADD NEW
@@ -1043,7 +1043,7 @@
                     <b-button
                       class="float-right btn-save ml-2"
                       @click="showEntry = false"
-                      variant="outline-danger"
+                      variant="dark"
                     >
                       Close
                     </b-button>
@@ -1051,7 +1051,7 @@
                       :disabled="forms.curriculum.isProcessing"
                       class="float-right btn-save"
                       @click="onCurriculumEntry()"
-                      variant="outline-primary"
+                      variant="primary"
                     >
                       <v-icon
                         v-if="forms.curriculum.isProcessing"
@@ -1148,7 +1148,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSubjects = false"
         >
           Close
@@ -1193,8 +1193,8 @@
       </b-table>
       <div slot="modal-footer">
         <b-button
-          class="btn-close"
-          variant="outline-danger"
+          class=""
+          variant="dark"
           @click="showModalSchoolCategory = false"
         >
           Close
@@ -1213,7 +1213,7 @@
       Are you sure you want to delete this curriculum?
       <div slot="modal-footer">
         <b-button
-          variant="outline-primary"
+          variant="primary"
           class="mr-2 btn-save"
           @click="onCurriculumDelete()"
         >
@@ -1226,8 +1226,8 @@
           Yes
         </b-button>
         <b-button
-          class="btn-close"
-          variant="outline-danger"
+          class=""
+          variant="dark"
           @click="showModalConfirmation = false"
         >
           No

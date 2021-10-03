@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-end">
       <b-button
         @click="isShownFees = true"
-        variant="outline-primary">
+        variant="primary">
         <v-icon name="plus-circle" /> New Item
       </b-button>
     </div>
@@ -121,7 +121,7 @@
       <div slot="modal-footer" class="w-100">
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="isShownFees = false"
         >
           Close

@@ -185,15 +185,15 @@
         <div slot="modal-footer" class="w-100">
           <!-- modal footer buttons -->
           <b-button
-            variant="outline-danger"
-            class="float-left btn-close"
+            variant="dark"
+            class="float-left "
             @click="showModalEntry = false"
           >
             Close
           </b-button>
           <b-button
             :disabled="forms.course.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="float-right btn-save"
             @click="onCourseEntry()"
           >
@@ -222,7 +222,7 @@
         Are you sure you want to delete this course ?
         <div slot="modal-footer">
           <b-button
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onCourseDelete()"
           >
@@ -235,8 +235,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No

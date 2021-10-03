@@ -38,7 +38,7 @@
         <div class="table-container">
           <div class="button-container">
             <button
-              class="btn btn-outline-primary add-row-button float-right mb-2"
+              class="btn btn-primary add-row-button float-right mb-2"
               @click="onAddRequirement()"
             >
               <v-icon name="plus-circle" /> ADD REQUIREMENT
@@ -66,7 +66,7 @@
             </template>
             <template v-slot:cell(action)="data">
               <b-button
-                variant="outline-danger"
+                variant="dark"
                 @click="onDeletingRequirement(data)"
                 ><v-icon name="trash"
               /></b-button>
@@ -75,7 +75,7 @@
         </div>
         <div class="footer-container">
           <b-button
-            variant="outline-primary"
+            variant="primary"
             class="float-right"
             @click="onSaveChanges"
             ><v-icon v-if="isProcessing" name="sync" spin class="mr-2" />SAVE
@@ -96,7 +96,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onDeleteRequirement()"
           >
@@ -104,8 +104,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No

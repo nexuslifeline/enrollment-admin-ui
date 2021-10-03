@@ -93,7 +93,7 @@
                     <b-col md="3">
                       <b-button
                         class="float-right mb-2"
-                        variant="outline-primary"
+                        variant="primary"
                         @click="onAddSubject(transcriptRecord.levelId)"
                       >
                         <v-icon name="plus-circle" /> ADD NEW SUBJECT
@@ -258,7 +258,7 @@
                             <b-col md="3">
                               <b-button
                                 class="float-right mb-2"
-                                variant="outline-primary"
+                                variant="primary"
                                 @click="
                                   onAddSubject(level.id, semester.id)
                                 "
@@ -514,7 +514,7 @@
           <!-- modal footer buttons -->
           <b-button
             class="float-right"
-            variant="outline-danger"
+            variant="dark"
             @click="showModalSubjects = false"
           >
             Close

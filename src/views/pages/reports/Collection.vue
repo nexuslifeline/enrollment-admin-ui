@@ -37,7 +37,7 @@
       />
        <b-button
           class="mt-4"
-          variant="outline-primary"
+          variant="primary"
           size="sm"
           block
           @click="previewCollection"

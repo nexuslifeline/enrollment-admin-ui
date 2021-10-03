@@ -77,8 +77,8 @@
       <div class="ml-1 drop-down__container" >
         <b-dropdown
           text="Create"
-          variant="outline-primary"
-          split-variant="outline-primary"
+          variant="primary"
+          split-variant="primary"
           class="clearance_drop-down"
           v-if="isAccessible($options.EClearancePermissions.ADD.id)"
           boundary="window">
@@ -262,7 +262,7 @@
           <b-col md="4">
             <b-button
               @click="addSignatory()"
-              variant="outline-primary"
+              variant="primary"
               class="float-right"
             >
               <v-icon name="plus-circle" /> New Signatory
@@ -299,7 +299,7 @@
             <b-button
               @click="removeSignatory(index)"
               size="sm"
-              variant="outline-danger">
+              variant="dark">
               <v-icon name="trash" />
             </b-button>
           </template>
@@ -310,7 +310,7 @@
           <b-button
             class="float-right btn-save ml-2"
             @click="showBatchEntry = false"
-            variant="outline-danger"
+            variant="dark"
           >
             Close
           </b-button>
@@ -318,7 +318,7 @@
             :disabled="forms.batchClearance.isProcessing"
             class="float-right btn-save"
             @click="onBatchCreateClearance()"
-            variant="outline-primary"
+            variant="primary"
           >
             <v-icon
               v-if="forms.batchClearance.isProcessing"
@@ -382,7 +382,7 @@
           <b-col md="4">
             <b-button
               @click="addSignatory(false)"
-              variant="outline-primary"
+              variant="primary"
               class="float-right"
             >
               <v-icon name="plus-circle" /> New Signatory
@@ -418,7 +418,7 @@
             <b-button
               @click="removeSignatory(index, false)"
               size="sm"
-              variant="outline-danger">
+              variant="dark">
               <v-icon name="trash" />
             </b-button>
           </template>
@@ -429,7 +429,7 @@
           <b-button
             class="float-right btn-save ml-2"
             @click="showEntry = false"
-            variant="outline-danger"
+            variant="dark"
           >
             Close
           </b-button>
@@ -437,7 +437,7 @@
             :disabled="forms.batchClearance.isProcessing"
             class="float-right btn-save"
             @click="onClearanceEntry()"
-            variant="outline-primary"
+            variant="primary"
           >
             <v-icon
               v-if="forms.batchClearance.isProcessing"
@@ -462,7 +462,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="forms.clearance.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onDeleteClearance()"
           >
@@ -475,8 +475,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No
@@ -984,7 +984,7 @@ export default {
   .clearance_drop-down {
     height: 24px;
 
-    .btn-outline-primary {
+    .btn-primary {
       display: flex;
       align-items: center;
     }

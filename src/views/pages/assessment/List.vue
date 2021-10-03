@@ -301,7 +301,7 @@
                       <b-button
                         @click="onAddFees(data.item.fees)"
                         v-if="showOptions"
-                        variant="outline-primary"
+                        variant="primary"
                         class="float-right"
                       >
                         <v-icon name="plus-circle" /> New Item
@@ -451,14 +451,14 @@
                 <div class="float-right" v-if="showOptions">
                   <b-button
                     @click="setApproveFees(data)"
-                    class="mr-2 ml-2" variant="outline-primary"
+                    class="mr-2 ml-2" variant="primary"
                     v-if="isAccessible($options.StudentFeePermissions.APPROVAL.id)"
                     :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"> Approve</b-button>
                   <b-button
                     v-if="isAccessible($options.StudentFeePermissions.DISAPPROVAL.id)"
                     :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"
                     @click="setRejectFees(data)"
-                    variant="outline-danger"
+                    variant="dark"
                     >Reject</b-button
                   >
                 </div>

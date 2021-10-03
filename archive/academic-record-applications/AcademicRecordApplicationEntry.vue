@@ -1160,7 +1160,7 @@
                 </b-form-group>
               </div>
               <button
-                class="btn btn-outline-primary add-subject-button"
+                class="btn btn-primary add-subject-button"
                 @click="onAddSubject()"
               >
                 <v-icon name="plus-circle" /> ADD SUBJECT
@@ -1357,7 +1357,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSubjects = false"
         >
           Close
@@ -1446,7 +1446,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSection = false"
         >
           Close

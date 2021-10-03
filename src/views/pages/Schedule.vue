@@ -10,7 +10,7 @@
                 <b-col md=12>
                   <b-row>
                     <b-col md=8>
-                      <b-button variant="outline-primary" 
+                      <b-button variant="primary" 
                         @click="setCreate()">
                         <v-icon name="plus-circle" /> ADD NEW SCHEDULE
                       </b-button>
@@ -68,7 +68,7 @@
               <b-col md=12>
                 <b-row>
                   <b-col md=12 >
-                    <b-button variant="outline-primary" class="float-right"  @click="addNewRow()">
+                    <b-button variant="primary" class="float-right"  @click="addNewRow()">
                       <v-icon name="plus-circle" /> ADD NEW ROW
                     </b-button>
                   </b-col>

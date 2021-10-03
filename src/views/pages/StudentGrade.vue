@@ -36,7 +36,7 @@
         <SplitButton
           text="Request Edit"
           @click="onRequestEdit"
-          splitVariant="outline-primary"
+          splitVariant="primary"
           :actions="[]"
         />
       </template>

@@ -165,7 +165,7 @@
         <div slot="modal-footer">
           <b-button
             :disabled="forms.user.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="mr-2 btn-save"
             @click="onUserGroupDelete()"
           >
@@ -178,8 +178,8 @@
             Yes
           </b-button>
           <b-button
-            variant="outline-danger"
-            class="btn-close"
+            variant="dark"
+            class=""
             @click="showModalConfirmation = false"
           >
             No

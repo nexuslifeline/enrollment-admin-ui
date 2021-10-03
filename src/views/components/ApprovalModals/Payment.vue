@@ -102,7 +102,7 @@
           <b-button
             class="float-left"
             @click="onDeletePaymentReceiptFile(selectedPaymentReceiptFileIndex)"
-            variant="outline-danger"
+            variant="dark"
           >
             <v-icon
               v-if="forms.paymentReceiptFile.isDeleting"
@@ -115,7 +115,7 @@
           <b-button
             @click="onUpdatePaymentReceiptFile()"
             class="float-right"
-            variant="outline-primary"
+            variant="primary"
           >
             <v-icon
               v-if="forms.paymentReceiptFile.isUpdating"

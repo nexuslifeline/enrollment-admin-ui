@@ -206,7 +206,7 @@
                 <div>
                   <div class="details__section-button-container">
                     <button
-                      class="btn btn-outline-primary add-subject-button"
+                      class="btn btn-primary add-subject-button"
                       v-if="showOptions"
                       @click="onAddSubject(data.item)">
                       <v-icon name="plus-circle" /> ADD SUBJECT
@@ -280,10 +280,10 @@
                 <div class="float-right">
                   <b-button
                     @click="setApproval(data)"
-                    class="mr-2" variant="outline-primary"
+                    class="mr-2" variant="primary"
                     v-if="isAccessible($options.EnlistmentPermissions.APPROVAL.id)"
                     :disabled="showTermsAlert || !hasTermsSchoolCategory(data.item)"> Approve</b-button>
-                  <b-button variant="outline-danger"
+                  <b-button variant="dark"
                     @click="setDisapproval(data)"
                     v-if="isAccessible(
                     $options.EnlistmentPermissions.DISAPPROVAL.id)"> Reject</b-button>
@@ -420,7 +420,7 @@
                 "
                 @click="setDisapproval(data)"
                 class="float-right my-2 mr-2"
-                variant="outline-danger"
+                variant="dark"
                 >Reject</b-button
               >
               <b-button
@@ -432,7 +432,7 @@
                 "
                 @click="setApproval(data)"
                 class="float-right m-2"
-                variant="outline-primary"
+                variant="primary"
                 >Approve</b-button
               >
             </b-overlay>
@@ -500,7 +500,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalPreview = false"
         >
           Close
@@ -583,7 +583,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSubjects = false"
         >
           Close
@@ -672,7 +672,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSection = false"
         >
           Close

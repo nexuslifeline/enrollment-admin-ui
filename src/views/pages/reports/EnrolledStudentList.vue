@@ -122,7 +122,7 @@
             </div>
             <div class="print-button-container">
               <b-button
-                variant="outline-primary"
+                variant="primary"
                 class="print-button"
                 @click="onPreviewEnrolledList()"
                 >Preview List</b-button
@@ -261,7 +261,7 @@
           :semesterId="filters.academicRecord.semesterId"/>
       <b-button
         class="mt-4"
-        variant="outline-primary"
+        variant="primary"
         size="sm"
         block
         @click="onPreviewEnrolledList">

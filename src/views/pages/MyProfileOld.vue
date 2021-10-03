@@ -219,7 +219,7 @@
         <div class="action-bar">
           <b-button
             class="btn-save float-right"
-            variant="outline-primary"
+            variant="primary"
             @click="onUpdateProfile"
             :disabled="isProcessing"
           >

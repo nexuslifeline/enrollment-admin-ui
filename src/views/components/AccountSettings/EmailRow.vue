@@ -9,7 +9,7 @@
         <vText size="s" weight="bold" type="p" align="right">{{ username || '' }}</vText>
         <vText size="s" color="light" type="p" align="right">{{ userGroup || '' }}</vText>
       </div>
-      <b-button @click="$router.push({ name: 'ChangeUsername' })" type="button" variant="outline-primary">
+      <b-button @click="$router.push({ name: 'ChangeUsername' })" type="button" variant="primary">
         Change
       </b-button>
     </div>

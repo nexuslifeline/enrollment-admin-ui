@@ -194,7 +194,7 @@
               </b-form-select>
             </div>
             <button
-              class="btn btn-outline-primary add-subject-button"
+              class="btn btn-primary add-subject-button"
               @click="onAddSubject(forms.academicRecord.fields)"
             >
               <v-icon name="plus-circle" /> ADD SUBJECT
@@ -266,7 +266,7 @@
             <b-col md="4">
               <b-button
                 @click="showModalFees = true"
-                variant="outline-primary"
+                variant="primary"
                 class="float-right"
               >
                 <v-icon name="plus-circle" /> New Item
@@ -379,14 +379,14 @@
               `/master-files/student/${$route.params.studentId}/school-records/enrollments`
             "
             class="float-right my-2 mr-2"
-            variant="outline-danger"
+            variant="dark"
             >Cancel</b-button
           >
           <b-button
             :disabled="isProcessing"
             @click="onUpdateEnrollment()"
             class="float-right m-2"
-            variant="outline-primary"
+            variant="primary"
           >
             <v-icon v-if="isProcessing" name="sync" spin />
             Update
@@ -456,7 +456,7 @@
       <div slot="modal-footer" class="w-100">
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSubjects = false"
         >
           Close
@@ -532,7 +532,7 @@
         <!-- modal footer buttons -->
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalFees = false"
         >
           Close

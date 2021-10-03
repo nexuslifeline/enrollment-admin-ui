@@ -455,15 +455,15 @@
       <div slot="modal-footer" class="w-100">
         <!-- modal footer buttons -->
         <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
+          variant="dark"
+          class="float-left "
           @click="showModalEntry = false"
         >
           Close
         </b-button>
         <b-button
           :disabled="forms.user.isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="float-right btn-save"
           @click="onUserEntry()"
         >
@@ -724,15 +724,15 @@
       <div slot="modal-footer" class="w-100">
         <!-- modal footer buttons -->
         <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
+          variant="dark"
+          class="float-left "
           @click="showModalUpdatePersonnel = false"
         >
           Close
         </b-button>
         <b-button
           :disabled="forms.user.isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="float-right btn-save"
           @click="onUserEntry()"
         >
@@ -805,15 +805,15 @@
       <div slot="modal-footer" class="w-100">
         <!-- modal footer buttons -->
         <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
+          variant="dark"
+          class="float-left "
           @click="showModalUpdateUser = false"
         >
           Close
         </b-button>
         <b-button
           :disabled="forms.user.isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="float-right btn-save"
           @click="onUserEntry()"
         >
@@ -870,15 +870,15 @@
       <div slot="modal-footer" class="w-100">
         <!-- modal footer buttons -->
         <b-button
-          variant="outline-danger"
-          class="float-left btn-close"
+          variant="dark"
+          class="float-left "
           @click="showModalUpdateUser = false"
         >
           Close
         </b-button>
         <b-button
           :disabled="forms.user.isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="float-right btn-save"
           @click="onUserEntry()"
         >
@@ -906,7 +906,7 @@
       <div slot="modal-footer">
         <b-button
           :disabled="forms.user.isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="mr-2 btn-save"
           @click="onUserGroupDelete()"
         >
@@ -919,8 +919,8 @@
           Yes
         </b-button>
         <b-button
-          variant="outline-danger"
-          class="btn-close"
+          variant="dark"
+          class=""
           @click="showModalConfirmation = false"
         >
           No

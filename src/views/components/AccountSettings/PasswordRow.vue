@@ -9,7 +9,7 @@
         <vText size="s" color="light" type="p" align="right">**********</vText>
         <vText size="s" color="light" type="p" align="right">Last Updated {{ passwordLastUpdateDate  }}</vText>
       </div>
-      <b-button @click="$router.push({ name: 'UpdatePassword' })" type="button" variant="outline-primary">
+      <b-button @click="$router.push({ name: 'UpdatePassword' })" type="button" variant="primary">
         Update
       </b-button>
     </div>

@@ -95,7 +95,7 @@
         <b-row class="mb-2">
           <b-col md="6">
             <b-btn
-              variant="outline-primary"
+              variant="primary"
               @click="setCreate()"
               v-if="isAccessible($options.ManualEnrollmentPermissions.ADD.id)"
               >Add New Record</b-btn

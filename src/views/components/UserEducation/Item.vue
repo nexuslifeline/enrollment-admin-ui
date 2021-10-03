@@ -7,7 +7,7 @@
       <vText size="s" color="light">{{ data.period }}</vText>
     </div>
     <div>
-      <b-button @click="$emit('onEdit', data)" type="button" variant="outline-primary">
+      <b-button @click="$emit('onEdit', data)" type="button" variant="primary">
         Edit
       </b-button>
     </div>

@@ -197,15 +197,15 @@
         <div slot="modal-footer" class="w-100">
           <!-- modal footer buttons -->
           <b-button
-            variant="outline-danger"
-            class="float-right btn-close ml-2"
+            variant="dark"
+            class="float-right  ml-2"
             @click="showModalAddDropped = false"
           >
             Close
           </b-button>
           <b-button
             :disabled="forms.droppedStudent.isProcessing"
-            variant="outline-primary"
+            variant="primary"
             class="float-right btn-save"
             @click="onDroppedStudent()"
           >

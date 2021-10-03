@@ -137,8 +137,8 @@
           Yes
         </b-button>
         <b-button
-          variant="outline-primary"
-          class="btn-close"
+          variant="primary"
+          class=""
           @click="showModalConfirmation = false"
         >
           No

@@ -49,7 +49,7 @@
                   "
                 />
               </b-form-group>
-              <!-- <b-button class="student-browse" variant="outline-primary" @click="onShowModalStudent">...</b-button> -->
+              <!-- <b-button class="student-browse" variant="primary" @click="onShowModalStudent">...</b-button> -->
             </div>
             <b-form-group label="Student">
               <b-form-input
@@ -304,14 +304,14 @@
         <b-button
           class="float-right ml-2"
           :to="`/finance/post-payment`"
-          variant="outline-danger"
+          variant="dark"
           :disabled="isProcessing"
         >
           Cancel
         </b-button>
         <b-button
           class="float-right"
-          variant="outline-primary"
+          variant="primary"
           :disabled="isProcessing"
           @click="onSavePayment"
         >
@@ -399,7 +399,7 @@
           </div>
         </template>
         <template v-slot:cell(action)="row">
-          <b-button variant="outline-primary" @click="onSelectedStudent(row)"
+          <b-button variant="primary" @click="onSelectedStudent(row)"
             ><v-icon name="check"
           /></b-button>
         </template>
@@ -423,8 +423,8 @@
       </b-row>
       <div slot="modal-footer">
         <b-button
-          variant="outline-danger"
-          class="btn-close"
+          variant="dark"
+          class=""
           @click="showModalStudent = false"
         >
           Close

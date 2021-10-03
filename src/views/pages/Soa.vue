@@ -61,8 +61,8 @@
          <b-dropdown
           v-if="isAccessible($options.StatementOfAccountPermissions.GENERATE.id)"
           text="Generate"
-          variant="outline-primary"
-          split-variant="outline-primary"
+          variant="primary"
+          split-variant="primary"
           class="soa__drop-down"
           split
           boundary="window">
@@ -178,7 +178,7 @@
       <div slot="modal-footer">
         <b-button
           :disabled="forms.billing.isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="mr-2 btn-save"
           @click="onDeleteSoa()"
         >
@@ -191,8 +191,8 @@
           Yes
         </b-button>
         <b-button
-          variant="outline-danger"
-          class="btn-close"
+          variant="dark"
+          class=""
           @click="showModalConfirmation = false"
         >
           No
@@ -941,7 +941,7 @@ export default {
   .soa__drop-down {
     height: 24px;
 
-    .btn-outline-primary {
+    .btn-primary {
       display: flex;
       align-items: center;
     }

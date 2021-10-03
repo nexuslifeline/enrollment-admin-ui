@@ -12,13 +12,13 @@
     <template v-slot:modal-footer>
         <!-- <b-button
           :disabled="isProcessing"
-          variant="outline-primary"
+          variant="primary"
           class="mr-2 btn-save"
           @click="onDeleteStudent()">
         <v-icon v-if="isProcessing" name="sync" spin class="mr-2" /> Yes</b-button>
         <b-button
-          variant="outline-danger"
-          class="btn-close"
+          variant="dark"
+          class=""
           @click="$emit('update:show', false)">No</b-button> -->
           <FooterAction
             confirmText="Confirm Delete"

@@ -314,7 +314,7 @@
                     <b-col md="3" offset-md="9">
                       <b-button
                         class="float-right mb-2"
-                        variant="outline-primary"
+                        variant="primary"
                         @click="onAddSubject(forms.evaluation.fields.levelId)"
                       >
                         <v-icon name="plus-circle" /> ADD SUBJECT
@@ -498,7 +498,7 @@
                             <b-col md="6">
                               <b-button
                                 class="float-right mb-2"
-                                variant="outline-primary"
+                                variant="primary"
                                 @click="onAddSubject(level.id, semester.id)"
                               >
                                 <v-icon name="plus-circle" /> ADD SUBJECT
@@ -691,7 +691,7 @@
             :to="
               `/master-files/student/${$route.params.studentId}/school-records/evaluations`
             "
-            variant="outline-danger"
+            variant="dark"
           >
             Close
           </b-button>
@@ -699,7 +699,7 @@
             :disabled="forms.evaluation.isProcessing"
             class="float-right btn-save"
             @click="onUpdateEvaluation()"
-            variant="outline-primary"
+            variant="primary"
           >
             <v-icon
               v-if="forms.evaluation.isProcessing"
@@ -776,7 +776,7 @@
       <div slot="modal-footer" class="w-100">
         <b-button
           class="float-right"
-          variant="outline-danger"
+          variant="dark"
           @click="showModalSubjects = false"
         >
           Close

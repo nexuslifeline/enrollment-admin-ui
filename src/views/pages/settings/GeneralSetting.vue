@@ -33,7 +33,7 @@
         </div>
         <div class="footer">
           <b-button
-            variant="outline-primary"
+            variant="primary"
             @click="onUpdateSettings"
             :disabled="isProcessing"
           >

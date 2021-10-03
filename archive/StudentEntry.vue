@@ -715,10 +715,10 @@
     <div class="action-container">
       <b-button class="float-right ml-2"
         :to="`/master-files/student`"
-        variant="outline-danger"
+        variant="dark"
         :disabled="isProcessing" > Cancel </b-button>
       <b-button class="float-right"
-        variant="outline-primary"
+        variant="primary"
         @click="onStudentEntry"
         :disabled="isProcessing">
         <v-icon

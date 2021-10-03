@@ -102,7 +102,7 @@
       <b-button
         class="btn-save"
         @click="showGradeSheet = false"
-        variant="outline-danger">
+        variant="dark">
         Cancel
       </b-button>
     </template>
