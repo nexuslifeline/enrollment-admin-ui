@@ -1,9 +1,15 @@
 <template>
   <PageContent
     title="Pera Padala Account Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadPeraPadalaAccounts"
-    :filterVisible="isFilterVisible"
+    description="Manage pera padala provider name, receiver name, mobile number and other details."
+    :searchKeyword="filters.peraPadalaAccount.criteria"
+    :pageFrom="paginations.peraPadalaAccount.from"
+    :pageTo="paginations.peraPadalaAccount.to"
+    :pageTotal="paginations.peraPadalaAccount.totalRows"
+    :perPage="paginations.peraPadalaAccount.perPage"
+    :currentPage.sync="paginations.peraPadalaAccount.page"
+    @onPageChange="loadPeraPadalaAccounts"
+    @onRefresh="loadPeraPadalaAccounts"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.PeraPadalaAccountPermissions.ADD.id)">
     <template v-slot:filters>
@@ -13,117 +19,65 @@
         type="text"
         placeholder="Search"
       />
-      <!-- v-if="isAccessible($options.ba.ADD.id)" -->
-      <!-- <b-button
-        variant="primary"
-        class="w-100 mt-2"
-        @click="setCreate()"
-      >
-        <v-icon name="plus-circle" /> ADD NEW BANK ACCOUNT
-      </b-button> -->
     </template>
     <template v-slot:content >
       <div>
-        <!-- <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button variant="primary" @click="setCreate()">
-                  <v-icon name="plus-circle" /> ADD NEW PERA PADALA ACCOUNT
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.peraPadalaAccount.criteria"
-                  type="text"
-                  placeholder="Search"
-                  debounce="500"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.peraPadalaAccounts.fields"
-              :busy="tables.peraPadalaAccounts.isBusy"
-              :items="tables.peraPadalaAccounts.items"
-              :current-page="paginations.peraPadalaAccount.page"
-              :per-page="paginations.peraPadalaAccount.perPage"
-              :filter="filters.peraPadalaAccount.criteria"
-              @filtered="onFiltered($event, paginations.peraPadalaAccount)"
-              responsive
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.peraPadalaAccounts.fields"
+          :busy="tables.peraPadalaAccounts.isBusy"
+          :items="tables.peraPadalaAccounts.items"
+          :current-page="paginations.peraPadalaAccount.page"
+          :per-page="paginations.peraPadalaAccount.perPage"
+          :filter="filters.peraPadalaAccount.criteria"
+          @filtered="onFiltered($event, paginations.peraPadalaAccount)"
+          responsive
+        >
+          <!-- :filter="filters.peraPadalaAccount.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(provider)="{ item, value }">
+            <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.PeraPadalaAccountPermissions.EDIT.id)">{{ value }} </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <!-- :filter="filters.peraPadalaAccount.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(provider)="{ item, value }">
-                <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.PeraPadalaAccountPermissions.EDIT.id)">{{ value }} </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.PeraPadalaAccountPermissions.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.PeraPadalaAccountPermissions.DELETE.id)"
-                    @click="
-                      (forms.peraPadalaAccount.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.peraPadalaAccount.from }} to
-                {{ paginations.peraPadalaAccount.to }} of
-                {{ paginations.peraPadalaAccount.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.peraPadalaAccount.page"
-                  :total-rows="paginations.peraPadalaAccount.totalRows"
-                  :per-page="paginations.peraPadalaAccount.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.peraPadalaAccount)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="isAccessible($options.PeraPadalaAccountPermissions.EDIT.id)"
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.PeraPadalaAccountPermissions.DELETE.id)"
+                @click="
+                  (forms.peraPadalaAccount.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
       <!-- Modal Entry -->

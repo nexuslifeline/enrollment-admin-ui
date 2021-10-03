@@ -1,9 +1,15 @@
 <template>
   <PageContent
     title="Bank Account Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadBankAccounts"
-    :filterVisible="isFilterVisible"
+    description="Manage bank name, account number, account name and other details."
+    :searchKeyword="filters.bankAccount.criteria"
+    :pageFrom="paginations.bankAccount.from"
+    :pageTo="paginations.bankAccount.to"
+    :pageTotal="paginations.bankAccount.totalRows"
+    :perPage="paginations.bankAccount.perPage"
+    :currentPage.sync="paginations.bankAccount.page"
+    @onPageChange="loadBankAccounts"
+    @onRefresh="loadBankAccounts"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.BankAccountPermissions.ADD.id)">
     <template v-slot:filters>
@@ -46,92 +52,73 @@
         </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.bankAccounts.fields"
-              :busy="tables.bankAccounts.isBusy"
-              :items="tables.bankAccounts.items"
-              :current-page="paginations.bankAccount.page"
-              :per-page="paginations.bankAccount.perPage"
-              :filter="filters.bankAccount.criteria"
-              @filtered="onFiltered($event, paginations.bankAccount)"
-              responsive
+      <div>
+         <b-table
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.bankAccounts.fields"
+          :busy="tables.bankAccounts.isBusy"
+          :items="tables.bankAccounts.items"
+          :current-page="paginations.bankAccount.page"
+          :per-page="paginations.bankAccount.perPage"
+          :filter="filters.bankAccount.criteria"
+          @filtered="onFiltered($event, paginations.bankAccount)"
+          class="c-table"
+          responsive
+        >
+          <!-- :filter="filters.bankAccount.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(bank)="{ item, value }">
+            <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.BankAccountPermissions.EDIT.id)">{{ value }} </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <!-- :filter="filters.bankAccount.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(bank)="{ item, value }">
-                <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.BankAccountPermissions.EDIT.id)">{{ value }} </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.BankAccountPermissions.EDIT.id
-                      )
-                    "
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.BankAccountPermissions.DELETE.id
-                      )
-                    "
-                    @click="
-                      (forms.bankAccount.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.bankAccount.from }} to
-                {{ paginations.bankAccount.to }} of
-                {{ paginations.bankAccount.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  v-model="paginations.bankAccount.page"
-                  :total-rows="paginations.bankAccount.totalRows"
-                  :per-page="paginations.bankAccount.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.bankAccount)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <!-- end table -->
+              <b-dropdown-item
+                v-if="
+                  isAccessible(
+                    $options.BankAccountPermissions.EDIT.id
+                  )
+                "
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="
+                  isAccessible(
+                    $options.BankAccountPermissions.DELETE.id
+                  )
+                "
+                @click="
+                  (forms.bankAccount.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
       </div>
+
       <!-- Modal Entry -->
       <b-modal
         v-model="showModalEntry"

@@ -254,7 +254,7 @@ export default [
         to: '/maintenance/semester'
       },
       {
-        label: 'Clearance Signatories',
+        label: 'Signatories',
         to: '/maintenance/clearance-signatories',
         permissionIds: EClearancePermissions.getIds()
       },

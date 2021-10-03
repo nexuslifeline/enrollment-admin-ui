@@ -1,9 +1,15 @@
 <template>
   <PageContent
     title="Department Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadDepartments"
-    :filterVisible="isFilterVisible"
+    description="Manage department name, description and other details."
+    :searchKeyword="filters.department.criteria"
+    :pageFrom="paginations.department.from"
+    :pageTo="paginations.department.to"
+    :pageTotal="paginations.department.totalRows"
+    :perPage="paginations.department.perPage"
+    :currentPage.sync="paginations.department.page"
+    @onPageChange="loadDepartments"
+    @onRefresh="loadDepartments"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.DepartmentPermissions.ADD.id)">
     <template v-slot:filters>
@@ -13,14 +19,6 @@
         type="text"
         placeholder="Search"
       />
-      <!-- <b-button
-        v-if="isAccessible($options.DepartmentPermissions.ADD.id)"
-        variant="primary"
-        class="w-100 mt-2"
-        @click="setCreate()"
-      >
-        <v-icon name="plus-circle" /> ADD NEW DEPARTMENT
-      </b-button> -->
     </template>
     <template v-slot:content>
     <div>
@@ -50,97 +48,75 @@
       </b-row> -->
       <!-- end add button and search -->
       <!-- table -->
-      <b-row>
-        <b-col md="12">
-          <b-table
-            class="c-table"
-            hover
-            outlined
-            show-empty
-            :fields="tables.departments.fields"
-            :busy="tables.departments.isBusy"
-            :items="tables.departments.items"
-            :current-page="paginations.department.page"
-            :per-page="paginations.department.perPage"
-            :filter="filters.department.criteria"
-            @filtered="onFiltered($event, paginations.department)"
-            responsive
+      <b-table
+        class="c-table"
+        hover
+        outlined
+        show-empty
+        :fields="tables.departments.fields"
+        :busy="tables.departments.isBusy"
+        :items="tables.departments.items"
+        :current-page="paginations.department.page"
+        :per-page="paginations.department.perPage"
+        :filter="filters.department.criteria"
+        @filtered="onFiltered($event, paginations.department)"
+        responsive
+      >
+        <!-- :filter="filters.department.criteria> -->
+        <template v-slot:table-busy>
+          <div class="text-center my-2">
+            <v-icon name="spinner" spin class="mr-2" />
+            <strong>Loading...</strong>
+          </div>
+        </template>
+        <template v-slot:cell(name)="{ item, value }">
+          <b-link
+            @click="setUpdate(item)"
+            :disabled="
+              !isAccessible($options.DepartmentPermissions.EDIT.id)
+            "
+            >{{ value }}
+          </b-link>
+        </template>
+        <template v-slot:cell(action)="row">
+          <b-dropdown
+            v-if="
+              isAccessible([
+                $options.DepartmentPermissions.EDIT.id,
+                $options.DepartmentPermissions.DELETE.id,
+              ])
+            "
+            right
+            variant="link"
+            toggle-class="text-decoration-none"
+            no-caret
+            boundary="window"
           >
-            <!-- :filter="filters.department.criteria> -->
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
+            <template v-slot:button-content>
+              <v-icon name="ellipsis-v" />
             </template>
-            <template v-slot:cell(name)="{ item, value }">
-              <b-link
-                @click="setUpdate(item)"
-                :disabled="
-                  !isAccessible($options.DepartmentPermissions.EDIT.id)
-                "
-                >{{ value }}
-              </b-link>
-            </template>
-            <template v-slot:cell(action)="row">
-              <b-dropdown
-                v-if="
-                  isAccessible([
-                    $options.DepartmentPermissions.EDIT.id,
-                    $options.DepartmentPermissions.DELETE.id,
-                  ])
-                "
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret
-                boundary="window"
-              >
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  v-if="isAccessible($options.DepartmentPermissions.EDIT.id)"
-                  @click="setUpdate(row.item)"
-                  :disabled="showModalEntry"
-                >
-                  Edit
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="
-                    isAccessible($options.DepartmentPermissions.DELETE.id)
-                  "
-                  @click="
-                    (forms.department.fields.id = row.item.id),
-                      (showModalConfirmation = true)
-                  "
-                  :disabled="showModalConfirmation"
-                >
-                  Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.department.from }} to
-              {{ paginations.department.to }} of
-              {{ paginations.department.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.department.page"
-                :total-rows="paginations.department.totalRows"
-                :per-page="paginations.department.perPage"
-                size="sm"
-                align="end"
-                @input="paginate(paginations.department)"
-              />
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
+            <b-dropdown-item
+              v-if="isAccessible($options.DepartmentPermissions.EDIT.id)"
+              @click="setUpdate(row.item)"
+              :disabled="showModalEntry"
+            >
+              Edit
+            </b-dropdown-item>
+            <b-dropdown-item
+              v-if="
+                isAccessible($options.DepartmentPermissions.DELETE.id)
+              "
+              @click="
+                (forms.department.fields.id = row.item.id),
+                  (showModalConfirmation = true)
+              "
+              :disabled="showModalConfirmation"
+            >
+              Delete
+            </b-dropdown-item>
+          </b-dropdown>
+        </template>
+      </b-table>
       <!-- end table -->
     </div>
 

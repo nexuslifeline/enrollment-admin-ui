@@ -1,9 +1,15 @@
 <template>
   <PageContent
-    title="School Fee Category Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadSchoolFees"
-    :filterVisible="isFilterVisible"
+    title="Fee Category Management"
+    description="Manage the fee category name, description and other details."
+    :searchKeyword="filters.schoolFeeCategory.criteria"
+    :pageFrom="paginations.schoolFeeCategory.from"
+    :pageTo="paginations.schoolFeeCategory.to"
+    :pageTotal="paginations.schoolFeeCategory.totalRows"
+    :perPage="paginations.schoolFeeCategory.perPage"
+    :currentPage.sync="paginations.schoolFeeCategory.page"
+    @onPageChange="loadSchoolFees"
+    @onRefresh="loadSchoolFees"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.FeeCategoryPermissions.ADD.id)">
     <template v-slot:filters>
@@ -43,102 +49,80 @@
         </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.schoolFeeCategories.fields"
-              :busy="tables.schoolFeeCategories.isBusy"
-              :items="tables.schoolFeeCategories.items"
-              :current-page="paginations.schoolFeeCategory.page"
-              :per-page="paginations.schoolFeeCategory.perPage"
-              :filter="filters.schoolFeeCategory.criteria"
-              @filtered="onFiltered($event, paginations.schoolFeeCategory)"
-              responsive
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.schoolFeeCategories.fields"
+          :busy="tables.schoolFeeCategories.isBusy"
+          :items="tables.schoolFeeCategories.items"
+          :current-page="paginations.schoolFeeCategory.page"
+          :per-page="paginations.schoolFeeCategory.perPage"
+          :filter="filters.schoolFeeCategory.criteria"
+          @filtered="onFiltered($event, paginations.schoolFeeCategory)"
+          responsive
+        >
+          <!-- :filter="filters.schoolFeeCategory.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="{ item, value }">
+            <b-link
+              @click="setUpdate(item)"
+              :disabled="
+                !isAccessible($options.FeeCategoryPermissions.EDIT.id) ||
+                  item.id ===
+                    $options.SchoolFeeCategories.MISCELLANEOUS_FEE.id
+              "
+              >{{ value }}
+            </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.FeeCategoryPermissions.EDIT.id,
+                  $options.FeeCategoryPermissions.DELETE.id,
+                ]) &&
+                  row.item.id !==
+                    $options.SchoolFeeCategories.MISCELLANEOUS_FEE.id
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <!-- :filter="filters.schoolFeeCategory.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(name)="{ item, value }">
-                <b-link
-                  @click="setUpdate(item)"
-                  :disabled="
-                    !isAccessible($options.FeeCategoryPermissions.EDIT.id) ||
-                      item.id ===
-                        $options.SchoolFeeCategories.MISCELLANEOUS_FEE.id
-                  "
-                  >{{ value }}
-                </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.FeeCategoryPermissions.EDIT.id,
-                      $options.FeeCategoryPermissions.DELETE.id,
-                    ]) &&
-                      row.item.id !==
-                        $options.SchoolFeeCategories.MISCELLANEOUS_FEE.id
-                  "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.FeeCategoryPermissions.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible($options.FeeCategoryPermissions.DELETE.id)
-                    "
-                    @click="
-                      (forms.schoolFeeCategory.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.schoolFeeCategory.from }} to
-                {{ paginations.schoolFeeCategory.to }} of
-                {{ paginations.schoolFeeCategory.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.schoolFeeCategory.page"
-                  :total-rows="paginations.schoolFeeCategory.totalRows"
-                  :per-page="paginations.schoolFeeCategory.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.schoolFeeCategory)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="isAccessible($options.FeeCategoryPermissions.EDIT.id)"
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="
+                  isAccessible($options.FeeCategoryPermissions.DELETE.id)
+                "
+                @click="
+                  (forms.schoolFeeCategory.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
       <!-- Modal Entry -->
@@ -274,14 +258,12 @@ import {
   FeeCategoryPermissions,
   SchoolFeeCategories,
 } from '../../helpers/enum';
-import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'schoolFeeCategory',
   mixins: [SchoolFeeCategoryApi, Tables, Access],
   components: {
-    Card,
     PageContent
   },
   FeeCategoryPermissions,

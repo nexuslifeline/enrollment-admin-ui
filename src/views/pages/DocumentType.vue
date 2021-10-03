@@ -1,9 +1,15 @@
 <template>
   <PageContent
     title="Document Type Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadDocumentTypes"
-    :filterVisible="isFilterVisible"
+    description="Manage document type name, description and other details."
+    :searchKeyword="filters.documentType.criteria"
+    :pageFrom="paginations.documentType.from"
+    :pageTo="paginations.documentType.to"
+    :pageTotal="paginations.documentType.totalRows"
+    :perPage="paginations.documentType.perPage"
+    :currentPage.sync="paginations.documentType.page"
+    @onPageChange="loadDocumentTypes"
+    @onRefresh="loadDocumentTypes"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.DocumentTypePermission.ADD.id)">
   <template v-slot:filters>
@@ -43,98 +49,76 @@
         </b-row> -->
         <!-- end add button and search -->
         <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.documentTypes.fields"
-              :busy="tables.documentTypes.isBusy"
-              :items="tables.documentTypes.items"
-              :current-page="paginations.documentType.page"
-              :per-page="paginations.documentType.perPage"
-              :filter="filters.documentType.criteria"
-              @filtered="onFiltered($event, paginations.documentType)"
-              responsive
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.documentTypes.fields"
+          :busy="tables.documentTypes.isBusy"
+          :items="tables.documentTypes.items"
+          :current-page="paginations.documentType.page"
+          :per-page="paginations.documentType.perPage"
+          :filter="filters.documentType.criteria"
+          @filtered="onFiltered($event, paginations.documentType)"
+          responsive
+        >
+          <!-- :filter="filters.documentType.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="{ item, value }">
+            <b-link
+              @click="setUpdate(item)"
+              :disabled="
+                !isAccessible($options.DocumentTypePermission.EDIT.id)
+              "
+              >{{ value }}
+            </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.DocumentTypePermission.EDIT.id,
+                  $options.DocumentTypePermission.DELETE.id,
+                ])
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <!-- :filter="filters.documentType.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(name)="{ item, value }">
-                <b-link
-                  @click="setUpdate(item)"
-                  :disabled="
-                    !isAccessible($options.DocumentTypePermission.EDIT.id)
-                  "
-                  >{{ value }}
-                </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.DocumentTypePermission.EDIT.id,
-                      $options.DocumentTypePermission.DELETE.id,
-                    ])
-                  "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.DocumentTypePermission.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible($options.DocumentTypePermission.DELETE.id)
-                    "
-                    @click="
-                      (forms.documentType.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.documentType.from }} to
-                {{ paginations.documentType.to }} of
-                {{ paginations.documentType.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.documentType.page"
-                  :total-rows="paginations.documentType.totalRows"
-                  :per-page="paginations.documentType.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.documentType)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="isAccessible($options.DocumentTypePermission.EDIT.id)"
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="
+                  isAccessible($options.DocumentTypePermission.DELETE.id)
+                "
+                @click="
+                  (forms.documentType.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
       <!-- Modal Entry -->

@@ -1,9 +1,15 @@
 <template>
   <PageContent
-    title="School Category Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadSchoolCategories"
-    :filterVisible="isFilterVisible"
+    title="School Category"
+    description="View the list of School Categories compromising the institution."
+    :searchKeyword="filters.schoolCategory.criteria"
+    :pageFrom="paginations.schoolCategory.from"
+    :pageTo="paginations.schoolCategory.to"
+    :pageTotal="paginations.schoolCategory.totalRows"
+    :perPage="paginations.schoolCategory.perPage"
+    :currentPage.sync="paginations.schoolCategory.page"
+    @onPageChange="loadSchoolCategories"
+    @onRefresh="loadSchoolCategories"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -16,46 +22,27 @@
     <template v-slot:content>
       <div>
         <!-- table -->
-        <b-row >
-          <b-col md=12>
-            <b-table
-              class="c-table"
-              hover outlined show-empty
-              :fields="tables.schoolCategories.fields"
-              :busy="tables.schoolCategories.isBusy"
-              :items.sync="tables.schoolCategories.items"
-              :current-page="paginations.schoolCategory.page"
-              :per-page="paginations.schoolCategory.perPage"
-              :filter="filters.schoolCategory.criteria"
-              responsive>
-              <!-- :filter="filters.schoolCategory.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon
-                    name="spinner"
-                    spin
-                    class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md=6>
-                Showing {{ paginations.schoolCategory.from }} to {{ paginations.schoolCategory.to }} of {{ paginations.schoolCategory.totalRows }} records.
-                </b-col>
-              <b-col md=6>
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.schoolCategory.page"
-                  :total-rows="paginations.schoolCategory.totalRows"
-                  :per-page="paginations.schoolCategory.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.schoolCategory)" />
-                </b-col>
-              </b-row>
-          </b-col>
-        </b-row>
+        <b-table
+          class="c-table"
+          hover outlined show-empty
+          :fields="tables.schoolCategories.fields"
+          :busy="tables.schoolCategories.isBusy"
+          :items.sync="tables.schoolCategories.items"
+          :current-page="paginations.schoolCategory.page"
+          :per-page="paginations.schoolCategory.perPage"
+          :filter="filters.schoolCategory.criteria"
+          responsive>
+          <!-- :filter="filters.schoolCategory.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon
+                name="spinner"
+                spin
+                class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
     </template>

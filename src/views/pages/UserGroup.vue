@@ -1,8 +1,15 @@
 <template>
-  <PageContent title="User Group Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadUserGroups"
-    :filterVisible="isFilterVisible"
+  <PageContent
+    title="User Group Management"
+    description="Manage user group code, name, description and permissions."
+    :searchKeyword="filters.userGroup.criteria"
+    :pageFrom="paginations.userGroup.from"
+    :pageTo="paginations.userGroup.to"
+    :pageTotal="paginations.userGroup.totalRows"
+    :perPage="paginations.userGroup.perPage"
+    :currentPage.sync="paginations.userGroup.page"
+    @onPageChange="loadUserGroups"
+    @onRefresh="loadUserGroups"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.UserGroupPermissions.ADD.id)">
     <template v-slot:filters>
@@ -12,118 +19,88 @@
         type="text"
         placeholder="Search"
       />
-      <!-- <b-button
-        v-if="isAccessible($options.UserGroupPermissions.ADD.id)"
-        variant="primary"
-        class="w-100 mt-2"
-        @click="setCreate()"
-      >
-        <v-icon name="plus-circle" /> ADD NEW USER GROUP
-      </b-button> -->
     </template>
     <template v-slot:content>
       <div>
         <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              hover
-              outlined
-              show-empty
-              :fields="tables.userGroups.fields"
-              :busy="tables.userGroups.isBusy"
-              :items="tables.userGroups.items"
-              :current-page="paginations.userGroup.page"
-              :per-page="paginations.userGroup.perPage"
-              :filter="filters.userGroup.criteria"
-              @filtered="onFiltered($event, paginations.userGroup)"
-              responsive
+        <b-table
+          class="c-table"
+          hover
+          outlined
+          show-empty
+          :fields="tables.userGroups.fields"
+          :busy="tables.userGroups.isBusy"
+          :items="tables.userGroups.items"
+          :current-page="paginations.userGroup.page"
+          :per-page="paginations.userGroup.perPage"
+          :filter="filters.userGroup.criteria"
+          @filtered="onFiltered($event, paginations.userGroup)"
+          responsive
+        >
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(code)="{ item, value }">
+            <b-link
+              :to="`/maintenance/user-group/${item.id}/`"
+              :disabled="
+                !isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)
+              "
+              >{{ value }}
+            </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              v-if="
+                isAccessible([
+                  $options.UserGroupPermissions.EDIT.id,
+                  $options.UserGroupPermissions.DELETE.id,
+                  $options.UserGroupPermissions.SETUP_PERMISSION.id,
+                ])
+              "
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(code)="{ item, value }">
-                <b-link
-                  :to="`/maintenance/user-group/${item.id}/`"
-                  :disabled="
-                    !isAccessible($options.UserGroupPermissions.SETUP_PERMISSION.id)
-                  "
-                  >{{ value }}
-                </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  v-if="
-                    isAccessible([
-                      $options.UserGroupPermissions.EDIT.id,
-                      $options.UserGroupPermissions.DELETE.id,
-                      $options.UserGroupPermissions.SETUP_PERMISSION.id,
-                    ])
-                  "
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.UserGroupPermissions.SETUP_PERMISSION.id
-                      )
-                    "
-                    :to="`/maintenance/user-group/${row.item.id}/`"
-                    :disabled="showModalEntry"
-                  >
-                    Setup Permission
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.UserGroupPermissions.EDIT.id)"
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="isAccessible($options.UserGroupPermissions.DELETE.id)"
-                    @click="
-                      (forms.userGroup.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.userGroup.from }} to
-                {{ paginations.userGroup.to }} of
-                {{ paginations.userGroup.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.userGroup.page"
-                  :total-rows="paginations.userGroup.totalRows"
-                  :per-page="paginations.userGroup.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.userGroup)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="
+                  isAccessible(
+                    $options.UserGroupPermissions.SETUP_PERMISSION.id
+                  )
+                "
+                :to="`/maintenance/user-group/${row.item.id}/`"
+                :disabled="showModalEntry"
+              >
+                Setup Permission
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.UserGroupPermissions.EDIT.id)"
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.UserGroupPermissions.DELETE.id)"
+                @click="
+                  (forms.userGroup.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
       <!-- Modal Entry -->
@@ -269,14 +246,12 @@ import { copyValue } from '../../helpers/extractor';
 import Tables from '../../helpers/tables';
 import Access from '../../mixins/utils/Access';
 import { UserGroupPermissions } from '../../helpers/enum';
-import Card from '../components/Card';
 import PageContent from "../components/PageContainer/PageContent";
 
 export default {
   name: 'UserGroup',
   mixins: [UserGroupApi, Tables, Access],
   components: {
-    Card,
     PageContent
   },
   UserGroupPermissions,

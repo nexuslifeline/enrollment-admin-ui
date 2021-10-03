@@ -346,7 +346,7 @@ function configRoutes () {
           children: [
             {
               path: 'clearance-signatories',
-              name: 'Clearance Signatories',
+              name: 'Signatories',
               component: Clearance,
               meta: { requiresAuth: true }
             },

@@ -1,9 +1,15 @@
 <template>
   <PageContent
     title="E-Wallet Account Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadEWalletAccounts"
-    :filterVisible="isFilterVisible"
+    description="Manage e-wallet provider name, account name, account id and other details."
+    :searchKeyword="filters.eWalletAccount.criteria"
+    :pageFrom="paginations.eWalletAccount.from"
+    :pageTo="paginations.eWalletAccount.to"
+    :pageTotal="paginations.eWalletAccount.totalRows"
+    :perPage="paginations.eWalletAccount.perPage"
+    :currentPage.sync="paginations.eWalletAccount.page"
+    @onPageChange="loadEWalletAccounts"
+    @onRefresh="loadEWalletAccounts"
     @create="setCreate()"
     :createButtonVisible="isAccessible($options.EWalletAccountPermissions.ADD.id)">
     <template v-slot:filters>
@@ -16,114 +22,70 @@
     </template>
     <template v-slot:content>
       <div>
-        <!-- <b-row class="mb-3">
-          <b-col md="12">
-            <b-row>
-              <b-col md="8">
-                <b-button variant="primary" @click="setCreate()">
-                  <v-icon name="plus-circle" /> ADD NEW E-WALLET ACCOUNT
-                </b-button>
-              </b-col>
-              <b-col md="4">
-                <b-form-input
-                  v-model="filters.eWalletAccount.criteria"
-                  type="text"
-                  placeholder="Search"
-                  debounce="500"
-                >
-                </b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row> -->
-        <!-- end add button and search -->
-        <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              small
-              hover
-              outlined
-              show-empty
-              :fields="tables.eWalletAccounts.fields"
-              :busy="tables.eWalletAccounts.isBusy"
-              :items="tables.eWalletAccounts.items"
-              :current-page="paginations.eWalletAccount.page"
-              :per-page="paginations.eWalletAccount.perPage"
-              :filter="filters.eWalletAccount.criteria"
-              @filtered="onFiltered($event, paginations.eWalletAccount)"
-              responsive
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.eWalletAccounts.fields"
+          :busy="tables.eWalletAccounts.isBusy"
+          :items="tables.eWalletAccounts.items"
+          :current-page="paginations.eWalletAccount.page"
+          :per-page="paginations.eWalletAccount.perPage"
+          :filter="filters.eWalletAccount.criteria"
+          @filtered="onFiltered($event, paginations.eWalletAccount)"
+          responsive
+        >
+          <!-- :filter="filters.eWalletAccount.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(provider)="{ item, value }">
+            <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.EWalletAccountPermissions.EDIT.id)">{{ value }} </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <!-- :filter="filters.eWalletAccount.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(provider)="{ item, value }">
-                <b-link @click="setUpdate(item)" :disabled="!isAccessible($options.EWalletAccountPermissions.EDIT.id)">{{ value }} </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <b-dropdown
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.EWalletAccountPermissions.EDIT.id
-                      )
-                    "
-                    @click="setUpdate(row.item)"
-                    :disabled="showModalEntry"
-                  >
-                    Edit
-                  </b-dropdown-item>
-                  <b-dropdown-item
-                    v-if="
-                      isAccessible(
-                        $options.EWalletAccountPermissions.DELETE.id
-                      )
-                    "
-                    @click="
-                      (forms.eWalletAccount.fields.id = row.item.id),
-                        (showModalConfirmation = true)
-                    "
-                    :disabled="showModalConfirmation"
-                  >
-                    Delete
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.eWalletAccount.from }} to
-                {{ paginations.eWalletAccount.to }} of
-                {{ paginations.eWalletAccount.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.eWalletAccount.page"
-                  :total-rows="paginations.eWalletAccount.totalRows"
-                  :per-page="paginations.eWalletAccount.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.eWalletAccount)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <b-dropdown-item
+                v-if="
+                  isAccessible(
+                    $options.EWalletAccountPermissions.EDIT.id
+                  )
+                "
+                @click="setUpdate(row.item)"
+                :disabled="showModalEntry"
+              >
+                Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="
+                  isAccessible(
+                    $options.EWalletAccountPermissions.DELETE.id
+                  )
+                "
+                @click="
+                  (forms.eWalletAccount.fields.id = row.item.id),
+                    (showModalConfirmation = true)
+                "
+                :disabled="showModalConfirmation"
+              >
+                Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
       <!-- Modal Entry -->

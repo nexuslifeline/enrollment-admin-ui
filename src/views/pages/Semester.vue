@@ -1,9 +1,15 @@
 <template>
   <PageContent
     title="Semester Management"
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadSemester"
-    :filterVisible="isFilterVisible"
+    description="Manage semester name, description and other details."
+    :searchKeyword="filters.semester.criteria"
+    :pageFrom="paginations.semester.from"
+    :pageTo="paginations.semester.to"
+    :pageTotal="paginations.semester.totalRows"
+    :perPage="paginations.semester.perPage"
+    :currentPage.sync="paginations.semester.page"
+    @onPageChange="loadSemester"
+    @onRefresh="loadSemester"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -16,75 +22,53 @@
     <template v-slot:content >
       <div>
         <!-- table -->
-        <b-row>
-          <b-col md="12">
-            <b-table
-              class="c-table"
-              hover
-              outlined
-              show-empty
-              :fields="tables.semesters.fields"
-              :busy="tables.semesters.isBusy"
-              :items.sync="tables.semesters.items"
-              :current-page="paginations.semester.page"
-              :per-page="paginations.semester.perPage"
-              :filter="filters.semester.criteria"
-              responsive
+        <b-table
+          class="c-table"
+          hover
+          outlined
+          show-empty
+          :fields="tables.semesters.fields"
+          :busy="tables.semesters.isBusy"
+          :items.sync="tables.semesters.items"
+          :current-page="paginations.semester.page"
+          :per-page="paginations.semester.perPage"
+          :filter="filters.semester.criteria"
+          responsive
+        >
+          <!-- :filter="filters.semester.criteria> -->
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(name)="{ item, value }">
+            <b-link @click="setAsActiveSemester(item)">{{ value }} </b-link>
+          </template>
+          <template v-slot:cell(action)="row">
+            <!-- need to add user access settings -->
+            <b-dropdown
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+              boundary="window"
             >
-              <!-- :filter="filters.semester.criteria> -->
-              <template v-slot:table-busy>
-                <div class="text-center my-2">
-                  <v-icon name="spinner" spin class="mr-2" />
-                  <strong>Loading...</strong>
-                </div>
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
               </template>
-              <template v-slot:cell(name)="{ item, value }">
-                <b-link @click="setAsActiveSemester(item)">{{ value }} </b-link>
-              </template>
-              <template v-slot:cell(action)="row">
-                <!-- need to add user access settings -->
-                <b-dropdown
-                  right
-                  variant="link"
-                  toggle-class="text-decoration-none"
-                  no-caret
-                  boundary="window"
-                >
-                  <template v-slot:button-content>
-                    <v-icon name="ellipsis-v" />
-                  </template>
-                  <!-- need to add user access settings -->
-                  <b-dropdown-item @click="setAsActiveSemester(row.item)">
-                    Set as Active Semester
-                  </b-dropdown-item>
-                </b-dropdown>
-              </template>
-              <template v-slot:cell(isActive)="row">
-                <b-badge :variant="row.item.isActive ? 'success' : 'danger'">
-                  {{ row.item.isActive ? 'Active' : 'Inactive' }}
-                </b-badge>
-              </template>
-            </b-table>
-            <b-row>
-              <b-col md="6">
-                Showing {{ paginations.semester.from }} to
-                {{ paginations.semester.to }} of
-                {{ paginations.semester.totalRows }} records.
-              </b-col>
-              <b-col md="6">
-                <b-pagination
-                  class="c-pagination"
-                  v-model="paginations.semester.page"
-                  :total-rows="paginations.semester.totalRows"
-                  :per-page="paginations.semester.perPage"
-                  size="sm"
-                  align="end"
-                  @input="paginate(paginations.semester)"
-                />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+              <!-- need to add user access settings -->
+              <b-dropdown-item @click="setAsActiveSemester(row.item)">
+                Set as Active Semester
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+          <template v-slot:cell(isActive)="row">
+            <b-badge :variant="row.item.isActive ? 'success' : 'danger'">
+              {{ row.item.isActive ? 'Active' : 'Inactive' }}
+            </b-badge>
+          </template>
+        </b-table>
         <!-- end table -->
       </div>
       <b-modal

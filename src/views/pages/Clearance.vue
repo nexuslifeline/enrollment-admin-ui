@@ -1,10 +1,16 @@
 <template>
   <PageContent
-    :title="`Clearance (${$store.state.schoolYear.name})`"
-    description="If all relevant requirements were settled, you can clear a particular student."
-    @toggleFilter="isFilterVisible = !isFilterVisible"
-    @refresh="loadClearances()"
-    :filterVisible="isFilterVisible"
+    :title="`Signatories for Clearance`"
+    description="Manage the required signatories to a particular level and section."
+    :badges="[{ text: $store.state.schoolYear.name }]"
+    :searchKeyword="filters.clearance.criteria"
+    :pageFrom="paginations.clearance.from"
+    :pageTo="paginations.clearance.to"
+    :pageTotal="paginations.clearance.totalRows"
+    :perPage="paginations.clearance.perPage"
+    :currentPage.sync="paginations.clearance.page"
+    @onPageChange="loadClearances"
+    @onRefresh="loadClearances"
     :createButtonVisible="false">
     <template v-slot:filters>
       <b-form-input
@@ -15,18 +21,6 @@
         placeholder="Search"
       >
       </b-form-input>
-      <!--<v-select
-        :options="$options.SchoolCategories.values"
-        @input="loadSchoolCategoryInfo(), loadSections(), loadClearances()"
-        v-model="filters.clearance.schoolCategoryId"
-        :reduce="item => item.id"
-        label="name"
-        placeholder="School Category"
-        class="mt-2"
-        :searchable="checkIfAllowedAll() || checkIfSuperUser()"
-        :selectable="option =>  checkIfSuperUser() || isAccessibleSchoolCategory(option.id)"
-        :clearable="checkIfAllowedAll()"
-      />-->
       <SelectCategory
         @input="onCategoryFilterChange"
         v-model="filters.clearance.schoolCategoryItem"
@@ -93,84 +87,64 @@
       </div>
     </template>
     <template v-slot:content>
-      <b-row v-if="!showEntry && !showBatchEntry">
-        <b-col md="12">
-          <b-table
-            class="c-table"
-            small
-            hover
-            outlined
-            show-empty
-            :fields="tables.clearances.fields"
-            :busy="tables.clearances.isBusy"
-            :items="tables.clearances.items"
-            responsive
-          >
-            <template v-slot:cell(name)="data">
-              <StudentColumn
-                :data="{ student: data.item.student }"
-                :callback="{
-                  loadDetails: () => null,
-                }"
-              />
-            </template>
-            <template v-slot:cell(education)="data">
-              <EducationColumn :data="data.item.academicRecord" :showSchoolYear="false"/>
-            </template>
-            <template v-slot:table-busy>
-              <div class="text-center my-2">
-                <v-icon name="spinner" spin class="mr-2" />
-                <strong>Loading...</strong>
-              </div>
-            </template>
-            <template v-slot:cell(action)="{ item: { id } }">
-              <b-dropdown
-                boundary="window"
-                right
-                variant="link"
-                toggle-class="text-decoration-none"
-                no-caret
+      <div v-if="!showEntry && !showBatchEntry">
+        <b-table
+          class="c-table"
+          small
+          hover
+          outlined
+          show-empty
+          :fields="tables.clearances.fields"
+          :busy="tables.clearances.isBusy"
+          :items="tables.clearances.items"
+          responsive
+        >
+          <template v-slot:cell(name)="data">
+            <StudentColumn
+              :data="{ student: data.item.student }"
+              :callback="{
+                loadDetails: () => null,
+              }"
+            />
+          </template>
+          <template v-slot:cell(education)="data">
+            <EducationColumn :data="data.item.academicRecord" :showSchoolYear="false"/>
+          </template>
+          <template v-slot:table-busy>
+            <div class="text-center my-2">
+              <v-icon name="spinner" spin class="mr-2" />
+              <strong>Loading...</strong>
+            </div>
+          </template>
+          <template v-slot:cell(action)="{ item: { id } }">
+            <b-dropdown
+              boundary="window"
+              right
+              variant="link"
+              toggle-class="text-decoration-none"
+              no-caret
+            >
+              <template v-slot:button-content>
+                <v-icon name="ellipsis-v" />
+              </template>
+              <b-dropdown-item
+                @click="setUpdateClearance(id)"
+                v-if="isAccessible($options.EClearancePermissions.EDIT.id)"
               >
-                <template v-slot:button-content>
-                  <v-icon name="ellipsis-v" />
-                </template>
-                <b-dropdown-item
-                  @click="setUpdateClearance(id)"
-                  v-if="isAccessible($options.EClearancePermissions.EDIT.id)"
-                >
-                  <v-icon name="pen" /> Edit
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-if="isAccessible($options.EClearancePermissions.DELETE.id)"
-                  @click="
-                    (forms.clearance.fields.id = id), (showModalConfirmation = true)
-                  "
-                >
-                  <v-icon name="trash" /> Delete
-                </b-dropdown-item>
-              </b-dropdown>
-            </template>
-          </b-table>
-          <b-row>
-            <b-col md="6">
-              Showing {{ paginations.clearance.from }} to
-              {{ paginations.clearance.to }} of
-              {{ paginations.clearance.totalRows }} records.
-            </b-col>
-            <b-col md="6">
-              <b-pagination
-                class="c-pagination"
-                v-model="paginations.clearance.page"
-                :total-rows="paginations.clearance.totalRows"
-                :per-page="paginations.clearance.perPage"
-                size="sm"
-                align="end"
-                @input="loadClearances()"
-              />
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
+                <v-icon name="pen" /> Edit
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-if="isAccessible($options.EClearancePermissions.DELETE.id)"
+                @click="
+                  (forms.clearance.fields.id = id), (showModalConfirmation = true)
+                "
+              >
+                <v-icon name="trash" /> Delete
+              </b-dropdown-item>
+            </b-dropdown>
+          </template>
+        </b-table>
+      </div>
       <Card v-if="showBatchEntry" title="Clearance - Batch Create">
         <b-row class="mb-3">
           <b-col md="6">
