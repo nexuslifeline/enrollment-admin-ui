@@ -1,6 +1,22 @@
 <template>
   <CenterContainer>
     <BackLink :previousRoute="{ name: 'PaymentList' }" />
+    <PaymentConfirmation
+      :isConfirming="isProcessing"
+      @onConfirm="onSubmitPayment"
+      :isShown.sync="isShownConfirmation"
+      :data="[
+        { label: 'Student #:', description: studentNo },
+        { label: 'Name:', description: name },
+        { label: 'Course:', description: courseName },
+        { label: 'Level & Semester:', description: [levelName, semesterName].join(' - ') },
+        { label: 'Mode of Payment:', description: paymentMode, underline: true },
+        { label: 'Date of Payment:', description: formattedPaymentDate },
+        { label: 'Payment will be posted to:', description: billingNo, underline: true },
+        { label: 'SOA/Bill Amount:', description: billingAmount },
+        { label: `You are about to post a payment amounting: `, description: paymentAmount, underline: true, blue: true, medium: true },
+      ]"
+    />
     <Card title="Payment Information" titleSize="m" hasFooter>
       <InputContainer>
         <b-form-group>
@@ -104,7 +120,7 @@
       </LinkVisibilityToggler>
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing || tables.billings.items.length === 0">
+          <b-button variant="primary" @click="isShownConfirmation = true" :disabled="isProcessing || tables.billings.items.length === 0">
             <v-icon name="spinner" spin v-if="isProcessing"/> Submit Payment
           </b-button>
         </CardFooterRow>
@@ -128,15 +144,6 @@
           @row-selected="onRowSelected"
           foot-clone
         >
-           <!-- <template v-slot:foot>
-            <div class="font-weight-bold">Total Due:</div>
-          </template> -->
-
-          <!-- <template v-slot:cell(selected)="{ rowSelected }">
-            <template v-if="rowSelected">
-              <v-icon :name="rowSelected ? 'check' : ''" />
-            </template>
-          </template> -->
           <template v-slot:table-busy>
             <div class="text-center my-2">
               <v-icon name="spinner" spin class="mr-2" />
@@ -214,20 +221,20 @@
             </b-overlay>
           </template>
 
-          <template #foot(totalPaid)="data">
+          <template #foot(totalPaid)>
             <b>Total: </b>
           </template>
-          <template #foot(totalRemainingDue)="data">
+          <template #foot(totalRemainingDue)>
             <b>{{ grandTotalRemainingDue }}</b>
           </template>
-          <template #foot()="data">
+          <template #foot()>
             <span> </span>
           </template>
         </b-table>
       </div>
       <template v-slot:footer>
         <CardFooterRow>
-          <b-button variant="primary" @click="onSubmitPayment" :disabled="isProcessing || tables.billings.items.length === 0">
+          <b-button variant="primary" @click="isShownConfirmation = true" :disabled="isProcessing || tables.billings.items.length === 0">
             <v-icon name="spinner" spin v-if="isProcessing"/> Submit Payment
           </b-button>
         </CardFooterRow>
@@ -249,15 +256,11 @@ import {
   BillingTypes,
 } from '../../../helpers/enum';
 import {
-  showNotification,
-  formatNumber,
-  clearFields,
   validate,
   reset,
   formatAccountingNumber
 } from '../../../helpers/forms';
 import { format } from 'date-fns';
-import SelectPaginated from '../../components/SelectPaginated';
 
 const paymentFields = {
   referenceNo: null,
@@ -273,16 +276,16 @@ const paymentFields = {
 
 export default {
   mixins: [StudentApi, PaymentApi, BillingApi, SchoolYearApi],
-  components: { SelectPaginated },
   BillingTypes,
   data() {
     return {
+      PaymentModes,
+      activeRow: {},
+      activeStudent: {},
+      isShownConfirmation: false,
       activeSchoolYear: null,
-      // showModalStudent: false,
       isLoading: false,
       isProcessing: false,
-      // selectedStudent: null,
-      // studentQuery: null,
       forms: {
         payment: {
           fields: { ...paymentFields, paymentModeId: PaymentModes.CASH.id },
@@ -293,11 +296,6 @@ export default {
       tables: {
         billings: {
           fields: [
-            // {
-            //   key: 'selected',
-            //   label: '',
-            //   tdClass: 'align-middle'
-            // },
             {
               key: 'billingNo',
               label: 'Billing No',
@@ -349,30 +347,6 @@ export default {
           ],
           items: [],
         },
-        // students: {
-        //   isBusy: false,
-        //   fields: [
-        //     {
-        //       key: 'name',
-        //       label: 'Name',
-        //       tdClass: 'align-middle',
-        //       thStyle: { width: '50%' },
-        //     },
-        //     {
-        //       key: 'contact',
-        //       label: 'Contact Info',
-        //       tdClass: 'align-middle',
-        //       thStyle: { width: '45%' },
-        //     },
-        //     {
-        //       key: 'action',
-        //       label: '',
-        //       tdClass: 'align-middle',
-        //       thStyle: { width: '40px' },
-        //     },
-        //   ],
-        //   items: [],
-        // },
         soaBillings: {
           isBusy: false,
           fields: [
@@ -479,6 +453,7 @@ export default {
   },
   methods: {
     onStudentSelect(student) {
+      this.activeStudent = student;
       if (!student?.id) {
         this.tables.billings.items = [];
         return;
@@ -494,48 +469,6 @@ export default {
         });
       }
     },
-    // onStudentSelect(e) {
-    //   console.log('onStudentSelect', e)
-    // },
-    // loadStudents() {
-    //   const { students } = this.tables;
-    //   const { criteria } = this.filters.student;
-    //   const {
-    //     student,
-    //     student: { perPage, page },
-    //   } = this.paginations;
-
-    //   students.isBusy = true;
-
-    //   let params = { paginate: true, perPage, page, criteria };
-    //   this.getStudentList(params).then(({ data }) => {
-    //     students.items = data.data;
-    //     student.from = data.meta.from;
-    //     student.to = data.meta.to;
-    //     student.totalRows = data.meta.total;
-    //     students.isBusy = false;
-    //   });
-    // },
-    // avatar(student) {
-    //   let src = '';
-    //   if (student.photo) {
-    //     src = process.env.VUE_APP_PUBLIC_PHOTO_URL + student.photo.hashName;
-    //   }
-    //   return src;
-    // },
-    // onShowModalStudent() {
-    //   this.showModalStudent = true;
-    //   this.filters.student.criteria = null;
-    //   this.paginations.student.page = 1;
-    //   this.loadStudents();
-    // },
-    // onSelectedStudent(row) {
-    //   this.showModalStudent = false;
-    //   this.selectedStudent = row.item;
-    //   this.forms.payment.fields.studentId = row.item.id;
-    //   // this.studentQuery = row.item.studentNo;
-    //   this.loadBillings(row.item.id);
-    // },
     async loadBillings(studentId) {
       const { billings } = this.tables;
       billings.isBusy = true;
@@ -553,40 +486,20 @@ export default {
           parseFloat(row[0].previousBalance) +
           parseFloat(row[0].totalAmount) -
           parseFloat(row[0].totalPaid);
-        payment.fields.billingId = row.length ? row[0].id : null;
+        payment.fields.billingId = row[0]?.id;
         payment.fields.amount = remainingBalance > 0 ? remainingBalance : 0;
+        this.activeRow = row[0];
       }
     },
-    // onSubmitPayment() {
-    //   this.isProcessing = true;
-    //   const {
-    //     payment,
-    //     payment: { fields },
-    //   } = this.forms;
-    //   fields.schoolYearId = this.activeSchoolYear.id;
-    //   reset(payment);
-    //   const studentId = fields?.studentId?.id ||  fields?.studentId;
-    //   this.addPayment({ ...fields, studentId })
-    //     .then(({ data }) => {
-    //       this.isProcessing = false;
-    //       this.$router.push('/finance/post-payment');
-    //     })
-    //     .catch((error) => {
-    //       const errors = error.response.data.errors;
-    //       this.isProcessing = false;
-    //       validate(payment, errors, this);
-    //     });
-    // },
     onSubmitPayment() {
       this.isProcessing = true;
       const {
         payment,
         payment: { fields: { billingId, amount, datePaid, paymentModeId, notes, referenceNo } },
       } = this.forms;
-      // fields.schoolYearId = this.activeSchoolYear.id;
       reset(payment);
       this.postPayment({ amount, datePaid, paymentModeId, notes, referenceNo }, billingId)
-        .then(({ data }) => {
+        .then(() => {
           this.isProcessing = false;
           this.$router.push('/finance/post-payment');
         })
@@ -596,22 +509,6 @@ export default {
           validate(payment, errors, this);
         });
     },
-    // getStudentInfo(student) {
-    //   this.selectedStudent = student;
-    //   this.forms.payment.fields.studentId = student.id;
-    //   this.loadBillings(student.id);
-    // },
-    // loadStudentsTypeAhead() {
-    //   const { students } = this.options;
-    //   const { studentQuery } = this.studentQuery;
-    //   const params = {
-    //     paginate: false,
-    //     criteria: studentQuery,
-    //   };
-    //   this.getStudentList(params).then(({ data }) => {
-    //     students.items = data;
-    //   });
-    // },
     loadDetails(row) {
       const { item } = row;
       this.$set(item, 'isLoading', true);
@@ -649,7 +546,7 @@ export default {
     },
     getPhoto(option) {
       const photo = (option && option.photo && option.photo.hashName) || '';
-      return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
+      return photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
     },
   },
   computed: {
@@ -657,6 +554,36 @@ export default {
       const { billings } = this.tables;
       return formatAccountingNumber(billings?.items?.reduce((accum, item) => accum + item?.totalRemainingDue, 0.0) || 0);
     },
+    billingNo() {
+      return this.activeRow?.billingNo || '';
+    },
+    billingAmount() {
+      return formatAccountingNumber(this.activeRow?.totalRemainingDue);
+    },
+    paymentMode() {
+      return this.PaymentModes.getEnum(this.forms.payment.fields?.paymentModeId)?.name || '';
+    },
+    formattedPaymentDate() {
+      return format(new Date(this.forms.payment.fields.datePaid), 'MMMM dd, yyyy');
+    },
+    name() {
+      return this.activeStudent?.name;
+    },
+    studentNo() {
+      return this.activeStudent?.studentNo;
+    },
+    courseName() {
+      return this.activeStudent?.latestAcademicRecord?.course?.name;
+    },
+    levelName() {
+      return this.activeStudent?.latestAcademicRecord?.level?.name;
+    },
+    semesterName() {
+      return this.activeStudent?.latestAcademicRecord?.semester?.name;
+    },
+    paymentAmount() {
+      return formatAccountingNumber(this.forms.payment.fields.amount);
+    }
   }
 };
 </script>

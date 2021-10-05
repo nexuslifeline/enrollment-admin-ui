@@ -1,7 +1,7 @@
 <template>
   <PageContent 
     title="Academic Transcripts"
-    description="Manage draft academic transcripts and approve the grades submitted by teachers and intructors. You can also print the finalized student's TOR."
+    description="Manage draft academic transcripts and approve the grades submitted by teachers and intructors. You can also print the final version student's TOR."
     :searchKeyword="filters.transcriptRecord.criteria"
     :pageFrom="paginations.transcriptRecord.from"
     :pageTo="paginations.transcriptRecord.to"
