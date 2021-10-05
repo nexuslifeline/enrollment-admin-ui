@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import { httpRequest, httpAuthRequest } from './helpers/http'
 //import { BootstrapVue } from 'bootstrap-vue'
+import PaymentConfirmation from './views/components/PaymentConfirmation/PaymentConfirmation';
 import SplitButton from './views/components/SplitButton/SplitButton';
 import SelectPaginated from './views/components/SelectPaginated';
 import StageIndicator from './views/components/Wizard/StageIndicator';
@@ -289,6 +290,7 @@ Vue.component('StageIndicator', StageIndicator);
 Vue.component('SelectPaginated', SelectPaginated);
 Vue.component('SelectLevelCourses', SelectLevelCourses);
 Vue.component('SplitButton', SplitButton);
+Vue.component('PaymentConfirmation', PaymentConfirmation);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
