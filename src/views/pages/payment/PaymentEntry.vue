@@ -5,17 +5,7 @@
       :isConfirming="isProcessing"
       @onConfirm="onSubmitPayment"
       :isShown.sync="isShownConfirmation"
-      :data="[
-        { label: 'Student #:', description: studentNo },
-        { label: 'Name:', description: name },
-        { label: 'Course:', description: courseName },
-        { label: 'Level & Semester:', description: [levelName, semesterName].join(' - ') },
-        { label: 'Mode of Payment:', description: paymentMode, underline: true },
-        { label: 'Date of Payment:', description: formattedPaymentDate },
-        { label: 'Payment will be posted to:', description: billingNo, underline: true },
-        { label: 'SOA/Bill Amount:', description: billingAmount },
-        { label: `You are about to post a payment amounting: `, description: paymentAmount, underline: true, blue: true, medium: true },
-      ]"
+      :data="confirmationData"
     />
     <Card title="Payment Information" titleSize="m" hasFooter>
       <InputContainer>
@@ -53,7 +43,7 @@
           </b-form-group>
         </InputContainer>
       </InputGroup>
-      <InputGroup>
+      <InputGroup :style="{ marginBottom: 0 }">
         <InputContainer>
           <b-form-group>
             <label class="required">Payment Mode</label>
@@ -101,6 +91,13 @@
           </b-form-group>
         </InputContainer>
       </InputGroup>
+      <template v-if="tables.billings.meta && Object.keys(tables.billings.meta).length > 0">
+        <div v-if="tables.billings.meta.paidBillingsOverpay > 0" class="overpayment__description">
+          The student has an overpayment amounting <b>{{ overpay }}</b> 
+          from last payment transaction with the reference number <a href="#"><b>{{ tables.billings.meta.lastPaymentReference }}</b></a>. 
+          This will be automatically forwarded to this payment transaction.
+        </div>
+      </template>
        <LinkVisibilityToggler
         linkText="Add Payment Notes"
         hideLinkText="Hide Payment Notes"
@@ -277,6 +274,7 @@ const paymentFields = {
 export default {
   mixins: [StudentApi, PaymentApi, BillingApi, SchoolYearApi],
   BillingTypes,
+  formatAccountingNumber,
   data() {
     return {
       PaymentModes,
@@ -295,6 +293,7 @@ export default {
       },
       tables: {
         billings: {
+          meta: {},
           fields: [
             {
               key: 'billingNo',
@@ -472,8 +471,9 @@ export default {
     async loadBillings(studentId) {
       const { billings } = this.tables;
       billings.isBusy = true;
-      await this.getBillingsOfStudent(studentId).then(({ data }) => {
+      await this.getBillingsOfStudent(studentId).then(({ data: { data, meta } }) => {
         billings.items = data;
+        billings.meta = meta;
         billings.isBusy = false;
       });
 
@@ -552,7 +552,8 @@ export default {
   computed: {
     grandTotalRemainingDue() {
       const { billings } = this.tables;
-      return formatAccountingNumber(billings?.items?.reduce((accum, item) => accum + item?.totalRemainingDue, 0.0) || 0);
+      const total = billings?.items?.reduce((accum, item) => accum + item?.totalRemainingDue, 0.0) || 0;
+      return formatAccountingNumber(total);
     },
     billingNo() {
       return this.activeRow?.billingNo || '';
@@ -583,6 +584,32 @@ export default {
     },
     paymentAmount() {
       return formatAccountingNumber(this.forms.payment.fields.amount);
+    },
+    overpay() {
+      return formatAccountingNumber(this.tables.billings?.meta?.paidBillingsOverpay || 0);
+    },
+    confirmationData() {
+      let data =  [
+        { label: 'Student #:', description: this.studentNo },
+        { label: 'Name:', description: this.name },
+        { label: 'Course:', description: this.courseName },
+        { label: 'Level & Semester:', description: [this.levelName, this.semesterName].join(' - ') },
+        { label: 'Mode of Payment:', description: this.paymentMode, underline: true },
+        { label: 'Date of Payment:', description: this.formattedPaymentDate },
+        { label: 'Payment will be posted to:', description: this.billingNo, underline: true },
+        { label: 'SOA/Bill Amount:', description: this.billingAmount },
+      ];
+
+      if (this.tables.billings?.meta?.paidBillingsOverpay > 0) {
+        const total = parseFloat(this.activeRow?.totalRemainingDue) - parseFloat(this.tables.billings?.meta?.paidBillingsOverpay);
+        data = [...data, ...[
+          { label: 'Less Overpay from Last Txn:', description: this.overpay },
+          { label: 'Remaining Billing Amount to Pay:', description: formatAccountingNumber(total), underline: true, red: true },
+        ]];
+      }
+
+      data.push({ label: `You are about to post a payment amounting: `, description: this.paymentAmount, blue: true, medium: true, underline: true });
+      return data;
     }
   }
 };
@@ -735,5 +762,10 @@ export default {
   width: 100%;
   height: 100%;
   // padding: 10px 45px;
+}
+
+.overpayment__description {
+  color: $dark-gray-100;
+  font-size: 13px;
 }
 </style>

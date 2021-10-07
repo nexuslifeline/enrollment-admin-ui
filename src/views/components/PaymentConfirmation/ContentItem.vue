@@ -3,7 +3,7 @@
     <div class="payment__label">
       {{ label }}
     </div>
-    <div class="payment__text" :class="{ blue: blue, medium: medium }">
+    <div class="payment__text" :class="{ blue, medium, red }">
       {{ description }}
     </div>
   </div>
@@ -22,6 +22,9 @@ export default {
       type: [Boolean]
     },
     medium: {
+      type: [Boolean]
+    },
+    red: {
       type: [Boolean]
     },
     column: {
@@ -50,6 +53,10 @@ export default {
       color: $blue;
     }
 
+    &.red {
+      color: $red;
+    }
+
     &.medium {
       font-size: 24px;
       font-weight: 600;
@@ -57,7 +64,7 @@ export default {
   }
 
   .payment__content-item {
-    margin-bottom: 7px;
+    margin-bottom: 5px;
     display: flex;
 
     &.column {

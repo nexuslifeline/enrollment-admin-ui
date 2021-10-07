@@ -17,6 +17,7 @@
             :label="item.label"
             :description="item.description"
             :blue="item.blue"
+            :red="item.red"
             :medium="item.medium"
             :column="item.column"
           />
@@ -69,6 +70,6 @@ export default {
 
   .underline {
     border-top: 1px solid $light-gray-200;
-    margin: 18px 0;
+    margin: 15px 0;
   }
 </style>

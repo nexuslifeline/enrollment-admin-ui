@@ -1062,7 +1062,7 @@ export default {
   methods: {
     getPhoto(option) {
       const photo = (option && option.photo && option.photo.hashName) || '';
-      return !!photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
+      return photo ? `${process.env.VUE_APP_PUBLIC_PHOTO_URL}${photo}` : '';
     },
     loadBillings() {
       const {
