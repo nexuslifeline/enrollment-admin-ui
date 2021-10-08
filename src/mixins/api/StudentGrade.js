@@ -25,6 +25,21 @@ export default {
     },
     acceptStudentGrade(personnelId, sectionId, subjectId) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${personnelId}/${sectionId}/${subjectId}`);
+    },
+    submitStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/submit`);
+    },
+    publishStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/publish`);
+    },
+    unpublishStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/unpublish`);
+    },
+    requestEditStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/request-edit`);
+    },
+    approveEditStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/approve-edit-request`);
     }
   }
 }

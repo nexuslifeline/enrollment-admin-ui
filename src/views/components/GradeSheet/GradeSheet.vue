@@ -36,12 +36,16 @@
                     :value="getGrade(period.id, academicRecord)"
                     type="number"
                     class="cell__input"
+                    :disabled="isReadOnly"
                     @input="onGradeInput({ gradePeriodId: period.id, academicRecordId: academicRecord.id, rowIndex: idx, grade: $event.target.value, academicRecord })"
                   />
                 </td>
               </template>
               <td class="cell__input-no-padding">
-                <input type="text" class="cell__input" :style="{ textAlign: 'left' }" />
+                <input
+                  type="text"
+                  class="cell__input" :style="{ textAlign: 'left' }"
+                  :disabled="isReadOnly" />
               </td>
               <template v-if="busyRow.includes(idx)">
                 <td class="cell__loader">
@@ -69,8 +73,9 @@
 <script>
 import debounce from 'lodash/debounce';
 import { AcademicRecordApi, GradingPeriodApi } from '../../../mixins/api';
-import { showNotification } from '../../../helpers/forms';
+import { showNotification, formatNumber } from '../../../helpers/forms';
 export default {
+  formatNumber,
   mixins: [
     AcademicRecordApi, GradingPeriodApi
   ],
@@ -83,6 +88,10 @@ export default {
     },
     section: {
       type: [Object]
+    },
+    isReadOnly: {
+      type: [Boolean],
+      default: false
     }
   },
   data() {
@@ -201,7 +210,19 @@ export default {
       // after the request remove busy state
       // just to replicate the request delay, will use setTimeout here
       this.updateAcacdemicRecordSubjectGrade(this.sectionId, this.subjectId, academicRecordId, gradePeriodId, { grade }).then(({ data }) => {
-        academicRecord.studentGrades[0] = data
+        // academicRecord.studentGrades[0] = data\]
+
+        const g = academicRecord.grades.find(g => g.pivot.gradingPeriodId === gradePeriodId && g.subjectId === this.subjectId )
+        if(g) {
+          this.$set(g, 'pivot', { gradingPeriodId: gradePeriodId, grade: this.$options.formatNumber(grade) })
+          //update grade on array
+        }
+        else{
+          //push on array
+          academicRecord.grades.push({ ...data, pivot: { gradingPeriodId: gradePeriodId, grade: this.$options.formatNumber(grade) }})
+        }
+
+        // this.$set(g, 'pivot', { grade: grade })
         this.busyRow = []
       }).catch((error) => {
         this.busyRow = []
@@ -227,30 +248,12 @@ export default {
       })
     },
     getGrade(periodId, academicRecord) {
-      //get grades array of student grades array
-      //structure on response
-
-      //  studentgrades: [
-      //    0: {
-      //           id,
-      //         grades: [
-      //             {
-      //               id,
-      //               pivot: {
-      //                 gradingperiodid,
-      //                 grade
-      //               }
-      //             }
-      //         ]
-      //   }
-      // ]
-
-      const grades = academicRecord?.studentGrades[0]?.grades || null
+      const grades = academicRecord?.grades || null
       if(grades) {
         //find if has grade on period
-        const g = grades.find(g => g.id === periodId)
+        const g = grades.find(g => g.pivot.gradingPeriodId === periodId)
         if(g) {
-          //return grade
+          //return grade)
           return g?.pivot?.grade || null
         }
       }
