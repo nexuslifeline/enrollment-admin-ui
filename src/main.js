@@ -55,6 +55,7 @@ import BackLink from './views/components/BackLink/Link';
 import { InputGroup, InputContainer, InputInline } from './views/components/InputGroup';
 import LinkVisibilityToggler from './views/components/VisibilityToggler/Link';
 import CenterContainer from './views/components/CenterContainer';
+import AvatarGroup from './views/components/AvatarGroup/AvatarGroup';
 import Toggle from './views/components/Form/Toggle';
 import vSelect from 'vue-select'
 import { AlertPlugin, BIconPlus } from 'bootstrap-vue';
@@ -106,6 +107,7 @@ import { TabsPlugin } from 'bootstrap-vue'
 import { ToastPlugin } from 'bootstrap-vue'
 import { TooltipPlugin } from 'bootstrap-vue'
 import MaskedInput from 'vue-text-mask'
+import infiniteScroll from 'vue-infinite-scroll';
 import {
   BIconFolderSymlink,
   BIconFolder2Open,
@@ -147,8 +149,9 @@ import {
   BIconFolderPlus,
   BIconFolderMinus,
   BIconChevronDoubleLeft,
-  BIconChevronDoubleRight
+  BIconChevronDoubleRight,
 } from 'bootstrap-vue';
+// Vue.component('BIconBell', BIconBell);
 Vue.component('BIconDownload', BIconDownload);
 Vue.component('BIconFunnel', BIconFunnel);
 Vue.component('BIconPrinter', BIconPrinter);
@@ -242,7 +245,7 @@ import Icon from 'vue-awesome/components/Icon'
 Vue.config.performance = true
 Vue.component('v-icon', Icon)
 Vue.component('v-select', vSelect)
-
+Vue.component('AvatarGroup', AvatarGroup);
 Vue.component('vText', vText);
 Vue.component('BackLink', BackLink);
 Vue.component('SelectLevel', SelectLevel);
@@ -303,7 +306,7 @@ Vue.prototype.$log = console.log.bind(console)
 Vue.prototype.$http = httpRequest
 Vue.prototype.$authHttp = httpAuthRequest
 
-
+Vue.use(infiniteScroll)
 Vue.use(AlertPlugin);
 Vue.use(AvatarPlugin);
 Vue.use(BadgePlugin);

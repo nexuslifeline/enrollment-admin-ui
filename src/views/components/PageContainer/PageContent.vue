@@ -5,7 +5,9 @@
         <span v-if="!shrink" class="c-side-filter__panel-title">
           {{ filterTitle || 'Search and Filters' }}
         </span>
-        <button class="action__toggle-panel" @click="shrink = !shrink">
+        <button
+          class="action__toggle-panel"
+          @click="shrink = !shrink">
           <BIconChevronDoubleRight v-if="shrink" scale=".85" />
           <BIconChevronDoubleLeft v-else scale=".85" />
         </button>
@@ -104,21 +106,27 @@
             </div>
           </div>
         </div>
-        <slot name="bottom-actions"></slot>
+        <slot name="bottom-actions" />
       </div>
     </div>
+    <RightPanel v-if="hasPanel" :notificationCount="panelNotificationCount">
+      <template slot="panel-content">
+        <slot name="panel-content" />
+      </template>
+    </RightPanel>
   </div>
 </template>
 <script>
 // import RefreshButton from './RefreshButton';
-// import FilterButton from './FilterButton';
+import RightPanel from './RightPanel';
 import CreateButton from './CreateButton';
 
 export default {
   components: {
     // RefreshButton,
     // FilterButton,
-    CreateButton
+    CreateButton,
+    RightPanel
   },
   data() {
     return {
@@ -187,7 +195,15 @@ export default {
     },
     badges: {
       type: Array,
-    }
+    },
+    hasPanel: {
+      type: Boolean,
+      default: false
+    },
+    panelNotificationCount: {
+      type: Number,
+      default: 0
+    },
   },
   methods: {
     onPrint() {
@@ -217,6 +233,7 @@ export default {
   width: 240px;
   background-color: $white;
   z-index: 2;
+  transition: all .5s;
 }
 
 .c-side-filter__container-header {
@@ -232,6 +249,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  transition: all .5s;
 }
 
 .c-side-filter__content {
@@ -437,5 +455,4 @@ export default {
   flex: 1;
   font-size: 13.5px;
 }
-
 </style>

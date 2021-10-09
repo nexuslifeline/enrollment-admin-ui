@@ -1,5 +1,5 @@
 <template>
-  <PageContent 
+  <PageContent
     title="Academic Transcripts"
     description="Manage draft academic transcripts and approve the grades submitted by teachers and intructors. You can also print the final version student's TOR."
     :searchKeyword="filters.transcriptRecord.criteria"
@@ -11,13 +11,11 @@
     @onPageChange="loadTranscriptRecords"
     @onRefresh="loadTranscriptRecords"
     @create="setCreate()"
+    :hasPanel="true"
+    :panelNotificationCount="pendingCount"
     :createButtonVisible="false">
-    <template v-slot:extra-buttons>
-      <button 
-        @click="$router.push({path: `/registrar/student-grade`})"
-        class="for-approval-button">
-        For Approval {{studentGradeCount > 0 ? `(${studentGradeCount})` : ''}}
-      </button>
+    <template v-slot:panel-content>
+      <PendingGrades :count.sync="pendingCount" />
     </template>
     <template v-slot:filters>
       <b-form-input
@@ -1415,6 +1413,7 @@ import ActiveViewLinks from '../components/ActiveRowViewer/ActiveViewLinks';
 import Access from '../../mixins/utils/Access';
 import PageContent from  '../components/PageContainer/PageContent'
 import NoAccess from "../components/NoAccess";
+import PendingGrades from '../components/PendingGrades/PendingGrades';
 import { StudentColumn, CurriculumColumn, EducationColumn } from '../components/ColumnDetails';
 
 const COLOR_FACTORY_LENGTH = getColorFactoryLength();
@@ -1439,6 +1438,7 @@ export default {
     StudentGradeApi
   ],
   components: {
+    PendingGrades,
     AvatarMaker,
     ActiveRowViewer,
     ActiveViewHeader,
@@ -1460,6 +1460,7 @@ export default {
   StudentGradeStatuses,
   data() {
     return {
+      pendingCount: 0,
       isFilterVisible: true,
       studentGradeCount: 0,
       fileViewer: {
@@ -2068,6 +2069,50 @@ export default {
 
   &:hover {
     background-color: $light-gray-50;
+  }
+}
+
+.list__sub-action {
+  background: none;
+  border: 0;
+  outline: none;
+  // border-left: 1px solid $light-gray-10;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  @include for-size(phone-only) {
+    min-width: none;
+    flex: 1;
+
+    .list__sub-action-label {
+      display: none;
+    }
+  }
+}
+
+.list__sub-action-label {
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 5px;
+  color: $blue;
+  position: relative;
+
+  &:hover {
+    color: $dark-gray;
+  }
+
+  &:before {
+    position: absolute;
+    content: ' ';
+    height: 5px;
+    width: 5px;
+    border-radius: 50%;
+    // border: 1px solid $white;
+    left: 1px;
+    margin: 0 2px 0 0;
   }
 }
 </style>

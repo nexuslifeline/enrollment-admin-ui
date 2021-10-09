@@ -23,7 +23,8 @@ const colors = [
   { bg: '#99025f', font: '#FFFFFF', light: '#ffe0f3' },
   { bg: '#700391', font: '#FFFFFF', light: '#f7deff' },
   { bg: '#ff0526', font: '#FFFFFF', light: '#ffe0e4' },
-  { bg: '#fa8202', font: '#FFFFFF', light: '#fff4e8' }
+  { bg: '#fa8202', font: '#FFFFFF', light: '#fff4e8' },
+  { bg: '#e8eaed', font: '#080808', light: '#f7f7f7' }, // default
 ];
 
 export const colorFactory = (idx) => colors[idx];

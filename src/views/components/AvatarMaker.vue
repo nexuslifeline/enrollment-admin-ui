@@ -1,6 +1,6 @@
 <template>
-  <div class="avatar-maker__container"
-    :class="{ uploadable: enableUpload }"
+  <div
+    :class="`avatar-maker__container ${enableUpload && 'uploadable' } ${containerClass}`"
     :style="{ height: `${size}px`, width: `${size}px` }"
     @click.stop="onBrowseClick">
     <b-avatar
@@ -74,6 +74,10 @@
       enableUpload: {
         type: [Boolean],
         default: false
+      },
+      containerClass: {
+        type: [String],
+        default: ''
       }
     },
     methods: {
