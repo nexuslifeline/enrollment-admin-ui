@@ -47,7 +47,6 @@ import SubjectsTable from './SubjectsTable';
 import { TranscriptRecordApi } from '../../../mixins/api';
 import { Semesters } from '../../../helpers/enum'
 import { showNotification } from '../../../helpers/forms';
-import { parse } from 'date-fns/fp';
 import CardLoader from '../Card/CardLoader'
 
 export default {

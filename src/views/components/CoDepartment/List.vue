@@ -66,7 +66,7 @@ export default {
       this.page.to = data.meta.to
       this.page.lastPage = data.meta.lastPage
       this.isLoadingMore = false;
-    }).catch((error) => {
+    }).catch(() => {
       this.isLoadingMore = false;
     });
   },
