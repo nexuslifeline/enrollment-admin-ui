@@ -20,7 +20,7 @@
           <template v-for="(academicRecord, idx) in academicRecords">
             <tr :key="idx" @click="lastRowIndex = idx">
               <td class="cell__sticky cell__center">{{ idx + 1 }}</td>
-              <td class="cell__sticky">
+              <td class="cell__sticky" :style="{ zIndex: 0 }">
                 <div class="cell__student-headline">
                   <AvatarMaker
                     :avatarId="idx"
@@ -31,6 +31,13 @@
                   <div class="cell__name">
                     <BulletedContent :items="[academicRecord.student && academicRecord.student.name || '', `SN: ${academicRecord.student && academicRecord.student.studentNo || 'N/A'}`]" />
                   </div>
+                  <button class="dropdown__toggle" @click.stop="onDropdownShown(idx), makeFront($event)" @blur="makeBehind($event)">
+                    <BIconThreeDotsVertical  />
+                    <ul v-if="isDropdownShown.includes(idx)" class="dropdown__menu">
+                      <li class="dropdown__menu-item" @click="onDropStudent(academicRecord)">Mark as Dropped</li>
+                      <li class="dropdown__menu-item" @click="onEditGrade(academicRecord)">Edit Grades</li>
+                    </ul>
+                  </button>
                 </div>
               </td>
               <template v-for="period in gradingPeriods">
@@ -52,9 +59,14 @@
                   :disabled="isReadOnly" />
               </td>
               <template v-if="busyRow.includes(idx)">
-                <td class="cell__loader">
+                <td class="cell__overlay-row">
                   <b-spinner type="border" small />
                   <span class="ml-2 text-muted">Saving...</span>
+                </td>
+              </template>
+              <template v-if="checkDropStatus(academicRecord)">
+                <td class="cell__overlay-row">
+                  <span class="ml-2 text-danger">Dropped</span>
                 </td>
               </template>
             </tr>
@@ -62,7 +74,7 @@
           <template v-if="isBusy">
             <tr>
               <td>&nbsp;</td>
-              <td class="cell__loader">
+              <td class="cell__overlay-row">
                 <b-spinner type="border" small />
                 <span class="ml-2 text-muted">Loading...</span>
               </td>
@@ -106,7 +118,8 @@ export default {
       hasMore: true,
       isBusy: false,
       gradingPeriods: [],
-      academicRecords: []
+      academicRecords: [],
+      isDropdownShown: []
     }
   },
   created() {
@@ -115,7 +128,41 @@ export default {
     }
     this.loadGradingPeriods()
   },
+  mounted() {
+    window.addEventListener('click', this.hideDropdown);
+  },
+  beforeDestroy() {
+    window.removeEventListener('click', this.hideDropdown);
+  },
   methods: {
+    hideDropdown() {
+      this.isDropdownShown = [];
+    },
+    onDropStudent(academicRecord) {
+      console.log('academicRecord', academicRecord)
+    },
+    onEditGrade() {
+      console.log('skip this first, no ui yet')
+    },
+    makeFront(e) {
+      const elem = e.target.closest('td');
+      if (elem) {
+        elem.style.zIndex = 99999;
+      }
+    },
+    makeBehind(e) {
+      const elem = e.target.closest('td');
+      if (elem) {
+        elem.style.zIndex = 0;
+      }
+    },
+    onDropdownShown(idx) {
+      if (this.isDropdownShown.includes(idx)) {
+        this.isDropdownShown = [];
+      } else {
+        this.isDropdownShown = [idx];
+      }
+    },
     loadMore: debounce(function (reset) {
       if (!this.sectionId && !this.subjectId) {
         return;
@@ -210,6 +257,12 @@ export default {
         }
       }
       return null
+    },
+    checkDropStatus(academicRecord) {
+      console.log('academicRecord', academicRecord)
+      return academicRecord?.subjects?.some(
+        ({ pivot: v }) => v.sectionId === this.sectionId && v.subjectId === this.subjectId && v.isDropped
+      );
     }
   },
   watch: {
@@ -232,20 +285,54 @@ export default {
   }
 }
 </script>
+
 <style lang="scss" scoped>
   @import "../../../assets/scss/shared.scss";
 
+  .dropdown__toggle {
+    background: none;
+    border: 0;
+    outline: none;
+    margin-left: auto;
+    position: relative;
+  }
+
+  .dropdown__menu {
+    list-style: none;
+    position: absolute;
+    background-color: $white;
+    padding: 3px 0;
+    min-width: 150px;
+    border-radius: 4px;
+    border: 1px solid $light-gray-10;
+  }
+
+  .dropdown__menu-item {
+    text-align: left;
+    border-bottom: 1px solid $light-gray-100;
+    padding: 3px 10px;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    &:hover {
+      background-color: $light-gray-100;
+    }
+  }
+
   .outer__container {
-    overflow: hidden;
+    // overflow: hidden;
     width: 100%;
     height: 100%;
     border: 1px solid $light-gray-10;
   }
 
   .table__container {
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
     height: calc(100vh - 165px);
-    max-height: calc(100vh - 150px);
+    // max-height: calc(100vh - 150px);
     overflow: scroll;
     position: relative;
     border: 0;
@@ -291,7 +378,7 @@ export default {
   thead {
     .cell__long {
       left: 0;
-      min-width: 350px;
+      min-width: 410px;
     }
 
     .cell__extra-long {
@@ -331,6 +418,14 @@ export default {
       left: 0;
       background: $white;
       border-right: 1px solid $light-gray-10;
+    }
+
+    .cell__sticky-action {
+      position: -webkit-sticky; /* for Safari */
+      position: sticky;
+      top: 0;
+      background: $white;
+      border-left: 1px solid $light-gray-10;
     }
 
     tr:nth-child(even) {
@@ -384,14 +479,14 @@ export default {
     padding: 0;
   }
 
-  .cell__loader {
+  .cell__overlay-row {
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
     width: 100%;
     background-color: $white;
-    opacity: .85;
+    opacity: .7;
     display: flex;
     justify-content: center;
     align-items: center;
