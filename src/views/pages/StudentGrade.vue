@@ -14,7 +14,7 @@
       <template v-if="[
         StudentGradeStatuses.DRAFT.id,
         StudentGradeStatuses.REQUEST_EDIT_APPROVED.id
-      ].includes(studentGrade.studentGradeStatusId)">
+      ].includes(studentGradeStatusId)">
         <SplitButton
           text="Publish Grades"
           @click="setPublishGrade"
@@ -23,7 +23,7 @@
           ]"
         />
       </template>
-      <template v-else-if="studentGrade.studentGradeStatusId === StudentGradeStatuses.PUBLISHED.id">
+      <template v-else-if="studentGradeStatusId === StudentGradeStatuses.PUBLISHED.id">
         <SplitButton
           text="Submit for Review"
           @click="setSubmitForReview"
@@ -33,7 +33,7 @@
           ]"
         />
       </template>
-      <template v-else-if="studentGrade.studentGradeStatusId === StudentGradeStatuses.SUBMITTED.id">
+      <template v-else-if="studentGradeStatusId === StudentGradeStatuses.SUBMITTED.id">
         <SplitButton
           text="Request Edit"
           @click="setRequestEdit"
@@ -60,12 +60,12 @@
         :isReadOnly="![
           StudentGradeStatuses.DRAFT.id,
           StudentGradeStatuses.REQUEST_EDIT_APPROVED.id
-        ].includes(studentGrade.studentGradeStatusId)" />
+        ].includes(studentGradeStatusId)" />
 
         <ConfirmationModal
           :isShown.sync="showPublishGrade"
           title="Publish Grade"
-          @onCancel="showPublishGrade=false"
+          @onCancel="showPublishGrade = false"
           @onYes="onPublishGrade"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -76,7 +76,7 @@
         <ConfirmationModal
           :isShown.sync="showUnpublishGrade"
           title="Un-Publish Grade"
-          @onCancel="showUnpublishGrade=false"
+          @onCancel="showUnpublishGrade = false"
           @onYes="onUnpublishGrade"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -87,7 +87,7 @@
         <ConfirmationModal
           :isShown.sync="showSubmitGrade"
           title="Submit Grade for Review"
-          @onCancel="showSubmitGrade=false"
+          @onCancel="showSubmitGrade = false"
           @onYes="onSubmitForReview"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -98,7 +98,7 @@
         <ConfirmationModal
           :isShown.sync="showRequestEdit"
           title="Request Edit"
-          @onCancel="showRequestEdit=false"
+          @onCancel="showRequestEdit = false"
           @onYes="onRequestEdit"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -113,7 +113,7 @@ import { StudentGradeStatuses } from '../../helpers/enum';
 import { validate } from '../../helpers/forms';
 import { StudentGradeApi } from '../../mixins/api';
 import ConfirmationModal from '../components/ConfirmationModal'
-import TranscriptRecordVue from './TranscriptRecord.vue';
+
 export default {
   mixins: [StudentGradeApi],
   components: { ConfirmationModal },
@@ -140,13 +140,15 @@ export default {
       this.subjectId = subjectId;
       this.section = section
     },
-    loadGradeSheetDetail() {
-      // GET /student-grades?sectionId=1&subjectId=1&paginate=false
-      // should return 1 array element [0]
-      const params = { sectionId: this.sectionId, subjectId: this.subjectId, paginate: false}
-      this.getStudentGradeList(params).then(({ data }) => {
-         this.studentGrade = data[0]
-      })
+    async loadGradeSheetDetail() {
+      const params = { sectionId: this.sectionId, subjectId: this.subjectId, paginate: false }
+      const { data } = this.getStudentGradeList(params);
+      if (!data || data.length === 0) { // if there is not student grade yet, we just need to create it
+        // POST /student-grades
+        return;
+      }
+
+      this.studentGrade = data[0];
     },
     onSubmitForReview() {
       console.log('onSubmitForReview')
@@ -233,6 +235,9 @@ export default {
         return this.StudentGradeStatuses.getEnum(this.studentGrade.studentGradeStatusId).name
       }
        return 'N/A'
+    },
+    studentGradeStatusId() {
+      return this.studentGrade?.studentGradeStatusId;
     }
   },
   watch: {

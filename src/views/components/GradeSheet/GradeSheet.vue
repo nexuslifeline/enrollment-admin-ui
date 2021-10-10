@@ -1,6 +1,10 @@
 <template>
   <div class="outer__container">
-    <div class="table__container" ref="infiniteScroll">
+    <div
+      class="table__container"
+      v-infinite-scroll="loadMore"
+      :infinite-scroll-disabled="isBusy"
+      :infinite-scroll-distance="10">
       <table>
         <thead>
           <tr>
@@ -55,7 +59,7 @@
               </template>
             </tr>
           </template>
-          <template v-if="isLoadingMore">
+          <template v-if="isBusy">
             <tr>
               <td>&nbsp;</td>
               <td class="cell__loader">
@@ -100,7 +104,7 @@ export default {
       busyRow: [],
       currentPage: 1,
       hasMore: true,
-      isLoadingMore: false,
+      isBusy: false,
       gradingPeriods: [],
       academicRecords: []
     }
@@ -111,66 +115,23 @@ export default {
     }
     this.loadGradingPeriods()
   },
-  mounted() {
-    const infiniteScroll = this.$refs.infiniteScroll;
-    infiniteScroll.addEventListener('scroll', () => {
-      this.doScrollCheck();
-    });
-
-    if (!this.isVerticalScrollVisible()) {
-      this.makeScrollable();
-    }
-  },
   methods: {
-    isVerticalScrollVisible() {
-      const infiniteScroll = this.$refs.infiniteScroll;
-      return infiniteScroll.scrollHeight > infiniteScroll.clientHeight;
-    },
-    makeScrollable() {
-      setTimeout(() => {
-        if (this.isVerticalScrollVisible()) return;
-        if (!this.hasMore) return;
-        this.doScrollCheck();
-        //commented the next line it cause infinite loop
-        // this.makeScrollable();
-      }, 250);
-    },
-    doScrollCheck() {
-      const infiniteScroll = this.$refs.infiniteScroll;
-      if(infiniteScroll.scrollTop + infiniteScroll.clientHeight >= infiniteScroll.scrollHeight) {
-        if(this.sectionId && this.subjectId)
-        this.loadMore();
-      }
-    },
     loadMore(reset) {
-
-      if (!this.hasMore || this.isLoadingMore) {
+      if (!this.sectionId && !this.subjectId) {
         return;
       }
 
-      this.isLoadingMore = true;
+      if (!this.hasMore || this.isBusy) {
+        return;
+      }
 
-      console.log('reload student list in GET /sections/:id/subjects/:id/academic-records')
-      // setTimeout(() => { // this is just to replicate the GET http request, change this to actual http request once api is available
-      //   if (reset) { // we need to reset if section id has changed
-      //     // passed data here without pushing/concat to academicRecords
-      //     this.currentPage = 1;
-      //   } else {
-      //     // concat/append data here to academicRecords
-      //     this.currentPage = this.currentPage + 1;
-      //   }
+      this.isBusy = true;
 
-      //   this.academicRecords = Array.from({ length: 25 * this.currentPage }); // this is for test purpose only, remove this line if GET request is already added
-      //   const meta = { lastPage: 10 }; // this is for test purpose only, remove this line if GET request is already added
-
-      //   this.hasMore = this.currentPage !== meta.lastPage;
-      //   this.isLoadingMore = false;
-      // }, 1000);
-
-      const params = { paginate: true }
+      // NOTE! FIX ME!
+      // for the meantime, I just set it to 20 records per page just to make sure scroll is visible if there are multiple pages
+      const params = { paginate: true, perPage: 20 };
 
       this.getAcademicRecordsOfSubjectOfSection(this.sectionId, this.subjectId, params).then(({ data }) => {
-        console.log(data)
         if (reset) { // we need to reset if section id has changed
           // passed data here without pushing/concat to academicRecords
           this.currentPage = data.meta.currentPage;
@@ -181,9 +142,9 @@ export default {
 
         this.academicRecords = data.data
         this.hasMore = this.currentPage !== data.meta.lastPage;
-        this.isLoadingMore = false;
+        this.isBusy = false;
       }).catch(() => {
-        this.isLoadingMore = false;
+        this.isBusy = false;
         showNotification(this, 'danger', 'Error in fetching data.')
       });
     },
@@ -199,16 +160,8 @@ export default {
 
     },
     saveGrade({ gradePeriodId, academicRecordId, rowIndex, grade, academicRecord }) {
-      // console.log('gradePeriodId', gradePeriodId)
-      // console.log('studentId', studentId)
-      // console.log('rowIndex', rowIndex)
-      // PUT/PATCH grade here
-
       // before the request, make the row busy
       this.busyRow = [rowIndex];
-      // PUT /sections/:id/subjects/:id/academic-records/:id/grade-periods/:id
-      // after the request remove busy state
-      // just to replicate the request delay, will use setTimeout here
       this.updateAcacdemicRecordSubjectGrade(this.sectionId, this.subjectId, academicRecordId, gradePeriodId, { grade }).then(({ data }) => {
         // academicRecord.studentGrades[0] = data\]
 
@@ -222,7 +175,6 @@ export default {
           academicRecord.grades.push({ ...data, pivot: { gradingPeriodId: gradePeriodId, grade: this.$options.formatNumber(grade) }})
         }
 
-        // this.$set(g, 'pivot', { grade: grade })
         this.busyRow = []
       }).catch((error) => {
         this.busyRow = []
