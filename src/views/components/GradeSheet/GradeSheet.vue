@@ -116,7 +116,7 @@ export default {
     this.loadGradingPeriods()
   },
   methods: {
-    loadMore(reset) {
+    loadMore: debounce(function (reset) {
       if (!this.sectionId && !this.subjectId) {
         return;
       }
@@ -147,7 +147,7 @@ export default {
         this.isBusy = false;
         showNotification(this, 'danger', 'Error in fetching data.')
       });
-    },
+    }, 250),
     onGradeInput(payload) {
       if (payload.rowIndex === this.lastRowIndex || this.lastRowIndex === null) {
         this.debounceGradeInput(payload);
@@ -188,7 +188,7 @@ export default {
     debounceGradeInput: debounce(function (payload) {
       this.saveGrade(payload)
     }, 650),
-    loadGradingPeriods() {
+    loadGradingPeriods: debounce(function () {
       if(!this.section){
         return
       }
@@ -198,7 +198,7 @@ export default {
       this.getGradingPeriodList(params).then(({ data }) => {
         this.gradingPeriods = data
       })
-    },
+    }, 250),
     getGrade(periodId, academicRecord) {
       const grades = academicRecord?.grades || null
       if(grades) {
@@ -395,6 +395,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 35px;
   }
 
 </style>

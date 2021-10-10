@@ -17,9 +17,9 @@
       ].includes(studentGradeStatusId)">
         <SplitButton
           text="Publish Grades"
-          @click="setPublishGrade"
+          @click="isShownPublish = true"
           :actions="[
-            { text: 'Submit for Review', callback: setSubmitForReview },
+            { text: 'Submit for Review', callback: () => isShownSubmit = true },
           ]"
         />
       </template>
@@ -28,8 +28,8 @@
           text="Submit for Review"
           @click="setSubmitForReview"
           :actions="[
-            { text: 'Unpublish Grades', callback: setUnpublishGrade },
-            { text: 'Request Edit', callback: setRequestEdit },
+            { text: 'Unpublish Grades', callback: () => isShownUnpublish = true },
+            { text: 'Request Edit', callback: () => isShownRequest = true },
           ]"
         />
       </template>
@@ -63,9 +63,9 @@
         ].includes(studentGradeStatusId)" />
 
         <ConfirmationModal
-          :isShown.sync="showPublishGrade"
+          :isShown.sync="isShownPublish"
           title="Publish Grade"
-          @onCancel="showPublishGrade = false"
+          @onCancel="isShownPublish = false"
           @onYes="onPublishGrade"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -74,9 +74,9 @@
         </ConfirmationModal>
 
         <ConfirmationModal
-          :isShown.sync="showUnpublishGrade"
+          :isShown.sync="isShownUnpublish"
           title="Un-Publish Grade"
-          @onCancel="showUnpublishGrade = false"
+          @onCancel="isShownUnpublish = false"
           @onYes="onUnpublishGrade"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -85,9 +85,9 @@
         </ConfirmationModal>
 
         <ConfirmationModal
-          :isShown.sync="showSubmitGrade"
+          :isShown.sync="isShownSubmit"
           title="Submit Grade for Review"
-          @onCancel="showSubmitGrade = false"
+          @onCancel="isShownSubmit = false"
           @onYes="onSubmitForReview"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -96,9 +96,9 @@
         </ConfirmationModal>
 
         <ConfirmationModal
-          :isShown.sync="showRequestEdit"
+          :isShown.sync="isShownRequest"
           title="Request Edit"
-          @onCancel="showRequestEdit = false"
+          @onCancel="isShownRequest = false"
           @onYes="onRequestEdit"
           :isConfirmBusy="isProcessing">
           <template #modal-body>
@@ -109,6 +109,7 @@
   </PageContent>
 </template>
 <script>
+import debounce from 'lodash/debounce';
 import { StudentGradeStatuses } from '../../helpers/enum';
 import { validate } from '../../helpers/forms';
 import { StudentGradeApi } from '../../mixins/api';
@@ -127,10 +128,10 @@ export default {
       semesterId: null,
       studentGrade: {},
       StudentGradeStatuses,
-      showPublishGrade: false,
-      showSubmitGrade: false,
-      showRequestEdit: false,
-      showUnpublishGrade: false,
+      isShownPublish: false,
+      isShownSubmit: false,
+      isShownRequest: false,
+      isShownUnpublish: false,
       isProcessing: false,
     }
   },
@@ -140,24 +141,21 @@ export default {
       this.subjectId = subjectId;
       this.section = section
     },
-    async loadGradeSheetDetail() {
+    loadGradeSheetDetail: debounce(function () {
       const params = { sectionId: this.sectionId, subjectId: this.subjectId, paginate: false }
-      const { data } = this.getStudentGradeList(params);
-      if (!data || data.length === 0) { // if there is not student grade yet, we just need to create it
-        // POST /student-grades
-        return;
-      }
-
-      this.studentGrade = data[0];
-    },
+      this.getStudentGradeList(params).then(({ data }) => {
+         this.studentGrade = data?.[0] || {};
+      }).catch((error) => {
+        console.warn(error);
+      });
+    }, 250),
     onSubmitForReview() {
-      console.log('onSubmitForReview')
       // POST /student-grades/:id/submit
       const { id: studentGradeId } = this.studentGrade
       this.isProcessing = true
       this.submitStudentGrade(studentGradeId).then(({ data }) => {
         this.studentGrade = data
-        this.showSubmitGrade = false
+        this.isShownSubmit = false
         this.isProcessing = false
       }).catch((error) => {
         const errors = error.response.data.errors;
@@ -166,13 +164,12 @@ export default {
       });
     },
     onPublishGrade() {
-      console.log('onPublishGrade')
       // POST /student-grades/:id/publish
       const { id: studentGradeId } = this.studentGrade
       this.isProcessing = true
       this.publishStudentGrade(studentGradeId).then(({ data }) => {
         this.studentGrade = data
-        this.showPublishGrade = false
+        this.isShownPublish = false
         this.isProcessing = false
       }).catch((error) => {
         const errors = error.response.data.errors;
@@ -181,13 +178,12 @@ export default {
       });
     },
     onUnpublishGrade() {
-      console.log('onUnpublishGrade')
       // POST /student-grades/:id/unpublish
       this.isProcessing = true
       const { id: studentGradeId } = this.studentGrade
       this.unpublishStudentGrade(studentGradeId).then(({ data }) => {
         this.studentGrade = data
-        this.showUnpublishGrade = false
+        this.isShownUnpublish = false
         this.isProcessing = false
       }).catch((error) => {
         const errors = error.response.data.errors;
@@ -196,31 +192,18 @@ export default {
       });
     },
     onRequestEdit() {
-      console.log('onRequestEdit')
       // POST /student-grades/:id/request-edit
       const { id: studentGradeId } = this.studentGrade
       this.isProcessing = true
       this.requestEditStudentGrade(studentGradeId).then(({ data }) => {
         this.studentGrade = data
-        this.showRequestEdit = false
+        this.isShownRequest = false
         this.isProcessing = false
       }).catch((error) => {
         const errors = error.response.data.errors;
         validate(null, errors, this);
         this.isProcessing = false
       });
-    },
-    setPublishGrade() {
-      this.showPublishGrade = true
-    },
-    setSubmitForReview() {
-      this.showSubmitGrade = true
-    },
-    setRequestEdit() {
-      this.showRequestEdit = true
-    },
-    setUnpublishGrade() {
-      this.showUnpublishGrade = true
     }
   },
   computed: {
@@ -231,13 +214,10 @@ export default {
       return this.studentGrade?.section?.schoolYear?.name || 'N/A'
     },
     studentGradeStatusName() {
-      if(this.studentGrade?.studentGradeStatusId){
-        return this.StudentGradeStatuses.getEnum(this.studentGrade.studentGradeStatusId).name
-      }
-       return 'N/A'
+      return this.StudentGradeStatuses.getEnum(this.studentGradeStatusId).name
     },
     studentGradeStatusId() {
-      return this.studentGrade?.studentGradeStatusId;
+      return this.studentGrade?.studentGradeStatusId || this.StudentGradeStatuses.DRAFT.id;
     }
   },
   watch: {
