@@ -46,14 +46,11 @@ export default {
     }
   },
   created() {
-    // this.$emit('update:count', 10);
+
   },
   methods: {
     loadMore() {
       if (!this.hasMore) return;
-      // GET /student-grades
-      // with SUBMITTED and REQUEST EDIT status
-      // as workaround to make sure the container will have a scroll, set 15 perPage in the request. seems the current package doesnt support this yet
       this.isBusy = true;
 
       const params = {
@@ -68,14 +65,7 @@ export default {
         this.hasMore = this.currentPage !== data.meta.lastPage;
         this.currentPage += 1
         this.$emit('update:count', data.meta.total);
-      })
-
-      // setTimeout(() => {
-      //   this.data = Array.from({ length: this.nextPage * 15 });
-      //   this.nextPage = this.nextPage + 1;
-      //   this.hasMore = this.nextPage <= 7;
-      //   this.isBusy = false;
-      // }, 500);
+      });
     },
     onRemoveItem(studentGradeId) {
       const index = this.data.findIndex(sg => sg.id === studentGradeId)

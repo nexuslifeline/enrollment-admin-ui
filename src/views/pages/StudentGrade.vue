@@ -38,9 +38,7 @@
           text="Request Edit"
           @click="setRequestEdit"
           splitVariant="primary"
-          :actions="[
-            { text: 'Request Edit', callback: setRequestEdit },
-          ]"
+          :actions="[]"
         />
       </template>
     </template>

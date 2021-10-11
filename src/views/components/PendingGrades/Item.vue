@@ -21,13 +21,54 @@
           Requesting to edit Grades from {{ sectionName }} / {{ subjectName }}.
         </template>
       </span>
-      <div class="pending-grades__content-actions">
+
+      <template v-if="isConfirmingFinalize || isConfirmingAllow || isConfirmingReject" >
+        <div class="pending-grades__confirmation-container">
+          <b-form-textarea rows="2" placeholder="You may add a notes or description" :style="{ fontSize: '12px' }" />
+        </div>
+        <div class="pending-grades__content-actions">
+          <template v-if="isConfirmingFinalize">
+            <button
+              v-b-tooltip
+              title="Once accepted, the grades will be posted and will reflect to Academic Transcript(TOR) of the Student."
+              class="pending-grades__btn pending-grades__btn-primary active"
+              @click.stop="onAcceptGrade">
+              Confirm Accept
+            </button>
+          </template>
+          <template v-else-if="isConfirmingAllow">
+            <button
+              v-b-tooltip
+              title="Once allowed, the teacher or instructor will be able to edit the Grades again."
+              class="pending-grades__btn pending-grades__btn-primary active"
+              @click.stop="onAllowEditing">
+              Confirm Allow
+            </button>
+          </template>
+          <template v-else-if="isConfirmingReject">
+            <button
+              v-b-tooltip
+              title="Once rejected, it will be remove in the pending list and the teacher or instructor will be able to edit the Grades."
+              class="pending-grades__btn pending-grades__btn-secondary active"
+              @click.stop="isConfirmingReject">
+              Confirm Reject
+            </button>
+          </template>
+          <button
+            v-b-tooltip
+            class="pending-grades__btn pending-grades__btn-secondary"
+            @click.stop="isConfirmingFinalize = false, isConfirmingAllow = false, isConfirmingReject = false">
+            Cancel
+          </button>
+        </div>
+      </template>
+      <div v-else class="pending-grades__content-actions">
         <template v-if="StudentGradeStatuses.SUBMITTED.id === data.studentGradeStatusId">
           <button
             v-b-tooltip
             title="Once accepted, the grades will be posted and will reflect to Academic Transcript(TOR) of the Student."
             class="pending-grades__btn pending-grades__btn-primary"
-            @click.stop="onAcceptGrade">
+            @click.stop="isConfirmingFinalize = true">
             Accept
           </button>
         </template>
@@ -36,7 +77,7 @@
             v-b-tooltip
             title="Once allowed, the teacher or instructor will be able to edit the Grades again."
             class="pending-grades__btn pending-grades__btn-primary"
-            @click.stop="onAllowEditing">
+            @click.stop="isConfirmingAllow = true">
             Allow
           </button>
         </template>
@@ -44,17 +85,17 @@
           v-b-tooltip
           title="Once rejected, it will be remove in the pending list and the teacher or instructor will be able to edit the Grades."
           class="pending-grades__btn pending-grades__btn-secondary"
-          @click.stop="onReject">
+          @click.stop="isConfirmingReject = true">
           Reject
         </button>
       </div>
     </div>
     <div class="pending-grades__other-content">
       <span class="pending-grades__content-subheadline" v-if="StudentGradeStatuses.SUBMITTED.id === data.studentGradeStatusId">
-        {{ $options.formatDistance(new Date(data.submittedDate), new Date(), { addSuffix: true }) }}
+        {{ $options.formatDistance(new Date(data.submittedDate), new Date(), { addSuffix: false }) }}
       </span>
       <span class="pending-grades__content-subheadline" v-else-if="StudentGradeStatuses.REQUEST_EDIT.id === data.studentGradeStatusId">
-        {{ $options.formatDistance(new Date(data.editRequestedDate), new Date(), { addSuffix: true }) }}
+        {{ $options.formatDistance(new Date(data.editRequestedDate), new Date(), { addSuffix: false }) }}
       </span>
       <AvatarGroup
         :data="data.students" />
@@ -64,7 +105,7 @@
 <script>
 import { StudentGradeStatuses } from '../../../helpers/enum';
 import formatDistance from 'date-fns/formatDistance';
-import { showNotification } from '../../../helpers/forms';
+import { validate } from '../../../helpers/forms';
 import { StudentGradeApi } from '../../../mixins/api';
 export default {
   formatDistance,
@@ -77,7 +118,10 @@ export default {
   data() {
     return {
       StudentGradeStatuses,
-      isProcessing: false
+      isProcessing: false,
+      isConfirmingFinalize: false,
+      isConfirmingAllow: false,
+      isConfirmingReject: false
     };
   },
   methods: {
@@ -85,7 +129,7 @@ export default {
       // POST /student-grades/:id/finalize
       const { id: studentGradeId } = this.data
       this.isProcessing = true
-      this.finalizeStudentGrade(studentGradeId).then(({ data }) => {
+      this.finalizeStudentGrade(studentGradeId).then(() => {
         this.$emit('onRemoveItem', studentGradeId)
         this.isProcessing = false
       }).catch((error) => {
@@ -98,7 +142,7 @@ export default {
       // POST /student-grades/:id/publish -> to allow instructor edit the grade again
       const { id: studentGradeId } = this.data
       this.isProcessing = true
-      this.publishStudentGrade(studentGradeId).then(({ data }) => {
+      this.publishStudentGrade(studentGradeId).then(() => {
         this.$emit('onRemoveItem', studentGradeId)
         this.isProcessing = false
       }).catch((error) => {
@@ -111,7 +155,7 @@ export default {
       // POST /student-grades/:id/reject
       const { id: studentGradeId } = this.data
       this.isProcessing = true
-      this.rejectStudentGrade(studentGradeId).then(({ data }) => {
+      this.rejectStudentGrade(studentGradeId).then(() => {
         this.$emit('onRemoveItem', studentGradeId)
         this.isProcessing = false
       }).catch((error) => {
@@ -124,7 +168,7 @@ export default {
   computed: {
     personnelInitials() {
       const { firstName, lastName } = this.data.personnel
-      return `${firstName && firstName.charAt(0) || ''}${lastName && lastName.charAt(0) || ''}`
+      return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`
     },
     subjectName() {
       const { subject } = this.data
@@ -196,9 +240,9 @@ export default {
   .pending-grades__btn {
     border: 0;
     outline: none;
-    font-size: 12.5px;
+    font-size: 12px;
     background: none;
-    border-radius: 4px;
+    border-radius: 3px;
     font-weight: 500;
 
     & ~ .pending-grades__btn {
@@ -212,6 +256,11 @@ export default {
     &:hover {
       background-color: $light-blue-20;
     }
+
+    &.active {
+      background-color: $blue;
+      color: $white;
+    }
   }
 
   .pending-grades__btn-secondary {
@@ -220,5 +269,14 @@ export default {
     &:hover {
       background-color: $light-gray-100;
     }
+
+    &.active {
+      background-color: $light-gray-100;
+      color: $dark-gray-300;
+    }
+  }
+
+  .pending-grades__confirmation-container {
+    margin-top: 10px;
   }
 </style>
