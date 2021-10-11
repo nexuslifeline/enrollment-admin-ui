@@ -2,20 +2,27 @@
   <div class="pending-grades__container">
     <div class="pending-grades__header">
       <span class="pending-grades__headline">
+        <button v-if="hasSelected" class="pending-grades__action-back" @click="selected = null">
+          <BIconChevronLeft />
+        </button>
         Pending Grades for Review
       </span>
     </div>
     <div
+      v-show="!hasSelected"
       class="pending-grades__body"
       v-infinite-scroll="loadMore"
       :infinite-scroll-disabled="isBusy"
       :infinite-scroll-distance="10">
       <template v-for="(item, idx) in data">
-        <Request :key="idx" :data="item" @onRemoveItem="onRemoveItem"/>
+        <Request :key="idx" :data="item" @onRemoveItem="onRemoveItem" @onSelect="onSelectRequest" />
       </template>
       <div v-if="isBusy" class="loader__container">
         <BSpinner scale="1.2" />
       </div>
+    </div>
+    <div v-if="hasSelected">
+      this is the view for grade detail
     </div>
   </div>
 </template>
@@ -43,12 +50,16 @@ export default {
       data: [],
       perPage: 15,
       currentPage: 1,
+      selected: null
     }
   },
   created() {
 
   },
   methods: {
+    onSelectRequest(item) {
+      this.selected = item?.id;
+    },
     loadMore() {
       if (!this.hasMore) return;
       this.isBusy = true;
@@ -71,6 +82,11 @@ export default {
       const index = this.data.findIndex(sg => sg.id === studentGradeId)
       this.data.splice(index, 1)
       this.$emit('update:count', this.count - 1);
+    }
+  },
+  computed: {
+    hasSelected() {
+      return !!this.selected;
     }
   }
 };
@@ -112,5 +128,18 @@ export default {
     align-items: center;
     justify-content: center;
     padding: 10px;
+  }
+
+  .pending-grades__action-back {
+    border: 0;
+    outline: none;
+    background: none;
+    margin: 0;
+    border-radius: 5px;
+    padding: 3px;
+
+    &:hover {
+      background-color: $light-gray-100;
+    }
   }
 </style>

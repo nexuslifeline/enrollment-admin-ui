@@ -1,5 +1,5 @@
 <template>
-  <div class="pending-grades__item">
+  <div class="pending-grades__item" @click="$emit('onSelect', data)">
     <div class="item__overlay"  v-if="isProcessing" >
       <BSpinner />
     </div>
@@ -98,7 +98,13 @@
         {{ $options.formatDistance(new Date(data.editRequestedDate), new Date(), { addSuffix: false }) }}
       </span>
       <AvatarGroup
-        :data="data.students" />
+        :data="data.students"
+      />
+    </div>
+    <div class="pending-grades__other-actions">
+      <button class="pending-grades__action-view">
+        <BIconChevronRight />
+      </button>
     </div>
   </div>
 </template>
@@ -191,6 +197,14 @@ export default {
     padding: 6px 5px;
     border-bottom: 1px solid $light-gray-100;
     position: relative;
+    cursor: pointer;
+
+    &:hover {
+      .pending-grades__action-view {
+        background-color: $light-blue-20;
+        color: $blue;
+      }
+    }
   }
 
   .item__overlay {
@@ -277,6 +291,27 @@ export default {
   }
 
   .pending-grades__confirmation-container {
-    margin-top: 10px;
+    margin: 10px 0;
+  }
+
+  .pending-grades__other-actions {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: 18px;
+  }
+
+  .pending-grades__action-view {
+    background: none;
+    outline: none;
+    border: 0;
+    border-radius: 5px;
+    padding: 3px;
+    color: $black;
+
+    &:hover {
+      background-color: $light-blue-20;
+      color: $blue;
+    }
   }
 </style>

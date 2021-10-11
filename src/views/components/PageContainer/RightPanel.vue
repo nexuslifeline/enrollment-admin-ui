@@ -36,7 +36,7 @@ export default {
 
 .page-content__slide-panel {
   position: fixed;
-  width: 470px;
+  width: 490px;
   top: 0;
   right: 0;
   height: 100vh;
@@ -46,7 +46,7 @@ export default {
   transition: right .8s;
 
   &.isCollapse {
-    right: -470px;
+    right: -490px;
   }
 }
 
