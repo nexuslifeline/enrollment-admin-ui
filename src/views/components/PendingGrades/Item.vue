@@ -1,25 +1,28 @@
 <template>
   <div class="pending-grades__item">
+    <div class="item__overlay"  v-if="isProcessing" >
+      <BSpinner />
+    </div>
     <AvatarMaker
       :avatarId="10"
       :size="43"
-      :text="`PR`"
+      :text="personnelInitials"
       :borderSize="3"
     />
     <div class="pending-grades__content">
       <span class="pending-grades__content-headline">
-        Paul Christian Rueda
+        {{ data.personnel && data.personnel.name || ''}}
       </span>
       <span class="pending-grades__content-subheadline">
-        <template v-if="StudentGradeStatuses.SUBMITTED.id === 3">
-          Submitted Grades from BSIT-1A for review.
+        <template v-if="StudentGradeStatuses.SUBMITTED.id === data.studentGradeStatusId">
+          Submitted Grades from {{ sectionName }} / {{ subjectName }} for review.
         </template>
-        <template v-else-if="StudentGradeStatuses.REQUEST_EDIT.id === 4">
-          Requesting to edit Grades from BSIT-1A.
+        <template v-else-if="StudentGradeStatuses.REQUEST_EDIT.id === data.studentGradeStatusId">
+          Requesting to edit Grades from {{ sectionName }} / {{ subjectName }}.
         </template>
       </span>
       <div class="pending-grades__content-actions">
-        <template v-if="StudentGradeStatuses.SUBMITTED.id === 3">
+        <template v-if="StudentGradeStatuses.SUBMITTED.id === data.studentGradeStatusId">
           <button
             v-b-tooltip
             title="Once accepted, the grades will be posted and will reflect to Academic Transcript(TOR) of the Student."
@@ -28,7 +31,7 @@
             Accept
           </button>
         </template>
-        <template v-else-if="StudentGradeStatuses.REQUEST_EDIT.id === 4">
+        <template v-else-if="StudentGradeStatuses.REQUEST_EDIT.id === data.studentGradeStatusId">
           <button
             v-b-tooltip
             title="Once allowed, the teacher or instructor will be able to edit the Grades again."
@@ -47,26 +50,25 @@
       </div>
     </div>
     <div class="pending-grades__other-content">
-      <span class="pending-grades__content-subheadline">
-        {{ $options.formatDistance(new Date('2021-10-05'), new Date(), { addSuffix: true }) }}
+      <span class="pending-grades__content-subheadline" v-if="StudentGradeStatuses.SUBMITTED.id === data.studentGradeStatusId">
+        {{ $options.formatDistance(new Date(data.submittedDate), new Date(), { addSuffix: true }) }}
+      </span>
+      <span class="pending-grades__content-subheadline" v-else-if="StudentGradeStatuses.REQUEST_EDIT.id === data.studentGradeStatusId">
+        {{ $options.formatDistance(new Date(data.editRequestedDate), new Date(), { addSuffix: true }) }}
       </span>
       <AvatarGroup
-        :data="[
-          { id: 1, name: 'Gelyn Joy Rueda' },
-          { id: 2, name: 'Kaezer Paul Rueda' },
-          { id: 3, name: 'Elizabeth Rueda' },
-          { id: 4, name: 'Jennifer Rueda' },
-          { id: 5, name: 'Irene Rueda' },
-          { id: 6, name: 'Paulino Rueda' }
-        ]" />
+        :data="data.students" />
     </div>
   </div>
 </template>
 <script>
 import { StudentGradeStatuses } from '../../../helpers/enum';
 import formatDistance from 'date-fns/formatDistance';
+import { showNotification } from '../../../helpers/forms';
+import { StudentGradeApi } from '../../../mixins/api';
 export default {
   formatDistance,
+  mixins: [StudentGradeApi],
   props: {
     data: {
       type: [Object]
@@ -74,18 +76,63 @@ export default {
   },
   data() {
     return {
-      StudentGradeStatuses
+      StudentGradeStatuses,
+      isProcessing: false
     };
   },
   methods: {
     onAcceptGrade() {
       // POST /student-grades/:id/finalize
+      const { id: studentGradeId } = this.data
+      this.isProcessing = true
+      this.finalizeStudentGrade(studentGradeId).then(({ data }) => {
+        this.$emit('onRemoveItem', studentGradeId)
+        this.isProcessing = false
+      }).catch((error) => {
+        const errors = error.response.data.errors
+        validate(null, errors, this)
+        this.isProcessing = false
+      });
     },
     onAllowEditing() {
       // POST /student-grades/:id/publish -> to allow instructor edit the grade again
+      const { id: studentGradeId } = this.data
+      this.isProcessing = true
+      this.publishStudentGrade(studentGradeId).then(({ data }) => {
+        this.$emit('onRemoveItem', studentGradeId)
+        this.isProcessing = false
+      }).catch((error) => {
+        const errors = error.response.data.errors
+        validate(null, errors, this)
+        this.isProcessing = false
+      });
     },
     onReject() {
       // POST /student-grades/:id/reject
+      const { id: studentGradeId } = this.data
+      this.isProcessing = true
+      this.rejectStudentGrade(studentGradeId).then(({ data }) => {
+        this.$emit('onRemoveItem', studentGradeId)
+        this.isProcessing = false
+      }).catch((error) => {
+        const errors = error.response.data.errors
+        validate(null, errors, this)
+        this.isProcessing = false
+      });
+    }
+  },
+  computed: {
+    personnelInitials() {
+      const { firstName, lastName } = this.data.personnel
+      return `${firstName && firstName.charAt(0) || ''}${lastName && lastName.charAt(0) || ''}`
+    },
+    subjectName() {
+      const { subject } = this.data
+      return subject ? `${subject.description}(${subject.name})` : ''
+    },
+    sectionName() {
+      const { section } = this.data
+      return section?.name || ''
     }
   }
 };
@@ -99,6 +146,21 @@ export default {
     flex-direction: row;
     padding: 6px 5px;
     border-bottom: 1px solid $light-gray-100;
+    position: relative;
+  }
+
+  .item__overlay {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0.7;
+    background-color: whitesmoke;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .pending-grades__content {

@@ -40,6 +40,12 @@ export default {
     },
     approveEditStudentGrade(id) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/approve-edit-request`);
+    },
+    finalizeStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/finalize`);
+    },
+    rejectStudentGrade(id) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/reject`);
     }
   }
 }

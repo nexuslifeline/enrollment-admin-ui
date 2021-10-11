@@ -18,7 +18,7 @@
           :key="idx"
           :avatarId="item.id"
           :size="24"
-          :text="`PR`"
+          :text="getStudentInitial(item)"
           :borderSize="2"
           :borderColor="'white'"
           containerClass="avatar__container"
@@ -32,10 +32,10 @@
           <AvatarMaker
             :avatarId="item.id"
             :size="22"
-            :text="`PR`"
+            :text="getStudentInitial(item)"
           />
           <span class="avatar-group__tooltip-item-text">
-            John Purontong Doe
+            {{ item.name }}
           </span>
         </div>
       </template>
@@ -63,6 +63,12 @@ export default {
   },
   created() {
     this.uniqId = Date.now();
+  },
+  methods: {
+    getStudentInitial(data){
+      const { firstName, lastName } = data
+      return `${firstName && firstName.charAt(0) || ''}${lastName && lastName.charAt(0) || ''}`
+    }
   }
 };
 </script>

@@ -11,7 +11,7 @@
       :infinite-scroll-disabled="isBusy"
       :infinite-scroll-distance="10">
       <template v-for="(item, idx) in data">
-         <Request :key="idx" />
+        <Request :key="idx" :data="item" @onRemoveItem="onRemoveItem"/>
       </template>
       <div v-if="isBusy" class="loader__container">
         <BSpinner scale="1.2" />
@@ -20,8 +20,11 @@
   </div>
 </template>
 <script>
+import { StudentGradeApi } from '../../../mixins/api';
 import Request from './Item';
+import { StudentGradeStatuses } from '../../../helpers/enum'
 export default {
+  mixins: [StudentGradeApi],
   components: {
     Request
   },
@@ -33,14 +36,17 @@ export default {
   },
   data() {
     return {
+      StudentGradeStatuses,
       isBusy: false,
       hasMore: true,
       nextPage: 1,
-      data: []
+      data: [],
+      perPage: 15,
+      currentPage: 1,
     }
   },
   created() {
-    this.$emit('update:count', 10);
+    // this.$emit('update:count', 10);
   },
   methods: {
     loadMore() {
@@ -48,15 +54,33 @@ export default {
       // GET /student-grades
       // with SUBMITTED and REQUEST EDIT status
       // as workaround to make sure the container will have a scroll, set 15 perPage in the request. seems the current package doesnt support this yet
-      console.log('loadMore')
       this.isBusy = true;
 
-      setTimeout(() => {
-        this.data = Array.from({ length: this.nextPage * 15 });
-        this.nextPage = this.nextPage + 1;
-        this.hasMore = this.nextPage <= 7;
+      const params = {
+        paginate: true,
+        page: this.currentPage,
+        perPage: this.perPage,
+        studentGradeStatusId: [this.StudentGradeStatuses.SUBMITTED.id, this.StudentGradeStatuses.REQUEST_EDIT.id],
+      }
+      this.getStudentGradeList(params).then(({ data }) => {
+        this.data.push(...data.data)
         this.isBusy = false;
-      }, 500);
+        this.hasMore = this.currentPage !== data.meta.lastPage;
+        this.currentPage += 1
+        this.$emit('update:count', data.meta.total);
+      })
+
+      // setTimeout(() => {
+      //   this.data = Array.from({ length: this.nextPage * 15 });
+      //   this.nextPage = this.nextPage + 1;
+      //   this.hasMore = this.nextPage <= 7;
+      //   this.isBusy = false;
+      // }, 500);
+    },
+    onRemoveItem(studentGradeId) {
+      const index = this.data.findIndex(sg => sg.id === studentGradeId)
+      this.data.splice(index, 1)
+      this.$emit('update:count', this.count - 1);
     }
   }
 };
