@@ -2,10 +2,15 @@
   <div class="pending-grades__container">
     <div class="pending-grades__header">
       <span class="pending-grades__headline">
-        <button v-if="hasSelected" class="pending-grades__action-back" @click="selected = null">
-          <BIconChevronLeft />
-        </button>
-        Pending Grades for Review
+        <template v-if="hasSelected">
+          <button class="pending-grades__action-back" @click="selected = null">
+            <BIconChevronLeft />
+          </button>
+          BSIT-1A / Data Structure
+        </template>
+        <template v-else>
+          Pending Grades for Review
+        </template>
       </span>
     </div>
     <div
@@ -21,19 +26,21 @@
         <BSpinner scale="1.2" />
       </div>
     </div>
-    <div v-if="hasSelected">
-      this is the view for grade detail
+    <div v-if="hasSelected" class="pending-grades__body">
+      <GradeView />
     </div>
   </div>
 </template>
 <script>
 import { StudentGradeApi } from '../../../mixins/api';
 import Request from './Item';
+import GradeView from './GradeView';
 import { StudentGradeStatuses } from '../../../helpers/enum'
 export default {
   mixins: [StudentGradeApi],
   components: {
-    Request
+    Request,
+    GradeView
   },
   props: {
     count: {
@@ -103,7 +110,7 @@ export default {
   }
 
   .pending-grades__header {
-    min-height: 35px;
+    height: 40px;
     border-bottom: 1px solid $light-gray-10;
     display: flex;
     align-items: center;
@@ -137,6 +144,7 @@ export default {
     margin: 0;
     border-radius: 5px;
     padding: 3px;
+    margin-right: 5px;
 
     &:hover {
       background-color: $light-gray-100;
