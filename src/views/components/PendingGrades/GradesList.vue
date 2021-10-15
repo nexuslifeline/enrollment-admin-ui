@@ -163,6 +163,7 @@ export default {
     right: 12px;
     list-style: none;
     padding: 3px 0;
+    z-index: 2;
   }
 
   .grade-list__menu-item {
