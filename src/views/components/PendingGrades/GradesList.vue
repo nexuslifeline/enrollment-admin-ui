@@ -29,6 +29,13 @@
             <b-spinner type="border" small />
           </di>
         </template>
+        <template v-if="idx === 1"> <!-- change to method that returns dropped(true/false) see reference in Grade Sheet-->
+          <di class="grade-list__row-overlay">
+            <span class="text-danger">
+              Dropped
+            </span>
+          </di>
+        </template>
       </div>
     </template>
     <button @click="onShowMore" class="grade-list__more">
