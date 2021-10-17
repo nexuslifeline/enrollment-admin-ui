@@ -18,15 +18,15 @@
         </thead>
         <tbody>
           <template v-for="(academicRecord, idx) in academicRecords">
-            <tr :key="idx" @click="lastRowIndex = idx">
+            <tr :key="idx" @click="lastRowIndex = idx" >
               <td class="cell__sticky cell__center">{{ idx + 1 }}</td>
               <td class="cell__sticky" :style="{ zIndex: 0 }">
                 <div class="cell__student-headline">
                   <AvatarMaker
                     :avatarId="idx"
                     :size="25"
-                    :text="'PH'"
-                    :src="''"
+                    :text="getInitial(academicRecord.student)"
+                    :src="getPhotoPath(academicRecord.student)"
                   />
                   <div class="cell__name">
                     <BulletedContent :items="[academicRecord.student && academicRecord.student.name || '', `SN: ${academicRecord.student && academicRecord.student.studentNo || 'N/A'}`]" />
@@ -34,7 +34,7 @@
                   <button class="dropdown__toggle" @click.stop="onDropdownShown(idx), makeFront($event)" @blur="makeBehind($event)">
                     <BIconThreeDotsVertical  />
                     <ul v-if="isDropdownShown.includes(idx)" class="dropdown__menu">
-                      <li class="dropdown__menu-item" @click="onDropStudent(academicRecord)">Mark as Dropped</li>
+                      <li class="dropdown__menu-item" @click="setDropStudent(academicRecord)">Mark as Dropped</li>
                       <li class="dropdown__menu-item" @click="onEditGrade(academicRecord)">Edit Grades</li>
                     </ul>
                   </button>
@@ -83,15 +83,29 @@
         </tbody>
       </table>
     </div>
+    <ConfirmationModal
+      :isShown.sync="isShowDropStudent"
+      @onCancel="isShowDropStudent=false"
+      title="Drop Student"
+      @onYes="onDropStudent"
+      :isConfirmBusy="isProcessing">
+      <template #modal-body>
+        Are you sure you want to dropped student {{ selectedAcademicRecordStudentName }} ?
+      </template>
+    </ConfirmationModal>
   </div>
 </template>
 
 <script>
 import debounce from 'lodash/debounce';
 import { AcademicRecordApi, GradingPeriodApi } from '../../../mixins/api';
-import { showNotification, formatNumber } from '../../../helpers/forms';
+import { showNotification, formatNumber, validate } from '../../../helpers/forms';
+import ConfirmationModal from '../ConfirmationModal'
+import { getFilePath } from '../../../helpers/utils'
 export default {
   formatNumber,
+  getFilePath,
+  components: { ConfirmationModal },
   mixins: [
     AcademicRecordApi, GradingPeriodApi
   ],
@@ -119,7 +133,10 @@ export default {
       isBusy: false,
       gradingPeriods: [],
       academicRecords: [],
-      isDropdownShown: []
+      isDropdownShown: [],
+      selectedAcademicRecord: {},
+      isShowDropStudent: false,
+      isProcessing: false
     }
   },
   created() {
@@ -134,12 +151,38 @@ export default {
   beforeDestroy() {
     window.removeEventListener('click', this.hideDropdown);
   },
+  computed: {
+    selectedAcademicRecordStudentName() {
+      return this.selectedAcademicRecord?.student?.name || ''
+    }
+  },
   methods: {
     hideDropdown() {
       this.isDropdownShown = [];
     },
-    onDropStudent(academicRecord) {
-      console.log('academicRecord', academicRecord)
+    setDropStudent(academicRecord) {
+      this.isShowDropStudent = true
+      this.selectedAcademicRecord = academicRecord
+    },
+    onDropStudent() {
+      // console.log('academicRecord', academicRecord)
+      const { id:academicRecordId } = this.selectedAcademicRecord
+      const payload = {
+        isDropped: 1
+      }
+      this.isProcessing = true
+      this.updateAcademicRecordSubject(academicRecordId, this.subjectId, payload).then(({ data }) => {
+        const subject = this.selectedAcademicRecord.subjects.find( ({ pivot: v }) => v.subjectId === this.subjectId && v.sectionId === this.sectionId)
+        // console.log(subject)
+        subject.pivot.isDropped = 1
+        this.isProcessing = false
+        this.isShowDropStudent = false
+      }).catch((error) => {
+        const errors = error.response.data.errors
+        validate(null, errors, this)
+        this.isProcessing = false
+        this.isShowDropStudent = false
+      });
     },
     onEditGrade() {
       console.log('skip this first, no ui yet')
@@ -182,12 +225,12 @@ export default {
         if (reset) { // we need to reset if section id has changed
           // passed data here without pushing/concat to academicRecords
           this.currentPage = data.meta.currentPage;
+          this.academicRecords = data.data
         } else {
           // concat/append data here to academicRecords
           this.currentPage = this.currentPage + 1;
+           this.academicRecords.push(...data.data)
         }
-
-        this.academicRecords = data.data
         this.hasMore = this.currentPage !== data.meta.lastPage;
         this.isBusy = false;
       }).catch(() => {
@@ -263,6 +306,18 @@ export default {
       return academicRecord?.subjects?.some(
         ({ pivot: v }) => v.sectionId === this.sectionId && v.subjectId === this.subjectId && v.isDropped
       );
+    },
+    getInitial(student) {
+      const { firstName, lastName } = student
+      return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`
+    },
+    getPhotoPath(student) {
+      const { photo } = student
+      if(!photo) {
+        return ''
+      }
+
+      return this.$options.getFilePath(photo.hashName)
     }
   },
   watch: {
@@ -373,6 +428,7 @@ export default {
       padding: 3.5px 10px;
       font-weight: 500;
     }
+
   }
 
   thead {
