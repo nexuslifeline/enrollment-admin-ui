@@ -8,6 +8,7 @@
       :size="43"
       :text="personnelInitials"
       :borderSize="3"
+      :src="photo"
     />
     <div class="pending-grades__content">
       <span class="pending-grades__content-headline">
@@ -24,7 +25,16 @@
 
       <template v-if="isConfirmingFinalize || isConfirmingAllow || isConfirmingReject" >
         <div class="pending-grades__confirmation-container">
-          <b-form-textarea rows="2" placeholder="You may add a notes or description" :style="{ fontSize: '12px' }" />
+          <b-form-group
+            :state="forms.studentGrade.states.notes"
+            :invalid-feedback="forms.studentGrade.errors.notes">
+            <b-form-textarea
+              rows="2"
+              placeholder="You may add a notes or description"
+              :style="{ fontSize: '12px' }"
+              v-model="forms.studentGrade.fields.notes"
+            />
+          </b-form-group>
         </div>
         <div class="pending-grades__content-actions">
           <template v-if="isConfirmingFinalize">
@@ -50,7 +60,7 @@
               v-b-tooltip
               title="Once rejected, it will be remove in the pending list and the teacher or instructor will be able to edit the Grades."
               class="pending-grades__btn pending-grades__btn-secondary active"
-              @click.stop="isConfirmingReject">
+              @click.stop="onReject">
               Confirm Reject
             </button>
           </template>
@@ -111,10 +121,16 @@
 <script>
 import { StudentGradeStatuses } from '../../../helpers/enum';
 import formatDistance from 'date-fns/formatDistance';
-import { validate } from '../../../helpers/forms';
+import { clearFields, reset, validate } from '../../../helpers/forms';
 import { StudentGradeApi } from '../../../mixins/api';
+import { getFilePath } from '../../../helpers/utils'
+
+const studentGradeFields = {
+  notes: null
+}
 export default {
   formatDistance,
+  getFilePath,
   mixins: [StudentGradeApi],
   props: {
     data: {
@@ -127,46 +143,65 @@ export default {
       isProcessing: false,
       isConfirmingFinalize: false,
       isConfirmingAllow: false,
-      isConfirmingReject: false
+      isConfirmingReject: false,
+      forms: {
+        studentGrade: {
+          fields: { ...studentGradeFields },
+          states: { ...studentGradeFields },
+          errors: { ...studentGradeFields }
+        }
+      }
     };
   },
   methods: {
     onAcceptGrade() {
       // POST /student-grades/:id/finalize
       const { id: studentGradeId } = this.data
+      const { studentGrade, studentGrade: { fields: { notes }} } = this.forms
       this.isProcessing = true
-      this.finalizeStudentGrade(studentGradeId).then(() => {
-        this.$emit('onRemoveItem', studentGradeId)
+      reset(studentGrade)
+      this.finalizeStudentGrade(studentGradeId, { notes }).then(() => {
         this.isProcessing = false
+        this.$emit('onRemoveItem', studentGradeId)
+        this.isConfirmingFinalize  = false
+        clearFields(studentGrade.fields)
       }).catch((error) => {
         const errors = error.response.data.errors
-        validate(null, errors, this)
+        validate(studentGrade, errors, this)
         this.isProcessing = false
       });
     },
     onAllowEditing() {
       // POST /student-grades/:id/publish -> to allow instructor edit the grade again
       const { id: studentGradeId } = this.data
+      const { studentGrade, studentGrade: { fields: { notes }} } = this.forms
       this.isProcessing = true
-      this.publishStudentGrade(studentGradeId).then(() => {
+      reset(studentGrade)
+      this.publishStudentGrade(studentGradeId, { notes }).then(() => {
         this.$emit('onRemoveItem', studentGradeId)
+        this.isConfirmingAllow  = false
         this.isProcessing = false
+        clearFields(studentGrade.fields)
       }).catch((error) => {
         const errors = error.response.data.errors
-        validate(null, errors, this)
+        validate(studentGrade, errors, this)
         this.isProcessing = false
       });
     },
     onReject() {
       // POST /student-grades/:id/reject
       const { id: studentGradeId } = this.data
+      const { studentGrade, studentGrade: { fields: { notes }} } = this.forms
       this.isProcessing = true
-      this.rejectStudentGrade(studentGradeId).then(() => {
+      reset(studentGrade)
+      this.rejectStudentGrade(studentGradeId, { notes }).then(() => {
         this.$emit('onRemoveItem', studentGradeId)
         this.isProcessing = false
+        clearFields(studentGrade.fields)
+        this.isConfirmingReject= false
       }).catch((error) => {
         const errors = error.response.data.errors
-        validate(null, errors, this)
+        validate(studentGrade, errors, this)
         this.isProcessing = false
       });
     }
@@ -183,6 +218,14 @@ export default {
     sectionName() {
       const { section } = this.data
       return section?.name || ''
+    },
+    photo() {
+      const { photo } = this.data.personnel
+      if(!photo) {
+        return ''
+      }
+
+      return this.$options.getFilePath(photo.hashName)
     }
   }
 };

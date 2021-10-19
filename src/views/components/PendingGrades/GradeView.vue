@@ -8,50 +8,86 @@
         <AvatarMaker
           :avatarId="1"
           :size="33"
-          :text="'PR'"
+          :text="personnelInitials"
           :borderSize="3"
           class="m-auto"
+          :src="photo"
         />
-        <span class="ml-1">Paul Christian Rueda</span>
+        <span class="ml-1">{{ personnel && personnel.name || '' }}</span>
       </div>
     </InlineItem>
     <InlineItem label="Group: ">
-      Instructor
+       {{ user && user.userGroup && user.userGroup.name || '' }}
     </InlineItem>
     <InlineItem label="Department: ">
-      CIT
+      {{ personnel && personnel.department && personnel.department.name || '' }}
     </InlineItem>
     <InlineItem label="Email: ">
-      chrisrueda14@yahoo.com
+      {{ user && user.username || '' }}
     </InlineItem>
     <InlineItem label="Address: ">
-      San Jose, San Simon, Pampanga, PH
+      {{ personnel && personnel.completeAddress || '' }}
     </InlineItem>
     <br />
     <div>
       <h4 class="grade-view__title">
         Grades
       </h4>
-      <GradeList />
+      <GradeList :sectionId="studentGrade.sectionId" :subjectId="studentGrade.subjectId"/>
     </div>
     <br />
   </div>
 </template>
 <script>
-  import GradeList from './GradesList';
-  export default {
-    props: {
-      gradeId: {
-        type: [String, Number]
-      }
-    },
-    components: {
-      GradeList
-    },
-    created() {
-      // GET /student-grades/:id
+import { validate } from '../../../helpers/forms';
+import { StudentGradeApi } from '../../../mixins/api';
+import GradeList from './GradesList';
+import { getFilePath } from '../../../helpers/utils';
+export default {
+  getFilePath,
+  props: {
+    gradeId: {
+      type: [String, Number]
     }
-  };
+  },
+  mixins: [StudentGradeApi],
+  components: {
+    GradeList
+  },
+  data() {
+    return {
+      studentGrade: {}
+    }
+  },
+  created() {
+    // GET /student-grades/:id
+    this.getStudentGrade(this.gradeId).then(({ data }) => {
+      this.studentGrade = data
+    }).catch((error) => {
+      const errors = error.response.data.errors
+      validate(null, errors, this)
+    });
+  },
+  computed: {
+    personnel() {
+      return this.studentGrade?.personnel || {}
+    },
+    personnelInitials() {
+      const { firstName, lastName } = this.personnel
+      return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`
+    },
+    photo() {
+      const { photo } = this.personnel
+      if(!photo) {
+        return ''
+      }
+      return this.$options.getFilePath(photo.hashName)
+    },
+    user() {
+      return this.studentGrade?.personnel?.user || null
+    },
+  }
+};
 </script>
 <style lang="scss" scoped>
   @import '../../../assets/scss/_shared.scss';

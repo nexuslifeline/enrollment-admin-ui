@@ -38,14 +38,14 @@ export default {
     requestEditStudentGrade(id) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/request-edit`);
     },
-    approveEditStudentGrade(id) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/approve-edit-request`);
+    approveEditStudentGrade(id, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/approve-edit-request`, data);
     },
-    finalizeStudentGrade(id) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/finalize`);
+    finalizeStudentGrade(id, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/finalize`, data);
     },
-    rejectStudentGrade(id) {
-      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/reject`);
+    rejectStudentGrade(id, data) {
+      return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/reject`, data);
     }
   }
 }

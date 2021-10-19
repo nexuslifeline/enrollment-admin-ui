@@ -19,6 +19,7 @@
           :avatarId="item.id"
           :size="24"
           :text="getStudentInitial(item)"
+          :src="getStudentPhoto(item)"
           :borderSize="2"
           :borderColor="'white'"
           containerClass="avatar__container"
@@ -33,6 +34,7 @@
             :avatarId="item.id"
             :size="22"
             :text="getStudentInitial(item)"
+            :src="getStudentPhoto(item)"
           />
           <span class="avatar-group__tooltip-item-text">
             {{ item.name }}
@@ -47,7 +49,9 @@
 </template>
 <script>
 
+import { getFilePath } from '../../../helpers/utils'
 export default {
+  getFilePath,
   props: {
     data: {
       type: [Array]
@@ -65,9 +69,17 @@ export default {
     this.uniqId = Date.now();
   },
   methods: {
-    getStudentInitial(data){
+    getStudentInitial(data) {
       const { firstName, lastName } = data
       return `${firstName && firstName.charAt(0) || ''}${lastName && lastName.charAt(0) || ''}`
+    },
+    getStudentPhoto(data) {
+      const { photo } = data
+      if(!photo) {
+        return ''
+      }
+
+      return this.$options.getFilePath(photo.hashName)
     }
   }
 };

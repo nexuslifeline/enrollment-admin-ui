@@ -6,7 +6,7 @@
           <button class="pending-grades__action-back" @click="selected = null">
             <BIconChevronLeft />
           </button>
-          BSIT-1A / Data Structure
+          {{ `${section && section.name || 'N/A' } / ${subject && subject.description || 'N/A' }` }}
         </template>
         <template v-else>
           Pending Grades for Review
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div v-if="hasSelected" class="pending-grades__body">
-      <GradeView />
+      <GradeView :gradeId="selected.id" />
     </div>
   </div>
 </template>
@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     onSelectRequest(item) {
-      this.selected = item?.id;
+      this.selected = item
     },
     loadMore() {
       if (!this.hasMore) return;
@@ -89,11 +89,18 @@ export default {
       const index = this.data.findIndex(sg => sg.id === studentGradeId)
       this.data.splice(index, 1)
       this.$emit('update:count', this.count - 1);
+      this.selected = null
     }
   },
   computed: {
     hasSelected() {
       return !!this.selected;
+    },
+    section() {
+      return this.selected?.section || null
+    },
+    subject() {
+      return this.selected?.subject || null
     }
   }
 };
