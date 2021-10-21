@@ -93,7 +93,7 @@ const ClearanceClearing = () => import('@/views/pages/ClearanceClearing')
 const DroppedStudent = () => import('@/views/pages/DroppedStudent')
 
 const SetupSchoolYear = () => import('@/views/pages/sy-setup/Setup')
-
+const GradeSymbol = () => import('@/views/pages/grade-symbol/List')
 
 Vue.use(Router)
 
@@ -348,6 +348,12 @@ function configRoutes () {
               path: 'clearance-signatories',
               name: 'Signatories',
               component: Clearance,
+              meta: { requiresAuth: true }
+            },
+            {
+              path: 'grade-symbol',
+              name: 'Grade Symbol',
+              component: GradeSymbol,
               meta: { requiresAuth: true }
             },
             {

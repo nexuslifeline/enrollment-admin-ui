@@ -38,5 +38,6 @@ export { default as DocumentTypeApi } from './DocumentType';
 export { default as StudentGradeApi } from './StudentGrade';
 export { default as StudentClearanceApi } from './StudentClearance';
 export { default as GradingPeriodApi } from './GradingPeriod';
+export { default as GradeSymbolApi } from './GradeSymbol';
 // export { default as StudentGradeApi } from './StudentGrade';
 // export { default as StudentFileApi } from './StudentFile';

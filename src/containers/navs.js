@@ -292,6 +292,11 @@ export default [
         to: '/maintenance/document-type',
         permissionIds: DocumentTypePermission.getIds()
       },
+      {
+        label: 'Grade Symbol',
+        to: '/maintenance/grade-symbol',
+        permissionIds: DocumentTypePermission.getIds()//todo: apply actual permissions
+      },
     ]
   },
   {
