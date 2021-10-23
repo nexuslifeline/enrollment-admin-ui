@@ -651,6 +651,12 @@ export const DepartmentPermissions = new Enum({
   DELETE: { id: 103, name: 'Delete' }
 });
 
+export const GradeSymbolPermissions = new Enum({
+  ADD: { id: 101, name: 'Add' },
+  EDIT: { id: 102, name: 'Edit' },
+  DELETE: { id: 103, name: 'Delete' }
+});
+
 export const SchoolYearPermissions = new Enum({
   ADD: { id: 111, name: 'Add' },
   EDIT: { id: 112, name: 'Edit' },

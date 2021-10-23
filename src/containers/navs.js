@@ -32,7 +32,8 @@ import {
   SettingPermissions,
   EClearancePermissions,
   EClearanceClearingPermissions,
-  DroppedStudentPermissions
+  DroppedStudentPermissions,
+  GradeSymbolPermissions
 } from '../helpers/enum';
 
 export default [
@@ -231,7 +232,8 @@ export default [
       ...PeraPadalaAccountPermissions.getIds(),
       ...EWalletAccountPermissions.getIds(),
       ...DocumentTypePermission.getIds(),
-      ...EClearancePermissions.getIds()
+      ...EClearancePermissions.getIds(),
+      ...GradeSymbolPermissions.getIds()
     ],
     children: [
       {
@@ -295,7 +297,7 @@ export default [
       {
         label: 'Grade Symbol',
         to: '/maintenance/grade-symbol',
-        permissionIds: DocumentTypePermission.getIds()//todo: apply actual permissions
+        permissionIds: GradeSymbolPermissions.getIds()
       },
     ]
   },

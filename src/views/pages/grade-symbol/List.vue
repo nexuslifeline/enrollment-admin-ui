@@ -10,7 +10,7 @@
     :currentPage.sync="paginations.gradeSymbol.page"
     @onPageChange="loadGradeSymbol"
     @onRefresh="loadGradeSymbol"
-    :createButtonVisible="isAccessible(1)"
+    :createButtonVisible="isAccessible($options.GradeSymbolPermissions.ADD.id)"
     @create="setCreate">
     <template v-slot:filters>
       <b-form-input
@@ -55,13 +55,13 @@
                 <v-icon name="ellipsis-v" />
               </template>
               <b-dropdown-item
-                v-if="isAccessible(1)"
+                v-if="isAccessible($options.GradeSymbolPermissions.EDIT.id)"
                 @click="setUpdate(data.item)"
                 :disabled="showModalEntry">
                 Edit
               </b-dropdown-item>
               <b-dropdown-item
-                v-if="isAccessible(1)"
+                v-if="isAccessible($options.GradeSymbolPermissions.DELETE.id)"
                 @click="setDelete(data.item)"
                 :disabled="showModalConfirmation">
                 Delete
@@ -94,7 +94,7 @@
 </template>
 <script>
 import {
-
+  GradeSymbolPermissions
 } from '../../../helpers/enum';
 import { GradeSymbolApi } from '../../../mixins/api';
 import Access from '../../../mixins/utils/Access';
@@ -104,6 +104,7 @@ import GradeSymbolEntry from './Entry'
 import { formatNumber, showNotification } from '../../../helpers/forms';
 import ConfirmationModal from '../../components/ConfirmationModal'
 export default {
+  GradeSymbolPermissions,
   components: {
     PageContent,
     GradeSymbolEntry,

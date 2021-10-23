@@ -103,7 +103,7 @@ export default {
   },
   created() {
     if(this.data) {
-      alert('loaded')
+      // alert('loaded')
       const { gradeSymbol } = this.forms
       copyValue(this.data, gradeSymbol.fields)
       this.entryMode = 'Edit'
