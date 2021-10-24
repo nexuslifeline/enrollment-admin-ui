@@ -10,7 +10,12 @@
     :currentPage.sync="paginations.payment.page"
     @onPageChange="loadPaymentList"
     @onRefresh="loadPaymentList"
-    :createButtonVisible="false">
+    :createButtonVisible="false"
+    :hasPanel="true"
+    :panelNotificationCount="pendingCount">
+    <template v-slot:panel-content>
+      <PendingPayments :count.sync="pendingCount" />
+    </template>
     <template v-slot:filters>
       <b-form-input
         v-model="filters.payment.criteria"
@@ -828,6 +833,8 @@ import PageContent from "../components/PageContainer/PageContent";
 import PaymentApproval from "../components/ApprovalModals/Payment";
 import PaymentRejection from '../components/RejectionModals/Payment'
 
+import PendingPayments from '../components/PendingPayments/PendingPayments'
+
 export default {
   name: 'Payment',
   mixins: [
@@ -855,7 +862,8 @@ export default {
     AvatarMaker,
     PageContent,
     PaymentApproval,
-    PaymentRejection
+    PaymentRejection,
+    PendingPayments
   },
   format,
   startOfMonth,
@@ -864,6 +872,7 @@ export default {
   PaymentPermissions,
   data() {
     return {
+      pendingCount: 0,
       isFilterVisible: true,
       selectedPayment: null,
       fileViewer: {
