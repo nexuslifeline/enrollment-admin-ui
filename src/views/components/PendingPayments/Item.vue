@@ -8,11 +8,10 @@
       :size="43"
       :text="studentInitials"
       :borderSize="3"
-      :src="photo"
-    />
+      :src="photo"/>
     <div class="pending-grades__content">
       <span class="pending-grades__content-headline">
-        Student Name
+        {{ student && student.name  || ''}}
       </span>
       <span class="pending-grades__content-subheadline">
         Submitted payment waiting for review and approval.
@@ -111,7 +110,7 @@
         {{ $options.formatDistance(new Date(data.datePaid), new Date(), { addSuffix: false }) }}
       </span>
     </div>
-    <div class="pending-grades__other-actions">
+    <div class="pending-grades__other-actions" @click="$emit('onSelect', data)">
       <button class="pending-grades__action-view">
         <BIconChevronRight />
       </button>
@@ -160,31 +159,14 @@ export default {
   methods: {
     onApprove() {
       // POST /student-grades/:id/finalize
-      const { id: studentGradeId } = this.data
-      const { payment, payment: { fields: { approvalNotes }} } = this.forms
+      const { id: paymentId } = this.data
+      const { payment, payment: { fields: { approvalNotes, referenceNo }} } = this.forms
       this.isProcessing = true
       reset(payment)
-      this.finalizeStudentGrade(studentGradeId, { approvalNotes }).then(() => {
+      this.approvePayment({ approvalNotes, referenceNo }, paymentId).then(() => {
         this.isProcessing = false
-        this.$emit('onRemoveItem', studentGradeId)
+        this.$emit('onRemoveItem', paymentId)
         this.isConfirmingFinalize  = false
-        clearFields(payment.fields)
-      }).catch((error) => {
-        const errors = error.response.data.errors
-        validate(payment, errors, this)
-        this.isProcessing = false
-      });
-    },
-    onAllowEditing() {
-      // POST /student-grades/:id/publish -> to allow instructor edit the grade again
-      const { id: studentGradeId } = this.data
-      const { payment, payment: { fields: { approvalNotes }} } = this.forms
-      this.isProcessing = true
-      reset(payment)
-      this.publishStudentGrade(studentGradeId, { approvalNotes }).then(() => {
-        this.$emit('onRemoveItem', studentGradeId)
-        this.isConfirmingFinalize  = false
-        this.isProcessing = false
         clearFields(payment.fields)
       }).catch((error) => {
         const errors = error.response.data.errors
@@ -194,12 +176,12 @@ export default {
     },
     onReject() {
       // POST /student-grades/:id/reject
-      const { id: studentGradeId } = this.data
-      const { payment, payment: { fields: { approvalNotes }} } = this.forms
+      const { id: paymentId } = this.data
+      const { payment, payment: { fields: { disapprovalNotes }} } = this.forms
       this.isProcessing = true
       reset(payment)
-      this.rejectStudentGrade(studentGradeId, { approvalNotes }).then(() => {
-        this.$emit('onRemoveItem', studentGradeId)
+      this.rejectPayment({ disapprovalNotes }, paymentId).then(() => {
+        this.$emit('onRemoveItem', paymentId)
         this.isProcessing = false
         clearFields(payment.fields)
         this.isConfirmingReject= false
@@ -211,6 +193,9 @@ export default {
     },
   },
   computed: {
+    student() {
+      return this.data?.student || null
+    },
     studentInitials() {
       const { firstName, lastName } = this.data.student
       return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`
