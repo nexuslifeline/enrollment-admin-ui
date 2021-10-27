@@ -7,7 +7,7 @@
        <div :key="idx" class="grade-list__row">
         <div class="grade-list__cell grade-list__cell-name">
           <AvatarMaker
-            :avatarId="2"
+            :avatarId="academicRecord.student.id"
             :size="25"
             :text="getStudentInitial(academicRecord.student)"
             :borderSize="3"
