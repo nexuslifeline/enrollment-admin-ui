@@ -21,12 +21,20 @@
             <BIconThreeDotsVertical  />
             <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
               <li @click="setDropStudent(academicRecord)" class="grade-list__menu-item">Mark as Dropped</li>
-              <li @click="onEditGrade(academicRecord)" class="grade-list__menu-item">Edit Grade</li>
+              <li @click="onEditGrade(idx)" class="grade-list__menu-item">Edit Grade</li>
             </ul>
           </button>
         </div>
         <div class="grade-list__cell grade-list__cell-grade">
-          {{ getCurrentGrade(academicRecord) }}
+          <input
+            v-if="editingRow.includes(idx)"
+            @input="onInputGrade(academicRecord, idx)"
+            :value="getCurrentGrade(academicRecord)"
+            class="grade-list__cell-input"
+          />
+          <template v-else>
+            {{ getCurrentGrade(academicRecord) }}
+          </template>
         </div>
         <template v-if="busyRow.includes(idx)">
           <div class="grade-list__row-overlay">
@@ -85,7 +93,8 @@ export default {
       isLoading: true,
       isShowDropStudent: false,
       selectedAcademicRecord: null,
-      isProcessing: false
+      isProcessing: false,
+      editingRow: []
     }
   },
   created() {
@@ -150,9 +159,18 @@ export default {
         this.busyRow = []
       });
     },
-    onEditGrade() {
-      // no ui yet, just skip for the meantime
+    onEditGrade(idx) {
+      this.editingRow = [idx];
     },
+    onInputGrade: debounce(function (academicRecord, idx) {
+      // PUT/PATCH grade here
+      this.busyRow = [idx];
+
+      setTimeout(() => {
+        this.busyRow = [];
+        this.editingRow = [];
+      }, 1000);
+    }, 350),
     onDropdownSelect(idx) {
       if (this.visibleDropdown.includes(idx)) {
         this.visibleDropdown = [];
@@ -274,7 +292,7 @@ export default {
   }
 
   .grade-list__cell-grade {
-    width: 60px;
+    width: 75px;
     text-align: center;
     border-left: 1px solid $light-gray-10;
   }
@@ -342,6 +360,13 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .grade-list__cell-input {
+    width: 100%;
+    text-align: center;
+    // border: 0;
+    // background-color: $light-gray-10;
   }
 
 </style>
