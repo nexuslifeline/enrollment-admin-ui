@@ -17,7 +17,7 @@
           <span>
             {{ academicRecord.student && academicRecord.student.name || ''}}
           </span>
-          <button @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
+          <button v-if="!editingRow.includes(idx)" @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
             <BIconThreeDotsVertical  />
             <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
               <li @click="setDropStudent(academicRecord)" class="grade-list__menu-item">Mark as Dropped</li>
@@ -26,12 +26,19 @@
           </button>
         </div>
         <div class="grade-list__cell grade-list__cell-grade">
-          <input
-            v-if="editingRow.includes(idx)"
-            @input="onInputGrade(academicRecord, idx)"
-            :value="getCurrentGrade(academicRecord)"
-            class="grade-list__cell-input"
-          />
+          <template v-if="editingRow.includes(idx)">
+            <input
+              :value="getCurrentGrade(academicRecord)"
+              class="grade-list__cell-input"
+            />
+            <button  @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
+              <BIconThreeDotsVertical  />
+              <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
+                <li @click="onSaveGrade(academicRecord, idx)" class="grade-list__menu-item">Save</li>
+                <li @click="editingRow = []" class="grade-list__menu-item">Cancel</li>
+              </ul>
+            </button>
+          </template>
           <template v-else>
             {{ getCurrentGrade(academicRecord) }}
           </template>
@@ -70,6 +77,8 @@ import { AcademicRecordApi, StudentGradeApi } from '../../../mixins/api';
 import { getFilePath } from '../../../helpers/utils'
 import debounce from 'lodash/debounce'
 import ConfirmationModal from '../../components/ConfirmationModal'
+import { validate } from '../../../helpers/forms';
+
 export default {
   getFilePath,
   components: { ConfirmationModal },
@@ -162,15 +171,9 @@ export default {
     onEditGrade(idx) {
       this.editingRow = [idx];
     },
-    onInputGrade: debounce(function (academicRecord, idx) {
+    onSaveGrade(academicRecord, idx) {
       // PUT/PATCH grade here
-      this.busyRow = [idx];
-
-      setTimeout(() => {
-        this.busyRow = [];
-        this.editingRow = [];
-      }, 1000);
-    }, 350),
+    },
     onDropdownSelect(idx) {
       if (this.visibleDropdown.includes(idx)) {
         this.visibleDropdown = [];
@@ -367,6 +370,14 @@ export default {
     text-align: center;
     // border: 0;
     // background-color: $light-gray-10;
+  }
+
+  .grade-list__cell-grade {
+    display: flex;
+    padding: 2px 0 2px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
 </style>
