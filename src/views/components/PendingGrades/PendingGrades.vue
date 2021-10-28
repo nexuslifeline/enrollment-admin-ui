@@ -14,7 +14,7 @@
       </span>
     </div>
     <div
-      v-show="!hasSelected"
+      v-show="count > 0 && !hasSelected"
       class="pending-grades__body"
       v-infinite-scroll="loadMore"
       :infinite-scroll-disabled="isBusy"
@@ -26,9 +26,15 @@
         <BSpinner scale="1.2" />
       </div>
     </div>
-    <div v-if="hasSelected" class="pending-grades__body">
+    <div v-if="count > 0 && hasSelected" class="pending-grades__body">
       <GradeView :gradeId="selected.id" />
     </div>
+    <template v-if="count === 0">
+     <div class="empty__container">
+        <img src="img/mailbox.svg" class="image__empty-requests" />
+        <h6>No Pending Requests</h6>
+     </div>
+    </template>
   </div>
 </template>
 <script>
@@ -156,5 +162,19 @@ export default {
     &:hover {
       background-color: $light-gray-100;
     }
+  }
+
+  .image__empty-requests {
+    height: auto;
+    width: 100%;
+  }
+
+  .empty__container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
   }
 </style>
