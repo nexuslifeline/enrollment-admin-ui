@@ -90,29 +90,7 @@ export default {
         this.isLoading = false
       });
     },500),
-    onMarkDropped() {
-      const { id:academicRecordId } = this.selectedAcademicRecord
-      const payload = {
-        isDropped: 1
-      }
-      this.isProcessing = true
-      const index = this.billingItems.find(ar => ar.id === academicRecordId)
-      this.busyRow.push(index)
-      this.updateAcademicRecordSubject(academicRecordId, this.subjectId, payload).then(({ data }) => {
-        const subject = this.selectedAcademicRecord.subjects.find( ({ pivot: v }) => v.subjectId === this.subjectId && v.sectionId === this.sectionId)
-        // console.log(subject)
-        subject.pivot.isDropped = 1
-        this.isProcessing = false
-        this.isShowDropStudent = false
-        this.busyRow = []
-      }).catch((error) => {
-        const errors = error.response.data.errors
-        validate(null, errors, this)
-        this.isProcessing = false
-        this.isShowDropStudent = false
-        this.busyRow = []
-      });
-    },
+ 
     onEditGrade() {
       // no ui yet, just skip for the meantime
     },

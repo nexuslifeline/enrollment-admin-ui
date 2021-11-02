@@ -29,7 +29,7 @@
     <InlineItem label="Address:">
       {{ data.currentAddress || data.address }}
     </InlineItem>
-    <InlineItem label="Category:">
+    <InlineItem label="Category:" v-if="studentCategory">
       <b-badge
         :variant="studentCategory.id === $options.StudentCategories.NEW.id
           ? 'success'

@@ -91,6 +91,11 @@ export default [
         permissionIds: StudentPaymentPermissions.getIds()
       },
       {
+        label: 'New Payment',
+        to: '/enrollment/new-payment',
+        permissionIds: StudentPaymentPermissions.getIds()
+      },
+      {
         label: 'Manual Entry',
         to: '/enrollment/academic-record-applications',
         permissionIds: ManualEnrollmentPermissions.getIds()

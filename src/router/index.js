@@ -95,6 +95,9 @@ const DroppedStudent = () => import('@/views/pages/DroppedStudent')
 const SetupSchoolYear = () => import('@/views/pages/sy-setup/Setup')
 const GradeSymbol = () => import('@/views/pages/grade-symbol/List')
 
+const NewPayment = () => import('@/views/pages/new-payment/Payment')
+const PaymentDetail = () => import('@/views/pages/new-payment/Detail')
+
 Vue.use(Router)
 
 const router = new Router({
@@ -176,6 +179,19 @@ function configRoutes () {
               name: 'Payment',
               component: Payment,
               meta: { requiresAuth: true }
+            },
+            {
+              path: 'new-payment',
+              name: 'NewPayment',
+              component: NewPayment,
+              meta: { requiresAuth: true },
+              children: [
+                {
+                  path: ':paymentId/detail',
+                  name: 'Payment Detail',
+                  component: PaymentDetail
+                }
+              ]
             },
             {
               path: 'academic-record-applications',

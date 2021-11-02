@@ -47,9 +47,10 @@
     <br />
     <div>
       <h4 class="grade-view__title">
-        Attachments
+        Payment Files
       </h4>
-      <AttachmentList
+      <PaymentFiles :paymentId="paymentId" :owner="student"/>
+      <!-- <AttachmentList
         class="mt-2"
         :items="payment.files"
         titleKey="name"
@@ -68,7 +69,7 @@
         :navCount="fileViewer.paymentFile.activeNavCount"
         :navActiveIndex="fileViewer.paymentFile.activeNavIndex"
         :enableArrowNav="fileViewer.paymentFile.isActiveNavEnabled"
-      />
+      /> -->
     </div>
     <br />
   </div>
@@ -79,6 +80,7 @@ import { PaymentApi, PaymentFileApi } from '../../../mixins/api';
 import BillingItems from './BillingItems';
 import AttachmentList from '../Attachment/AttachmentList';
 import { getFilePath } from '../../../helpers/utils';
+import PaymentFiles from '../../components/PaymentFiles/List'
 
 export default {
   getFilePath,
@@ -90,7 +92,8 @@ export default {
   mixins: [PaymentApi,PaymentFileApi],
   components: {
     BillingItems,
-    AttachmentList
+    AttachmentList,
+    PaymentFiles
   },
   data() {
     return {

@@ -18,6 +18,7 @@ import ApprovalItem from './views/components/ApprovalContainer/Item';
 import InlineItem from './views/components/ApprovalContainer/InlineItem';
 import ApprovalView from './views/components/ApprovalContainer/PageLayout';
 import AcademicView from './views/components/CardView/AcademicView';
+import PaymentView from './views/components/CardView/PaymentView';
 import StudentAttachments from './views/components/StudentFiles/List';
 import SchoolView from './views/components/CardView/SchoolView';
 import EducationView from './views/components/CardView/EducationView';
@@ -294,6 +295,7 @@ Vue.component('SelectPaginated', SelectPaginated);
 Vue.component('SelectLevelCourses', SelectLevelCourses);
 Vue.component('SplitButton', SplitButton);
 Vue.component('PaymentConfirmation', PaymentConfirmation);
+Vue.component('PaymentView', PaymentView);
 
 //Vue.use(CoreuiVue)
 //Vue.use(BootstrapVue)
