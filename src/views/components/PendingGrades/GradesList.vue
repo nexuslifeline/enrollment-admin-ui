@@ -21,26 +21,25 @@
             <BIconThreeDotsVertical  />
             <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
               <li @click="setDropStudent(academicRecord)" class="grade-list__menu-item">Mark as Dropped</li>
-              <li @click="onEditGrade(idx)" class="grade-list__menu-item">Edit Grade</li>
+              <li v-if="!$options.isEmpty(academicRecord.currentGrade)" @click="onEditGrade(idx)" class="grade-list__menu-item">Edit Grade</li>
             </ul>
           </button>
         </div>
         <div class="grade-list__cell grade-list__cell-grade">
           <template v-if="editingRow.includes(idx)">
             <input
-              :value="getCurrentGrade(academicRecord)"
-              class="grade-list__cell-input"
-            />
+              v-model="academicRecord.currentGrade.pivot.grade"
+              class="grade-list__cell-input" />
             <button  @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
               <BIconThreeDotsVertical  />
               <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
                 <li @click="onSaveGrade(academicRecord, idx)" class="grade-list__menu-item">Save</li>
-                <li @click="editingRow = []" class="grade-list__menu-item">Cancel</li>
+                <li @click="onCancel" class="grade-list__menu-item">Cancel</li>
               </ul>
             </button>
           </template>
           <template v-else>
-            {{ getCurrentGrade(academicRecord) }}
+            {{ !$options.isEmpty(academicRecord.currentGrade) ? $options.formatNumber(academicRecord.currentGrade.pivot.grade) : 'N/A' }}
           </template>
         </div>
         <template v-if="busyRow.includes(idx)">
@@ -76,11 +75,14 @@
 import { AcademicRecordApi, StudentGradeApi } from '../../../mixins/api';
 import { getFilePath } from '../../../helpers/utils'
 import debounce from 'lodash/debounce'
+import isEmpty from 'lodash/isEmpty'
 import ConfirmationModal from '../../components/ConfirmationModal'
-import { validate } from '../../../helpers/forms';
+import { formatNumber, validate } from '../../../helpers/forms';
 
 export default {
   getFilePath,
+  formatNumber,
+  isEmpty,
   components: { ConfirmationModal },
   props: {
     sectionId: {
@@ -103,7 +105,7 @@ export default {
       isShowDropStudent: false,
       selectedAcademicRecord: null,
       isProcessing: false,
-      editingRow: []
+      editingRow: [],
     }
   },
   created() {
@@ -135,7 +137,7 @@ export default {
           this.academicRecords = []
         }
 
-        this.academicRecords.push(...data.data)
+        this.academicRecords.push(...this.formatAcademicRecords(data.data))
         this.hasMore = data.meta.currentPage !== data.meta.lastPage
         this.nextPage += 1
         this.isLoading = false
@@ -171,8 +173,25 @@ export default {
     onEditGrade(idx) {
       this.editingRow = [idx];
     },
+    onCancel() {
+      // to reset previous values of inputs
+      this.editingRow = []
+      this.hasMore = true
+      this.nextPage = 1
+      this.loadMore(true)
+    },
     onSaveGrade(academicRecord, idx) {
       // PUT/PATCH grade here
+      const { id: academicRecordId, currentGrade: { pivot: { studentGradeId, grade, gradingPeriodId } } } = academicRecord
+      this.busyRow.push(idx)
+      this.updateStudentGradePeriod(studentGradeId, academicRecordId, gradingPeriodId, { grade }).then(({ data }) => {
+        this.editingRow = []
+        this.busyRow = []
+      }).catch((error) => {
+        const errors = error.response.data.errors
+        console.log(errors)
+        this.busyRow = []
+      })
     },
     onDropdownSelect(idx) {
       if (this.visibleDropdown.includes(idx)) {
@@ -208,10 +227,10 @@ export default {
       this.isShowDropStudent = true
       this.selectedAcademicRecord = academicRecord
     },
-    getCurrentGrade(academicRecord) {
+    getRecentGrade(academicRecord) {
       const { grades } = academicRecord
       if(!grades.length > 0) {
-        return 'N/A'
+        return null
       }
       const current = grades.reduce((prev, current) => {
         if(!prev) {
@@ -220,7 +239,12 @@ export default {
         return current.pivot.gradingPeriodId > prev.pivot.gradingPeriodId ? current : prev
       }, null)
 
-      return current.pivot.grade
+      return { ...current }
+    },
+    formatAcademicRecords(academicRecords) {
+      return academicRecords.map( academicRecord => {
+        return { ...academicRecord, currentGrade: { ...this.getRecentGrade(academicRecord) } }
+      })
     }
   },
   computed: {
