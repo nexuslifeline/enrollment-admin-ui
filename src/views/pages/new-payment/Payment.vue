@@ -77,8 +77,10 @@
 import { PaymentApi } from '../../../mixins/api';
 import StudentColumn  from '../../components/ColumnDetails/StudentColumn'
 import format from 'date-fns/format'
+import { PaymentStatuses } from '../../../helpers/enum'
 export default {
   format,
+  PaymentStatuses,
   mixins: [ PaymentApi ],
   components: { StudentColumn },
   data() {
@@ -173,6 +175,7 @@ export default {
         perPage,
         page,
         criteria,
+        paymentStatusId: this.$options.PaymentStatuses.APPROVED.id
         // ordering: this.getOrdering(this.sortBy, this.sortDesc)
       };
 
