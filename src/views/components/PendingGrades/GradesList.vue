@@ -7,7 +7,7 @@
        <div :key="idx" class="grade-list__row">
         <div class="grade-list__cell grade-list__cell-name">
           <AvatarMaker
-            :avatarId="2"
+            :avatarId="academicRecord.student.id"
             :size="25"
             :text="getStudentInitial(academicRecord.student)"
             :borderSize="3"
@@ -17,16 +17,30 @@
           <span>
             {{ academicRecord.student && academicRecord.student.name || ''}}
           </span>
-          <button @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
+          <button v-if="!editingRow.includes(idx)" @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
             <BIconThreeDotsVertical  />
             <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
               <li @click="setDropStudent(academicRecord)" class="grade-list__menu-item">Mark as Dropped</li>
-              <li @click="onEditGrade(academicRecord)" class="grade-list__menu-item">Edit Grade</li>
+              <li v-if="!$options.isEmpty(academicRecord.currentGrade)" @click="onEditGrade(idx)" class="grade-list__menu-item">Edit Grade</li>
             </ul>
           </button>
         </div>
         <div class="grade-list__cell grade-list__cell-grade">
-          {{ getCurrentGrade(academicRecord) }}
+          <template v-if="editingRow.includes(idx)">
+            <input
+              v-model="academicRecord.currentGrade.pivot.grade"
+              class="grade-list__cell-input" />
+            <button  @click.stop="onDropdownSelect(idx)" class="grade-list__dropdown">
+              <BIconThreeDotsVertical  />
+              <ul v-if="visibleDropdown.includes(idx)" class="grade-list__menu">
+                <li @click="onSaveGrade(academicRecord, idx)" class="grade-list__menu-item">Save</li>
+                <li @click="onCancel" class="grade-list__menu-item">Cancel</li>
+              </ul>
+            </button>
+          </template>
+          <template v-else>
+            {{ !$options.isEmpty(academicRecord.currentGrade) ? $options.formatNumber(academicRecord.currentGrade.pivot.grade) : 'N/A' }}
+          </template>
         </div>
         <template v-if="busyRow.includes(idx)">
           <div class="grade-list__row-overlay">
@@ -61,9 +75,14 @@
 import { AcademicRecordApi, StudentGradeApi } from '../../../mixins/api';
 import { getFilePath } from '../../../helpers/utils'
 import debounce from 'lodash/debounce'
+import isEmpty from 'lodash/isEmpty'
 import ConfirmationModal from '../../components/ConfirmationModal'
+import { formatNumber, validate } from '../../../helpers/forms';
+
 export default {
   getFilePath,
+  formatNumber,
+  isEmpty,
   components: { ConfirmationModal },
   props: {
     sectionId: {
@@ -85,7 +104,8 @@ export default {
       isLoading: true,
       isShowDropStudent: false,
       selectedAcademicRecord: null,
-      isProcessing: false
+      isProcessing: false,
+      editingRow: [],
     }
   },
   created() {
@@ -117,7 +137,7 @@ export default {
           this.academicRecords = []
         }
 
-        this.academicRecords.push(...data.data)
+        this.academicRecords.push(...this.formatAcademicRecords(data.data))
         this.hasMore = data.meta.currentPage !== data.meta.lastPage
         this.nextPage += 1
         this.isLoading = false
@@ -150,8 +170,28 @@ export default {
         this.busyRow = []
       });
     },
-    onEditGrade() {
-      // no ui yet, just skip for the meantime
+    onEditGrade(idx) {
+      this.editingRow = [idx];
+    },
+    onCancel() {
+      // to reset previous values of inputs
+      this.editingRow = []
+      this.hasMore = true
+      this.nextPage = 1
+      this.loadMore(true)
+    },
+    onSaveGrade(academicRecord, idx) {
+      // PUT/PATCH grade here
+      const { id: academicRecordId, currentGrade: { pivot: { studentGradeId, grade, gradingPeriodId } } } = academicRecord
+      this.busyRow.push(idx)
+      this.updateStudentGradePeriod(studentGradeId, academicRecordId, gradingPeriodId, { grade }).then(({ data }) => {
+        this.editingRow = []
+        this.busyRow = []
+      }).catch((error) => {
+        const errors = error.response.data.errors
+        console.log(errors)
+        this.busyRow = []
+      })
     },
     onDropdownSelect(idx) {
       if (this.visibleDropdown.includes(idx)) {
@@ -187,10 +227,10 @@ export default {
       this.isShowDropStudent = true
       this.selectedAcademicRecord = academicRecord
     },
-    getCurrentGrade(academicRecord) {
+    getRecentGrade(academicRecord) {
       const { grades } = academicRecord
       if(!grades.length > 0) {
-        return 'N/A'
+        return null
       }
       const current = grades.reduce((prev, current) => {
         if(!prev) {
@@ -199,7 +239,12 @@ export default {
         return current.pivot.gradingPeriodId > prev.pivot.gradingPeriodId ? current : prev
       }, null)
 
-      return current.pivot.grade
+      return { ...current }
+    },
+    formatAcademicRecords(academicRecords) {
+      return academicRecords.map( academicRecord => {
+        return { ...academicRecord, currentGrade: { ...this.getRecentGrade(academicRecord) } }
+      })
     }
   },
   computed: {
@@ -274,7 +319,7 @@ export default {
   }
 
   .grade-list__cell-grade {
-    width: 60px;
+    width: 75px;
     text-align: center;
     border-left: 1px solid $light-gray-10;
   }
@@ -339,6 +384,21 @@ export default {
     height: 100%;
     background-color: $white;
     opacity: .8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .grade-list__cell-input {
+    width: 100%;
+    text-align: center;
+    // border: 0;
+    // background-color: $light-gray-10;
+  }
+
+  .grade-list__cell-grade {
+    display: flex;
+    padding: 2px 0 2px 4px;
     display: flex;
     align-items: center;
     justify-content: center;
