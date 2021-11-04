@@ -33,6 +33,7 @@
               placeholder="You may add a notes or description"
               :style="{ fontSize: '12px' }"
               v-model="forms.studentGrade.fields.notes"
+              @click.stop="() => false"
             />
           </b-form-group>
         </div>

@@ -46,6 +46,9 @@ export default {
     },
     rejectStudentGrade(id, data) {
       return this.$authHttp.post(`${apiPrefix}/${apiVersion}/student-grades/${id}/reject`, data);
+    },
+    updateStudentGradePeriod(studentGradeId, academicRecordId, gradingPeriodId, data) {
+      return this.$authHttp.put(`${apiPrefix}/${apiVersion}/student-grades/${studentGradeId}/academic-records/${academicRecordId}/grade-periods/${gradingPeriodId}`, data);
     }
   }
 }

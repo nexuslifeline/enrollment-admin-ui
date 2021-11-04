@@ -447,9 +447,7 @@ import {
   BillingTypes,
 } from '../../../helpers/enum';
 import {
-  showNotification,
   formatNumber,
-  clearFields,
   validate,
   reset,
 } from '../../../helpers/forms';

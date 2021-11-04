@@ -65,7 +65,7 @@ export default {
     getAcademicRecordsOfSubjectOfSection(sectionId, subjectId, params) {
       return this.$authHttp.get(`${apiPrefix}/${apiVersion}/sections/${sectionId}/subjects/${subjectId}/academic-records`, { params: params })
     },
-    updateAcacdemicRecordSubjectGrade(sectionId, subjectId, academicRecordId, gradingPeriodId, data){
+    updateAcademicRecordSubjectGrade(sectionId, subjectId, academicRecordId, gradingPeriodId, data){
       return this.$authHttp.put(`${apiPrefix}/${apiVersion}/sections/${sectionId}/subjects/${subjectId}/academic-records/${academicRecordId}/grade-periods/${gradingPeriodId}`
         , data)
     }

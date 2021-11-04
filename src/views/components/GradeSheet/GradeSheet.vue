@@ -252,7 +252,7 @@ export default {
     saveGrade({ gradePeriodId, academicRecordId, rowIndex, grade, academicRecord }) {
       // before the request, make the row busy
       this.busyRow = [rowIndex];
-      this.updateAcacdemicRecordSubjectGrade(this.sectionId, this.subjectId, academicRecordId, gradePeriodId, { grade }).then(({ data }) => {
+      this.updateAcademicRecordSubjectGrade(this.sectionId, this.subjectId, academicRecordId, gradePeriodId, { grade }).then(({ data }) => {
         // academicRecord.studentGrades[0] = data\]
 
         const g = academicRecord.grades.find(g => g.pivot.gradingPeriodId === gradePeriodId && g.subjectId === this.subjectId )
