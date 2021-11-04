@@ -1,48 +1,8 @@
 <template>
   <Panel @onClose="$router.push({ name: 'NewPayment' })" :isBusy="isLoading" showNotes>
-    <!-- <template v-slot:header>
-      <b-badge
-        v-if="$options.EvaluationStatuses.APPROVED.academicRecordStatuses.includes(academicRecordStatusId)"
-        variant="success"
-        class="ml-2">
-        Approved
-      </b-badge>
-      <b-badge
-        v-else-if="$options.EvaluationStatuses.REJECTED.academicRecordStatuses.includes(academicRecordStatusId)"
-        variant="danger"
-        class="ml-2">
-        Rejected
-      </b-badge>
-      <b-badge
-        v-else
-        variant="warning"
-        class="ml-2">
-        Pending
-      </b-badge>
-    </template> -->
-    <!-- <template v-slot:actions>
-      <b-dropdown
-        right
-        variant="link"
-        toggle-class="text-decoration-none"
-        no-caret
-        boundary="window">
-        <template v-slot:button-content>
-          <BIconThreeDots />
-        </template>
-        <b-dropdown-item
-          @click="onAcceptTransferCredit"
-          v-if="isAccessible($options.EvaluationPermissions.ACCEPT_CREDITS.id) && showOptions">
-          Accept Transfer Credit
-        </b-dropdown-item>
-        <b-dropdown-item @click="onApproveRequest" >
-          Approve Request
-        </b-dropdown-item>
-        <b-dropdown-item @click="onRejectionRequest">
-          Reject Request
-        </b-dropdown-item>
-      </b-dropdown>
-    </template> -->
+    <template v-slot:header>
+      <span class="title"> Payment Details </span>
+    </template>
     <template v-slot:content>
       <SlidePanelNotes>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni dolorem corrupti iure rem sit blanditiis eveniet neque eaque perspiciatis porro.
@@ -154,5 +114,11 @@ export default {
     &:hover {
       color: $dark-blue;
     }
+  }
+
+  .title {
+    font-size: 12pt;
+    margin-left: 10px;
+    font-weight: bold;
   }
 </style>

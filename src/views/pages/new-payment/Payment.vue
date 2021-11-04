@@ -10,7 +10,12 @@
     :currentPage.sync="paginations.payment.page"
     @onPageChange="loadPayments"
     @onRefresh="loadPayments"
-    :createButtonVisible="false">
+    :createButtonVisible="false"
+    hasPanel
+    :panelNotificationCount="pendingCount">
+    <template v-slot:panel-content>
+      <PendingPayments :count.sync="pendingCount" @onApproveRejectItem="loadPayments" />
+    </template>
     <template v-slot:filters>
       <b-form-input
         v-model="filters.payment.criteria"
@@ -78,13 +83,15 @@ import { PaymentApi } from '../../../mixins/api';
 import StudentColumn  from '../../components/ColumnDetails/StudentColumn'
 import format from 'date-fns/format'
 import { PaymentStatuses } from '../../../helpers/enum'
+import PendingPayments from '../../components/PendingPayments/PendingPayments'
 export default {
   format,
   PaymentStatuses,
   mixins: [ PaymentApi ],
-  components: { StudentColumn },
+  components: { StudentColumn, PendingPayments },
   data() {
      return {
+        pendingCount: 0,
         sortBy: 'name',
         sortDesc: true,
         tables: {

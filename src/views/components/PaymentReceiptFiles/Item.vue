@@ -24,14 +24,14 @@
 </template>
 
 <script>
-import { PaymentFileApi } from '../../../mixins/api';
+import { PaymentReceiptFileApi } from '../../../mixins/api';
 import { download } from '../../../helpers/utils';
 export default {
   download,
   props: {
     data: [Object]
   },
-  mixins: [PaymentFileApi],
+  mixins: [PaymentReceiptFileApi],
   methods: {
     downloadFile(data) {
       this.getPaymentReceiptFilePreview(data.paymentId, data.id).then((response) => {

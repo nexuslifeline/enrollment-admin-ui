@@ -89,6 +89,7 @@ export default {
       const index = this.data.findIndex(sg => sg.id === paymentId)
       this.data.splice(index, 1)
       this.$emit('update:count', this.count - 1);
+      this.$emit('onApproveRejectItem')
       this.selected = null
     }
   },

@@ -57,7 +57,7 @@ export default {
   outline: none;
   position: absolute;
   left: -30px;
-  top: 85px;
+  top: 200px;
   border: 1px solid $light-gray-10;
   border-right: 0;
   border-top-left-radius: 3px;
