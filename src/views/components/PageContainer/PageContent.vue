@@ -45,6 +45,11 @@
         </div>
       </div>
       <div class="content-list__actions">
+        <div class="breadcumb-container">
+          <Breadcrumb v-if="breadcrumb" :items="breadcrumb"/>
+        </div>
+        <div class="list__fill-bar">
+        </div>
         <button class="list__sub-action" @click="shrink = !shrink">
           <BIconFunnel scale=".9" />
           <span class="list__sub-action-label">
@@ -69,9 +74,6 @@
             Download
           </span>
         </button>
-        <div class="list__fill-bar">
-
-        </div>
         <slot name="actions"></slot>
       </div>
       <div class="content-list__body" :class="{ noPadding: noPaddingBody, noScroll: noScrollBody }">
@@ -120,13 +122,15 @@
 // import RefreshButton from './RefreshButton';
 import RightPanel from './RightPanel';
 import CreateButton from './CreateButton';
+import Breadcrumb from '../Breadcrumb/Breadcrumb'
 
 export default {
   components: {
     // RefreshButton,
     // FilterButton,
     CreateButton,
-    RightPanel
+    RightPanel,
+    Breadcrumb
   },
   data() {
     return {
@@ -217,6 +221,11 @@ export default {
     onPageChange(page) {
       this.$emit('update:currentPage', page);
       this.$emit('onPageChange', page);
+    }
+  },
+  computed: {
+    breadcrumb() {
+      return this.$route?.meta?.crumb || []
     }
   }
 };
@@ -454,5 +463,11 @@ export default {
   align-items: center;
   flex: 1;
   font-size: 13.5px;
+}
+
+.breadcumb-container {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
 }
 </style>

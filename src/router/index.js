@@ -150,12 +150,48 @@ function configRoutes () {
               path: 'evaluation',
               name: 'Evaluation',
               component: Evaluation,
-              meta: { requiresAuth: true },
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Enrollment',
+                    path: '/enrollment'
+                  },
+                  {
+                    text: 'Evaluations',
+                    path: '/enrollment/evaluation'
+                  }
+                ]
+              },
               children: [
                 {
                   path: ':evaluationId/detail',
                   name: 'Evaluation Detail',
-                  component: EvaluationDetail
+                  component: EvaluationDetail,
+                  meta: {
+                    crumb: [
+                      {
+                        text: 'Home',
+                        path: '/'
+                      },
+                      {
+                        text: 'Enrollment',
+                        path: '/enrollment'
+                      },
+                      {
+                        text: 'Evaluation',
+                        path: '/enrollment/evaluation'
+                      },
+                      {
+                        text: 'Detail',
+                        path: '/enrollment/evaluation/:evaluationId/detail'
+                      }
+                    ]
+                  }
                 }
               ]
             },
@@ -163,25 +199,89 @@ function configRoutes () {
               path: 'student-subject-enlisment',
               name: 'Student Subject Enlistment',
               component: Enlistment,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Enrollment',
+                    path: '/enrollment'
+                  },
+                  {
+                    text: 'Enlistments',
+                    path: '/enrollment/student-subject-enlisment'
+                  }
+                ]
+              }
             },
             {
               path: 'student-assessment-fee',
               name: 'Student Assessment Fee',
               component: Assessment,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Enrollment',
+                    path: '/enrollment'
+                  },
+                  {
+                    text: 'Assesments',
+                    path: '/enrollment/student-assessment-fee'
+                  }
+                ]
+              }
             },
             {
               path: 'payment',
               name: 'Payment',
               component: Payment,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Enrollment',
+                    path: '/enrollment'
+                  },
+                  {
+                    text: 'Payments',
+                    path: '/enrollment/payment'
+                  }
+                ]
+              }
             },
             {
               path: 'academic-record-applications',
               name: 'Academic Record Applications',
               component: AcademicRecordApplicationList,
-              meta: { requiresAuth: true },
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Enrollment',
+                    path: '/enrollment'
+                  },
+                  {
+                    text: 'Manual Entry',
+                    path: '/enrollment/academic-record-applications'
+                  }
+                ]
+              },
               children: [
                 {
                   path: ':academicRecordId',
@@ -223,37 +323,136 @@ function configRoutes () {
               path: 'curriculum',
               name: 'Curriculum',
               component: Curriculum,
-              meta: { requiresAuth: true, userType: 1 }
+              meta: {
+                requiresAuth: true,
+                userType: 1,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Registrar',
+                    path: '/registrar'
+                  },
+                  {
+                    text: 'Curriculums',
+                    path: '/registrar/curriculum'
+                  }
+                ]
+              }
             },
             {
               path: 'schedule',
               name: 'Scheduling',
               component: Schedule,
-              meta: { requiresAuth: true, userType: 1 }
+              meta: {
+                requiresAuth: true,
+                userType: 1,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Registrar',
+                    path: '/registrar'
+                  },
+                  {
+                    text: 'Scheduling',
+                    path: '/registrar/schedule'
+                  }
+                ]
+              }
             },
             {
               path: 'section',
               name: 'Section',
               component: Section,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Registrar',
+                    path: '/registrar'
+                  },
+                  {
+                    text: 'Section & Schedule',
+                    path: '/registrar/section'
+                  }
+                ]
+              }
             },
             {
               path: 'subject',
               name: 'Subject',
               component: Subject,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Registrar',
+                    path: '/registrar'
+                  },
+                  {
+                    text: 'Subjects',
+                    path: '/registrar/subject'
+                  }
+                ]
+              }
             },
             {
               path: 'course',
               name: 'Course',
               component: Course,
-              meta: { requiresAuth: true, userType: 1 }
+              meta: {
+                requiresAuth: true,
+                userType: 1,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Registrar',
+                    path: '/registrar'
+                  },
+                  {
+                    text: 'Courses',
+                    path: '/registrar/course'
+                  }
+                ]
+              }
             },
             {
               path: 'academic-transcript',
               name: 'Academic Transript',
               component: TranscriptRecord,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Registrar',
+                    path: '/registrar'
+                  },
+                  {
+                    text: 'Academic Transripts',
+                    path: '/registrar/academic-transcript'
+                  }
+                ]
+              }
             },
             {
               path: 'academic-transcript/:transcriptRecordId',
@@ -272,20 +471,54 @@ function configRoutes () {
         {
           path: 'finance',
           name: 'Finance',
-          redirect: { name: 'Rate Sheet' },
+          redirect: { name: 'Soa' },
           component: { render(c) { return c('router-view') } },
           children: [
             {
               path: 'rate-sheet',
               name: 'Rate Sheet',
               component: RateSheet,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: {
+                requiresAuth: true,
+                userType: 2,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Finance',
+                    path: '/finance'
+                  },
+                  {
+                    text: 'Rate Sheets',
+                    path: '/finance/rate-sheet'
+                  }
+                ]
+              }
             },
             {
               path: 'soa',
               name: 'Soa',
               component: Soa,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: {
+                requiresAuth: true,
+                userType: 2,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Finance',
+                    path: '/finance'
+                  },
+                  {
+                    text: 'Statement of Accounts',
+                    path: '/finance/soa'
+                  }
+                ]
+              }
             },
             {
               path: 'soa/generate',
@@ -303,7 +536,24 @@ function configRoutes () {
               path: 'other-billing',
               name: 'Other Billing',
               component: OtherBilling,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: {
+                requiresAuth: true,
+                userType: 2,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Finance',
+                    path: '/finance'
+                  },
+                  {
+                    text: 'Other Billings',
+                    path: '/finance/other-billing'
+                  }
+                ]
+              }
             },
             {
               path: 'other-billing/generate',
@@ -326,7 +576,24 @@ function configRoutes () {
                   path: '/',
                   name: 'PaymentList',
                   component: PaymentList,
-                  meta: { requiresAuth: true, userType: 0 }
+                  meta: {
+                    requiresAuth: true,
+                    userType: 0,
+                    crumb: [
+                      {
+                        text: 'Home',
+                        path: '/'
+                      },
+                      {
+                        text: 'Finance',
+                        path: '/finance'
+                      },
+                      {
+                        text: 'Payments',
+                        path: '/finance/post-payment'
+                      }
+                    ]
+                  }
                 },
                 {
                   path: 'add',
@@ -341,38 +608,118 @@ function configRoutes () {
         {
           path: 'maintenance',
           name: 'Maintenance',
-          redirect: { name: 'Department' },
+          redirect: { path: '/maintenance/user-group' },
           component: { render(c) { return c('router-view') } },
           children: [
             {
               path: 'clearance-signatories',
               name: 'Signatories',
               component: Clearance,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Signatories',
+                    path: '/maintenance/clearance-signatories'
+                  }
+                ]
+              }
             },
             {
               path: 'grade-symbol',
               name: 'Grade Symbol',
               component: GradeSymbol,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Grade Symbols',
+                    path: '/maintenance/grade-symbol'
+                  }
+                ]
+              }
             },
             {
               path: 'department',
               name: 'Department',
               component: Department,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Departments',
+                    path: '/maintenance/department'
+                  }
+                ]
+              }
             },
             {
               path: 'school-category',
               name: 'School Category',
               component: SchoolCategory,
-              meta: { requiresAuth: true, userType: 0 }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'School Categories',
+                    path: '/maintenance/school-category'
+                  }
+                ]
+              }
             },
             {
               path: 'semester',
               name: 'Semester',
               component: Semester,
-              meta: { requiresAuth: true, userType: 0 }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Semesters',
+                    path: '/maintenance/semester'
+                  }
+                ]
+              }
             },
             {
               path: 'school-year',
@@ -383,7 +730,23 @@ function configRoutes () {
                   path: '/',
                   name: 'School Year',
                   component: SchoolYear,
-                  meta: { requiresAuth: true }
+                  meta: {
+                    requiresAuth: true,
+                    crumb: [
+                      {
+                        text: 'Home',
+                        path: '/'
+                      },
+                      {
+                        text: 'Maintenance',
+                        path: '/maintenance'
+                      },
+                      {
+                        text: 'School Years',
+                        path: '/maintenance/school-year'
+                      }
+                    ]
+                  }
                 },
                 {
                   path: ':id/setup',
@@ -397,31 +760,116 @@ function configRoutes () {
               path: 'school-fee-category',
               name: 'School Fee Category',
               component: SchoolFeeCategory,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: {
+                requiresAuth: true,
+                userType: 2,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'School Fee Categories',
+                    path: '/maintenance/school-fee-category'
+                  }
+                ]
+              }
             },
             {
               path: 'school-fee',
               name: 'School Fee',
               component: SchoolFee,
-              meta: { requiresAuth: true, userType: 2 }
+              meta: {
+                requiresAuth: true,
+                userType: 2,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'School Fees',
+                    path: '/maintenance/school-fee'
+                  }
+                ]
+              }
             },
             {
               path: 'bank-account',
               name: 'Bank Account',
               component: BankAccount,
-              meta: { requiresAuth: true, userType: 0 }
+              meta: {
+                requiresAuth: true,
+                userType: 0,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Bank Accounts',
+                    path: '/maintenance/bank-account'
+                  }
+                ]
+              }
             },
             {
               path: 'pera-padala-account',
               name: 'Pera Padala Account',
               component: PeraPadalaAccount,
-              meta: { requiresAuth: true, userType: 0 }
+              meta: {
+                requiresAuth: true,
+                userType: 0,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Pera Padala Accounts',
+                    path: '/maintenance/pera-padala-account'
+                  }
+                ]
+              }
             },
             {
               path: 'e-wallet-account',
               name: 'E Wallet Account',
               component: EWalletAccount,
-              meta: { requiresAuth: true, userType: 0 }
+              meta: {
+                requiresAuth: true,
+                userType: 0,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'E Wallet Accounts',
+                    path: '/maintenance/e-wallet-account'
+                  }
+                ]
+              }
             },
             {
               path: 'user-group',
@@ -462,33 +910,98 @@ function configRoutes () {
               path: 'document-type',
               name: 'Document Type',
               component: DocumentType,
-              meta: { requiresAuth: true, userType: 0 }
+              meta: {
+                requiresAuth: true,
+                userType: 0,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Maintenance',
+                    path: '/maintenance'
+                  },
+                  {
+                    text: 'Document Types',
+                    path: '/maintenance/document-type'
+                  }
+                ]
+              }
             },
           ]
         },
         {
           path: 'instructor',
           name: 'Instructor',
-          redirect: { name: 'Student List' },
+          redirect: { name: 'Clearance' },
           component: { render(c) { return c('router-view') } },
           children: [
             {
               path: 'grade-sheet',
               name: 'Grade Sheet',
               component: StudentGrade,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Instructor',
+                    path: '/instructor'
+                  },
+                  {
+                    text: 'Grade Sheets',
+                    path: '/instructor/grade-sheet'
+                  }
+                ]
+              }
             },
             {
               path: 'clearance',
               name: 'Clearance',
               component: ClearanceClearing,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Instructor',
+                    path: '/instructor'
+                  },
+                  {
+                    text: 'Clearances',
+                    path: '/instructor/clearance'
+                  }
+                ]
+              }
             },
             {
               path: 'dropped-student',
               name: 'Drop Student',
               component: DroppedStudent,
-              meta: { requiresAuth: true }
+              meta: {
+                requiresAuth: true,
+                crumb: [
+                  {
+                    text: 'Home',
+                    path: '/'
+                  },
+                  {
+                    text: 'Instructor',
+                    path: '/instructor'
+                  },
+                  {
+                    text: 'Drop Students',
+                    path: '/instructor/dropped-student'
+                  }
+                ]
+              }
             },
           ]
         },
@@ -507,19 +1020,76 @@ function configRoutes () {
                   path: '/',
                   name: 'Member List',
                   component: Member,
-                  meta: { requiresAuth: true, userType: 0 },
+                  meta: {
+                    requiresAuth: true,
+                    userType: 0,
+                    crumb: [
+                      {
+                        text: 'Home',
+                        path: '/'
+                      },
+                      {
+                        text: 'Master Files',
+                        path: '/master-files'
+                      },
+                      {
+                        text: 'Members',
+                        path: '/master-files/member'
+                      }
+                    ]
+                  },
                   children: [
                     {
                       path: 'account/:personnelId/change-username',
                       name: 'List Change Member Username',
                       component: ChangeUsername,
-                      meta: { requiresAuth: true }
+                      meta: {
+                        requiresAuth: true,
+                        crumb: [
+                          {
+                            text: 'Home',
+                            path: '/'
+                          },
+                          {
+                            text: 'Master Files',
+                            path: '/master-files'
+                          },
+                          {
+                            text: 'Members',
+                            path: '/master-files/member'
+                          },
+                          {
+                            text: 'Change Username',
+                            path: '/master-files/member/account/:personnelId/change-username'
+                          }
+                        ]
+                      }
                     },
                     {
                       path: 'account/:personnelId/change-password',
                       name: 'List Change Member Password',
                       component: ChangePassword,
-                      meta: { requiresAuth: true }
+                      meta: {
+                        requiresAuth: true,
+                        crumb: [
+                          {
+                            text: 'Home',
+                            path: '/'
+                          },
+                          {
+                            text: 'Master Files',
+                            path: '/master-files'
+                          },
+                          {
+                            text: 'Members',
+                            path: '/master-files/member'
+                          },
+                          {
+                            text: 'Change Password',
+                            path: '/master-files/member/account/:personnelId/change-password'
+                          }
+                        ]
+                      }
                     },
                   ]
                 },
@@ -559,19 +1129,76 @@ function configRoutes () {
                   path: '/',
                   name: 'Student List',
                   component: StudentList,
-                  meta: { requiresAuth: true, userType: 0 },
+                  meta: {
+                    requiresAuth: true,
+                    userType: 0,
+                    crumb: [
+                      {
+                        text: 'Home',
+                        path: '/'
+                      },
+                      {
+                        text: 'Master Files',
+                        path: '/master-files'
+                      },
+                      {
+                        text: 'Students',
+                        path: '/master-files/student'
+                      }
+                    ]
+                  },
                   children: [
                     {
                       path: 'account/:studentId/change-username',
                       name: 'List Change Student Username',
                       component: ChangeUsername,
-                      meta: { requiresAuth: true }
+                      meta: {
+                        requiresAuth: true,
+                        crumb: [
+                          {
+                            text: 'Home',
+                            path: '/'
+                          },
+                          {
+                            text: 'Master Files',
+                            path: '/master-files'
+                          },
+                          {
+                            text: 'Students',
+                            path: '/master-files/student'
+                          },
+                          {
+                            text: 'Change Username',
+                            path: '/master-files/student/account/:studentId/change-username'
+                          }
+                        ]
+                      }
                     },
                     {
                       path: 'account/:studentId/change-password',
                       name: 'List Change Student Password',
                       component: ChangePassword,
-                      meta: { requiresAuth: true }
+                      meta: {
+                        requiresAuth: true,
+                        crumb: [
+                          {
+                            text: 'Home',
+                            path: '/'
+                          },
+                          {
+                            text: 'Master Files',
+                            path: '/master-files'
+                          },
+                          {
+                            text: 'Students',
+                            path: '/master-files/student'
+                          },
+                          {
+                            text: 'Change Password',
+                            path: '/master-files/student/account/:studentId/change-password'
+                          }
+                        ]
+                      }
                     },
                   ]
                 },

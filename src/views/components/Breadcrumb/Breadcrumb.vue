@@ -20,7 +20,6 @@ export default {
       if(index === this.items.length - 1) {
         return
       }
-
       this.$router.push(item.path)
     }
   }
