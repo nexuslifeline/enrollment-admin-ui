@@ -1,5 +1,5 @@
 <template>
-  <div class="pending-grades__item" @click="$emit('onSelect', data)">
+  <div class="pending-grades__item" >
     <div class="item__overlay"  v-if="isProcessing" >
       <BSpinner />
     </div>
@@ -112,7 +112,7 @@
         :data="data.students"
       />
     </div>
-    <div class="pending-grades__other-actions">
+    <div class="pending-grades__other-actions" @click="$emit('onSelect', data)">
       <button class="pending-grades__action-view">
         <BIconChevronRight />
       </button>
